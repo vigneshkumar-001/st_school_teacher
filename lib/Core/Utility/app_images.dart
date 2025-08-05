@@ -16,5 +16,7 @@ class AppImages {
   static String tick = 'asset/Images/tick.png';
   static String bcImage = 'asset/Images/BcImage.png';
   static String doubleArrow = 'asset/Images/2ArrowbuttonImage.png';
-
+  static String afternoon = 'asset/Images/Afternoon.png';
+  static String morning = 'asset/Images/Morning.png';
+  static String sportsDay = 'asset/Images/Sports Day.png';
 }

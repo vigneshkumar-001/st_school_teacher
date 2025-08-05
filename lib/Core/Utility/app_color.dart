@@ -12,4 +12,9 @@ class AppColor {
   static const  red = Color(0xffF5465C);
   static const  green = Color(0xff1BB35A);
   static const  borderGary = Color(0xffC8C8C8);
+  static const  yellow = Color(0xffFFAE00);
+  static const orange = Color(0xffFF9B0F);
+  static const averageG1Green = Color(0xff43DD5F);
+  static const averageG2Yellow = Color(0xffF6AD25);
+  static const averageG3Red = Color(0xffFF3C3C);
 }

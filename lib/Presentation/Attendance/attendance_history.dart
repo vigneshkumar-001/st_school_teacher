@@ -75,8 +75,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
   }
 
   void scrollToSelectedDate() {
-    final dates = getFullMonthDates(currentMonth);
-    final index = dates.indexWhere((item) {
+    final index = getFullMonthDates(currentMonth).indexWhere((item) {
       final date = item['fullDate'] as DateTime;
       return selectedDate.day == date.day &&
           selectedDate.month == date.month &&
@@ -84,11 +83,15 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
     });
 
     if (index != -1) {
-      final double itemWidth = 57;
-      double scrollOffset = (index * itemWidth) - 100;
-      if (scrollOffset < 0) scrollOffset = 0;
+      final itemWidth = 52.0;
+      final screenWidth = MediaQuery.of(context).size.width;
+      final offset = (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
 
-      _scrollController.jumpTo(scrollOffset);
+      _scrollController.animateTo(
+        offset < 0 ? 0 : offset,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
@@ -190,11 +193,23 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                   ),
                   child: Stack(
                     children: [
-                      Image.asset(
-                        AppImages.bcImage,
-                        height: 220,
-
-                        fit: BoxFit.cover,
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              AppImages.bcImage,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            ),
+                            Image.asset(
+                              AppImages.bcImage,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            ),
+                          ],
+                        ),
                       ),
                       Positioned.fill(
                         child: Padding(
@@ -217,7 +232,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
-                                              DateFormat.yMMMMd().format(
+                                              DateFormat.MMMM().format(
                                                 selectedDate,
                                               ),
                                               style: GoogleFont.ibmPlexSans(
@@ -230,6 +245,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                             Icon(
                                               Icons.keyboard_arrow_down,
                                               color: AppColor.white,
+                                              size: 30,
                                             ),
                                           ],
                                         ),
@@ -239,7 +255,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                 ),
                                 SizedBox(height: 20),
                                 SizedBox(
-                                  height: 90,
+                                  height: 85,
                                   child: ListView.builder(
                                     controller: _scrollController,
                                     scrollDirection: Axis.horizontal,
@@ -264,7 +280,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                           });
                                         },
                                         child: Container(
-                                          width: 48,
+                                          width: 47,
                                           decoration:
                                               isSelected
                                                   ? BoxDecoration(
@@ -390,9 +406,11 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                   horizontal: 6.5,
                                 ),
                                 child: GestureDetector(
-                                  onTap:
-                                      () =>
-                                          setState(() => selectedIndex = index),
+                                  onTap: () {
+                                    setState(() {
+                                      scrollToSelectedDate();
+                                    });
+                                  },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16.5,

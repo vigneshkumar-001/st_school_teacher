@@ -189,4 +189,116 @@ class CommonContainer {
       ),
     );
   }
+
+  static announcementsScreen({
+    required String mainText,
+    required String backRoundImage,
+    required String additionalText1,
+    required String additionalText2,
+    required String additionalText3,
+    required String additionalText4,
+    VoidCallback? onDetailsTap,
+    IconData? iconData,
+    double verticalPadding = 9,
+    Color? gradientStartColor,
+    Color? gradientEndColor,
+  }) {
+    return InkWell(
+      onTap: onDetailsTap,
+      child: Stack(
+        children: [
+          Image.asset(backRoundImage),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    gradientStartColor ?? AppColor.black.withOpacity(0.01),
+                    gradientEndColor ?? AppColor.black,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(22),
+                  bottomRight: Radius.circular(22),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 25,
+                  vertical: verticalPadding,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          mainText,
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.white,
+                          ),
+                        ),
+                        Spacer(),
+                        Icon(iconData, size: 22, color: AppColor.white),
+                        SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (additionalText1 != '')
+                              Text(
+                                additionalText1,
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 12,
+                                  color: AppColor.lightgray,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  additionalText2,
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    color: AppColor.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  additionalText3,
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    color: AppColor.white,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  additionalText4,
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    color: AppColor.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
