@@ -7,6 +7,7 @@ import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
+import '../Homework/homework_create.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -94,6 +95,12 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 SizedBox(height: 20),
                 CommonContainer.Menu_Students(
+                  Start: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeworkCreate()),
+                    );
+                  },
                   onIconTap: () {},
                   mainText: 'Homework',
                   subText: 'Create',
