@@ -9,7 +9,7 @@ class GoogleFont {
     double? height = 1.5,
     FontWeight? fontWeight,
     letterSpacing,
-    Color? color,
+    Color? color,  Paint? foreground,
   }) {
     return GoogleFonts.ibmPlexSans(
       fontSize: fontSize,

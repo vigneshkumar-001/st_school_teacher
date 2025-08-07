@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:st_teacher_app/Core/Utility/app_color.dart';
 
+import 'Presentation/Home/home.dart';
 import 'Presentation/Menu/menu_screen.dart';
 
 void main() {
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(scaffoldBackgroundColor: AppColor.white),
       debugShowCheckedModeBanner: false,
-      home: MenuScreen(),
+      home: Home(),
     );
   }
 }

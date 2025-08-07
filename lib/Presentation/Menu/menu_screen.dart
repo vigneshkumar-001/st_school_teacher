@@ -55,7 +55,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(11.0),
                         child: InkWell(
-                          onTap: () {},
+                          onTap: () => Navigator.pop(context),
                           child: Image.asset(AppImages.close, height: 23.2),
                         ),
                       ),

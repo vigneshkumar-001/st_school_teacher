@@ -17,4 +17,10 @@ class AppColor {
   static const averageG1Green = Color(0xff43DD5F);
   static const averageG2Yellow = Color(0xffF6AD25);
   static const averageG3Red = Color(0xffFF3C3C);
+  static const blueG1 = Color(0xff2FAFFF);
+  static const lightWhite = Color(0xffF2F2F2);
+  static const lightBlueC1 = Color(0xffEDF8FF);
+  static const lowLightYellow = Color(0xffFFF5E8);
+  static const lowLightNavi = Color(0xffF4F7FF);
+  static const lowLightPink = Color(0xffFFF2F0);
 }

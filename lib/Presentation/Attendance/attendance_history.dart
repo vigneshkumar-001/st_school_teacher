@@ -408,7 +408,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      scrollToSelectedDate();
+                                      selectedIndex = index;
                                     });
                                   },
                                   child: Container(
