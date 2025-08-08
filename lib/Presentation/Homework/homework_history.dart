@@ -166,13 +166,13 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                               ),
                               child: SizedBox(
                                 height: 40,
-                                child:
-                                ListView.builder(
+                                child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
-                                  itemCount: selectedClassName.length,
+                                  itemCount: className.length,
                                   itemBuilder: (context, index) {
-                                    final name = selectedClassName[index];
-                                    final isSelected = selectedClassName == name;
+                                    final name = className[index];
+                                    final isSelected =
+                                        selectedClassName == name;
 
                                     return GestureDetector(
                                       onTap: () {
@@ -181,22 +181,39 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                         });
                                       },
                                       child: Container(
-                                        margin: const EdgeInsets.only(right: 12),
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        margin: const EdgeInsets.only(
+                                          right: 12,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
                                         decoration: BoxDecoration(
-                                          color: isSelected ? AppColor.black : AppColor.white,
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(color: AppColor.gray),
+                                          color:
+                                              isSelected
+                                                  ? AppColor.white
+                                                  : AppColor.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          border: Border.all(
+                                            color:
+                                                isSelected
+                                                    ? AppColor.blue
+                                                    : AppColor.borderGary,
+                                          ),
                                         ),
                                         alignment: Alignment.center,
                                         child: buildClassNameRichText(
                                           name,
-                                          isSelected ? AppColor.white : AppColor.black,
+                                          isSelected
+                                              ? AppColor.blue
+                                              : AppColor.gray,
                                         ),
                                       ),
                                     );
                                   },
-                                )
+                                ),
                               ),
                             ),
 
@@ -282,7 +299,6 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
 }
 
 Widget buildClassNameRichText(String name, Color color) {
-  // Handle "All" case
   if (name.trim().toLowerCase() == 'all') {
     return Text(
       'All',
@@ -294,11 +310,10 @@ Widget buildClassNameRichText(String name, Color color) {
     );
   }
 
-  // Split by space (e.g., '7th C' → ['7th', 'C'])
   final parts = name.trim().split(' ');
   if (parts.length == 2) {
-    final grade = parts[0]; // e.g., '7th'
-    final section = parts[1]; // e.g., 'C'
+    final grade = parts[0];
+    final section = parts[1];
 
     final numberPart = RegExp(r'\d+').stringMatch(grade) ?? '';
     final suffixPart = grade.replaceFirst(numberPart, '');
@@ -343,4 +358,3 @@ Widget buildClassNameRichText(String name, Color color) {
     ),
   );
 }
-

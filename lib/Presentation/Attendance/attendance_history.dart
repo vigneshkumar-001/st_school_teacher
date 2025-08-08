@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../Core/Utility/google_fonts.dart';
 import 'attendance_history_student.dart';
+import 'attendance_start.dart';
 
 class AttendanceHistory extends StatefulWidget {
   const AttendanceHistory({super.key});
@@ -458,7 +459,9 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           ),
                           CommonContainer.StudentsList(
                             mainText: 'Juliya',
-                            onIconTap: () {},
+                            onIconTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => AttendanceHistoryStudent()));
+                            },
                           ),
                           CommonContainer.StudentsList(
                             mainText: 'Marie',
@@ -530,7 +533,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AttendanceHistoryStudent(),
+                          builder: (context) => AttendanceStart(),
                         ),
                       );
                     },

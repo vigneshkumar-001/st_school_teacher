@@ -27,14 +27,16 @@ class _AttendanceHistoryStudentDateState
     selectedMonth = DateTime(
       widget.selectedDate.year,
       widget.selectedDate.month,
+      widget.selectedDate.day,
     );
   }
 
   void goToPreviousMonth() {
     setState(() {
       selectedMonth = DateTime(
-        selectedMonth.month == 1 ? selectedMonth.year - 1 : selectedMonth.year,
-        selectedMonth.month == 1 ? 12 : selectedMonth.month - 1,
+        selectedMonth.year,
+        selectedMonth.month - 1,
+        selectedMonth.day,
       );
     });
   }
@@ -42,8 +44,9 @@ class _AttendanceHistoryStudentDateState
   void goToNextMonth() {
     setState(() {
       selectedMonth = DateTime(
-        selectedMonth.month == 12 ? selectedMonth.year + 1 : selectedMonth.year,
-        selectedMonth.month == 12 ? 1 : selectedMonth.month + 1,
+        selectedMonth.year,
+        selectedMonth.month + 1,
+        selectedMonth.day,
       );
     });
   }
@@ -121,37 +124,43 @@ class _AttendanceHistoryStudentDateState
                   color: AppColor.white,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: Icon(CupertinoIcons.left_chevron),
-                          onPressed: goToPreviousMonth,
-                        ),
-                        Text(
-                          DateFormat('MMMM yyyy').format(selectedMonth),
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 30,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Icon(CupertinoIcons.left_chevron),
+                            onPressed: goToPreviousMonth,
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(CupertinoIcons.right_chevron),
-                          onPressed: goToNextMonth,
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColor.lowLightgray),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(15),
+                          Spacer(),
+                          Text(
+                            DateFormat('dd MMMM').format(selectedMonth),
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Spacer(),
+                          IconButton(
+                            icon: Icon(CupertinoIcons.right_chevron),
+                            onPressed: goToNextMonth,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 38),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColor.lowLightgray),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -204,124 +213,124 @@ class _AttendanceHistoryStudentDateState
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    CommonContainer.announcementsScreen(
-                      additionalText2: '3Pm ',
-                      additionalText3: 'to ',
-                      additionalText4: '5Pm',
-                      mainText: 'Sports Day',
-                      backRoundImage: AppImages.sportsDay,
-                      iconData: CupertinoIcons.clock_fill,
-                      additionalText1: '',
+                      SizedBox(height: 20),
+                      CommonContainer.announcementsScreen(
+                        additionalText2: '3Pm ',
+                        additionalText3: 'to ',
+                        additionalText4: '5Pm',
+                        mainText: 'Sports Day',
+                        backRoundImage: AppImages.sportsDay,
+                        iconData: CupertinoIcons.clock_fill,
+                        additionalText1: '',
 
-                      verticalPadding: 12,
-                      gradientStartColor: AppColor.black.withOpacity(0.1),
-                      gradientEndColor: AppColor.black,
-                    ),
-                    SizedBox(height: 38),
-                    Row(
-                      children: [
-                        Text(
-                          'July Overall Attendance ',
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.black,
-                          ),
-                        ),
-
-                        Spacer(),
-                        Text(
-                          'Average',
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.orange,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 15),
-
-                    Stack(
-                      alignment: Alignment.centerLeft,
-                      children: [
-                        Container(
-                          height: 30,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColor.lightgray,
-                                AppColor.lowLightgray.withOpacity(0.2),
-                                AppColor.lowLightgray.withOpacity(0.2),
-                                AppColor.lightgray,
-                              ],
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomRight,
+                        verticalPadding: 12,
+                        gradientStartColor: AppColor.black.withOpacity(0.1),
+                        gradientEndColor: AppColor.black,
+                      ),
+                      SizedBox(height: 38),
+                      Row(
+                        children: [
+                          Text(
+                            'July Overall Attendance ',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColor.black,
                             ),
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColor.black.withOpacity(0.1),
-                                blurRadius: 9,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
                           ),
-                        ),
 
-                        Container(
-                          height: 30,
-                          width: progressWidth,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColor.averageG3Red,
-                                AppColor.averageG2Yellow,
-                                AppColor.averageG1Green,
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
+                          Spacer(),
+                          Text(
+                            'Average',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.orange,
                             ),
-                            borderRadius: BorderRadius.circular(30),
                           ),
-                        ),
+                        ],
+                      ),
+                      SizedBox(height: 15),
 
-                        Positioned(
-                          left: progressWidth - 25,
-                          top: 3,
-                          child: Container(
-                            width: 12,
-                            height: 24,
+                      Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          Container(
+                            height: 30,
+                            width: double.infinity,
                             decoration: BoxDecoration(
-                              color: AppColor.white,
-                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColor.lightgray,
+                                  AppColor.lowLightgray.withOpacity(0.2),
+                                  AppColor.lowLightgray.withOpacity(0.2),
+                                  AppColor.lightgray,
+                                ],
+                                begin: Alignment.topRight,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
+                                  color: AppColor.black.withOpacity(0.1),
+                                  blurRadius: 9,
+                                  offset: Offset(0, 2),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
 
-                    SizedBox(height: 12),
+                          Container(
+                            height: 30,
+                            width: progressWidth,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColor.averageG3Red,
+                                  AppColor.averageG2Yellow,
+                                  AppColor.averageG1Green,
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
 
-                    Text(
-                      "$current Out of $total",
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppColor.gray,
+                          Positioned(
+                            left: progressWidth - 25,
+                            top: 3,
+                            child: Container(
+                              width: 12,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: AppColor.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+
+                      SizedBox(height: 15),
+
+                      Text(
+                        "$current Out of $total",
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColor.gray,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 27),

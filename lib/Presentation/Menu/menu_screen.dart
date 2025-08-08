@@ -8,6 +8,7 @@ import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
 import '../Homework/homework_create.dart';
+import '../Quiz Screen/quiz_screen_create.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -109,6 +110,14 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 SizedBox(height: 20),
                 CommonContainer.Menu_Students(
+                  Start: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QuizScreenCreate(),
+                      ),
+                    );
+                  },
                   onIconTap: () {},
                   mainText: 'Quiz',
                   subText: 'Create',
@@ -132,13 +141,13 @@ class _MenuScreenState extends State<MenuScreen> {
                   addButton: true,
                 ),
                 SizedBox(height: 20),
-                CommonContainer.Menu_Students(
-                  onIconTap: () {},
-                  mainText: 'Events',
-                  subText: '',
-                  image: AppImages.Events,
-                  addButton: false,
-                ),
+                // CommonContainer.Menu_Students(
+                //   onIconTap: () {},
+                //   mainText: 'Events',
+                //   subText: '',
+                //   image: AppImages.Events,
+                //   addButton: false,
+                // ),
                 SizedBox(height: 35),
                 Text(
                   'Students',
@@ -150,26 +159,29 @@ class _MenuScreenState extends State<MenuScreen> {
                 SizedBox(height: 15),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      CommonContainer.menuScrollContainer(
-                        onIconTap: () {},
-                        mainText: 'My\nAttendance',
-                        image: AppImages.myAttendance,
-                      ),
-                      SizedBox(width: 20),
-                      CommonContainer.menuScrollContainer(
-                        onIconTap: () {},
-                        mainText: 'Assigned\nClasses',
-                        image: AppImages.assignedClasses,
-                      ),
-                      SizedBox(width: 20),
-                      CommonContainer.menuScrollContainer(
-                        onIconTap: () {},
-                        mainText: 'My\nProfile',
-                        image: AppImages.myProfile,
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                    child: Row(
+                      children: [
+                        CommonContainer.menuScrollContainer(
+                          onIconTap: () {},
+                          mainText: 'My\nAttendance',
+                          image: AppImages.myAttendance,
+                        ),
+                        // SizedBox(width: 20),
+                        // CommonContainer.menuScrollContainer(
+                        //   onIconTap: () {},
+                        //   mainText: 'Assigned\nClasses',
+                        //   image: AppImages.assignedClasses,
+                        // ),
+                        SizedBox(width: 30),
+                        CommonContainer.menuScrollContainer(
+                          onIconTap: () {},
+                          mainText: 'My\nProfile',
+                          image: AppImages.myProfile,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

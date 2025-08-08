@@ -8,11 +8,11 @@ class AppColor {
   static const lowLightgray = Color(0xffF5F5F5);
   static const lightgray = Color(0xffACACAC);
   static const gray = Color(0xff777777);
-  static const  black = Color(0xff000000);
-  static const  red = Color(0xffF5465C);
-  static const  green = Color(0xff1BB35A);
-  static const  borderGary = Color(0xffC8C8C8);
-  static const  yellow = Color(0xffFFAE00);
+  static const black = Color(0xff000000);
+  static const red = Color(0xffF5465C);
+  static const green = Color(0xff1BB35A);
+  static const borderGary = Color(0xffC8C8C8);
+  static const yellow = Color(0xffFFAE00);
   static const orange = Color(0xffFF9B0F);
   static const averageG1Green = Color(0xff43DD5F);
   static const averageG2Yellow = Color(0xffF6AD25);
@@ -23,4 +23,15 @@ class AppColor {
   static const lowLightYellow = Color(0xffFFF5E8);
   static const lowLightNavi = Color(0xffF4F7FF);
   static const lowLightPink = Color(0xffFFF2F0);
+  static const greenG1 = Color(0xff4ED382);
+  static const greenG2 = Color(0xff42C287);
+  static const greenG3 = Color(0xffDBFFEF);
+  static const bluehG1 = Color(0xff5BC9FE);
+  static const bluehG2 = Color(0xff309FD4);
+  static const orangeG1 = Color(0xffFBBF30);
+  static const orangeG2 = Color(0xffD96A1B);
+  static const lowlightgreen = Color(0xffE8FCF1);
+  static const lightgreen = Color(0xff3AD87C);
+  static const splash = Color(0xffF3FAFF);
+  static const weAreColor = Color(0xffF2F9FF);
 }

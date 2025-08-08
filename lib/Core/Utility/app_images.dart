@@ -24,10 +24,21 @@ class AppImages {
   static String paragraph = 'asset/Images/Paragraph.png';
   static String picherImageDark = 'asset/Images/picherImageDark.png';
   static String uploadImage = 'asset/Images/UploadImage.png';
-  static String homeworkPreviewImage1 = 'asset/Images/Homework_Preview_Image1.png';
-  static String homeworkPreviewImage2 = 'asset/Images/Homework_Preview_Image2.png';
+  static String homeworkPreviewImage1 =
+      'asset/Images/Homework_Preview_Image1.png';
+  static String homeworkPreviewImage2 =
+      'asset/Images/Homework_Preview_Image2.png';
   static String avatar1 = 'asset/Images/avatar1.png';
   static String schoolLogo = 'asset/Images/SchoolLogo.png';
   static String homescreenBcImage = 'asset/Images/HomescreenBcImage.png';
   static String menuImage = 'asset/Images/MenuImage.png';
+  static String scheduleExam = 'asset/Images/ScheduleExam.png';
+  static String splashBackImage1 = 'asset/Images/splashBackImage1.png';
+  static String splashBackImage2 = 'asset/Images/splashBackImage1.png';
+  static String schoolLogo1 = 'asset/Images/schoolLogo1.png';
+  static String advertisement1 = 'asset/Images/advertisement1.png';
+  static String advertisement2 = 'asset/Images/advertisement2.png';
+  static String advertisement3 = 'asset/Images/advertisement3.png';
+  static String advertisement4 = 'asset/Images/advertisement4.png';
+  static String clock = 'asset/Images/Clock.png';
 }

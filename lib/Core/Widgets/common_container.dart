@@ -331,6 +331,7 @@ class CommonContainer {
     bool? hasError = false,
     FocusNode? focusNode,
     Color borderColor = AppColor.red,
+    Color? imageColor,
   }) {
     DateTime today = DateTime.now();
 
@@ -503,7 +504,7 @@ class CommonContainer {
                         imagePath,
                         height: imageSize,
                         width: imageSize,
-                        color: AppColor.gray,
+                        color: imageColor,
                       ),
                     ),
                   ),
@@ -745,4 +746,100 @@ class CommonContainer {
       ),
     );
   }
+
+  static carouselSlider({
+    required String mainText1,
+    required String mainText2,
+    required String iconImage,
+    required String bcImage,
+    Gradient? gradient,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Stack(
+        children: [
+          Image.asset(bcImage, height: 249, width: 187),
+          Positioned(
+            child: Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: Text(
+                      mainText1,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Flexible(
+                    child: Text(
+                      mainText2,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                   Spacer(),
+                  Align(
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      height: 80,
+                      width: 80,
+                      child: Image.asset(iconImage, fit: BoxFit.contain),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static checkMark({required VoidCallback onTap, String? imagePath}) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ),
+          elevation: MaterialStateProperty.all(0),
+          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColor.blueG1, AppColor.blue],
+                begin: Alignment.topRight,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(17.0),
+              child: Image.asset(imagePath ?? '', height: 20, width: 20),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
 }
