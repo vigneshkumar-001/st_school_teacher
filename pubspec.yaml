@@ -48,6 +48,12 @@ dependencies:
   url_launcher: any
   flutter_map: ^6.1.0
   latlong2: ^0.9.0
+  shared_preferences: any
+  dio: any
+  get: any
+  get_it: any
+  equatable: any
+  dartz: any
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:st_teacher_app/Core/Utility/app_color.dart';
 import 'package:st_teacher_app/Core/Utility/app_images.dart';
 import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_controller.dart';
 
 import '../../Core/Utility/google_fonts.dart';
 import 'attendance_history_student.dart';
@@ -18,6 +19,8 @@ class AttendanceHistory extends StatefulWidget {
 
 class _AttendanceHistoryState extends State<AttendanceHistory> {
   TextEditingController searchController = TextEditingController();
+
+
   String _searchText = '';
 
   @override
@@ -77,6 +80,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
     monthDates = getFullMonthDates(currentMonth);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToSelectedDate();
+
     });
   }
 
@@ -135,6 +139,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
         child: SingleChildScrollView(
+
           child: Column(
             children: [
               Padding(
@@ -153,6 +158,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                       child: RichText(
                         text: TextSpan(
                           text: '7',
+
                           style: GoogleFont.ibmPlexSans(
                             fontSize: 14,
                             color: AppColor.gray,
@@ -636,10 +642,117 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                     ),
                                   ],
                                 ),
+
+                              );
+                            }),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        if (selectedIndex == 0) ...[
+                          CommonContainer.StudentsList(
+                            mainText: 'Kanjana',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Juliya',
+                            onIconTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => AttendanceHistoryStudent(),
+                                ),
+                              );
+                            },
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Marie',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Christiana',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Christiana',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Olivia',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Stella',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Marie',
+                            onIconTap: () {},
+                          ),
+                        ] else if (selectedIndex == 1) ...[
+                          CommonContainer.StudentsList(
+                            mainText: 'Marie',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Christiana',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Olivia',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Stella',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Marie',
+                            onIconTap: () {},
+                          ),
+                        ] else if (selectedIndex == 2) ...[
+                          CommonContainer.StudentsList(
+                            mainText: 'Olivia',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Stella',
+                            onIconTap: () {},
+                          ),
+                          CommonContainer.StudentsList(
+                            mainText: 'Marie',
+                            onIconTap: () {},
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 27),
+                Center(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AttendanceStart(),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColor.blue, width: 1.5),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 60,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+
                               ),
                             ),
                           );
                         }),
+
                       ),
                     ),
                   ],
