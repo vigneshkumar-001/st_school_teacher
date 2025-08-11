@@ -1,14 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:st_teacher_app/Core/Utility/app_color.dart';
 import 'package:st_teacher_app/Core/Utility/app_images.dart';
+import 'package:st_teacher_app/Core/Utility/app_loader.dart';
 import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 import 'package:intl/intl.dart';
-import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_controller.dart';
+import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_history_controller.dart';
+import 'package:st_teacher_app/Presentation/Attendance/model/attendance_history_response.dart';
 
 import '../../Core/Utility/google_fonts.dart';
 import 'attendance_history_student.dart';
 import 'attendance_start.dart';
+import 'controller/attendance_controller.dart';
 
 class AttendanceHistory extends StatefulWidget {
   const AttendanceHistory({super.key});
@@ -19,20 +23,25 @@ class AttendanceHistory extends StatefulWidget {
 
 class _AttendanceHistoryState extends State<AttendanceHistory> {
   TextEditingController searchController = TextEditingController();
-
-
   String _searchText = '';
-
+  final AttendanceController attendanceController = Get.put(
+    AttendanceController(),
+  );
+  final AttendanceHistoryController attendanceHistoryController = Get.put(
+    AttendanceHistoryController(),
+  );
   @override
   void dispose() {
     searchController.dispose();
     super.dispose();
   }
+
   int subjectIndex = 0;
 
   final List<Map<String, dynamic>> tab = [
-  {"label": "7th C"},
-{"label": "11th C1"},];
+    {"label": "7th C"},
+    {"label": "11th C1"},
+  ];
 
   int selectedIndex = 0;
 
@@ -79,9 +88,33 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
     _scrollController = ScrollController();
     monthDates = getFullMonthDates(currentMonth);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadAttendance();
       scrollToSelectedDate();
-
     });
+  }
+
+  AttendanceHistoryData? attendanceData;
+
+  void loadAttendance() async {
+    final data = await attendanceHistoryController.fetchAttendance(
+      selectedDate,
+      38,
+      showLoader: true,
+    );
+    if (data != null) {
+      setState(() {
+        attendanceData = data;
+
+        tabs[0]['count'] = data.fullPresentCount;
+        tabs[1]['count'] = data.fullAbsentCount;
+        tabs[2]['count'] = data.morningAbsentCount;
+
+        // If you want to update student lists, you can map them:
+        // Example for present students:
+        // presentStudents = data.fullPresentStudents.map((e) => {'name': e.name, 'id': e.id}).toList();
+        // similarly for others...
+      });
+    }
   }
 
   void scrollToSelectedDate() {
@@ -139,11 +172,13 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
         child: SingleChildScrollView(
-
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 18,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -158,7 +193,6 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                       child: RichText(
                         text: TextSpan(
                           text: '7',
-
                           style: GoogleFont.ibmPlexSans(
                             fontSize: 14,
                             color: AppColor.gray,
@@ -274,25 +308,31 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                         controller: _scrollController,
                                         scrollDirection: Axis.horizontal,
                                         itemCount:
-                                            getFullMonthDates(currentMonth).length,
+                                            getFullMonthDates(
+                                              currentMonth,
+                                            ).length,
                                         itemBuilder: (context, index) {
                                           final item =
                                               getFullMonthDates(
                                                 currentMonth,
                                               )[index];
-                                          final date = item['fullDate'] as DateTime;
+                                          final date =
+                                              item['fullDate'] as DateTime;
                                           final isSelected =
                                               selectedDate.day == date.day &&
-                                              selectedDate.month == date.month &&
+                                              selectedDate.month ==
+                                                  date.month &&
                                               selectedDate.year == date.year;
 
                                           return GestureDetector(
                                             onTap: () {
                                               setState(() {
                                                 selectedDate = date;
-                                                scrollToSelectedDate();
                                               });
+                                              loadAttendance(); // Fetch new data for this date
+                                              scrollToSelectedDate(); // Scroll the list to center the selected date
                                             },
+
                                             child: Container(
                                               width: 47,
                                               decoration:
@@ -312,24 +352,30 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                                 children: [
                                                   Text(
                                                     item['day'],
-                                                    style: GoogleFont.ibmPlexSans(
-                                                      color:
-                                                          isSelected
-                                                              ? Colors.blue
-                                                              : Colors.white,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
+                                                    style:
+                                                        GoogleFont.ibmPlexSans(
+                                                          color:
+                                                              isSelected
+                                                                  ? Colors.blue
+                                                                  : Colors
+                                                                      .white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   ),
                                                   Text(
                                                     item['date'].toString(),
-                                                    style: GoogleFont.ibmPlexSans(
-                                                      color:
-                                                          isSelected
-                                                              ? Colors.blue
-                                                              : Colors.white,
-                                                      fontSize: 22,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
+                                                    style:
+                                                        GoogleFont.ibmPlexSans(
+                                                          color:
+                                                              isSelected
+                                                                  ? Colors.blue
+                                                                  : Colors
+                                                                      .white,
+                                                          fontSize: 22,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -374,7 +420,24 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                   _searchText = value;
                                 });
                               },
+
                               decoration: InputDecoration(
+                                suffixIcon:
+                                    _searchText.isNotEmpty
+                                        ? GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              searchController.clear();
+                                              _searchText = '';
+                                            });
+                                          },
+                                          child: Icon(
+                                            Icons.clear,
+                                            size: 20,
+                                            color: AppColor.gray,
+                                          ),
+                                        )
+                                        : null,
                                 hintText: 'Search',
                                 hintStyle: GoogleFont.ibmPlexSans(
                                   fontSize: 14,
@@ -394,7 +457,9 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                 filled: true,
                                 fillColor: AppColor.lowLightgray,
 
-                                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 10,
+                                ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30),
                                   borderSide: BorderSide(
@@ -435,7 +500,9 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                               isSelected
                                                   ? AppColor.white
                                                   : AppColor.white,
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
                                           border: Border.all(
                                             color:
                                                 isSelected
@@ -465,76 +532,93 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                               ),
                             ),
                             SizedBox(height: 10),
-                            if (selectedIndex == 0) ...[
-                              CommonContainer.StudentsList(
-                                mainText: 'Kanjana',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Juliya',
-                                onIconTap: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => AttendanceHistoryStudent()));
-                                },
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Marie',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Christiana',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Christiana',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Olivia',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Stella',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Marie',
-                                onIconTap: () {},
-                              ),
-                            ] else if (selectedIndex == 1) ...[
-                              CommonContainer.StudentsList(
-                                mainText: 'Marie',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Christiana',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Olivia',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Stella',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Marie',
-                                onIconTap: () {},
-                              ),
-                            ] else if (selectedIndex == 2) ...[
-                              CommonContainer.StudentsList(
-                                mainText: 'Olivia',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Stella',
-                                onIconTap: () {},
-                              ),
-                              CommonContainer.StudentsList(
-                                mainText: 'Marie',
-                                onIconTap: () {},
-                              ),
-                            ],
+                            /* Obx(() {
+                              if (attendanceHistoryController.isLoading.value) {
+                                return Center(
+                                  child: AppLoader.circularLoader(
+                                    AppColor.black,
+                                  ),
+                                );
+                              }
+
+                              if (attendanceData == null) {
+                                return Center(
+                                  child: Text('No attendance data found'),
+                                );
+                              }
+
+                              List students = [];
+                              if (selectedIndex == 0) {
+                                students = attendanceData!.fullPresentStudents;
+                              } else if (selectedIndex == 1) {
+                                students = attendanceData!.fullAbsentStudents;
+                              } else if (selectedIndex == 2) {
+                                students =
+                                    attendanceData!.morningAbsentStudents;
+                              }
+
+                              if (students.isEmpty) {
+                                return Center(child: Text('No students found'));
+                              }
+
+                              return Column(
+                                children:
+                                    students.map<Widget>((student) {
+                                      return CommonContainer.StudentsList(
+                                        mainText: student.name,
+                                        onIconTap: () {},
+                                      );
+                                    }).toList(),
+                              );
+                            }),*/
+                            Obx(() {
+                              if (attendanceHistoryController.isLoading.value) {
+                                return Center(
+                                  child: AppLoader.circularLoader(
+                                    AppColor.black,
+                                  ),
+                                );
+                              }
+
+                              if (attendanceData == null) {
+                                return Center(
+                                  child: Text('No attendance data found'),
+                                );
+                              }
+
+                              List students = [];
+                              if (selectedIndex == 0) {
+                                students = attendanceData!.fullPresentStudents;
+                              } else if (selectedIndex == 1) {
+                                students = attendanceData!.fullAbsentStudents;
+                              } else if (selectedIndex == 2) {
+                                students =
+                                    attendanceData!.morningAbsentStudents;
+                              }
+
+                              // Apply search filter:
+                              final filteredStudents =
+                                  students.where((student) {
+                                    final name =
+                                        student.name.toString().toLowerCase();
+                                    final query = _searchText.toLowerCase();
+                                    return name.contains(query);
+                                  }).toList();
+
+                              if (filteredStudents.isEmpty) {
+                                return Center(child: Text('No students found'));
+                              }
+
+                              return Column(
+                                children:
+                                    filteredStudents.map<Widget>((student) {
+                                      return CommonContainer.StudentsList(
+                                        mainText: student.name,
+                                        onIconTap: () {},
+                                      );
+                                    }).toList(),
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -580,7 +664,75 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                   ],
                 ),
               ),
-              SizedBox(height: 34),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Obx(() {
+        return Container(
+          decoration: BoxDecoration(color: AppColor.white),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(attendanceController.classList.length, (
+                index,
+              ) {
+                final isSelected = subjectIndex == index;
+                final classItem = attendanceController.classList[index];
+
+                return GestureDetector(
+                  onTap: () {
+                    // First update the state synchronously
+                    setState(() {
+                      subjectIndex = index;
+                      // selectedClass = attendanceController.classList[index];
+                    });
+
+                    // Then fetch data async
+                    // attendanceController.getTodayStatus(selectedClass.id).then((
+                    //   data,
+                    // ) {
+                    //   if (data != null) {
+                    //     _prepareTabs(data);
+                    //   }
+                    // });
+                  },
+
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 55,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: isSelected ? AppColor.blue : AppColor.borderGary,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Text(
+                      "${classItem.className} ${classItem.section}",
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 11,
+                        color: isSelected ? AppColor.blue : AppColor.gray,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+/*SizedBox(height: 34),
               Container(
                 decoration: BoxDecoration(color: AppColor.white),
                 child: Column(
@@ -604,15 +756,15 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                 ),
                                 decoration: BoxDecoration(
                                   color:
-                                  isSelected
-                                      ? AppColor.white
-                                      : AppColor.white,
+                                      isSelected
+                                          ? AppColor.white
+                                          : AppColor.white,
                                   borderRadius: BorderRadius.circular(30),
                                   border: Border.all(
                                     color:
-                                    isSelected
-                                        ? AppColor.blue
-                                        : AppColor.borderGary,
+                                        isSelected
+                                            ? AppColor.blue
+                                            : AppColor.borderGary,
                                     width: 1.5,
                                   ),
                                 ),
@@ -620,10 +772,10 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                   children: [
                                     isSelected
                                         ? Image.asset(
-                                      AppImages.tick,
-                                      height: 15,
-                                      color: AppColor.blue,
-                                    )
+                                          AppImages.tick,
+                                          height: 15,
+                                          color: AppColor.blue,
+                                        )
                                         : SizedBox.shrink(),
                                     SizedBox(width: isSelected ? 5 : 0),
                                     Text(
@@ -631,137 +783,23 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                       style: GoogleFont.ibmPlexSans(
                                         fontSize: 12,
                                         color:
-                                        isSelected
-                                            ? AppColor.blue
-                                            : AppColor.gray,
+                                            isSelected
+                                                ? AppColor.blue
+                                                : AppColor.gray,
                                         fontWeight:
-                                        isSelected
-                                            ? FontWeight.w700
-                                            : FontWeight.w700,
+                                            isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w700,
                                       ),
                                     ),
                                   ],
                                 ),
-
-                              );
-                            }),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        if (selectedIndex == 0) ...[
-                          CommonContainer.StudentsList(
-                            mainText: 'Kanjana',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Juliya',
-                            onIconTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => AttendanceHistoryStudent(),
-                                ),
-                              );
-                            },
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Marie',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Christiana',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Christiana',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Olivia',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Stella',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Marie',
-                            onIconTap: () {},
-                          ),
-                        ] else if (selectedIndex == 1) ...[
-                          CommonContainer.StudentsList(
-                            mainText: 'Marie',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Christiana',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Olivia',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Stella',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Marie',
-                            onIconTap: () {},
-                          ),
-                        ] else if (selectedIndex == 2) ...[
-                          CommonContainer.StudentsList(
-                            mainText: 'Olivia',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Stella',
-                            onIconTap: () {},
-                          ),
-                          CommonContainer.StudentsList(
-                            mainText: 'Marie',
-                            onIconTap: () {},
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 27),
-                Center(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AttendanceStart(),
-                        ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColor.blue, width: 1.5),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 60,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-
                               ),
                             ),
                           );
                         }),
-
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+              ),*/
