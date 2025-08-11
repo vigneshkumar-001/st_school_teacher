@@ -24,6 +24,7 @@ class AttendanceResponse {
 
 class AttendanceData {
   final String className;
+  final String? messages;
   final String section;
   final String classId;
   final bool morningAttendanceDone;
@@ -48,6 +49,7 @@ class AttendanceData {
 
   AttendanceData({
     required this.className,
+    this.messages,
     required this.section,
     required this.classId,
     required this.morningAttendanceDone,
@@ -72,6 +74,7 @@ class AttendanceData {
   factory AttendanceData.fromJson(Map<String, dynamic> json) {
     return AttendanceData(
       className: json['class'] ?? '',
+      messages: json['messages'] ?? '',
       section: json['section'] ?? '',
       classId: json['classId'] ?? '',
       morningAttendanceDone: json['morning_attendance_done'] ?? false,
@@ -101,6 +104,7 @@ class AttendanceData {
   Map<String, dynamic> toJson() {
     return {
       'class': className,
+      'messages': messages,
       'section': section,
       'classId': classId,
       'morning_attendance_done': morningAttendanceDone,

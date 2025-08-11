@@ -165,28 +165,31 @@ class CommonContainer {
 
   static StudentsList({required String mainText, VoidCallback? onIconTap}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
       child: Column(
         children: [
-          Row(
-            children: [
-              Text(
-                mainText,
-                style: GoogleFont.ibmPlexSans(
-                  fontSize: 14,
-                  color: AppColor.black,
+          InkWell(
+            onTap: onIconTap,
+            child: Row(
+              children: [
+                Text(
+                  mainText,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 14,
+                    color: AppColor.black,
+                  ),
                 ),
-              ),
-              Spacer(),
-              InkWell(
-                onTap: onIconTap,
-                child: Image.asset(
-                  AppImages.rightSideArrow,
-                  height: 10,
-                  color: AppColor.lightgray,
+                Spacer(),
+                InkWell(
+                  onTap: onIconTap,
+                  child: Image.asset(
+                    AppImages.rightSideArrow,
+                    height: 10,
+                    color: AppColor.lightgray,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           SizedBox(height: 10),
           Divider(color: AppColor.lowLightgray),
