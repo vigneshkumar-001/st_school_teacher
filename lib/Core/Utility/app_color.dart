@@ -34,4 +34,17 @@ class AppColor {
   static const lightgreen = Color(0xff3AD87C);
   static const splash = Color(0xffF3FAFF);
   static const weAreColor = Color(0xffF2F9FF);
+  static const profileClass1st = Color(0xffDCF5F1);
+  static const profileClass2nd = Color(0xffDCF5DC);
+  static const profileClass3rd = Color(0xffEDF5DC);
+  static const profileClass4th = Color(0xffF6EFEE);
+  static const profileClass5th = Color(0xffF6F3EE);
+  static const profileClass6th = Color(0xffF4F6EE);
+  static const profileClass7th = Color(0xffEEF6EE);
+  static const profileClass8th = Color(0xffEEF4F6);
+  static const profileClass9th = Color(0xffEEEFF6);
+  static const profileClass10th = Color(0xffF6EEF6);
+  static const profileClass11th = Color(0xffF6EEF1);
+  static const profileClass12th = Color(0xffF6EEEE);
+  static const lowlightWhite = Color(0xffF4FBFF);
 }

@@ -41,4 +41,10 @@ class AppImages {
   static String advertisement3 = 'asset/Images/advertisement3.png';
   static String advertisement4 = 'asset/Images/advertisement4.png';
   static String clock = 'asset/Images/Clock.png';
+  static String profileBCImage = 'asset/Images/ProfileBcImage.png';
+  static String profileContainerImage =
+      'asset/Images/profileContainerImage.png';
+  static String numberAdd = 'asset/Images/numberADD.png';
+  static String schoolGirl = 'asset/Images/schoolGirl.png';
+  static String logOut = 'asset/Images/Logout.png';
 }
