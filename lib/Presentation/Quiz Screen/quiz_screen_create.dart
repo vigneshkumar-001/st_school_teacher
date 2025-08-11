@@ -647,7 +647,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                           ),
                                           child:Row(
                                             children: [
-                                              // Wrapping TextField + Divider in a Stack
+
                                               Expanded(
                                                 child: Stack(
                                                   children: [
@@ -659,7 +659,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                           color: AppColor.gray,
                                                         ),
                                                         border: InputBorder.none,
-                                                        contentPadding: EdgeInsets.only(right: 20), // avoid overlap
+                                                        contentPadding: EdgeInsets.only(right: 20),
                                                       ),
                                                       controller: TextEditingController(
                                                         text: question.answers[index],
@@ -698,7 +698,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                 ),
                                               ),
 
-                                              // Optional trailing icon
+
                                               SizedBox(width: 8),
                                               GestureDetector(
                                                 // onTap: () => _removeListItem(index),

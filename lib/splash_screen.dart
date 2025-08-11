@@ -33,7 +33,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => ChangeMobileNumber(page: 'splash',)),
+            MaterialPageRoute(
+              builder: (context) => ChangeMobileNumber(page: 'splash'),
+            ),
           );
         }
       });
@@ -49,16 +51,31 @@ class _SplashScreenState extends State<SplashScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(AppImages.splashBackImage1),
-                    Image.asset(AppImages.schoolLogo1),
-                    Image.asset(AppImages.splashBackImage2),
-                  ],
-                ),
+              Stack(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(AppImages.splashBackImage1),
+                        Image.asset(AppImages.schoolLogo1),
+                        Image.asset(AppImages.splashBackImage2),
+                      ],
+                    ),
+                  ),
+                  Positioned(bottom: 10,top: 0,
+                    child: Text(
+                      'For Teachers',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+
               Container(
                 width: width,
                 height: 12,
@@ -98,7 +115,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
+
               SizedBox(height: 35),
+
               Text(
                 'V 1.2',
                 style: GoogleFont.ibmPlexSans(

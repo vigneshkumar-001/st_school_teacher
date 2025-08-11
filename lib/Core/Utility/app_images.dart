@@ -34,7 +34,7 @@ class AppImages {
   static String menuImage = 'asset/Images/MenuImage.png';
   static String scheduleExam = 'asset/Images/ScheduleExam.png';
   static String splashBackImage1 = 'asset/Images/splashBackImage1.png';
-  static String splashBackImage2 = 'asset/Images/splashBackImage1.png';
+  static String splashBackImage2 = 'asset/Images/splashBackImage2.png';
   static String schoolLogo1 = 'asset/Images/schoolLogo1.png';
   static String advertisement1 = 'asset/Images/advertisement1.png';
   static String advertisement2 = 'asset/Images/advertisement2.png';
