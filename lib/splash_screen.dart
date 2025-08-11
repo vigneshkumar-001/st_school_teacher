@@ -63,13 +63,19 @@ class _SplashScreenState extends State<SplashScreen> {
                       ],
                     ),
                   ),
-                  Positioned(bottom: 10,top: 0,
-                    child: Text(
-                      'For Teachers',
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.black,
+                  Positioned(
+                    bottom: 0,
+                    top: 640,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Text(
+                        'For Teachers',
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.black,
+                        ),
                       ),
                     ),
                   ),
