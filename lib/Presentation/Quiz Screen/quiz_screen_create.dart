@@ -412,9 +412,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                               ),
                                                         ),
                                                       ),
-                                                      const SizedBox(
-                                                        height: 10,
-                                                      ),
+                                                      SizedBox(height: 10),
                                                       Text(
                                                         section,
                                                         style:
@@ -616,7 +614,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                     verticalDivider: false,
                                     onChanged: (val) => question.question = val,
                                   ),
-                                   SizedBox(height: 16),
+                                  SizedBox(height: 16),
                                   Text(
                                     'Answer',
                                     style: GoogleFont.ibmPlexSans(
@@ -624,7 +622,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                   SizedBox(height: 10),
+                                  SizedBox(height: 10),
                                   ListView.builder(
                                     itemCount: 4,
                                     shrinkWrap: true,
@@ -645,75 +643,96 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                               18,
                                             ),
                                           ),
-                                          child:Row(
+                                          child: Row(
                                             children: [
-
                                               Expanded(
                                                 child: Stack(
                                                   children: [
                                                     TextField(
                                                       decoration: InputDecoration(
-                                                        hintText: 'List ${index + 1}',
-                                                        hintStyle: GoogleFont.ibmPlexSans(
-                                                          fontSize: 14,
-                                                          color: AppColor.gray,
+                                                        hintText:
+                                                            'List ${index + 1}',
+                                                        hintStyle:
+                                                            GoogleFont.ibmPlexSans(
+                                                              fontSize: 14,
+                                                              color:
+                                                                  AppColor.gray,
+                                                            ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        suffixIcon: Container(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                vertical: 8,
+                                                              ),
+                                                          child: Container(
+                                                            width: 1.5,
+                                                            height:
+                                                                double.infinity,
+                                                            color:
+                                                                Colors
+                                                                    .grey
+                                                                    .shade400,
+                                                          ),
                                                         ),
-                                                        border: InputBorder.none,
-                                                        contentPadding: EdgeInsets.only(right: 20),
+                                                        suffixIconConstraints:
+                                                            const BoxConstraints(
+                                                              minWidth: 10,
+                                                              minHeight: 10,
+                                                            ),
                                                       ),
-                                                      controller: TextEditingController(
-                                                        text: question.answers[index],
-                                                      ),
+                                                      controller:
+                                                          TextEditingController(
+                                                            text:
+                                                                question
+                                                                    .answers[index],
+                                                          ),
                                                       onChanged: (value) {
-                                                        question.answers[index] = value;
+                                                        question.answers[index] =
+                                                            value;
                                                       },
                                                     ),
 
-                                                    // Positioned Divider
                                                     Positioned(
-                                                      right: 210,
+                                                      right: 245,
                                                       top: 10,
                                                       bottom: 10,
 
                                                       child: Container(
                                                         width: 2,
-                                                        height: 30,
+                                                        height: 40,
                                                         decoration: BoxDecoration(
                                                           gradient: LinearGradient(
-                                                            begin: Alignment.topCenter,
-                                                            end: Alignment.bottomCenter,
+                                                            begin:
+                                                                Alignment
+                                                                    .topCenter,
+                                                            end:
+                                                                Alignment
+                                                                    .bottomCenter,
                                                             colors: [
-                                                              Colors.grey.shade200,
-                                                              Colors.grey.shade300,
-                                                              Colors.grey.shade200,
+                                                              Colors
+                                                                  .grey
+                                                                  .shade200,
+                                                              Colors
+                                                                  .grey
+                                                                  .shade300,
+                                                              Colors
+                                                                  .grey
+                                                                  .shade200,
                                                             ],
                                                           ),
-                                                          borderRadius: BorderRadius.circular(
-                                                            1,
-                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                1,
+                                                              ),
                                                         ),
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
-
-
-                                              SizedBox(width: 8),
-                                              GestureDetector(
-                                                // onTap: () => _removeListItem(index),
-                                                child: Image.asset(
-                                                  AppImages.close,
-                                                  height: 26,
-                                                  color: AppColor.gray,
-                                                ),
-                                              ),
                                             ],
-                                          )
-
-
-
-
+                                          ),
                                         ),
                                       );
                                     },

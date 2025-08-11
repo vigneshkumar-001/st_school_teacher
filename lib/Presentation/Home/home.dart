@@ -19,7 +19,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   int _currentIndex = 0;
   int selectedIndex = 0;
   int subjectIndex = 0;
@@ -238,7 +237,7 @@ class _HomeState extends State<Home> {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 20,
                                   ),
-                                ),
+                                ),SizedBox(height: 20,),
 
                                 // Container(
                                 //   decoration: BoxDecoration(
@@ -302,7 +301,7 @@ class _HomeState extends State<Home> {
                                 //   ),
                                 // ),
                                 SizedBox(
-                                  height: 300,
+                                  height: 200,
                                   child: CarouselSlider.builder(
                                     itemCount: sliderItems.length,
                                     options: CarouselOptions(
@@ -412,9 +411,9 @@ class _HomeState extends State<Home> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 60),
+                                SizedBox(height: 35),
                                 SizedBox(
-                                  height: 75,
+                                  height: 70,
                                   child: Stack(
                                     clipBehavior: Clip.none,
                                     children: [
@@ -468,7 +467,7 @@ class _HomeState extends State<Home> {
                                                 ),
                                                 curve: Curves.easeInOut,
                                                 width: 75,
-                                                height: isSelected ? 60 : 60,
+                                                height: isSelected ? 50 : 50,
                                                 margin:
                                                     const EdgeInsets.symmetric(
                                                       horizontal: 0,
@@ -620,7 +619,7 @@ class _HomeState extends State<Home> {
                                                                   EdgeInsets.symmetric(
                                                                     horizontal:
                                                                         12,
-                                                                    vertical: 8,
+                                                                    vertical: 5,
                                                                   ),
                                                               decoration: BoxDecoration(
                                                                 color:
@@ -665,7 +664,7 @@ class _HomeState extends State<Home> {
                                                             padding:
                                                                 const EdgeInsets.symmetric(
                                                                   vertical:
-                                                                      25.0,
+                                                                      12.0,
                                                                 ),
                                                             child: Column(
                                                               mainAxisSize:
@@ -731,7 +730,7 @@ class _HomeState extends State<Home> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: 80),
+                                SizedBox(height: 50),
                                 Center(
                                   child: OutlinedButton(
                                     onPressed: () {
