@@ -62,6 +62,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         Image.asset(AppImages.splashBackImage2),
                       ],
                     ),
+
                     Positioned(
                       bottom: 25,
                       left: 0,
@@ -69,15 +70,9 @@ class _SplashScreenState extends State<SplashScreen> {
                       child: Text(
                         'For Teachers',
                         textAlign: TextAlign.center,
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.black,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+
+                  ),
+                 
               ),
 
               // Progress bar

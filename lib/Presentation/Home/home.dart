@@ -19,7 +19,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   int _currentIndex = 0;
   int selectedIndex = 0;
   int subjectIndex = 0;
@@ -244,6 +243,7 @@ class _HomeState extends State<Home> {
                                     ),
                                   ),
 
+
                                   // Container(
                                   //   decoration: BoxDecoration(
                                   //     gradient: LinearGradient(
@@ -325,6 +325,84 @@ class _HomeState extends State<Home> {
                                             _currentIndex = index;
                                           });
                                         },
+
+                                ),SizedBox(height: 20,),
+
+                                // Container(
+                                //   decoration: BoxDecoration(
+                                //     gradient: LinearGradient(
+                                //       colors: [
+                                //         AppColor.greenG1,
+                                //         AppColor.greenG1,
+                                //         AppColor.greenG1.withOpacity(0.9),
+                                //         AppColor.greenG2.withOpacity(0.5),
+                                //         AppColor.greenG3.withOpacity(0.5),
+                                //         AppColor.white.withOpacity(0.5),
+                                //         AppColor.white,
+                                //         AppColor.white,
+                                //       ],
+                                //       begin: Alignment.topCenter,
+                                //       end: Alignment.bottomCenter,
+                                //     ),
+                                //     borderRadius: BorderRadius.circular(16),
+                                //   ),
+                                //   child: Stack(
+                                //     children: [
+                                //       Image.asset(
+                                //         AppImages.bcImage,
+                                //         height: 249,
+                                //         width: 187,
+                                //       ),
+                                //       Positioned(
+                                //         child: Padding(
+                                //           padding: const EdgeInsets.all(25.0),
+                                //           child: Column(
+                                //             crossAxisAlignment:
+                                //                 CrossAxisAlignment.start,
+                                //             children: [
+                                //               Text(
+                                //                 'Assign',
+                                //                 style: GoogleFont.ibmPlexSans(
+                                //                   fontSize: 22,
+                                //                   fontWeight: FontWeight.w800,
+                                //                   color: AppColor.white,
+                                //                 ),
+                                //               ),
+                                //               Text(
+                                //                 'Homework',
+                                //                 style: GoogleFont.ibmPlexSans(
+                                //                   fontSize: 22,
+                                //                   fontWeight: FontWeight.w500,
+                                //                   color: AppColor.white,
+                                //                 ),
+                                //               ),
+                                //               SizedBox(height: 10),
+                                //               Image.asset(
+                                //                 AppImages.Homework,
+                                //                 height: 113,
+                                //                 width: 139,
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                                SizedBox(
+                                  height: 200,
+                                  child: CarouselSlider.builder(
+                                    itemCount: sliderItems.length,
+                                    options: CarouselOptions(
+                                      enlargeCenterPage: false,
+                                      viewportFraction: 0.5,
+                                      padEnds: true,
+                                      enableInfiniteScroll: false,
+                                      autoPlay: false,
+                                      autoPlayInterval: Duration(seconds: 3),
+                                      autoPlayAnimationDuration: Duration(
+                                        milliseconds: 500,
+
                                       ),
                                       itemBuilder: (context, index, realIndex) {
                                         final bool isSelected =
@@ -416,6 +494,7 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                   ),
+
                                   SizedBox(height: 60),
                                   SizedBox(
                                     height: 75,
@@ -438,6 +517,30 @@ class _HomeState extends State<Home> {
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.topRight,
                                               ),
+
+                                ),
+                                SizedBox(height: 35),
+                                SizedBox(
+                                  height: 70,
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Positioned.fill(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                AppColor.white.withOpacity(0.3),
+                                                AppColor.lowLightgray,
+                                                AppColor.lowLightgray,
+                                                AppColor.lowLightgray,
+                                                AppColor.lowLightgray,
+                                                AppColor.lowLightgray,
+                                                AppColor.white.withOpacity(0.3),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.topRight,
+
                                             ),
                                           ),
                                         ),
@@ -459,6 +562,7 @@ class _HomeState extends State<Home> {
                                               final section = item['section']!;
                                               final isSelected =
                                                   index == selectedIndex;
+
 
                                               return GestureDetector(
                                                 onTap: () {
@@ -506,6 +610,53 @@ class _HomeState extends State<Home> {
                                                                   0,
                                                                   4,
                                                                 ),
+
+                                            return GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedIndex = index;
+                                                });
+                                              },
+                                              child: AnimatedContainer(
+                                                duration: Duration(
+                                                  milliseconds: 40,
+                                                ),
+                                                curve: Curves.easeInOut,
+                                                width: 75,
+                                                height: isSelected ? 50 : 50,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 0,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      isSelected
+                                                          ? AppColor.white
+                                                          : Colors.transparent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  border:
+                                                      isSelected
+                                                          ? Border.all(
+                                                            color:
+                                                                AppColor.black,
+                                                            width: 1.5,
+                                                          )
+                                                          : null,
+                                                  boxShadow:
+                                                      isSelected
+                                                          ? [
+                                                            BoxShadow(
+                                                              color: AppColor
+                                                                  .white
+                                                                  .withOpacity(
+                                                                    0.5,
+                                                                  ),
+                                                              blurRadius: 10,
+                                                              offset: Offset(
+                                                                0,
+                                                                4,
+
                                                               ),
                                                             ]
                                                             : [],
@@ -565,6 +716,7 @@ class _HomeState extends State<Home> {
                                                                       ),
                                                                     ),
                                                                   ),
+
                                                                   // Padding(
                                                                   //   padding:
                                                                   //       const EdgeInsets.only(
@@ -614,6 +766,92 @@ class _HomeState extends State<Home> {
                                                                   //   ),
                                                                   // ),
                                                                 ],
+
+                                                                ),
+                                                                // Padding(
+                                                                //   padding:
+                                                                //       const EdgeInsets.only(
+                                                                //         top: 8.0,
+                                                                //       ),
+                                                                //   child: ShaderMask(
+                                                                //     shaderCallback:
+                                                                //         (
+                                                                //           bounds,
+                                                                //         ) => const LinearGradient(
+                                                                //           colors: [
+                                                                //             AppColor
+                                                                //                 .blueG1,
+                                                                //             AppColor
+                                                                //                 .blue,
+                                                                //           ],
+                                                                //           begin:
+                                                                //               Alignment.topLeft,
+                                                                //           end:
+                                                                //               Alignment.bottomRight,
+                                                                //         ).createShader(
+                                                                //           Rect.fromLTWH(
+                                                                //             0,
+                                                                //             0,
+                                                                //             bounds
+                                                                //                 .width,
+                                                                //             bounds
+                                                                //                 .height,
+                                                                //           ),
+                                                                //         ),
+                                                                //     blendMode:
+                                                                //         BlendMode
+                                                                //             .srcIn,
+                                                                //     child: Text(
+                                                                //       'th',
+                                                                //       style: GoogleFont.ibmPlexSans(
+                                                                //         fontSize:
+                                                                //             14,
+                                                                //         color:
+                                                                //             Colors
+                                                                //                 .white,
+                                                                //         fontWeight:
+                                                                //             FontWeight
+                                                                //                 .bold,
+                                                                //       ),
+                                                                //     ),
+                                                                //   ),
+                                                                // ),
+                                                              ],
+                                                            ),
+                                                            Container(
+                                                              margin:
+                                                                  EdgeInsets.only(
+                                                                    bottom: 0,
+                                                                  ),
+                                                              padding:
+                                                                  EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        12,
+                                                                    vertical: 5,
+                                                                  ),
+                                                              decoration: BoxDecoration(
+                                                                color:
+                                                                    AppColor
+                                                                        .black,
+                                                                borderRadius: BorderRadius.only(
+                                                                  topLeft:
+                                                                      Radius.circular(
+                                                                        40,
+                                                                      ),
+                                                                  topRight:
+                                                                      Radius.circular(
+                                                                        40,
+                                                                      ),
+                                                                  bottomLeft:
+                                                                      Radius.circular(
+                                                                        0,
+                                                                      ),
+                                                                  bottomRight:
+                                                                      Radius.circular(
+                                                                        0,
+                                                                      ),
+                                                                ),
+
                                                               ),
                                                               Container(
                                                                 margin:
@@ -629,6 +867,7 @@ class _HomeState extends State<Home> {
                                                                 decoration: BoxDecoration(
                                                                   color:
                                                                       AppColor
+
                                                                           .black,
                                                                   borderRadius: BorderRadius.only(
                                                                     topLeft:
@@ -648,6 +887,23 @@ class _HomeState extends State<Home> {
                                                                           0,
                                                                         ),
                                                                   ),
+
+                                                                          .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                        : Center(
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  vertical:
+                                                                      12.0,
+
                                                                 ),
                                                                 child: Text(
                                                                   section,
@@ -727,10 +983,31 @@ class _HomeState extends State<Home> {
                                                               ),
                                                             ),
                                                           ),
+
                                                 ),
                                               );
                                             },
                                           ),
+
+                                                        ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 50),
+                                Center(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => AttendanceStart(),
+
                                         ),
                                       ],
                                     ),
