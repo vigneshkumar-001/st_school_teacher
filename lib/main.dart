@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:st_teacher_app/Core/Utility/app_color.dart';
 import 'package:st_teacher_app/splash_screen.dart';
 
-import 'Presentation/Home/home.dart';
-import 'Presentation/Menu/menu_screen.dart';
+import 'init_controller.dart';
 
-void main() {
+Future<void> main() async {
+  await initController();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: AppColor.white,
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       theme: ThemeData(scaffoldBackgroundColor: AppColor.white),
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),

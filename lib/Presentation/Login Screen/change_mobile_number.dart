@@ -2,14 +2,20 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:st_teacher_app/Core/Utility/app_loader.dart';
 
 import '../../../../Core/Utility/app_color.dart' show AppColor;
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/custom_textfield.dart';
 import '../../Core/Utility/google_fonts.dart';
+ 
 import '../../Core/Widgets/common_container.dart';
+ 
+import 'controller/login_controller.dart';
+ 
 import 'otp_screen.dart';
+import 'package:get/get.dart';
 
 class ChangeMobileNumber extends StatefulWidget {
   final String? page;
@@ -20,6 +26,7 @@ class ChangeMobileNumber extends StatefulWidget {
 }
 
 class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
+  final LoginController loginController = Get.put(LoginController());
   final TextEditingController mobileNumberController = TextEditingController();
   bool _showClear = false;
   bool _isFormatting = false;
@@ -244,40 +251,42 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                       ),
                     ),
                     const SizedBox(height: 25),
-                    AppButton.button(
-                      text: 'Get OTP',
-                      width: double.infinity,
-                      onTap: () {
-                        final String mbl = mobileNumberController.text
-                            .replaceAll(' ', '');
-
-                        if (mbl.isEmpty) {
-                          setState(() {
-                            errorText = 'Mobile Number is Required';
-                          });
-                        } else if (mbl.length != 10) {
-                          setState(() {
-                            errorText =
-                                'Mobile Number must be exactly 10 digits';
-                          });
-                        } else {
-                          setState(() {
-                            errorText = '';
-                          });
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => OtpScreen(
-                                    mobileNumber: mbl,
-                                    pages: widget.page,
+                    Obx(() {
+                      return AppButton.button(
+                        text: 'Get OTP',
+                        loader:
+                            loginController.isLoading.value
+                                ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
                                   ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
+                                )
+                                : null,
+                        width: double.infinity,
+                        onTap: () {
+                          final String mbl = mobileNumberController.text
+                              .replaceAll(' ', '');
+                          if (mbl.isEmpty) {
+                            setState(() {
+                              errorText = 'Mobile Number is Required';
+                            });
+                          } else if (mbl.length != 10) {
+                            setState(() {
+                              errorText =
+                                  'Mobile Number must be exactly 10 digits';
+                            });
+                          } else {
+                            setState(() {
+                              errorText = '';
+                            });
+                            loginController.mobileNumberLogin('8870210295');
+                          }
+                        },
+                      );
+                    }),
                   ],
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
@@ -15,6 +16,9 @@ class AttendanceStart extends StatefulWidget {
 class _AttendanceStartState extends State<AttendanceStart> {
   int selectedIndex = 0;
 
+  final AttendanceController attendanceController = AttendanceController();
+
+
   int subjectIndex = 0;
 
   final List<Map<String, dynamic>> tab = [
@@ -22,11 +26,18 @@ class _AttendanceStartState extends State<AttendanceStart> {
     {"label": "11th C1"},
   ];
 
+
   final List<Map<String, dynamic>> tabs = [
     {"count": 10, "label": "Present"},
     {"count": 5, "label": "Absent"},
     {"count": 3, "label": "Pending"},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    attendanceController.getClassList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -404,6 +415,20 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                             : AppColor.borderGary,
                                     width: 1.5,
                                   ),
+
+                                  child: Text(
+                                    "${tabs[index]['count']} ${tabs[index]['label']}",
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontSize: 12,
+                                      color:
+                                          isSelected
+                                              ? AppColor.blue
+                                              : AppColor.gray,
+                                      fontWeight:
+                                          isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w400,
+
                                 ),
                                 child: Row(
                                   children: [
@@ -428,6 +453,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                 ? FontWeight.w700
                                                 : FontWeight.w700,
                                       ),
+
                                     ),
                                   ],
                                 ),
