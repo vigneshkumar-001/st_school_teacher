@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
@@ -14,12 +15,18 @@ class AttendanceStart extends StatefulWidget {
 
 class _AttendanceStartState extends State<AttendanceStart> {
   int selectedIndex = 0;
-
+  final AttendanceController attendanceController = AttendanceController();
   final List<Map<String, dynamic>> tabs = [
     {"count": 10, "label": "Present"},
     {"count": 5, "label": "Absent"},
     {"count": 3, "label": "Pending"},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    attendanceController.getClassList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,10 +272,10 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           isSelected
                                               ? AppColor.blue
                                               : AppColor.gray,
-                                        fontWeight:
-                                        isSelected
-                                            ?  FontWeight.w700
-                                            : FontWeight.w400
+                                      fontWeight:
+                                          isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w400,
                                     ),
                                   ),
                                 ),

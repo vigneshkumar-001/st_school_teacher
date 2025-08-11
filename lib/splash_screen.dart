@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../Core/Utility/app_color.dart';
@@ -20,13 +19,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _startLoading();
+     _startLoading();
   }
 
   void _startLoading() {
     Timer.periodic(const Duration(milliseconds: 400), (timer) {
       setState(() {
-        _progress += 0.1; // Increase progress
+        _progress += 0.1;
         if (_progress >= 1.0) {
           _progress = 1.0;
           timer.cancel();
@@ -51,10 +50,11 @@ class _SplashScreenState extends State<SplashScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             children: [
-              Stack(
-                children: [
-                  Expanded(
-                    child: Column(
+              // ✅ Expanded is now wrapping the Stack (correct usage)
+              Expanded(
+                child: Stack(
+                  children: [
+                    Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Image.asset(AppImages.splashBackImage1),
@@ -62,20 +62,25 @@ class _SplashScreenState extends State<SplashScreen> {
                         Image.asset(AppImages.splashBackImage2),
                       ],
                     ),
-                  ),
-                  Positioned(bottom: 10,top: 0,
-                    child: Text(
-                      'For Teachers',
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.black,
+                    Positioned(
+                      bottom: 25,
+                      left: 0,
+                      right: 0,
+                      child: Text(
+                        'For Teachers',
+                        textAlign: TextAlign.center,
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.black,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
+              // Progress bar
               Container(
                 width: width,
                 height: 12,
@@ -84,12 +89,12 @@ class _SplashScreenState extends State<SplashScreen> {
                   border: Border.all(color: AppColor.blue, width: 2),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(1.5),
+                  padding: const EdgeInsets.all(1.5),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: TweenAnimationBuilder<double>(
                       tween: Tween(begin: 0, end: _progress),
-                      duration: Duration(milliseconds: 500),
+                      duration: const Duration(milliseconds: 500),
                       builder: (context, value, _) {
                         return Stack(
                           children: [
@@ -116,7 +121,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
 
-              SizedBox(height: 35),
+              const SizedBox(height: 15),
 
               Text(
                 'V 1.2',
@@ -126,6 +131,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   color: AppColor.lightgray,
                 ),
               ),
+              const SizedBox(height: 15),
             ],
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:st_teacher_app/Core/Utility/app_color.dart';
 import 'package:st_teacher_app/Core/Utility/app_images.dart';
 import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_controller.dart';
 
 import '../../Core/Utility/google_fonts.dart';
 import 'attendance_history_student.dart';
@@ -18,6 +19,8 @@ class AttendanceHistory extends StatefulWidget {
 
 class _AttendanceHistoryState extends State<AttendanceHistory> {
   TextEditingController searchController = TextEditingController();
+
+
   String _searchText = '';
 
   @override
@@ -72,6 +75,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
     monthDates = getFullMonthDates(currentMonth);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToSelectedDate();
+
     });
   }
 
@@ -145,7 +149,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      text: '7',
+                      text:   '7',
                       style: GoogleFont.ibmPlexSans(
                         fontSize: 14,
                         color: AppColor.gray,
@@ -460,7 +464,13 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           CommonContainer.StudentsList(
                             mainText: 'Juliya',
                             onIconTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => AttendanceHistoryStudent()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => AttendanceHistoryStudent(),
+                                ),
+                              );
                             },
                           ),
                           CommonContainer.StudentsList(
