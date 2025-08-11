@@ -7,7 +7,7 @@ class AppButton {
     BuildContext? context,
     VoidCallback? onTap,
     required String text,
-    Widget? loader, // Pass a widget like CircularProgressIndicator
+    Widget? loader,
     double fontSize = 16,
     bool isBorder = false,
     FontWeight? fontWeight = FontWeight.w700,

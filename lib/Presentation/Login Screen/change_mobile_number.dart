@@ -243,7 +243,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                         alignment: Alignment.topRight,
                         child: Text(
                           errorText,
-                          style: const TextStyle(
+                          style:  GoogleFont.ibmPlexSans(
                             color: Colors.red,
                             fontSize: 12,
                           ),
@@ -261,7 +261,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                                   width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    color: AppColor.white,
                                   ),
                                 )
                                 : null,
