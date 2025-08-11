@@ -22,6 +22,7 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
   int selectedIndex = 0;
   int subjectIndex = 0;
+  bool showThirdContainer = false;
 
   final List<Map<String, String>> classData = [
     {'grade': '8', 'section': 'A'},
@@ -96,17 +97,14 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    return WillPopScope(
-      onWillPop: () async {
-        return   false;
-      },
-      child: Scaffold(
-        backgroundColor: AppColor.blue,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Image.asset(AppImages.homescreenBcImage),
-              Positioned.fill(
+    return Scaffold(
+      backgroundColor: AppColor.blue,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Image.asset(AppImages.homescreenBcImage),
+            Positioned.fill(
+              child: Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 0),
                   child: Column(
@@ -202,37 +200,39 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
-              Stack(
-                children: [
-                  Positioned(
-                    top: 140,
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    child: DraggableScrollableSheet(
-                      initialChildSize: 0.85,
-                      minChildSize: 0.85,
-                      maxChildSize: 0.85,
-                      builder: (context, scrollController) {
-                        return Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: const BoxDecoration(
-                            color: AppColor.white,
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(30),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ],
+            ),
+            Stack(
+              children: [
+                Positioned(
+                  top: 140,
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: DraggableScrollableSheet(
+                    initialChildSize: 0.85,
+                    minChildSize: 0.85,
+                    maxChildSize: 0.85,
+                    builder: (context, scrollController) {
+                      return Container(
+                        padding: const EdgeInsets.all(0),
+                        decoration: const BoxDecoration(
+                          color: AppColor.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(30),
                           ),
-                          child: SingleChildScrollView(
-                            controller: scrollController,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: SingleChildScrollView(
+                          controller: scrollController,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            child: Expanded(
                               child: Column(
                                 children: [
                                   Text(
@@ -242,7 +242,7 @@ class _HomeState extends State<Home> {
                                       fontSize: 20,
                                     ),
                                   ),
-
+                                  SizedBox(height: 20),
 
                                   // Container(
                                   //   decoration: BoxDecoration(
@@ -306,13 +306,14 @@ class _HomeState extends State<Home> {
                                   //   ),
                                   // ),
                                   SizedBox(
-                                    height: 300,
+                                    height: 210,
                                     child: CarouselSlider.builder(
                                       itemCount: sliderItems.length,
                                       options: CarouselOptions(
                                         enlargeCenterPage: false,
                                         viewportFraction: 0.5,
                                         padEnds: true,
+                                        initialPage: 0,
                                         enableInfiniteScroll: false,
                                         autoPlay: false,
                                         autoPlayInterval: Duration(seconds: 3),
@@ -325,84 +326,6 @@ class _HomeState extends State<Home> {
                                             _currentIndex = index;
                                           });
                                         },
-
-                                ),SizedBox(height: 20,),
-
-                                // Container(
-                                //   decoration: BoxDecoration(
-                                //     gradient: LinearGradient(
-                                //       colors: [
-                                //         AppColor.greenG1,
-                                //         AppColor.greenG1,
-                                //         AppColor.greenG1.withOpacity(0.9),
-                                //         AppColor.greenG2.withOpacity(0.5),
-                                //         AppColor.greenG3.withOpacity(0.5),
-                                //         AppColor.white.withOpacity(0.5),
-                                //         AppColor.white,
-                                //         AppColor.white,
-                                //       ],
-                                //       begin: Alignment.topCenter,
-                                //       end: Alignment.bottomCenter,
-                                //     ),
-                                //     borderRadius: BorderRadius.circular(16),
-                                //   ),
-                                //   child: Stack(
-                                //     children: [
-                                //       Image.asset(
-                                //         AppImages.bcImage,
-                                //         height: 249,
-                                //         width: 187,
-                                //       ),
-                                //       Positioned(
-                                //         child: Padding(
-                                //           padding: const EdgeInsets.all(25.0),
-                                //           child: Column(
-                                //             crossAxisAlignment:
-                                //                 CrossAxisAlignment.start,
-                                //             children: [
-                                //               Text(
-                                //                 'Assign',
-                                //                 style: GoogleFont.ibmPlexSans(
-                                //                   fontSize: 22,
-                                //                   fontWeight: FontWeight.w800,
-                                //                   color: AppColor.white,
-                                //                 ),
-                                //               ),
-                                //               Text(
-                                //                 'Homework',
-                                //                 style: GoogleFont.ibmPlexSans(
-                                //                   fontSize: 22,
-                                //                   fontWeight: FontWeight.w500,
-                                //                   color: AppColor.white,
-                                //                 ),
-                                //               ),
-                                //               SizedBox(height: 10),
-                                //               Image.asset(
-                                //                 AppImages.Homework,
-                                //                 height: 113,
-                                //                 width: 139,
-                                //               ),
-                                //             ],
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
-                                SizedBox(
-                                  height: 200,
-                                  child: CarouselSlider.builder(
-                                    itemCount: sliderItems.length,
-                                    options: CarouselOptions(
-                                      enlargeCenterPage: false,
-                                      viewportFraction: 0.5,
-                                      padEnds: true,
-                                      enableInfiniteScroll: false,
-                                      autoPlay: false,
-                                      autoPlayInterval: Duration(seconds: 3),
-                                      autoPlayAnimationDuration: Duration(
-                                        milliseconds: 500,
-
                                       ),
                                       itemBuilder: (context, index, realIndex) {
                                         final bool isSelected =
@@ -415,9 +338,9 @@ class _HomeState extends State<Home> {
                                         final double scale =
                                             isSelected ? 1.0 : 0.8;
                                         final double elevation =
-                                            isSelected ? 10 : 2;
+                                            isSelected ? 0 : 0;
                                         final double offsetY =
-                                            isSelected ? 0 : 30;
+                                            isSelected ? 0 : 40;
                                         final double opacity =
                                             isSelected ? 1.0 : 0.6;
 
@@ -494,10 +417,9 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                   ),
-
-                                  SizedBox(height: 60),
+                                  SizedBox(height: 35),
                                   SizedBox(
-                                    height: 75,
+                                    height: 70,
                                     child: Stack(
                                       clipBehavior: Clip.none,
                                       children: [
@@ -506,41 +428,21 @@ class _HomeState extends State<Home> {
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                 colors: [
-                                                  AppColor.white.withOpacity(0.3),
+                                                  AppColor.white.withOpacity(
+                                                    0.3,
+                                                  ),
                                                   AppColor.lowLightgray,
                                                   AppColor.lowLightgray,
                                                   AppColor.lowLightgray,
                                                   AppColor.lowLightgray,
                                                   AppColor.lowLightgray,
-                                                  AppColor.white.withOpacity(0.3),
+                                                  AppColor.white.withOpacity(
+                                                    0.3,
+                                                  ),
                                                 ],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.topRight,
                                               ),
-
-                                ),
-                                SizedBox(height: 35),
-                                SizedBox(
-                                  height: 70,
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Positioned.fill(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                AppColor.white.withOpacity(0.3),
-                                                AppColor.lowLightgray,
-                                                AppColor.lowLightgray,
-                                                AppColor.lowLightgray,
-                                                AppColor.lowLightgray,
-                                                AppColor.lowLightgray,
-                                                AppColor.white.withOpacity(0.3),
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.topRight,
-
                                             ),
                                           ),
                                         ),
@@ -555,6 +457,7 @@ class _HomeState extends State<Home> {
                                             itemCount: classData.length,
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 2,
+                                              vertical: 5,
                                             ),
                                             itemBuilder: (context, index) {
                                               final item = classData[index];
@@ -562,7 +465,6 @@ class _HomeState extends State<Home> {
                                               final section = item['section']!;
                                               final isSelected =
                                                   index == selectedIndex;
-
 
                                               return GestureDetector(
                                                 onTap: () {
@@ -576,7 +478,7 @@ class _HomeState extends State<Home> {
                                                   ),
                                                   curve: Curves.easeInOut,
                                                   width: 75,
-                                                  height: isSelected ? 60 : 60,
+                                                  height: isSelected ? 50 : 50,
                                                   margin:
                                                       const EdgeInsets.symmetric(
                                                         horizontal: 0,
@@ -585,14 +487,18 @@ class _HomeState extends State<Home> {
                                                     color:
                                                         isSelected
                                                             ? AppColor.white
-                                                            : Colors.transparent,
+                                                            : Colors
+                                                                .transparent,
                                                     borderRadius:
-                                                        BorderRadius.circular(16),
+                                                        BorderRadius.circular(
+                                                          16,
+                                                        ),
                                                     border:
                                                         isSelected
                                                             ? Border.all(
                                                               color:
-                                                                  AppColor.black,
+                                                                  AppColor
+                                                                      .black,
                                                               width: 1.5,
                                                             )
                                                             : null,
@@ -610,53 +516,6 @@ class _HomeState extends State<Home> {
                                                                   0,
                                                                   4,
                                                                 ),
-
-                                            return GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedIndex = index;
-                                                });
-                                              },
-                                              child: AnimatedContainer(
-                                                duration: Duration(
-                                                  milliseconds: 40,
-                                                ),
-                                                curve: Curves.easeInOut,
-                                                width: 75,
-                                                height: isSelected ? 50 : 50,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 0,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      isSelected
-                                                          ? AppColor.white
-                                                          : Colors.transparent,
-                                                  borderRadius:
-                                                      BorderRadius.circular(16),
-                                                  border:
-                                                      isSelected
-                                                          ? Border.all(
-                                                            color:
-                                                                AppColor.black,
-                                                            width: 1.5,
-                                                          )
-                                                          : null,
-                                                  boxShadow:
-                                                      isSelected
-                                                          ? [
-                                                            BoxShadow(
-                                                              color: AppColor
-                                                                  .white
-                                                                  .withOpacity(
-                                                                    0.5,
-                                                                  ),
-                                                              blurRadius: 10,
-                                                              offset: Offset(
-                                                                0,
-                                                                4,
-
                                                               ),
                                                             ]
                                                             : [],
@@ -668,7 +527,9 @@ class _HomeState extends State<Home> {
                                                                 MainAxisAlignment
                                                                     .spaceBetween,
                                                             children: [
-                                                              SizedBox(height: 8),
+                                                              SizedBox(
+                                                                height: 8,
+                                                              ),
                                                               Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
@@ -680,10 +541,8 @@ class _HomeState extends State<Home> {
                                                                           bounds,
                                                                         ) => const LinearGradient(
                                                                           colors: [
-                                                                            AppColor
-                                                                                .black,
-                                                                            AppColor
-                                                                                .black,
+                                                                            AppColor.black,
+                                                                            AppColor.black,
                                                                           ],
                                                                           begin:
                                                                               Alignment.topLeft,
@@ -693,10 +552,8 @@ class _HomeState extends State<Home> {
                                                                           Rect.fromLTWH(
                                                                             0,
                                                                             0,
-                                                                            bounds
-                                                                                .width,
-                                                                            bounds
-                                                                                .height,
+                                                                            bounds.width,
+                                                                            bounds.height,
                                                                           ),
                                                                         ),
                                                                     blendMode:
@@ -708,15 +565,12 @@ class _HomeState extends State<Home> {
                                                                         fontSize:
                                                                             28,
                                                                         color:
-                                                                            AppColor
-                                                                                .black,
+                                                                            AppColor.black,
                                                                         fontWeight:
-                                                                            FontWeight
-                                                                                .bold,
+                                                                            FontWeight.bold,
                                                                       ),
                                                                     ),
                                                                   ),
-
                                                                   // Padding(
                                                                   //   padding:
                                                                   //       const EdgeInsets.only(
@@ -766,92 +620,6 @@ class _HomeState extends State<Home> {
                                                                   //   ),
                                                                   // ),
                                                                 ],
-
-                                                                ),
-                                                                // Padding(
-                                                                //   padding:
-                                                                //       const EdgeInsets.only(
-                                                                //         top: 8.0,
-                                                                //       ),
-                                                                //   child: ShaderMask(
-                                                                //     shaderCallback:
-                                                                //         (
-                                                                //           bounds,
-                                                                //         ) => const LinearGradient(
-                                                                //           colors: [
-                                                                //             AppColor
-                                                                //                 .blueG1,
-                                                                //             AppColor
-                                                                //                 .blue,
-                                                                //           ],
-                                                                //           begin:
-                                                                //               Alignment.topLeft,
-                                                                //           end:
-                                                                //               Alignment.bottomRight,
-                                                                //         ).createShader(
-                                                                //           Rect.fromLTWH(
-                                                                //             0,
-                                                                //             0,
-                                                                //             bounds
-                                                                //                 .width,
-                                                                //             bounds
-                                                                //                 .height,
-                                                                //           ),
-                                                                //         ),
-                                                                //     blendMode:
-                                                                //         BlendMode
-                                                                //             .srcIn,
-                                                                //     child: Text(
-                                                                //       'th',
-                                                                //       style: GoogleFont.ibmPlexSans(
-                                                                //         fontSize:
-                                                                //             14,
-                                                                //         color:
-                                                                //             Colors
-                                                                //                 .white,
-                                                                //         fontWeight:
-                                                                //             FontWeight
-                                                                //                 .bold,
-                                                                //       ),
-                                                                //     ),
-                                                                //   ),
-                                                                // ),
-                                                              ],
-                                                            ),
-                                                            Container(
-                                                              margin:
-                                                                  EdgeInsets.only(
-                                                                    bottom: 0,
-                                                                  ),
-                                                              padding:
-                                                                  EdgeInsets.symmetric(
-                                                                    horizontal:
-                                                                        12,
-                                                                    vertical: 5,
-                                                                  ),
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                    AppColor
-                                                                        .black,
-                                                                borderRadius: BorderRadius.only(
-                                                                  topLeft:
-                                                                      Radius.circular(
-                                                                        40,
-                                                                      ),
-                                                                  topRight:
-                                                                      Radius.circular(
-                                                                        40,
-                                                                      ),
-                                                                  bottomLeft:
-                                                                      Radius.circular(
-                                                                        0,
-                                                                      ),
-                                                                  bottomRight:
-                                                                      Radius.circular(
-                                                                        0,
-                                                                      ),
-                                                                ),
-
                                                               ),
                                                               Container(
                                                                 margin:
@@ -862,12 +630,12 @@ class _HomeState extends State<Home> {
                                                                     EdgeInsets.symmetric(
                                                                       horizontal:
                                                                           12,
-                                                                      vertical: 8,
+                                                                      vertical:
+                                                                          5,
                                                                     ),
                                                                 decoration: BoxDecoration(
                                                                   color:
                                                                       AppColor
-
                                                                           .black,
                                                                   borderRadius: BorderRadius.only(
                                                                     topLeft:
@@ -887,28 +655,12 @@ class _HomeState extends State<Home> {
                                                                           0,
                                                                         ),
                                                                   ),
-
-                                                                          .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        )
-                                                        : Center(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets.symmetric(
-                                                                  vertical:
-                                                                      12.0,
-
                                                                 ),
                                                                 child: Text(
                                                                   section,
                                                                   style: GoogleFont.ibmPlexSans(
-                                                                    fontSize: 20,
+                                                                    fontSize:
+                                                                        20,
                                                                     color:
                                                                         AppColor
                                                                             .white,
@@ -925,7 +677,7 @@ class _HomeState extends State<Home> {
                                                               padding:
                                                                   const EdgeInsets.symmetric(
                                                                     vertical:
-                                                                        25.0,
+                                                                        12.0,
                                                                   ),
                                                               child: Column(
                                                                 mainAxisSize:
@@ -933,13 +685,12 @@ class _HomeState extends State<Home> {
                                                                         .min,
                                                                 children: [
                                                                   Container(
-                                                                    padding:
-                                                                        const EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              25,
-                                                                          vertical:
-                                                                              3,
-                                                                        ),
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          25,
+                                                                      vertical:
+                                                                          3,
+                                                                    ),
                                                                     decoration: BoxDecoration(
                                                                       color:
                                                                           AppColor
@@ -955,11 +706,9 @@ class _HomeState extends State<Home> {
                                                                         fontSize:
                                                                             14,
                                                                         color:
-                                                                            AppColor
-                                                                                .gray,
+                                                                            AppColor.gray,
                                                                         fontWeight:
-                                                                            FontWeight
-                                                                                .w600,
+                                                                            FontWeight.w600,
                                                                       ),
                                                                     ),
                                                                   ),
@@ -983,36 +732,15 @@ class _HomeState extends State<Home> {
                                                               ),
                                                             ),
                                                           ),
-
                                                 ),
                                               );
                                             },
                                           ),
-
-                                                        ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 50),
-                                Center(
-                                  child: OutlinedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => AttendanceStart(),
-
                                         ),
                                       ],
                                     ),
                                   ),
-                                  SizedBox(height: 80),
+                                  SizedBox(height: 50),
                                   Center(
                                     child: OutlinedButton(
                                       onPressed: () {
@@ -1034,7 +762,9 @@ class _HomeState extends State<Home> {
                                           vertical: 16,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius: BorderRadius.circular(
+                                            50,
+                                          ),
                                         ),
                                       ),
                                       child: Row(
@@ -1061,14 +791,14 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
