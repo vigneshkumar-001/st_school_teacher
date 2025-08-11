@@ -20,6 +20,8 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+
+
   final TextEditingController otp = TextEditingController();
   String? otpError;
   String verifyCode = '';

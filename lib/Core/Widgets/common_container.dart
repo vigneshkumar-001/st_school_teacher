@@ -104,7 +104,7 @@ class CommonContainer {
   }) {
     return Container(
       height: 152.6,
-      width: 145,
+      width: 168,
       decoration: BoxDecoration(
         color: AppColor.white,
         borderRadius: BorderRadius.circular(20),
@@ -774,24 +774,24 @@ class CommonContainer {
                       style: GoogleFont.ibmPlexSans(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColor.white,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(height: 4),
+
                   Flexible(
                     child: Text(
                       mainText2,
                       style: GoogleFont.ibmPlexSans(
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        color: AppColor.white,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                   Spacer(),
+                  Spacer(),
                   Align(
                     alignment: Alignment.center,
                     child: SizedBox(
@@ -842,4 +842,103 @@ class CommonContainer {
     );
   }
 
+  static Widget myProfileContainer({
+    required String standardText1,
+    required String standardText2,
+    required String standardText3,
+    required List<String> sections,
+    VoidCallback? onIconTap,
+    List<EdgeInsets>? paddings,
+    EdgeInsetsGeometry? containerPadding,
+    EdgeInsetsGeometry? sectionTextPadding,
+    Color? backgroundColor,
+    Color? sectionBgColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor ?? AppColor.profileClass1st,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding:
+            containerPadding ??
+            const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                text: standardText1,
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColor.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: standardText2,
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                  TextSpan(
+                    text: standardText3,
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 16,
+
+                      color: AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 15),
+            Row(
+              children:
+                  sections.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final section = entry.value;
+                    final padding =
+                        paddings != null && paddings.length > index
+                            ? paddings[index]
+                            : const EdgeInsets.only(right: 10);
+
+                    return Padding(
+                      padding: padding,
+                      child: InkWell(onTap: onIconTap,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                sectionBgColor ?? AppColor.white.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColor.white),
+                          ),
+                          child: Padding(
+                            padding:
+                                sectionTextPadding ??
+                                const EdgeInsets.symmetric(
+                                  horizontal: 39,
+                                  vertical: 22,
+                                ),
+                            child: Text(
+                              section,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

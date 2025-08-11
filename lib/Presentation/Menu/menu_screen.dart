@@ -5,9 +5,11 @@ import 'package:st_teacher_app/Core/Utility/app_images.dart';
 import 'package:st_teacher_app/Core/Utility/google_fonts.dart';
 import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 
+import '../Attendance-teacher/attendance_history_teacher.dart';
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
 import '../Homework/homework_create.dart';
+import '../Profile/my_profile.dart';
 import '../Quiz Screen/quiz_screen_create.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -150,40 +152,47 @@ class _MenuScreenState extends State<MenuScreen> {
                 // ),
                 SizedBox(height: 35),
                 Text(
-                  'Students',
+                  'About Me',
                   style: GoogleFont.ibmPlexSans(
                     fontSize: 18,
                     color: AppColor.lightgray,
                   ),
                 ),
                 SizedBox(height: 15),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                    child: Row(
-                      children: [
-                        CommonContainer.menuScrollContainer(
-                          onIconTap: () {},
-                          mainText: 'My\nAttendance',
-                          image: AppImages.myAttendance,
-                        ),
-                        // SizedBox(width: 20),
-                        // CommonContainer.menuScrollContainer(
-                        //   onIconTap: () {},
-                        //   mainText: 'Assigned\nClasses',
-                        //   image: AppImages.assignedClasses,
-                        // ),
-                        SizedBox(width: 30),
-                        CommonContainer.menuScrollContainer(
-                          onIconTap: () {},
-                          mainText: 'My\nProfile',
-                          image: AppImages.myProfile,
-                        ),
-                      ],
+                Row(
+                  children: [
+                    CommonContainer.menuScrollContainer(
+                      onIconTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AttendanceHistoryTeacher(),
+                          ),
+                        );
+                      },
+                      mainText: 'My\nAttendance',
+                      image: AppImages.myAttendance,
                     ),
-                  ),
+                    // SizedBox(width: 20),
+                    // CommonContainer.menuScrollContainer(
+                    //   onIconTap: () {},
+                    //   mainText: 'Assigned\nClasses',
+                    //   image: AppImages.assignedClasses,
+                    // ),
+                    SizedBox(width: 20),
+                    CommonContainer.menuScrollContainer(
+                      onIconTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MyProfile()),
+                        );
+                      },
+                      mainText: 'My\nProfile',
+                      image: AppImages.myProfile,
+                    ),
+                  ],
                 ),
+                SizedBox(height: 15),
               ],
             ),
           ),
