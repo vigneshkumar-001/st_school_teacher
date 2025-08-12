@@ -106,11 +106,13 @@ class _MenuScreenState extends State<MenuScreen> {
                       MaterialPageRoute(builder: (context) => HomeworkCreate()),
                     );
                   },
-                  onIconTap: () {Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeworkHistory()),
-                  );
-
+                  onIconTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeworkHistory(),
+                      ),
+                    );
                   },
                   mainText: 'Homework',
                   subText: 'Create',
@@ -130,9 +132,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onIconTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => QuizHistory(),
-                      ),
+                      MaterialPageRoute(builder: (context) => QuizHistory()),
                     );
                   },
                   mainText: 'Quiz',

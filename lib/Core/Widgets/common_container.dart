@@ -9,6 +9,7 @@ import '../Utility/app_images.dart';
 import '../Utility/google_fonts.dart';
 
 final FocusNode nextFieldFocusNode = FocusNode();
+String? selectedSection;
 
 class CommonContainer {
   static Menu_Students({
@@ -893,13 +894,28 @@ class CommonContainer {
     required String standardText2,
     required String standardText3,
     required List<String> sections,
-    VoidCallback? onIconTap,
+    String? selectedSection,
+    Function(String section)? onSectionTap,
     List<EdgeInsets>? paddings,
     EdgeInsetsGeometry? containerPadding,
     EdgeInsetsGeometry? sectionTextPadding,
     Color? backgroundColor,
     Color? sectionBgColor,
   }) {
+
+    String getSectionDetails(String section) {
+      switch (section) {
+        case 'A':
+          return 'A - Social Science';
+        case 'B':
+          return 'B - Mathematics';
+        case 'C':
+          return 'C - Science';
+        default:
+          return '';
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColor.profileClass1st,
@@ -933,7 +949,6 @@ class CommonContainer {
                     text: standardText3,
                     style: GoogleFont.ibmPlexSans(
                       fontSize: 16,
-
                       color: AppColor.black,
                     ),
                   ),
@@ -942,43 +957,54 @@ class CommonContainer {
             ),
             SizedBox(height: 15),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children:
-                  sections.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final section = entry.value;
-                    final padding =
-                        paddings != null && paddings.length > index
-                            ? paddings[index]
-                            : const EdgeInsets.only(right: 10);
+                  sections.map((section) {
+                    final isSelected = selectedSection == section;
 
-                    return Padding(
-                      padding: padding,
-                      child: InkWell(
-                        onTap: onIconTap,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color:
-                                sectionBgColor ??
-                                AppColor.white.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColor.white),
+                    return GestureDetector(
+                      onTap: () {
+                        if (onSectionTap != null) {
+                          onSectionTap(section);
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              isSelected
+                                  ? AppColor.white.withOpacity(0.5)
+                                  :  AppColor.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? AppColor.white : AppColor.white,
+                            width: 2,
                           ),
-                          child: Padding(
-                            padding:
-                                sectionTextPadding ??
-                                const EdgeInsets.symmetric(
-                                  horizontal: 39,
-                                  vertical: 22,
-                                ),
-                            child: Text(
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
                               section,
-                              style: GoogleFont.ibmPlexSans(
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.black,
+                                color: isSelected ? AppColor.black : AppColor.black,
                               ),
                             ),
-                          ),
+                            if (isSelected) ...[
+                              SizedBox(height: 8),
+                              Text(
+                                getSectionDetails(section),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     );
@@ -1037,7 +1063,7 @@ class CommonContainer {
                       text: leftValue,
                       fontWeight:
                           leftSelected ? FontWeight.w800 : FontWeight.w500,
-                      // color: leftSelected ? AppColor.blue : AppColor.black,
+
                       color:
                           leftSelected
                               ? (isQuizCompleted
@@ -1166,3 +1192,6 @@ class CommonContainer {
     );
   }
 }
+
+
+

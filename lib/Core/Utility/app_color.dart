@@ -49,3 +49,8 @@ class AppColor {
   static const lowlightWhite = Color(0xffF4FBFF);
   static const quizGreen = Color(0xffEDFAF2);
 }
+
+
+
+
+

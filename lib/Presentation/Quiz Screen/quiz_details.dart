@@ -55,7 +55,7 @@ class _QuizDetailsState extends State<QuizDetails> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 25,),
+                  SizedBox(height: 25),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColor.white,
