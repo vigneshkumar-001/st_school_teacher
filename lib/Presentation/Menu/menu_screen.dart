@@ -9,7 +9,9 @@ import '../Attendance-teacher/attendance_history_teacher.dart';
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
 import '../Homework/homework_create.dart';
+import '../Homework/homework_history.dart';
 import '../Profile/my_profile.dart';
+import '../Quiz Screen/quiz_history.dart';
 import '../Quiz Screen/quiz_screen_create.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -104,7 +106,12 @@ class _MenuScreenState extends State<MenuScreen> {
                       MaterialPageRoute(builder: (context) => HomeworkCreate()),
                     );
                   },
-                  onIconTap: () {},
+                  onIconTap: () {Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeworkHistory()),
+                  );
+
+                  },
                   mainText: 'Homework',
                   subText: 'Create',
                   image: AppImages.Homework,
@@ -120,7 +127,14 @@ class _MenuScreenState extends State<MenuScreen> {
                       ),
                     );
                   },
-                  onIconTap: () {},
+                  onIconTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QuizHistory(),
+                      ),
+                    );
+                  },
                   mainText: 'Quiz',
                   subText: 'Create',
                   image: AppImages.Quiz,

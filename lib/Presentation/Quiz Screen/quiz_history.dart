@@ -1,21 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_details.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import 'homework_create.dart';
-import 'homework_history_details.dart';
 
-class HomeworkHistory extends StatefulWidget {
-  const HomeworkHistory({super.key});
+class QuizHistory extends StatefulWidget {
+  const QuizHistory({super.key});
 
   @override
-  State<HomeworkHistory> createState() => _HomeworkHistoryState();
+  State<QuizHistory> createState() => _QuizHistoryState();
 }
 
-class _HomeworkHistoryState extends State<HomeworkHistory> {
+class _QuizHistoryState extends State<QuizHistory> {
   int index = 0;
   String selectedClassName = 'All';
 
@@ -37,7 +35,11 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
       'smaleText': '',
       'className': '7th C',
       'time': '4.30Pm',
-      'screen': () => HomeworkHistoryDetails(),
+      'subText': '0 out 50 ',
+      'done': 'Done',
+      'view': 'View',
+      'screen1': () {},
+      'screen': ()  => QuizDetails(),
       'bgColor': AppColor.lowLightBlue,
       'gradient': LinearGradient(
         colors: [AppColor.black, AppColor.black],
@@ -53,6 +55,11 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
       'smaleText': '',
       'className': '8th D',
       'time': '3.00Pm',
+      'supText': '0 out 50',
+      'done': 'Done',
+      'view': 'View',
+      'screen1': () {},
+      'screen': () {},
       'bgColor': AppColor.lowLightYellow,
       'gradient': LinearGradient(
         colors: [AppColor.black, AppColor.black],
@@ -68,6 +75,11 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
       'smaleText': '',
       'className': '6th B',
       'time': '1.30Pm',
+      'supText': '0 out 50',
+      'done': 'Done',
+      'view': 'View',
+      'screen1': () {},
+      'screen': () {},
       'bgColor': AppColor.lowLightNavi,
       'gradient': LinearGradient(
         colors: [AppColor.black, AppColor.black],
@@ -83,6 +95,11 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
       'smaleText': '',
       'className': '10th A',
       'time': '2.30Pm',
+      'supText': '0 out 50',
+      'done': 'Done',
+      'view': 'View',
+      'screen1': () {},
+      'screen': () {},
       'bgColor': AppColor.lowLightPink,
       'gradient': LinearGradient(
         colors: [AppColor.black, AppColor.black],
@@ -115,18 +132,18 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                     Spacer(),
                     InkWell(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomeworkCreate(),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => HomeworkCreate(),
+                        //   ),
+                        // );
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Create Homework',
+                            'Create Quiz',
                             style: GoogleFont.ibmPlexSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -143,7 +160,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                 SizedBox(height: 35),
                 Center(
                   child: Text(
-                    'Homework History',
+                    'Quiz History',
                     style: GoogleFont.inter(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
@@ -242,6 +259,8 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                                 className:
                                                     task['className'] ?? '',
                                                 subText: task['subText'] ?? '',
+                                                done: task['done'] ?? '',
+                                                view: task['view'] ?? '',
                                                 homeWorkText:
                                                     task['homeWorkText'] ?? '',
                                                 homeWorkImage:
@@ -264,20 +283,32 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                                     task['bgColor'] ??
                                                     AppColor.white,
                                                 gradient: task['gradient'],
-                                                onIconTap: () {
-                                                  final screenBuilder =
-                                                      task['screen'];
-                                                  if (screenBuilder != null) {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (_) =>
-                                                                screenBuilder(),
-                                                      ),
-                                                    );
-                                                  }
+                                                  onTap: () {
+                                                    final screenBuilder = task['screen'] as Widget Function()?;
+                                                    if (screenBuilder != null) {
+                                                      final widget = screenBuilder();
+                                                      if (widget != null) {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(builder: (_) => widget),
+                                                        );
+                                                      }
+                                                    }
+                                                  },
+
+                                                  onIconTap: () {
+                                                    final screenBuilder = task['screen1'] as Widget Function()?;
+                                                    if (screenBuilder != null) {
+                                                      final widget = screenBuilder();
+                                                      if (widget != null) {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(builder: (_) => widget),
+                                                        );
+                                                      }
+                                                    }
                                                 },
+
                                               ),
                                         );
                                       })

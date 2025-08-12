@@ -23,8 +23,6 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-
-
   final TextEditingController otp = TextEditingController();
   final LoginController otpController = LoginController();
   String? otpError;
@@ -163,7 +161,10 @@ class _OtpScreenState extends State<OtpScreen> {
                   Center(
                     child: Text(
                       otpError!,
-                      style: TextStyle(color: Colors.red, fontSize: 14),
+                      style: GoogleFont.ibmPlexSans(
+                        color: AppColor.red,
+                        fontSize: 14,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -179,7 +180,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       return;
                     }
 
-                    // Proceed if OTP is valid
+
 
                     if (widget.pages == 'splash') {
                       String Otp = otp.text.toString();

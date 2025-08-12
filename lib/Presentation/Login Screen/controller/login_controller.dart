@@ -32,7 +32,6 @@ class LoginController extends GetxController {
           AppLogger.log.i(response.message);
 
           Get.to(() => OtpScreen(mobileNumber: phone, pages: 'splash'));
-
         },
       );
     } catch (e) {

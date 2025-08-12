@@ -47,4 +47,5 @@ class AppColor {
   static const profileClass11th = Color(0xffF6EEF1);
   static const profileClass12th = Color(0xffF6EEEE);
   static const lowlightWhite = Color(0xffF4FBFF);
+  static const quizGreen = Color(0xffEDFAF2);
 }

@@ -9,6 +9,7 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'homework_create_preview.dart';
+import 'homework_history.dart';
 
 class HomeworkCreate extends StatefulWidget {
   const HomeworkCreate({super.key});
@@ -125,16 +126,30 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                       border: Border.all(color: AppColor.lightgray, width: 0.3),
                     ),
                     Spacer(),
-                    Text(
-                      'History',
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.gray,
+                    InkWell(onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeworkHistory(),
+                        ),
+                      );
+                    },
+                      child: Row(
+                        children: [
+                          Text(
+                            'History',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.gray,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Image.asset(AppImages.historyImage, height: 24),
+                        ],
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Image.asset(AppImages.historyImage, height: 24),
+
                   ],
                 ),
                 SizedBox(height: 35),
@@ -528,6 +543,182 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                           }),
                         ),
                         SizedBox(height: 25),
+                        if (_pickedImages.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 28.0),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: List.generate(_pickedImages.length, (
+                                    index,
+                                    ) {
+                                  final imageFile = _pickedImages[index];
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 14),
+
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Image-${index + 1}',
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColor.black,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            final picked = await _picker
+                                                .pickImage(
+                                              source: ImageSource.gallery,
+                                            );
+                                            if (picked != null) {
+                                              setState(() {
+                                                _pickedImages[index] = picked;
+                                              });
+                                            }
+                                          },
+                                          child: DottedBorder(
+                                            borderType: BorderType.RRect,
+                                            radius: const Radius.circular(20),
+                                            color: AppColor.lightgray,
+                                            strokeWidth: 1.5,
+                                            dashPattern: const [8, 4],
+                                            padding: const EdgeInsets.all(1),
+                                            child: Container(
+                                              height: 120,
+                                              padding: EdgeInsets.symmetric(
+                                                // vertical: 12,
+                                                horizontal: 12,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: AppColor.lightWhite,
+                                                borderRadius:
+                                                BorderRadius.circular(20),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  if (imageFile == null)
+                                                    Expanded(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                        children: [
+                                                          Image.asset(
+                                                            AppImages
+                                                                .uploadImage,
+                                                            height: 30,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Text(
+                                                            'Upload',
+                                                            style: GoogleFont.ibmPlexSans(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                              FontWeight
+                                                                  .w500,
+                                                              color:
+                                                              AppColor
+                                                                  .lightgray,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  else ...[
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                        12,
+                                                      ),
+                                                      child: Image.file(
+                                                        File(imageFile.path),
+                                                        width: 200,
+                                                        height: 100,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                    Spacer(),
+                                                    Padding(
+                                                      padding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 35.0,
+                                                      ),
+                                                      child: Column(
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                            EdgeInsets.only(
+                                                              right: 10.0,
+                                                            ),
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                setState(() {
+                                                                  _pickedImages
+                                                                      .removeAt(
+                                                                    index,
+                                                                  );
+                                                                });
+                                                              },
+                                                              child: Column(
+                                                                children: [
+                                                                  Image.asset(
+                                                                    AppImages
+                                                                        .close,
+                                                                    height: 26,
+                                                                    color:
+                                                                    AppColor
+                                                                        .gray,
+                                                                  ),
+                                                                  Text(
+                                                                    'Clear',
+                                                                    style: GoogleFont.ibmPlexSans(
+                                                                      fontSize:
+                                                                      14,
+                                                                      fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                      color:
+                                                                      AppColor
+                                                                          .lightgray,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            // IconButton(
+                                                            //   icon:  Icon(Icons.clear, size: 26),
+                                                            //   color: AppColor.lightgray,
+                                                            //   onPressed: () {
+                                                            //     setState(() {
+                                                            //       _pickedImages.removeAt(index);
+                                                            //     });
+                                                            //   },
+                                                            // ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ),
+                          ),
+                        SizedBox(height: 20,),
                         Text(
                           'Heading',
                           style: GoogleFont.ibmPlexSans(
@@ -584,181 +775,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                           ),
                         ],
 
-                        if (_pickedImages.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 28.0),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: List.generate(_pickedImages.length, (
-                                  index,
-                                ) {
-                                  final imageFile = _pickedImages[index];
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 14),
-
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Image-${index + 1}',
-                                          style: GoogleFont.ibmPlexSans(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColor.black,
-                                          ),
-                                        ),
-                                        SizedBox(height: 10),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            final picked = await _picker
-                                                .pickImage(
-                                                  source: ImageSource.gallery,
-                                                );
-                                            if (picked != null) {
-                                              setState(() {
-                                                _pickedImages[index] = picked;
-                                              });
-                                            }
-                                          },
-                                          child: DottedBorder(
-                                            borderType: BorderType.RRect,
-                                            radius: const Radius.circular(20),
-                                            color: AppColor.lightgray,
-                                            strokeWidth: 1.5,
-                                            dashPattern: const [8, 4],
-                                            padding: const EdgeInsets.all(1),
-                                            child: Container(
-                                              height: 120,
-                                              padding: EdgeInsets.symmetric(
-                                                // vertical: 12,
-                                                horizontal: 12,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: AppColor.lightWhite,
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  if (imageFile == null)
-                                                    Expanded(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Image.asset(
-                                                            AppImages
-                                                                .uploadImage,
-                                                            height: 30,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          Text(
-                                                            'Upload',
-                                                            style: GoogleFont.ibmPlexSans(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color:
-                                                                  AppColor
-                                                                      .lightgray,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  else ...[
-                                                    ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            12,
-                                                          ),
-                                                      child: Image.file(
-                                                        File(imageFile.path),
-                                                        width: 200,
-                                                        height: 100,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                    Spacer(),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            vertical: 35.0,
-                                                          ),
-                                                      child: Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                  right: 10.0,
-                                                                ),
-                                                            child: InkWell(
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  _pickedImages
-                                                                      .removeAt(
-                                                                        index,
-                                                                      );
-                                                                });
-                                                              },
-                                                              child: Column(
-                                                                children: [
-                                                                  Image.asset(
-                                                                    AppImages
-                                                                        .close,
-                                                                    height: 26,
-                                                                    color:
-                                                                        AppColor
-                                                                            .gray,
-                                                                  ),
-                                                                  Text(
-                                                                    'Clear',
-                                                                    style: GoogleFont.ibmPlexSans(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400,
-                                                                      color:
-                                                                          AppColor
-                                                                              .lightgray,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            // IconButton(
-                                                            //   icon:  Icon(Icons.clear, size: 26),
-                                                            //   color: AppColor.lightgray,
-                                                            //   onPressed: () {
-                                                            //     setState(() {
-                                                            //       _pickedImages.removeAt(index);
-                                                            //     });
-                                                            //   },
-                                                            // ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }),
-                              ),
-                            ),
-                          ),
                         SizedBox(height: 20),
                         if (_listSectionOpened) ...[
                           Text(
@@ -788,52 +805,43 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                   ),
                                   child: Row(
                                     children: [
-                                      // Wrapping TextField + Divider in a Stack
-                                      Expanded(
-                                        child: Stack(
-                                          children: [
-                                            TextField(
-                                              decoration: InputDecoration(
-                                                hintStyle: GoogleFont.ibmPlexSans(
-                                                  fontSize: 14,
-                                                  color: AppColor.gray,
-                                                ),
-                                                hintText: 'List ${index + 1}',
-                                                border: InputBorder.none,
-                                              ),
-                                              onChanged: (value) {
-                                                _listTextFields[index] = value;
-                                              },
-                                            ),
-
-
-                                            Positioned(
-                                              right: 210,
-                                              top: 10,
-                                              bottom: 10,
-
-                                              child: Container(
-                                                width: 2,
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomCenter,
-                                                    colors: [
-                                                      Colors.grey.shade200,
-                                                      Colors.grey.shade300,
-                                                      Colors.grey.shade200,
-                                                    ],
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(
-                                                    1,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                      Text('List ${index + 1}',style: GoogleFont.ibmPlexSans(fontSize: 14,color: AppColor.gray),),
+                                      SizedBox(width: 10,),
+                                      Container(
+                                        width: 2,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Colors.grey.shade200,
+                                              Colors.grey.shade300,
+                                              Colors.grey.shade200,
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            1,
+                                          ),
                                         ),
                                       ),
+                                      Expanded(
+                                        child: TextField(
+                                        decoration: InputDecoration(
+                                          hintStyle: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            color: AppColor.gray,
+                                          ),
+                                          // hintText: 'List ${index + 1}',
+                                          border: InputBorder.none,
+                                        ),
+                                        onChanged: (value) {
+                                          _listTextFields[index] = value;
+                                        },
+                                                                            ),
+                                      ),
+
+
 
 
                                       SizedBox(width: 8),
