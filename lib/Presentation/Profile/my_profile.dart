@@ -402,7 +402,7 @@ class _MyProfileState extends State<MyProfile> {
                   ),
                 ],
               ),
-              // padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+
               child: Stack(
                 children: [
                   Container(

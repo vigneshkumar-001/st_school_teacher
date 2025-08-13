@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../Core/Utility/app_color.dart';
 import 'Core/Utility/app_images.dart';
 import 'Core/Utility/google_fonts.dart';
+import 'Presentation/Home/home.dart';
 import 'Presentation/Login Screen/change_mobile_number.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -32,9 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => ChangeMobileNumber(page: 'splash'),
-            ),
+            MaterialPageRoute(builder: (context) => Home(page: 'splash')),
           );
         }
       });

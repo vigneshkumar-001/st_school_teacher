@@ -52,7 +52,7 @@ class LoginController extends GetxController {
           AppLogger.log.e(failure.message);
         },
         (response) async {
-          Get.offAll(Home(pages: 'homeScreen'));
+          // Get.offAll(Home(pages: 'homeScreen'));
           isOtpLoading.value = false;
           AppLogger.log.i(response.message);
           final prefs = await SharedPreferences.getInstance();

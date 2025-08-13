@@ -794,61 +794,70 @@ class CommonContainer {
     );
   }
 
-  static carouselSlider({
+  static Widget carouselSlider({
     required String mainText1,
     required String mainText2,
     required String iconImage,
     required String bcImage,
     Gradient? gradient,
+    double iconHeight = 120,
+    double iconWidth = 120,
   }) {
     return Container(
+      width: double.infinity,
+      height: 220,
       decoration: BoxDecoration(
         gradient: gradient,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Stack(
+        alignment: Alignment.center,
         children: [
-          Image.asset(bcImage, height: 249, width: 187),
-          Positioned(
-            child: Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Text(
-                      mainText1,
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: AppColor.white,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              bcImage,
+              height: 250,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    mainText1,
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: AppColor.white,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ),
 
-                  Flexible(
-                    child: Text(
-                      mainText2,
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.white,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                Flexible(
+                  child: Text(
+                    mainText2,
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.white,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  Spacer(),
-                  Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      height: 80,
-                      width: 80,
-                      child: Image.asset(iconImage, fit: BoxFit.contain),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: iconHeight,
+                  width: iconWidth,
+                  child: Image.asset(iconImage, fit: BoxFit.contain),
+                ),
+              ],
             ),
           ),
         ],
@@ -902,7 +911,6 @@ class CommonContainer {
     Color? backgroundColor,
     Color? sectionBgColor,
   }) {
-
     String getSectionDetails(String section) {
       switch (section) {
         case 'A':
@@ -977,7 +985,7 @@ class CommonContainer {
                           color:
                               isSelected
                                   ? AppColor.white.withOpacity(0.5)
-                                  :  AppColor.white.withOpacity(0.5),
+                                  : AppColor.white.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isSelected ? AppColor.white : AppColor.white,
@@ -991,7 +999,10 @@ class CommonContainer {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: isSelected ? AppColor.black : AppColor.black,
+                                color:
+                                    isSelected
+                                        ? AppColor.black
+                                        : AppColor.black,
                               ),
                             ),
                             if (isSelected) ...[
@@ -1192,6 +1203,3 @@ class CommonContainer {
     );
   }
 }
-
-
-
