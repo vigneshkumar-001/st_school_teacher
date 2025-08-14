@@ -165,7 +165,7 @@ class CommonContainer {
 
   static StudentsList({required String mainText, VoidCallback? onIconTap}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: Column(
         children: [
           InkWell(
@@ -586,6 +586,8 @@ class CommonContainer {
     required String smaleText,
     required String time,
     required String className,
+
+    required String section,
     required String aText1,
     required String aText2,
     required Color backRoundColor,
@@ -595,7 +597,7 @@ class CommonContainer {
     String? homeWorkImage,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
           color: backRoundColor,
@@ -605,7 +607,7 @@ class CommonContainer {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -626,7 +628,7 @@ class CommonContainer {
                       color: AppColor.black,
                     ),
                   ),
-                  // SizedBox(height: 6),
+                  SizedBox(height: 6),
                   // subText.toString().isEmpty
                   //     ? Container()
                   //     : Text(
@@ -645,7 +647,7 @@ class CommonContainer {
                   //     color: AppColor.gray,
                   //   ),
                   // ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -663,29 +665,21 @@ class CommonContainer {
                             children: [
                               RichText(
                                 text: TextSpan(
-                                  text: '7',
+                                  text: section,
                                   style: GoogleFont.ibmPlexSans(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                     color: AppColor.gray,
                                   ),
                                   children: [
-                                    TextSpan(
-                                      text: 'th ',
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColor.gray,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'C',
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800,
-                                        color: AppColor.gray,
-                                      ),
-                                    ),
+                                    // TextSpan(
+                                    //   text: section,
+                                    //   style: GoogleFont.ibmPlexSans(
+                                    //     fontSize: 12,
+                                    //     fontWeight: FontWeight.w800,
+                                    //     color: AppColor.gray,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -845,12 +839,116 @@ class CommonContainer {
     );
   }
 
+  /*
+ static Widget myProfileContainer({
+   required String standardText1,
+   required String standardText2,
+   required String standardText3,
+   required List<String> sections,
+   VoidCallback? onIconTap,
+   List<EdgeInsets>? paddings,
+   EdgeInsetsGeometry? containerPadding,
+   EdgeInsetsGeometry? sectionTextPadding,
+   Color? backgroundColor,
+   Color? sectionBgColor,
+ }) {
+   return Container(
+     decoration: BoxDecoration(
+       color: backgroundColor ?? AppColor.profileClass1st,
+       borderRadius: BorderRadius.circular(16),
+     ),
+     child: Padding(
+       padding:
+           containerPadding ??
+           const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+         children: [
+           RichText(
+             text: TextSpan(
+               text: standardText1,
+               style: GoogleFont.ibmPlexSans(
+                 fontSize: 16,
+                 fontWeight: FontWeight.w500,
+                 color: AppColor.black,
+               ),
+               children: [
+                 TextSpan(
+                   text: standardText2,
+                   style: GoogleFont.ibmPlexSans(
+                     fontSize: 12,
+                     fontWeight: FontWeight.w500,
+                     color: AppColor.black,
+                   ),
+                 ),
+                 TextSpan(
+                   text: standardText3,
+                   style: GoogleFont.ibmPlexSans(
+                     fontSize: 16,
+
+                     color: AppColor.black,
+                   ),
+                 ),
+               ],
+             ),
+           ),
+           SizedBox(height: 15),
+           Row(
+             children:
+                 sections.asMap().entries.map((entry) {
+                   final index = entry.key;
+                   final section = entry.value;
+                   final padding =
+                       paddings != null && paddings.length > index
+                           ? paddings[index]
+                           : const EdgeInsets.only(right: 10);
+
+                   return Padding(
+                     padding: padding,
+                     child: InkWell(
+                       onTap: onIconTap,
+                       child: Container(
+                         decoration: BoxDecoration(
+                           color:
+                               sectionBgColor ??
+                               AppColor.white.withOpacity(0.5),
+                           borderRadius: BorderRadius.circular(12),
+                           border: Border.all(color: AppColor.white),
+                         ),
+                         child: Padding(
+                           padding:
+                               sectionTextPadding ??
+                               const EdgeInsets.symmetric(
+                                 horizontal: 39,
+                                 vertical: 22,
+                               ),
+                           child: Text(
+                             section,
+                             style: GoogleFont.ibmPlexSans(
+                               fontSize: 18,
+                               fontWeight: FontWeight.w500,
+                               color: AppColor.black,
+                             ),
+                           ),
+                         ),
+                       ),
+                     ),
+                   );
+                 }).toList(),
+           ),
+         ],
+       ),
+     ),
+   );
+ }*/
   static Widget myProfileContainer({
     required String standardText1,
     required String standardText2,
     required String standardText3,
     required List<String> sections,
-    VoidCallback? onIconTap,
+    Map<String, List<String>>? sectionSubjects, // Map section -> subjects
+    String? expandedSection, // currently expanded section
+    Function(String section)? onSectionTap,
     List<EdgeInsets>? paddings,
     EdgeInsetsGeometry? containerPadding,
     EdgeInsetsGeometry? sectionTextPadding,
@@ -862,70 +960,76 @@ class CommonContainer {
         color: backgroundColor ?? AppColor.profileClass1st,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Padding(
-        padding:
-            containerPadding ??
-            const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                text: standardText1,
-                style: GoogleFont.ibmPlexSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColor.black,
-                ),
-                children: [
-                  TextSpan(
-                    text: standardText2,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.black,
-                    ),
-                  ),
-                  TextSpan(
-                    text: standardText3,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 16,
-
-                      color: AppColor.black,
-                    ),
-                  ),
-                ],
+      padding:
+          containerPadding ??
+          EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              text: standardText1,
+              style: GoogleFont.ibmPlexSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColor.black,
               ),
+              children: [
+                TextSpan(
+                  text: standardText2,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColor.black,
+                  ),
+                ),
+                TextSpan(
+                  text: standardText3,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 16,
+                    color: AppColor.black,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 15),
-            Row(
-              children:
-                  sections.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final section = entry.value;
-                    final padding =
-                        paddings != null && paddings.length > index
-                            ? paddings[index]
-                            : const EdgeInsets.only(right: 10);
+          ),
+          SizedBox(height: 15),
+          Row(
+            children:
+                sections.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final section = entry.value;
+                  final padding =
+                      paddings != null && paddings.length > index
+                          ? paddings[index]
+                          : EdgeInsets.only(right: 10);
 
-                    return Padding(
-                      padding: padding,
-                      child: InkWell(onTap: onIconTap,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color:
-                                sectionBgColor ?? AppColor.white.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColor.white),
-                          ),
-                          child: Padding(
-                            padding:
-                                sectionTextPadding ??
-                                const EdgeInsets.symmetric(
-                                  horizontal: 39,
-                                  vertical: 22,
-                                ),
-                            child: Text(
+                  bool isExpanded = section == expandedSection;
+                  List<String> subjects = sectionSubjects?[section] ?? [];
+
+                  return Padding(
+                    padding: padding,
+                    child: InkWell(
+                      onTap: () {
+                        if (onSectionTap != null) {
+                          onSectionTap(
+                            isExpanded ? '' : section,
+                          ); // collapse if tapped again
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              sectionBgColor ?? AppColor.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColor.white),
+                        ),
+                        padding:
+                            sectionTextPadding ??
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Row(
+                          children: [
+                            Text(
                               section,
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 18,
@@ -933,14 +1037,25 @@ class CommonContainer {
                                 color: AppColor.black,
                               ),
                             ),
-                          ),
+                            if (isExpanded && subjects.isNotEmpty) ...[
+                              SizedBox(width: 8),
+                              Text(
+                                '- ${subjects.join(", ")}',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    );
-                  }).toList(),
-            ),
-          ],
-        ),
+                    ),
+                  );
+                }).toList(),
+          ),
+        ],
       ),
     );
   }

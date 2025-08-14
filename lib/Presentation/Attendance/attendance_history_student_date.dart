@@ -2,14 +2,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Core/Utility/google_fonts.dart';
+import 'package:st_teacher_app/Presentation/Attendance/controller/student_attendence_controller.dart';
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
+import '../../Core/Utility/progress_bar.dart';
+import '../../Core/Widgets/attendance_card.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'attendance_history_student.dart';
+import 'controller/attendance_controller.dart';
+import 'model/student_attendance_response.dart';
+import 'package:get/get.dart';
 
 class AttendanceHistoryStudentDate extends StatefulWidget {
   final DateTime selectedDate;
-  const AttendanceHistoryStudentDate({super.key, required this.selectedDate});
+  final int studentId;
+  final int classId;
+  final String? studentName;
+  final String? className;
+  final String? section;
+  const AttendanceHistoryStudentDate({
+    super.key,
+    required this.selectedDate,
+    required this.studentId,
+    required this.classId,
+    this.studentName,
+    this.className,
+    this.section,
+  });
 
   @override
   State<AttendanceHistoryStudentDate> createState() =>
@@ -20,35 +39,89 @@ class _AttendanceHistoryStudentDateState
     extends State<AttendanceHistoryStudentDate> {
   DateTime selectedMonth = DateTime.now();
 
+  final StudentAttendanceController controller = Get.put(
+    StudentAttendanceController(),
+  );
+  final AttendanceController attendanceController = Get.put(
+    AttendanceController(),
+  );
+  StudentAttendanceData? attendanceData;
+  var selectedClass;
+  late DateTime selectedDate;
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    selectedDate = widget.selectedDate;
 
-    selectedMonth = DateTime(
-      widget.selectedDate.year,
-      widget.selectedDate.month,
-      widget.selectedDate.day,
+    // Load class list and initial attendance data
+    attendanceController.getClassList().then((_) async {
+      if (attendanceController.classList.isNotEmpty) {
+        selectedClass = attendanceController.classList.first;
+        _fetchAttendance(); // fetch after class selection
+      }
+    });
+  }
+
+  // void _fetchAttendance() async {
+  //   final result = await controller.studentDayAttendance(
+  //     studentId: widget.studentId,
+  //     classId: widget.classId,
+  //     date: selectedDate,
+  //   );
+  //
+  //   if (result != null) {
+  //     setState(() {
+  //       attendanceData =
+  //           result; // Assuming result.data is parsed into StudentAttendanceData
+  //       current =
+  //           (attendanceData?.thisMonthPresentPercentage ?? 0 * total ~/ 100)
+  //               .toInt();
+  //     });
+  //   }
+  // }
+
+  void _fetchAttendance() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final result = await controller.studentDayAttendance(
+      studentId: widget.studentId,
+      classId: widget.classId,
+      date: selectedDate,
+
+      showLoader: true,
     );
+
+    if (result != null) {
+      setState(() {
+        attendanceData = result;
+        current =
+            ((attendanceData?.thisMonthPresentPercentage ?? 0) * total ~/ 100)
+                .toInt();
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false; // still stop loading even if no result
+      });
+    }
   }
 
-  void goToPreviousMonth() {
+  void goToPreviousDay() {
     setState(() {
-      selectedMonth = DateTime(
-        selectedMonth.year,
-        selectedMonth.month - 1,
-        selectedMonth.day,
-      );
+      selectedDate = selectedDate.subtract(Duration(days: 1));
     });
+    _fetchAttendance();
   }
 
-  void goToNextMonth() {
+  void goToNextDay() {
     setState(() {
-      selectedMonth = DateTime(
-        selectedMonth.year,
-        selectedMonth.month + 1,
-        selectedMonth.day,
-      );
+      selectedDate = selectedDate.add(Duration(days: 1));
     });
+    _fetchAttendance();
   }
 
   int current = 15;
@@ -77,7 +150,7 @@ class _AttendanceHistoryStudentDateState
               Center(
                 child: RichText(
                   text: TextSpan(
-                    text: '7',
+                    text: widget.className ?? '',
                     style: GoogleFont.ibmPlexSans(
                       fontSize: 14,
                       color: AppColor.gray,
@@ -85,11 +158,7 @@ class _AttendanceHistoryStudentDateState
                     ),
                     children: [
                       TextSpan(
-                        text: 'th ',
-                        style: GoogleFont.ibmPlexSans(fontSize: 10),
-                      ),
-                      TextSpan(
-                        text: 'C ',
+                        text: ' ${widget.section ?? ''}',
                         style: GoogleFont.ibmPlexSans(
                           fontSize: 14,
                           color: AppColor.gray,
@@ -97,7 +166,7 @@ class _AttendanceHistoryStudentDateState
                         ),
                       ),
                       TextSpan(
-                        text: 'Section',
+                        text: ' Section',
                         style: GoogleFont.ibmPlexSans(
                           fontWeight: FontWeight.normal,
                         ),
@@ -109,7 +178,7 @@ class _AttendanceHistoryStudentDateState
               SizedBox(height: 3),
               Center(
                 child: Text(
-                  'Juliana Attendance',
+                  widget.studentName ?? '',
                   style: GoogleFont.ibmPlexSans(
                     fontSize: 22,
                     fontWeight: FontWeight.w500,
@@ -136,20 +205,21 @@ class _AttendanceHistoryStudentDateState
                         children: [
                           IconButton(
                             icon: Icon(CupertinoIcons.left_chevron),
-                            onPressed: goToPreviousMonth,
+                            onPressed: goToPreviousDay,
                           ),
                           Spacer(),
                           Text(
-                            DateFormat('dd MMMM').format(selectedMonth),
+                            DateFormat('dd MMMM').format(selectedDate),
                             style: GoogleFont.ibmPlexSans(
                               fontSize: 22,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+
                           Spacer(),
                           IconButton(
                             icon: Icon(CupertinoIcons.right_chevron),
-                            onPressed: goToNextMonth,
+                            onPressed: goToNextDay,
                           ),
                         ],
                       ),
@@ -164,7 +234,10 @@ class _AttendanceHistoryStudentDateState
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image.asset(AppImages.morning, height: 53),
+                              CurvedAttendanceCard(
+                                imagePath: AppImages.morning,
+                                isAbsent: attendanceData?.morning == "present",
+                              ),
                               SizedBox(width: 8),
                               Text(
                                 'Morning',
@@ -199,8 +272,13 @@ class _AttendanceHistoryStudentDateState
                                 ),
                               ),
                               SizedBox(width: 22),
-                              Image.asset(AppImages.afternoon, height: 53),
-                              SizedBox(width: 8),
+                              CurvedAttendanceCard(
+                                imagePath: AppImages.afternoon,
+                                isAbsent:
+                                    attendanceData?.afternoon ==
+                                    "present", // true/false from API
+                              ),
+                              SizedBox(width: 5),
                               Text(
                                 'Afternoon',
                                 style: GoogleFont.ibmPlexSans(
@@ -213,21 +291,22 @@ class _AttendanceHistoryStudentDateState
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
-                      CommonContainer.announcementsScreen(
-                        additionalText2: '3Pm ',
-                        additionalText3: 'to ',
-                        additionalText4: '5Pm',
-                        mainText: 'Sports Day',
-                        backRoundImage: AppImages.sportsDay,
-                        iconData: CupertinoIcons.clock_fill,
-                        additionalText1: '',
 
-                        verticalPadding: 12,
-                        gradientStartColor: AppColor.black.withOpacity(0.1),
-                        gradientEndColor: AppColor.black,
-                      ),
-                      SizedBox(height: 38),
+                      SizedBox(height: 50),
+                      // CommonContainer.announcementsScreen(
+                      //   additionalText2: '3Pm ',
+                      //   additionalText3: 'to ',
+                      //   additionalText4: '5Pm',
+                      //   mainText: 'Sports Day',
+                      //   backRoundImage: AppImages.sportsDay,
+                      //   iconData: CupertinoIcons.clock_fill,
+                      //   additionalText1: '',
+                      //
+                      //   verticalPadding: 12,
+                      //   gradientStartColor: AppColor.black.withOpacity(0.1),
+                      //   gradientEndColor: AppColor.black,
+                      // ),
+                      // SizedBox(height: 38),
                       Row(
                         children: [
                           Text(
@@ -252,7 +331,7 @@ class _AttendanceHistoryStudentDateState
                       ),
                       SizedBox(height: 15),
 
-                      Stack(
+                      /*  Stack(
                         alignment: Alignment.centerLeft,
                         children: [
                           Container(
@@ -317,6 +396,11 @@ class _AttendanceHistoryStudentDateState
                             ),
                           ),
                         ],
+                      ),*/
+                      GradientProgressBar(
+                        progress:
+                            (attendanceData?.thisMonthPresentPercentage ?? 0) /
+                            100,
                       ),
 
                       SizedBox(height: 15),

@@ -24,6 +24,7 @@ class AttendanceHistory extends StatefulWidget {
 class _AttendanceHistoryState extends State<AttendanceHistory> {
   TextEditingController searchController = TextEditingController();
   String _searchText = '';
+  var selectedClass;
   final AttendanceController attendanceController = Get.put(
     AttendanceController(),
   );
@@ -37,11 +38,6 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
   }
 
   int subjectIndex = 0;
-
-  final List<Map<String, dynamic>> tab = [
-    {"label": "7th C"},
-    {"label": "11th C1"},
-  ];
 
   int selectedIndex = 0;
 
@@ -96,11 +92,20 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
   AttendanceHistoryData? attendanceData;
 
   void loadAttendance() async {
+    if (attendanceController.classList.isNotEmpty) {
+      selectedClass = attendanceController.classList.first;
+    } else {
+      // Handle empty class list, maybe show error or fallback
+      print('Class list is empty!');
+      return;
+    }
+
     final data = await attendanceHistoryController.fetchAttendance(
       selectedDate,
-      38,
+      selectedClass.id,
       showLoader: true,
     );
+
     if (data != null) {
       setState(() {
         attendanceData = data;
@@ -108,11 +113,6 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
         tabs[0]['count'] = data.fullPresentCount;
         tabs[1]['count'] = data.fullAbsentCount;
         tabs[2]['count'] = data.morningAbsentCount;
-
-        // If you want to update student lists, you can map them:
-        // Example for present students:
-        // presentStudents = data.fullPresentStudents.map((e) => {'name': e.name, 'id': e.id}).toList();
-        // similarly for others...
       });
     }
   }
@@ -192,7 +192,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                     Center(
                       child: RichText(
                         text: TextSpan(
-                          text: '7',
+                          text: selectedClass?.className ?? '',
                           style: GoogleFont.ibmPlexSans(
                             fontSize: 14,
                             color: AppColor.gray,
@@ -200,11 +200,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           ),
                           children: [
                             TextSpan(
-                              text: 'th ',
-                              style: GoogleFont.ibmPlexSans(fontSize: 10),
-                            ),
-                            TextSpan(
-                              text: 'C ',
+                              text: ' ${selectedClass?.section ?? ''}',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 14,
                                 color: AppColor.gray,
@@ -212,7 +208,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                               ),
                             ),
                             TextSpan(
-                              text: 'Section',
+                              text: ' Section',
                               style: GoogleFont.ibmPlexSans(
                                 fontWeight: FontWeight.normal,
                               ),
@@ -614,7 +610,24 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                     filteredStudents.map<Widget>((student) {
                                       return CommonContainer.StudentsList(
                                         mainText: student.name,
-                                        onIconTap: () {},
+                                        onIconTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (
+                                                    context,
+                                                  ) => AttendanceHistoryStudent(
+                                                    studentId:
+                                                        student
+                                                            .id, // pass student id
+                                                    classId:
+                                                        selectedClass
+                                                            .id, // pass class id (or variable)
+                                                  ),
+                                            ),
+                                          );
+                                        },
                                       );
                                     }).toList(),
                               );

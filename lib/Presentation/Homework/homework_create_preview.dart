@@ -1,5 +1,10 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
@@ -7,15 +12,70 @@ import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'homework_history.dart';
+import 'package:get/get.dart';
 
 class HomeworkCreatePreview extends StatefulWidget {
-  const HomeworkCreatePreview({super.key});
+  final String subjects;
+  final List<String> description; // paragraphs
+  final List<File?> images; // image files
+  final List<String> listPoints;
+
+  final String heading;
+
+  final int? subjectId;
+  final int? selectedClassId;
+  const HomeworkCreatePreview({
+    super.key,
+    required this.subjects,
+    required this.description,
+
+    required this.heading,
+    this.subjectId,
+    required this.images,
+    required this.listPoints,
+    this.selectedClassId,
+  });
 
   @override
   State<HomeworkCreatePreview> createState() => _HomeworkCreatePreviewState();
 }
 
 class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
+  late DateTime now;
+  late String formattedTime;
+  late String formattedDate;
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    now = DateTime.now();
+    _updateTime();
+
+    // Optional: Update time every minute (or every second if you want)
+    timer = Timer.periodic(Duration(seconds: 60), (_) {
+      _updateTime();
+    });
+  }
+
+  void _updateTime() {
+    setState(() {
+      now = DateTime.now();
+      formattedTime = DateFormat('h.mm a').format(now);
+      formattedDate = DateFormat('dd.MMM.yy').format(now);
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  final CreateHomeworkController homeworkController = Get.put(
+    CreateHomeworkController(),
+  );
+  List<Map<String, dynamic>> contents = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,18 +127,35 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 30),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.asset(AppImages.homeworkPreviewImage1),
+                              widget.images != null && widget.images!.isNotEmpty
+                                  ? Column(
+                                    children:
+                                        widget.images!.map((img) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Image.file(
+                                              File(img?.path.toString() ?? ''),
+                                              fit: BoxFit.cover,
+                                              height: 200,
+                                              width: double.infinity,
+                                            ),
+                                          );
+                                        }).toList(),
+                                  )
+                                  : const SizedBox.shrink(),
+
                               SizedBox(height: 20),
-                              Image.asset(AppImages.homeworkPreviewImage2),
-                              SizedBox(height: 20),
+                              // Image.asset(AppImages.homeworkPreviewImage2),
+                              // SizedBox(height: 20),
                               Text(
-                                'Draw Single cell',
+                                widget.heading ?? '',
                                 style: GoogleFont.inter(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 24,
@@ -87,27 +164,33 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                               ),
                               SizedBox(height: 15),
                               Text(
-                                'Vestibulum non ipsum risus. Quisque et sem eu \nvelit varius pellentesque et sit amet diam. Phasellus \neros libero, finibus eu magna vel, viverra pharetra \nvelit. Nullam congue sapien neque, dapibus \ndignissim magna elementum at. Class aptent taciti \nsociosqu ad litora torquent per conubia nostra, per \ninceptos himenaeos.',
+                                widget.description.join(
+                                  ",\n",
+                                ), // new line separated
                                 style: GoogleFont.inter(
                                   fontSize: 12,
                                   color: AppColor.gray,
                                 ),
                               ),
                               SizedBox(height: 15),
-                              Text(
-                                '1.Task',
-                                style: GoogleFont.inter(
-                                  fontSize: 12,
-                                  color: AppColor.gray,
+
+                              if (widget.listPoints != null &&
+                                  widget.listPoints.isNotEmpty)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: List.generate(
+                                    widget.listPoints.length,
+                                    (index) {
+                                      return Text(
+                                        '${index + 1}. ${widget.listPoints[index]}',
+                                        style: GoogleFont.inter(
+                                          fontSize: 12,
+                                          color: AppColor.gray,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '2.Tksa',
-                                style: GoogleFont.inter(
-                                  fontSize: 12,
-                                  color: AppColor.gray,
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -136,7 +219,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                         ),
                                         SizedBox(width: 10),
                                         Text(
-                                          'Science Homework',
+                                          widget.subjects ?? '',
                                           style: GoogleFont.inter(
                                             fontSize: 12,
                                             color: AppColor.lightBlack,
@@ -165,7 +248,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                         ),
                                         SizedBox(width: 10),
                                         Text(
-                                          '4.30Pm',
+                                          formattedTime,
                                           style: GoogleFont.inter(
                                             fontSize: 12,
                                             color: AppColor.lightBlack,
@@ -173,7 +256,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                         ),
                                         SizedBox(width: 10),
                                         Text(
-                                          '18.Jul.25',
+                                          formattedDate,
                                           style: GoogleFont.inter(
                                             fontSize: 12,
                                             color: AppColor.gray,
@@ -235,14 +318,57 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                               ),
                               SizedBox(width: 10),
                               AppButton.button(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => HomeworkHistory(),
-                                    ),
+                                onTap: () async {
+                                  List<Map<String, dynamic>> contents = [];
+
+                                  // Add lists to contents
+                                  for (var listItem in widget.listPoints) {
+                                    if (listItem is List<String>) {
+                                      contents.add({
+                                        "type": "list",
+                                        "content": listItem,
+                                      });
+                                    } else if (listItem is String) {
+                                      contents.add({
+                                        "type": "list",
+                                        "content": listItem,
+                                      });
+                                    }
+                                  }
+
+                                  if (widget.description.length > 1) {
+                                    for (
+                                      var i = 1;
+                                      i < widget.description.length;
+                                      i++
+                                    ) {
+                                      var para = widget.description[i];
+                                      if (para.trim().isNotEmpty) {
+                                        contents.add({
+                                          "type": "paragraph",
+                                          "content": para,
+                                        });
+                                      }
+                                    }
+                                  }
+
+                                  // The first description string goes to 'description' field, or empty string if none
+                                  String mainDescription =
+                                      widget.description.isNotEmpty
+                                          ? widget.description[0]
+                                          : '';
+
+                                  await homeworkController.createHomeWork(
+                                    showLoader: true,
+                                    classId: widget.selectedClassId,
+                                    subjectId: widget.subjectId,
+                                    heading: widget.heading ?? '',
+                                    description: mainDescription,
+                                    publish: true,
+                                    contents: contents,
                                   );
                                 },
+
                                 width: 145,
                                 height: 60,
                                 text: 'Publish',
