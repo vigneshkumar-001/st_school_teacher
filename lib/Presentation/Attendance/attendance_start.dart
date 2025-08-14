@@ -370,7 +370,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                               horizontal: 12.0,
                                               vertical: 20,
                                             ),
-                                            child: Row(
+                                             child: Row(
                                               children: [
                                                 InkWell(
                                                   onTap:
