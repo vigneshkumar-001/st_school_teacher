@@ -1,16 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_history.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
+import '../../Core/Utility/progress_bar.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'attendance_history.dart';
 import 'attendance_history_student_date.dart';
+import 'controller/attendance_controller.dart';
+import 'controller/attendance_student_controller.dart';
+import 'package:get/get.dart';
 
 class AttendanceHistoryStudent extends StatefulWidget {
-  const AttendanceHistoryStudent({super.key});
+  final int? studentId;
+  final int? classId;
+  const AttendanceHistoryStudent({super.key, this.studentId, this.classId});
 
   @override
   State<AttendanceHistoryStudent> createState() =>
@@ -19,28 +28,81 @@ class AttendanceHistoryStudent extends StatefulWidget {
 
 class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
   DateTime today = DateTime.now();
-  DateTime selectedDay = DateTime.now();
-  void _onDaySelected(DateTime day, DateTime focusedDay) {
-    setState(() {
-      today = day;
-    });
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AttendanceHistoryStudentDate(selectedDate: day),
-      ),
-    );
-  }
+  AttendanceStudentData? attendanceData;
+  DateTime selectedDay = DateTime.now();
+  final AttendanceStudentController attendanceHistoryController = Get.put(
+    AttendanceStudentController(),
+  );
+
+  final AttendanceController attendanceController = Get.put(
+    AttendanceController(),
+  );
+  var selectedClass;
 
   int current = 15;
   int total = 20;
+  @override
+  void initState() {
+    super.initState();
+    loadStudentAttendance(_focusedDay);
+
+    attendanceController.getClassList().then((_) async {
+      if (attendanceController.classList.isNotEmpty) {
+        selectedClass = attendanceController.classList.first;
+
+        final attendanceData = await attendanceController.getTodayStatus(
+          selectedClass.id,
+        );
+
+        setState(() {});
+      }
+    });
+    loadStudentAttendance(_focusedDay);
+  }
+
+  Color? getAttendanceColor(
+    DateTime day,
+    Map<String, AttendanceByDate> attendanceByDate,
+  ) {
+    String formatted = DateFormat('yyyy-MM-dd').format(day);
+    if (!attendanceByDate.containsKey(formatted)) return null;
+
+    final dayData = attendanceByDate[formatted]!;
+
+    if (dayData.fullDayAbsent) {
+      return AppColor.red; // Absent color
+    } else if (dayData.holidayStatus) {
+      return AppColor.green; // Holiday color
+    } else if (dayData.eventsStatus) {
+      return AppColor.yellow;
+    }
+
+    return null;
+  }
+
+  void loadStudentAttendance(DateTime focusedDay) async {
+    final response = await attendanceHistoryController
+        .fetchStudentAttendanceHistory(
+          studentId: widget.studentId ?? 0,
+          classId: widget.classId ?? 0,
+          date: focusedDay,
+          showLoader: false,
+        );
+
+    if (response != null) {
+      setState(() {
+        attendanceData = response; // Assign the fetched data here
+      });
+    } else {
+      print("Failed to fetch attendance data");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final targetProgress = current / total;
-    final progressWidth = screenWidth * targetProgress;
     return Scaffold(
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
@@ -60,7 +122,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      text: '7',
+                      text: selectedClass?.className ?? '',
                       style: GoogleFont.ibmPlexSans(
                         fontSize: 14,
                         color: AppColor.gray,
@@ -68,11 +130,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                       ),
                       children: [
                         TextSpan(
-                          text: 'th ',
-                          style: GoogleFont.ibmPlexSans(fontSize: 10),
-                        ),
-                        TextSpan(
-                          text: 'C ',
+                          text: ' ${selectedClass?.section ?? ''}',
                           style: GoogleFont.ibmPlexSans(
                             fontSize: 14,
                             color: AppColor.gray,
@@ -80,7 +138,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                           ),
                         ),
                         TextSpan(
-                          text: 'Section',
+                          text: ' Section',
                           style: GoogleFont.ibmPlexSans(
                             fontWeight: FontWeight.normal,
                           ),
@@ -92,14 +150,15 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                 SizedBox(height: 3),
                 Center(
                   child: Text(
-                    'Juliana Attendance ',
-                    style: GoogleFont.ibmPlexSans(
+                    '${attendanceData?.studentName ?? "Loading..."} Attendance',
+                    style: GoogleFonts.ibmPlexSans(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: AppColor.black,
                     ),
                   ),
                 ),
+
                 SizedBox(height: 21),
                 Container(
                   decoration: BoxDecoration(
@@ -115,81 +174,78 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                       children: [
                         Container(
                           child: TableCalendar(
-                            focusedDay: today,
-                            headerStyle: HeaderStyle(
-                              formatButtonVisible: false,
-                              titleCentered: true,
-                              titleTextStyle: GoogleFont.ibmPlexSans(
-                                color: AppColor.black,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 22,
-                              ),
-                              leftChevronIcon: Icon(
-                                CupertinoIcons.left_chevron,
-                                size: 24,
-                                color: AppColor.gray,
-                              ),
-                              rightChevronIcon: Icon(
-                                CupertinoIcons.right_chevron,
-                                size: 24,
-                                color: AppColor.gray,
-                              ),
-                              headerPadding: EdgeInsets.only(bottom: 25),
-                            ),
-                            availableGestures: AvailableGestures.all,
-                            selectedDayPredicate:
-                                (day) => isSameDay(day, today),
-                            startingDayOfWeek: StartingDayOfWeek.monday,
+                            focusedDay: _focusedDay,
                             firstDay: DateTime.utc(2000),
                             lastDay: DateTime.utc(2050),
-                            onDaySelected: _onDaySelected,
-                            calendarStyle: CalendarStyle(
-                              todayDecoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [AppColor.blue, AppColor.blue],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
+                            onPageChanged: (focusedDay) {
+                              setState(() {
+                                _focusedDay = focusedDay;
+                              });
+                              loadStudentAttendance(focusedDay);
+                            },
+                            selectedDayPredicate:
+                                (day) => isSameDay(day, _selectedDay),
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                              });
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => AttendanceHistoryStudentDate(
+                                        selectedDate: _selectedDay!,
+                                        studentId: widget.studentId ?? 0,
+                                        classId: selectedClass.id,
+                                        studentName:
+                                            attendanceData?.studentName,
+                                        className: selectedClass?.className ?? '',
+                                        section: selectedClass?.section ?? '',
+                                      ),
                                 ),
-                                shape: BoxShape.circle,
-                              ),
-                              selectedDecoration: BoxDecoration(
-                                color: Colors.orange,
-                                shape: BoxShape.circle,
-                              ),
-                              weekendTextStyle: GoogleFont.ibmPlexSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.lightgray,
-                                letterSpacing: 1.2,
-                              ),
-                              weekNumberTextStyle: GoogleFont.ibmPlexSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.gray,
-                              ),
-                              defaultTextStyle: GoogleFont.ibmPlexSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.gray,
-                              ),
+                              );
+                            },
+                            calendarStyle: CalendarStyle(
+                              markersMaxCount: 1,
+                              markerSize: 6,
                             ),
-                            daysOfWeekStyle: DaysOfWeekStyle(
-                              weekdayStyle: GoogleFont.ibmPlexSans(
-                                color: AppColor.lightgray,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 11,
-                                letterSpacing: 1.2,
-                              ),
-                              weekendStyle: GoogleFont.ibmPlexSans(
-                                color: AppColor.lightgray,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 11,
-                                letterSpacing: 1.2,
-                              ),
+                            calendarBuilders: CalendarBuilders(
+                              markerBuilder: (context, day, events) {
+                                final color = getAttendanceColor(
+                                  day,
+                                  attendanceData?.attendanceByDate ?? {},
+                                );
+                                if (color != null) {
+                                  return Positioned(
+                                    bottom: 4,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: color,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return SizedBox.shrink();
+                              },
+                              defaultBuilder: (context, day, focusedDay) {
+                                return Center(
+                                  child: Text(
+                                    '${day.day}',
+                                    style: GoogleFonts.ibmPlexSans(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
-                        SizedBox(height: 35),
+
                         Container(
                           decoration: BoxDecoration(
                             color: AppColor.lowLightgray,
@@ -269,7 +325,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 38),
+                        SizedBox(height: 20),
                         Row(
                           children: [
                             Text(
@@ -292,76 +348,16 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 15),
 
-                        Stack(
-                          alignment: Alignment.centerLeft,
-                          children: [
-                            Container(
-                              height: 30,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColor.lightgray,
-                                    AppColor.lowLightgray.withOpacity(0.2),
-                                    AppColor.lowLightgray.withOpacity(0.2),
-                                    AppColor.lightgray,
-                                  ],
-                                  begin: Alignment.topRight,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColor.black.withOpacity(0.1),
-                                    blurRadius: 9,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            Container(
-                              height: 30,
-                              width: progressWidth,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColor.averageG3Red,
-                                    AppColor.averageG2Yellow,
-                                    AppColor.averageG1Green,
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-
-                            Positioned(
-                              left: progressWidth - 25,
-                              top: 3,
-                              child: Container(
-                                width: 12,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: AppColor.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 6,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                        SizedBox(height: 20),
+                        GradientProgressBar(
+                          progress:
+                              (attendanceData?.presentPercentage ?? 0) / 100,
                         ),
 
-                         SizedBox(height: 12),
+                        SizedBox(height: 15),
+
+                        SizedBox(height: 12),
 
                         Text(
                           "$current Out of $total",

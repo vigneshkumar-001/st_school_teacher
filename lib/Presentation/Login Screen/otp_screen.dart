@@ -23,8 +23,6 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-
-
   final TextEditingController otp = TextEditingController();
   final LoginController otpController = LoginController();
   String? otpError;

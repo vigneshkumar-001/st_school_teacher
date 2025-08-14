@@ -4,6 +4,10 @@ class ApiUrl {
   static String login = '$baseUrl/teacher-auth/login';
   static String verifyOtp = '$baseUrl/teacher-auth/verify-otp';
   static String classList = '$baseUrl/teacher-student-attendance/class-list';
+  static String teacherClassFetch = '$baseUrl/teacher-homework/meta';
+  static String getHomeWork = '$baseUrl/teacher-homework/list';
+  static String createHomework = '$baseUrl/teacher-homework/create';
+  static String profile = '$baseUrl/teacher-home/profile';
   static String attendance =
       '$baseUrl/teacher-student-attendance/mark-attendance';
 
@@ -16,5 +20,29 @@ class ApiUrl {
     required String formattedDate,
   }) {
     return '$baseUrl/teacher-student-attendance/attendance-by-date?class_id=$classId&date=$formattedDate';
+  }
+
+  static String monthlyAttendanceByStudent({
+    required int studentId,
+    required int month,
+    required int year,
+    required int classId,
+  }) {
+    return '$baseUrl/teacher-student-attendance/monthly-attendance-by-student?student_id=$studentId&month=$month&year=$year&class_id=$classId';
+  }
+
+  static String studentDayAttendance({
+    required int classId,
+    required String date,
+    required int studentId,
+  }) {
+    return '$baseUrl/teacher-student-attendance/student-day-attendance?class_id=$classId&date=$date&student_id=$studentId';
+  }
+
+  static String homeWorkDetails({
+    required int classId,
+
+  }) {
+    return '$baseUrl/teacher-homework/details/$classId';
   }
 }

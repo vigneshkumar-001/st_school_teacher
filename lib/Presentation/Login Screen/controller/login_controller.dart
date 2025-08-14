@@ -4,6 +4,7 @@ import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Home/home.dart';
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
+import '../../Menu/menu_screen.dart';
 import '../otp_screen.dart';
 
 class LoginController extends GetxController {
@@ -32,7 +33,6 @@ class LoginController extends GetxController {
           AppLogger.log.i(response.message);
 
           Get.to(() => OtpScreen(mobileNumber: phone, pages: 'splash'));
-
         },
       );
     } catch (e) {
@@ -53,7 +53,7 @@ class LoginController extends GetxController {
           AppLogger.log.e(failure.message);
         },
         (response) async {
-          Get.offAll(Home(pages: 'homeScreen'));
+          Get.offAll(Home());
           isOtpLoading.value = false;
           AppLogger.log.i(response.message);
           final prefs = await SharedPreferences.getInstance();
