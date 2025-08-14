@@ -39,7 +39,7 @@ class _QuizHistoryState extends State<QuizHistory> {
       'done': 'Done',
       'view': 'View',
       'screen1': () {},
-      'screen': ()  => QuizDetails(),
+      'screen': () => QuizDetails(),
       'bgColor': AppColor.lowLightBlue,
       'gradient': LinearGradient(
         colors: [AppColor.black, AppColor.black],
@@ -283,32 +283,43 @@ class _QuizHistoryState extends State<QuizHistory> {
                                                     task['bgColor'] ??
                                                     AppColor.white,
                                                 gradient: task['gradient'],
-                                                  onTap: () {
-                                                    final screenBuilder = task['screen'] as Widget Function()?;
-                                                    if (screenBuilder != null) {
-                                                      final widget = screenBuilder();
-                                                      if (widget != null) {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(builder: (_) => widget),
-                                                        );
-                                                      }
+                                                onTap: () {
+                                                  final screenBuilder =
+                                                      task['screen']
+                                                          as Widget Function()?;
+                                                  if (screenBuilder != null) {
+                                                    final widget =
+                                                        screenBuilder();
+                                                    if (widget != null) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder:
+                                                              (_) => widget,
+                                                        ),
+                                                      );
                                                     }
-                                                  },
-
-                                                  onIconTap: () {
-                                                    final screenBuilder = task['screen1'] as Widget Function()?;
-                                                    if (screenBuilder != null) {
-                                                      final widget = screenBuilder();
-                                                      if (widget != null) {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(builder: (_) => widget),
-                                                        );
-                                                      }
-                                                    }
+                                                  }
                                                 },
 
+                                                onIconTap: () {
+                                                  final screenBuilder =
+                                                      task['screen1']
+                                                          as Widget Function()?;
+                                                  if (screenBuilder != null) {
+                                                    final widget =
+                                                        screenBuilder();
+                                                    if (widget != null) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder:
+                                                              (_) => widget,
+                                                        ),
+                                                      );
+                                                    }
+                                                  }
+                                                },
                                               ),
                                         );
                                       })
