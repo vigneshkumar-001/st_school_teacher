@@ -245,481 +245,481 @@ class _HomeState extends State<Home> {
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 15,
                                   ),
-                                  child: Flexible(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
                                           'Actions',
                                           style: GoogleFont.ibmPlexSans(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 20,
                                           ),
                                         ),
-                                        SizedBox(height: 20),
+                                      ),
+                                      SizedBox(height: 20),
 
-                                        CarouselSlider(
-                                          options: CarouselOptions(
-                                            height: 235,
-                                            enlargeCenterPage: true,
-                                            enlargeFactor: 0.4,
-                                            viewportFraction: 0.4,
+                                      CarouselSlider(
+                                        options: CarouselOptions(
+                                          height: 235,
+                                          enlargeCenterPage: true,
+                                          enlargeFactor: 0.4,
+                                          viewportFraction: 0.4,
 
-                                            autoPlayInterval: const Duration(
-                                              seconds: 3,
-                                            ),
-                                            scrollPhysics:
-                                                BouncingScrollPhysics(),
-                                            onPageChanged: (index, reason) {
-                                              setState(() {
-                                                _currentIndex = index;
-                                              });
-                                            },
+                                          autoPlayInterval: const Duration(
+                                            seconds: 3,
                                           ),
-                                          items:
-                                              sliderItems.map((item) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 0.0,
-                                                      ),
-                                                  child: CommonContainer.carouselSlider(
-                                                    mainText1:
-                                                        item['mainText1'],
-                                                    mainText2:
-                                                        item['mainText2'],
-                                                    iconImage:
-                                                        item['iconImage'],
-                                                    bcImage: item['bcImage'],
-                                                    gradient: item['gradient'],
-                                                    iconHeight:
-                                                        (item['iconHeight'] ??
-                                                                113)
-                                                            .toDouble(),
-                                                    iconWidth:
-                                                        (item['iconWidth'] ??
-                                                                119)
-                                                            .toDouble(),
-                                                  ),
-                                                );
-                                              }).toList(),
+                                          scrollPhysics:
+                                              BouncingScrollPhysics(),
+                                          onPageChanged: (index, reason) {
+                                            setState(() {
+                                              _currentIndex = index;
+                                            });
+                                          },
                                         ),
-                                        SizedBox(height: 10),
-                                        InkWell(
-                                          onTap: () {},
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: AppColor.lowlightgreen,
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 8,
-                                                    horizontal: 17,
-                                                  ),
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                    AppImages.buttonArrow,
-                                                    color: AppColor.lightgreen,
-                                                    height: 20,
-                                                  ),
-                                                  SizedBox(height: 1),
-                                                  Text(
-                                                    'Go',
-                                                    style:
-                                                        GoogleFont.ibmPlexSans(
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 13,
-                                                          color:
-                                                              AppColor
-                                                                  .lightgreen,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 35),
-                                        SizedBox(
-                                          height: 70,
-                                          child: Stack(
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                              Positioned.fill(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [
-                                                        AppColor.white
-                                                            .withOpacity(0.3),
-                                                        AppColor.lowLightgray,
-                                                        AppColor.lowLightgray,
-                                                        AppColor.lowLightgray,
-                                                        AppColor.lowLightgray,
-                                                        AppColor.lowLightgray,
-                                                        AppColor.white
-                                                            .withOpacity(0.3),
-                                                      ],
-                                                      begin: Alignment.topLeft,
-                                                      end: Alignment.topRight,
+                                        items:
+                                            sliderItems.map((item) {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 0.0,
                                                     ),
-                                                  ),
-                                                ),
-                                              ),
-
-                                              Positioned(
-                                                top: -20,
-                                                bottom: -20,
-                                                left: 0,
-                                                right: 0,
-                                                child: ListView.builder(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  itemCount: classData.length,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 2,
-                                                        vertical: 5,
-                                                      ),
-                                                  itemBuilder: (
-                                                    context,
-                                                    index,
-                                                  ) {
-                                                    final item =
-                                                        classData[index];
-                                                    final grade =
-                                                        item['grade']!;
-                                                    final section =
-                                                        item['section']!;
-                                                    final isSelected =
-                                                        index == selectedIndex;
-
-                                                    return GestureDetector(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          selectedIndex = index;
-                                                        });
-                                                      },
-                                                      child: AnimatedContainer(
-                                                        duration: Duration(
-                                                          milliseconds: 40,
-                                                        ),
-                                                        curve: Curves.easeInOut,
-                                                        width: 75,
-                                                        height:
-                                                            isSelected
-                                                                ? 50
-                                                                : 50,
-                                                        margin:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 0,
-                                                            ),
-                                                        decoration: BoxDecoration(
-                                                          color:
-                                                              isSelected
-                                                                  ? AppColor
-                                                                      .white
-                                                                  : Colors
-                                                                      .transparent,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                16,
-                                                              ),
-                                                          border:
-                                                              isSelected
-                                                                  ? Border.all(
-                                                                    color:
-                                                                        AppColor
-                                                                            .black,
-                                                                    width: 1.5,
-                                                                  )
-                                                                  : null,
-                                                          boxShadow:
-                                                              isSelected
-                                                                  ? [
-                                                                    BoxShadow(
-                                                                      color: AppColor
-                                                                          .white
-                                                                          .withOpacity(
-                                                                            0.5,
-                                                                          ),
-                                                                      blurRadius:
-                                                                          10,
-                                                                      offset:
-                                                                          Offset(
-                                                                            0,
-                                                                            4,
-                                                                          ),
-                                                                    ),
-                                                                  ]
-                                                                  : [],
-                                                        ),
-                                                        child:
-                                                            isSelected
-                                                                ? Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    SizedBox(
-                                                                      height: 8,
-                                                                    ),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        ShaderMask(
-                                                                          shaderCallback:
-                                                                              (
-                                                                                bounds,
-                                                                              ) => const LinearGradient(
-                                                                                colors: [
-                                                                                  AppColor.black,
-                                                                                  AppColor.black,
-                                                                                ],
-                                                                                begin:
-                                                                                    Alignment.topLeft,
-                                                                                end:
-                                                                                    Alignment.bottomRight,
-                                                                              ).createShader(
-                                                                                Rect.fromLTWH(
-                                                                                  0,
-                                                                                  0,
-                                                                                  bounds.width,
-                                                                                  bounds.height,
-                                                                                ),
-                                                                              ),
-                                                                          blendMode:
-                                                                              BlendMode.srcIn,
-                                                                          child: Text(
-                                                                            '${grade}',
-                                                                            style: GoogleFont.ibmPlexSans(
-                                                                              fontSize:
-                                                                                  28,
-                                                                              color:
-                                                                                  AppColor.black,
-                                                                              fontWeight:
-                                                                                  FontWeight.bold,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        // Padding(
-                                                                        //   padding:
-                                                                        //       const EdgeInsets.only(
-                                                                        //         top: 8.0,
-                                                                        //       ),
-                                                                        //   child: ShaderMask(
-                                                                        //     shaderCallback:
-                                                                        //         (
-                                                                        //           bounds,
-                                                                        //         ) => const LinearGradient(
-                                                                        //           colors: [
-                                                                        //             AppColor
-                                                                        //                 .blueG1,
-                                                                        //             AppColor
-                                                                        //                 .blue,
-                                                                        //           ],
-                                                                        //           begin:
-                                                                        //               Alignment.topLeft,
-                                                                        //           end:
-                                                                        //               Alignment.bottomRight,
-                                                                        //         ).createShader(
-                                                                        //           Rect.fromLTWH(
-                                                                        //             0,
-                                                                        //             0,
-                                                                        //             bounds
-                                                                        //                 .width,
-                                                                        //             bounds
-                                                                        //                 .height,
-                                                                        //           ),
-                                                                        //         ),
-                                                                        //     blendMode:
-                                                                        //         BlendMode
-                                                                        //             .srcIn,
-                                                                        //     child: Text(
-                                                                        //       'th',
-                                                                        //       style: GoogleFont.ibmPlexSans(
-                                                                        //         fontSize:
-                                                                        //             14,
-                                                                        //         color:
-                                                                        //             Colors
-                                                                        //                 .white,
-                                                                        //         fontWeight:
-                                                                        //             FontWeight
-                                                                        //                 .bold,
-                                                                        //       ),
-                                                                        //     ),
-                                                                        //   ),
-                                                                        // ),
-                                                                      ],
-                                                                    ),
-                                                                    Container(
-                                                                      margin: EdgeInsets.only(
-                                                                        bottom:
-                                                                            0,
-                                                                      ),
-                                                                      padding: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            12,
-                                                                        vertical:
-                                                                            5,
-                                                                      ),
-                                                                      decoration: BoxDecoration(
-                                                                        color:
-                                                                            AppColor.black,
-                                                                        borderRadius: BorderRadius.only(
-                                                                          topLeft: Radius.circular(
-                                                                            40,
-                                                                          ),
-                                                                          topRight: Radius.circular(
-                                                                            40,
-                                                                          ),
-                                                                          bottomLeft:
-                                                                              Radius.circular(
-                                                                                0,
-                                                                              ),
-                                                                          bottomRight:
-                                                                              Radius.circular(
-                                                                                0,
-                                                                              ),
-                                                                        ),
-                                                                      ),
-                                                                      child: Text(
-                                                                        section,
-                                                                        style: GoogleFont.ibmPlexSans(
-                                                                          fontSize:
-                                                                              20,
-                                                                          color:
-                                                                              AppColor.white,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )
-                                                                : Center(
-                                                                  child: Padding(
-                                                                    padding: const EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          12.0,
-                                                                    ),
-                                                                    child: Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .min,
-                                                                      children: [
-                                                                        Container(
-                                                                          padding: const EdgeInsets.symmetric(
-                                                                            horizontal:
-                                                                                25,
-                                                                            vertical:
-                                                                                3,
-                                                                          ),
-                                                                          decoration: BoxDecoration(
-                                                                            color:
-                                                                                AppColor.white,
-                                                                            borderRadius: BorderRadius.circular(
-                                                                              20,
-                                                                            ),
-                                                                          ),
-                                                                          child: Text(
-                                                                            grade,
-                                                                            style: GoogleFont.ibmPlexSans(
-                                                                              fontSize:
-                                                                                  14,
-                                                                              color:
-                                                                                  AppColor.gray,
-                                                                              fontWeight:
-                                                                                  FontWeight.w600,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          height:
-                                                                              5,
-                                                                        ),
-                                                                        Text(
-                                                                          section,
-                                                                          style: GoogleFont.ibmPlexSans(
-                                                                            fontSize:
-                                                                                20,
-                                                                            color:
-                                                                                AppColor.lightgray,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: 50),
-                                        Center(
-                                          child: OutlinedButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (context) =>
-                                                          AttendanceStart(),
+                                                child: CommonContainer.carouselSlider(
+                                                  mainText1:
+                                                      item['mainText1'],
+                                                  mainText2:
+                                                      item['mainText2'],
+                                                  iconImage:
+                                                      item['iconImage'],
+                                                  bcImage: item['bcImage'],
+                                                  gradient: item['gradient'],
+                                                  iconHeight:
+                                                      (item['iconHeight'] ??
+                                                              113)
+                                                          .toDouble(),
+                                                  iconWidth:
+                                                      (item['iconWidth'] ??
+                                                              119)
+                                                          .toDouble(),
                                                 ),
                                               );
-                                            },
-                                            style: OutlinedButton.styleFrom(
-                                              side: BorderSide(
-                                                color: AppColor.blue,
-                                                width: 1.5,
-                                              ),
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 60,
-                                                vertical: 16,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  'Take Attenedence',
-                                                  style: GoogleFont.ibmPlexSans(
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColor.blue,
-                                                  ),
+                                            }).toList(),
+                                      ),
+                                      SizedBox(height: 10),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: AppColor.lowlightgreen,
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                                  vertical: 8,
+                                                  horizontal: 17,
                                                 ),
-                                                SizedBox(width: 15),
+                                            child: Column(
+                                              children: [
                                                 Image.asset(
-                                                  AppImages.doubleArrow,
-                                                  height: 19,
+                                                  AppImages.buttonArrow,
+                                                  color: AppColor.lightgreen,
+                                                  height: 20,
+                                                ),
+                                                SizedBox(height: 1),
+                                                Text(
+                                                  'Go',
+                                                  style:
+                                                      GoogleFont.ibmPlexSans(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 13,
+                                                        color:
+                                                            AppColor
+                                                                .lightgreen,
+                                                      ),
                                                 ),
                                               ],
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      SizedBox(height: 35),
+                                      SizedBox(
+                                        height: 70,
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Positioned.fill(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      AppColor.white
+                                                          .withOpacity(0.3),
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.white
+                                                          .withOpacity(0.3),
+                                                    ],
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.topRight,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            Positioned(
+                                              top: -20,
+                                              bottom: -20,
+                                              left: 0,
+                                              right: 0,
+                                              child: ListView.builder(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount: classData.length,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 2,
+                                                      vertical: 5,
+                                                    ),
+                                                itemBuilder: (
+                                                  context,
+                                                  index,
+                                                ) {
+                                                  final item =
+                                                      classData[index];
+                                                  final grade =
+                                                      item['grade']!;
+                                                  final section =
+                                                      item['section']!;
+                                                  final isSelected =
+                                                      index == selectedIndex;
+
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        selectedIndex = index;
+                                                      });
+                                                    },
+                                                    child: AnimatedContainer(
+                                                      duration: Duration(
+                                                        milliseconds: 40,
+                                                      ),
+                                                      curve: Curves.easeInOut,
+                                                      width: 75,
+                                                      height:
+                                                          isSelected
+                                                              ? 50
+                                                              : 50,
+                                                      margin:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 0,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            isSelected
+                                                                ? AppColor
+                                                                    .white
+                                                                : Colors
+                                                                    .transparent,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              16,
+                                                            ),
+                                                        border:
+                                                            isSelected
+                                                                ? Border.all(
+                                                                  color:
+                                                                      AppColor
+                                                                          .black,
+                                                                  width: 1.5,
+                                                                )
+                                                                : null,
+                                                        boxShadow:
+                                                            isSelected
+                                                                ? [
+                                                                  BoxShadow(
+                                                                    color: AppColor
+                                                                        .white
+                                                                        .withOpacity(
+                                                                          0.5,
+                                                                        ),
+                                                                    blurRadius:
+                                                                        10,
+                                                                    offset:
+                                                                        Offset(
+                                                                          0,
+                                                                          4,
+                                                                        ),
+                                                                  ),
+                                                                ]
+                                                                : [],
+                                                      ),
+                                                      child:
+                                                          isSelected
+                                                              ? Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      ShaderMask(
+                                                                        shaderCallback:
+                                                                            (
+                                                                              bounds,
+                                                                            ) => const LinearGradient(
+                                                                              colors: [
+                                                                                AppColor.black,
+                                                                                AppColor.black,
+                                                                              ],
+                                                                              begin:
+                                                                                  Alignment.topLeft,
+                                                                              end:
+                                                                                  Alignment.bottomRight,
+                                                                            ).createShader(
+                                                                              Rect.fromLTWH(
+                                                                                0,
+                                                                                0,
+                                                                                bounds.width,
+                                                                                bounds.height,
+                                                                              ),
+                                                                            ),
+                                                                        blendMode:
+                                                                            BlendMode.srcIn,
+                                                                        child: Text(
+                                                                          '${grade}',
+                                                                          style: GoogleFont.ibmPlexSans(
+                                                                            fontSize:
+                                                                                28,
+                                                                            color:
+                                                                                AppColor.black,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      // Padding(
+                                                                      //   padding:
+                                                                      //       const EdgeInsets.only(
+                                                                      //         top: 8.0,
+                                                                      //       ),
+                                                                      //   child: ShaderMask(
+                                                                      //     shaderCallback:
+                                                                      //         (
+                                                                      //           bounds,
+                                                                      //         ) => const LinearGradient(
+                                                                      //           colors: [
+                                                                      //             AppColor
+                                                                      //                 .blueG1,
+                                                                      //             AppColor
+                                                                      //                 .blue,
+                                                                      //           ],
+                                                                      //           begin:
+                                                                      //               Alignment.topLeft,
+                                                                      //           end:
+                                                                      //               Alignment.bottomRight,
+                                                                      //         ).createShader(
+                                                                      //           Rect.fromLTWH(
+                                                                      //             0,
+                                                                      //             0,
+                                                                      //             bounds
+                                                                      //                 .width,
+                                                                      //             bounds
+                                                                      //                 .height,
+                                                                      //           ),
+                                                                      //         ),
+                                                                      //     blendMode:
+                                                                      //         BlendMode
+                                                                      //             .srcIn,
+                                                                      //     child: Text(
+                                                                      //       'th',
+                                                                      //       style: GoogleFont.ibmPlexSans(
+                                                                      //         fontSize:
+                                                                      //             14,
+                                                                      //         color:
+                                                                      //             Colors
+                                                                      //                 .white,
+                                                                      //         fontWeight:
+                                                                      //             FontWeight
+                                                                      //                 .bold,
+                                                                      //       ),
+                                                                      //     ),
+                                                                      //   ),
+                                                                      // ),
+                                                                    ],
+                                                                  ),
+                                                                  Container(
+                                                                    margin: EdgeInsets.only(
+                                                                      bottom:
+                                                                          0,
+                                                                    ),
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          12,
+                                                                      vertical:
+                                                                          5,
+                                                                    ),
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          AppColor.black,
+                                                                      borderRadius: BorderRadius.only(
+                                                                        topLeft: Radius.circular(
+                                                                          40,
+                                                                        ),
+                                                                        topRight: Radius.circular(
+                                                                          40,
+                                                                        ),
+                                                                        bottomLeft:
+                                                                            Radius.circular(
+                                                                              0,
+                                                                            ),
+                                                                        bottomRight:
+                                                                            Radius.circular(
+                                                                              0,
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                    child: Text(
+                                                                      section,
+                                                                      style: GoogleFont.ibmPlexSans(
+                                                                        fontSize:
+                                                                            20,
+                                                                        color:
+                                                                            AppColor.white,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                              : Center(
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                    vertical:
+                                                                        12.0,
+                                                                  ),
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children: [
+                                                                      Container(
+                                                                        padding: const EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              25,
+                                                                          vertical:
+                                                                              3,
+                                                                        ),
+                                                                        decoration: BoxDecoration(
+                                                                          color:
+                                                                              AppColor.white,
+                                                                          borderRadius: BorderRadius.circular(
+                                                                            20,
+                                                                          ),
+                                                                        ),
+                                                                        child: Text(
+                                                                          grade,
+                                                                          style: GoogleFont.ibmPlexSans(
+                                                                            fontSize:
+                                                                                14,
+                                                                            color:
+                                                                                AppColor.gray,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Text(
+                                                                        section,
+                                                                        style: GoogleFont.ibmPlexSans(
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              AppColor.lightgray,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 50),
+                                      Center(
+                                        child: OutlinedButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) =>
+                                                        AttendanceStart(),
+                                              ),
+                                            );
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                            side: BorderSide(
+                                              color: AppColor.blue,
+                                              width: 1.5,
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 60,
+                                              vertical: 16,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Take Attenedence',
+                                                style: GoogleFont.ibmPlexSans(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: AppColor.blue,
+                                                ),
+                                              ),
+                                              SizedBox(width: 15),
+                                              Image.asset(
+                                                AppImages.doubleArrow,
+                                                height: 19,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
