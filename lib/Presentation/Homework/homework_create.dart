@@ -779,12 +779,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                         SizedBox(height: 40),
                         AppButton.button(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomeworkCreatePreview(),
-                              ),
-                            );
+
                           },
                           width: 145,
                           height: 60,
