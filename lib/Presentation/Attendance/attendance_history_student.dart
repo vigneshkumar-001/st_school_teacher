@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_history.dart';
@@ -375,6 +376,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                 Center(
                   child: OutlinedButton(
                     onPressed: () {
+                      HapticFeedback.heavyImpact();
                       Navigator.push(
                         context,
                         MaterialPageRoute(

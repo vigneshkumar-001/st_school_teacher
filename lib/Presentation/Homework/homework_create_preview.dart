@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
 
@@ -319,6 +320,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                               SizedBox(width: 10),
                               AppButton.button(
                                 onTap: () async {
+                                  HapticFeedback.heavyImpact();
                                   List<Map<String, dynamic>> contents = [];
 
                                   // Add lists to contents
@@ -352,7 +354,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     }
                                   }
 
-                                  // The first description string goes to 'description' field, or empty string if none
+
                                   String mainDescription =
                                       widget.description.isNotEmpty
                                           ? widget.description[0]

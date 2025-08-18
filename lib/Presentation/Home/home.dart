@@ -137,15 +137,8 @@ class _HomeState extends State<Home> {
                                   ),
                                 ),
                                 Spacer(),
-                                Text(
-                                  'Menu',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                SizedBox(width: 7),
+
+
                                 InkWell(
                                   onTap: () {
                                     Navigator.push(
@@ -155,18 +148,31 @@ class _HomeState extends State<Home> {
                                       ),
                                     );
                                   },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColor.white,
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(11.0),
-                                      child: Image.asset(
-                                        AppImages.menuImage,
-                                        height: 23.2,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Menu',
+                                        style: GoogleFont.ibmPlexSans(
+                                          fontSize: 14,
+                                          color: AppColor.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
                                       ),
-                                    ),
+                                      SizedBox(width: 7),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: AppColor.white,
+                                          borderRadius: BorderRadius.circular(50),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(11.0),
+                                          child: Image.asset(
+                                            AppImages.menuImage,
+                                            height: 23.2,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -213,8 +219,8 @@ class _HomeState extends State<Home> {
                         left: 0,
                         child: DraggableScrollableSheet(
                           initialChildSize: 0.85,
-                          minChildSize: 0.5,
-                          maxChildSize: 0.95,
+                          minChildSize: 0.85,
+                          maxChildSize: 0.85,
                           builder: (context, scrollController) {
                             return Container(
                               padding: const EdgeInsets.all(0),
