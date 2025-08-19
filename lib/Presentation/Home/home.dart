@@ -169,6 +169,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 Spacer(),
 
+ 
                                 InkWell(
                                   onTap: () {
                                     Navigator.push(
@@ -192,9 +193,9 @@ class _HomeState extends State<Home> {
                                       Container(
                                         decoration: BoxDecoration(
                                           color: AppColor.white,
-                                          borderRadius: BorderRadius.circular(
-                                            50,
-                                          ),
+ 
+                                          borderRadius: BorderRadius.circular(50),
+ 
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.all(11.0),

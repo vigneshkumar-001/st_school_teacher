@@ -283,9 +283,10 @@ class _MyProfileState extends State<MyProfile> {
                                                   MaterialPageRoute(
                                                     builder:
                                                         (context) =>
-                                                        ChangeMobileNumber(
-                                                          page: 'splash',
-                                                        ),
+                                                  ChangeMobileNumber(
+                                                              page: 'splash',
+                                                            ),
+
                                                   ),
                                                 );
                                               },
