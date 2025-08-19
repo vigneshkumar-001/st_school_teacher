@@ -27,13 +27,10 @@ class CustomTextField {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(sno, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        Text(sno, style: GoogleFont.ibmPlexSans(fontSize: 16,)),
         SizedBox(width: 8),
         Expanded(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
+          child: Text(text, style: GoogleFont.ibmPlexSans(fontSize: 16)),
         ),
       ],
     );

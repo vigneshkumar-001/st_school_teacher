@@ -623,9 +623,9 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                         ),
                                       ),
 
-                                      const SizedBox(height: 10),
+                                       SizedBox(height: 10),
 
-                                      // Student Lists
+
                                       if (selectedIndex == 0) ...[
                                         for (var student in presentStudents)
                                           CommonContainer.StudentsList(
@@ -643,8 +643,8 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           Center(
                                             child: Text(
                                               'No pending students',
-                                              style: TextStyle(
-                                                color: Colors.grey,
+                                              style: GoogleFont.ibmPlexSans(
+                                                color: AppColor.gray,
                                               ),
                                             ),
                                           )
@@ -659,8 +659,8 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           Center(
                                             child: Text(
                                               'No students',
-                                              style: TextStyle(
-                                                color: Colors.grey,
+                                              style: GoogleFont.ibmPlexSans(
+                                                color: AppColor.gray,
                                               ),
                                             ),
                                           )

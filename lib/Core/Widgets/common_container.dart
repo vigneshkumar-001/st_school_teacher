@@ -7,6 +7,7 @@ import 'package:st_teacher_app/Core/Utility/custom_textfield.dart';
 import '../Utility/app_color.dart';
 import '../Utility/app_images.dart';
 import '../Utility/google_fonts.dart';
+import 'package:flutter/material.dart';
 
 final FocusNode nextFieldFocusNode = FocusNode();
 
@@ -146,6 +147,7 @@ class CommonContainer {
     Color? imageColor,
     VoidCallback? onIconTap,
     Border? border,
+    bool? blueContainer,
   }) {
     return InkWell(
       onTap: onIconTap,
@@ -163,14 +165,18 @@ class CommonContainer {
     );
   }
 
-  static StudentsList({required String mainText, VoidCallback? onIconTap}) {
+  static StudentsList({
+    required String mainText,
+    VoidCallback? onIconTap,
+    bool blueContainer = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: onIconTap,
-            child: Row(
+      child: InkWell(
+        onTap: onIconTap,
+        child: Column(
+          children: [
+            Row(
               children: [
                 Text(
                   mainText,
@@ -180,20 +186,39 @@ class CommonContainer {
                   ),
                 ),
                 Spacer(),
-                InkWell(
-                  onTap: onIconTap,
-                  child: Image.asset(
-                    AppImages.rightSideArrow,
-                    height: 10,
-                    color: AppColor.lightgray,
+                if (blueContainer)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.blueStdContainer,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 20,
+                      ),
+                      child: Text(
+                        '7 out of 10',
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: AppColor.blue,
+                        ),
+                      ),
+                    ),
                   ),
+                SizedBox(width: 10),
+                Image.asset(
+                  AppImages.rightSideArrow,
+                  height: 10,
+                  color: AppColor.lightgray,
                 ),
               ],
             ),
-          ),
-          SizedBox(height: 10),
-          Divider(color: AppColor.lowLightgray),
-        ],
+            SizedBox(height: 10),
+            Divider(color: AppColor.lowLightgray),
+          ],
+        ),
       ),
     );
   }
@@ -969,65 +994,109 @@ class CommonContainer {
       ),
     );
   }
-
-  static carouselSlider({
+  static Widget carouselSlider({
     required String mainText1,
     required String mainText2,
     required String iconImage,
     required String bcImage,
+    bool isSelect = false,
     Gradient? gradient,
+    required int iconHeight,
+    required int iconWidth,
+    Alignment iconAlignment = Alignment.center,
+    double iconYOffset = 0,
+    EdgeInsets? iconPadding,
+    // NEW: control text block position/alignment like Figma
+    TextAlign textAlign = TextAlign.start,
+    EdgeInsets? textPadding,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
-        children: [
-          Image.asset(bcImage, height: 249, width: 187),
-          Positioned(
-            child: Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Text(
-                      mainText1,
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: AppColor.white,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+    final CrossAxisAlignment textCross =
+        (textAlign == TextAlign.end)
+            ? CrossAxisAlignment.end
+            : (textAlign == TextAlign.center)
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start;
 
-                  Flexible(
-                    child: Text(
-                      mainText2,
+    return Material(
+      color: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(22),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            // background
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Image.asset(bcImage, fit: BoxFit.cover),
+              ),
+            ),
+
+            // TEXTS (now alignable)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 20,
+              child: Padding(
+                padding:
+                    textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: textCross,
+                  children: [
+                    Text(
+                      mainText1,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
                       style: GoogleFont.ibmPlexSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
+                        fontSize: isSelect ? 22 : 15,
+                        fontWeight:
+                            isSelect ? FontWeight.w800 : FontWeight.w500,
                         color: AppColor.white,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Spacer(),
-                  Align(
-                    alignment: Alignment.center,
+                    Text(
+                      mainText2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: isSelect ? 22 : 20,
+                        fontWeight:
+                            isSelect ? FontWeight.w500 : FontWeight.w800,
+                        color: AppColor.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ILLUSTRATION (align + offset + padding)
+            Positioned.fill(
+              child: Padding(
+                padding:
+                    isSelect
+                        ? const EdgeInsets.symmetric(horizontal: 0)
+                        : const EdgeInsets.symmetric(horizontal: 25),
+                child: Align(
+                  alignment: iconAlignment,
+                  child: Transform.translate(
+                    offset: Offset(0, iconYOffset),
                     child: SizedBox(
-                      height: 80,
-                      width: 80,
+                      height: iconHeight.toDouble(),
+                      width: iconWidth.toDouble(),
                       child: Image.asset(iconImage, fit: BoxFit.contain),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1286,3 +1355,4 @@ class CommonContainer {
     );
   }
 }
+ 

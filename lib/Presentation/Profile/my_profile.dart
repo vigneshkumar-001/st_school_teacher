@@ -110,19 +110,19 @@ class _MyProfileState extends State<MyProfile> {
                                 sectionSubjects: {
                                   for (var s in classInfo.sections)
                                     s:
-                                        classInfo.subjects
-                                            .map((e) => e.name)
-                                            .toList(),
+                                    classInfo.subjects
+                                        .map((e) => e.name)
+                                        .toList(),
                                 },
                                 expandedSection:
-                                    expandedSections[classInfo.className],
+                                expandedSections[classInfo.className],
 
                                 onSectionTap: (section) {
                                   setState(() {
                                     if (expandedSections['${classInfo.className}'] ==
                                         section) {
                                       expandedSections['${classInfo.className}'] =
-                                          null; // collapse if same tapped
+                                      null; // collapse if same tapped
                                     } else {
                                       expandedSections['${classInfo.className}'] =
                                           section;
@@ -131,7 +131,7 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 paddings: List.generate(
                                   classInfo.sections.length,
-                                  (index) =>
+                                      (index) =>
                                       EdgeInsets.symmetric(horizontal: 6),
                                 ),
                                 containerPadding: EdgeInsets.symmetric(
@@ -283,9 +283,10 @@ class _MyProfileState extends State<MyProfile> {
                                                   MaterialPageRoute(
                                                     builder:
                                                         (context) =>
-                                                            ChangeMobileNumber(
+                                                  ChangeMobileNumber(
                                                               page: 'splash',
                                                             ),
+
                                                   ),
                                                 );
                                               },

@@ -1,28 +1,50 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+
 import 'package:st_teacher_app/Core/Utility/app_color.dart';
 import 'package:st_teacher_app/Core/Utility/app_images.dart';
-import 'package:flutter/material.dart' hide CarouselController;
-
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../Attendance/attendance_history_student.dart';
 import '../Attendance/attendance_start.dart';
 import '../Menu/menu_screen.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+
+import 'dart:ui' show lerpDouble; // so we can call lerpDouble(...)
 
 class Home extends StatefulWidget {
   final String? pages;
-  const Home({super.key, this.pages});
+  const Home({super.key, this.pages, required String page});
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+  late final PageController _pageController;
+
   int _currentIndex = 0;
+  int _current = 1;
   int selectedIndex = 0;
   int subjectIndex = 0;
   bool showThirdContainer = false;
+
+  double currentPage = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      viewportFraction: 0.66, // peeking space like Figma (tweak 0.64–0.68)
+      initialPage: 1, // start with middle centered
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, String>> classData = [
     {'grade': '8', 'section': 'A'},
@@ -36,32 +58,38 @@ class _HomeState extends State<Home> {
     {
       'gradient': LinearGradient(
         colors: [
-          AppColor.bluehG1,
-          AppColor.bluehG1,
-          AppColor.bluehG1,
-
-          AppColor.bluehG2.withOpacity(0.5),
-          AppColor.white.withOpacity(0.5),
+          AppColor.orangeG1,
+          AppColor.orangeG1,
+          AppColor.orangeG1,
+          AppColor.orangeG2,
+          AppColor.white,
+          AppColor.white,
+          AppColor.white,
           AppColor.white,
           AppColor.white,
         ],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
-      'mainText1': 'Conduct',
-      'mainText2': 'Quiz',
-      'iconImage': AppImages.Quiz,
+      'mainText1': 'Schedule',
+      'mainText2': 'Exam',
+      'iconImage': AppImages.scheduleExam,
       'bcImage': AppImages.bcImage,
     },
+
     {
       'gradient': LinearGradient(
         colors: [
           AppColor.greenG1,
           AppColor.greenG1,
-          AppColor.greenG1.withOpacity(0.9),
-          AppColor.greenG2.withOpacity(0.5),
-          AppColor.greenG3.withOpacity(0.5),
-          AppColor.white.withOpacity(0.5),
+          AppColor.greenG2,
+          AppColor.greenG2,
+          AppColor.greenG4,
+          AppColor.greenG3,
+          AppColor.greenG3,
+          AppColor.white,
+          AppColor.white,
+          AppColor.white,
           AppColor.white,
           AppColor.white,
         ],
@@ -77,19 +105,22 @@ class _HomeState extends State<Home> {
     {
       'gradient': LinearGradient(
         colors: [
-          AppColor.orangeG1,
-          AppColor.orangeG1,
-          AppColor.orangeG1,
-          AppColor.orangeG2.withOpacity(0.5),
-          AppColor.white.withOpacity(0.5),
+          AppColor.bluehG1,
+          AppColor.bluehG1,
+          AppColor.bluehG1,
+          AppColor.bluehG2,
+          AppColor.white,
+          AppColor.white,
+          AppColor.white,
+          AppColor.white,
           AppColor.white,
         ],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
-      'mainText1': 'Schedule',
-      'mainText2': 'Exam',
-      'iconImage': AppImages.scheduleExam,
+      'mainText1': 'Conduct',
+      'mainText2': 'Quiz',
+      'iconImage': AppImages.Quiz,
       'bcImage': AppImages.bcImage,
     },
   ];
@@ -138,7 +169,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 Spacer(),
 
-
+ 
                                 InkWell(
                                   onTap: () {
                                     Navigator.push(
@@ -162,7 +193,9 @@ class _HomeState extends State<Home> {
                                       Container(
                                         decoration: BoxDecoration(
                                           color: AppColor.white,
+ 
                                           borderRadius: BorderRadius.circular(50),
+ 
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.all(11.0),
@@ -252,154 +285,320 @@ class _HomeState extends State<Home> {
                                           fontSize: 20,
                                         ),
                                       ),
-                                      SizedBox(height: 20),
+                                      SizedBox(height: 1),
 
-                                      // Container(
-                                      //   decoration: BoxDecoration(
-                                      //     gradient: LinearGradient(
-                                      //       colors: [
-                                      //         AppColor.greenG1,
-                                      //         AppColor.greenG1,
-                                      //         AppColor.greenG1.withOpacity(0.9),
-                                      //         AppColor.greenG2.withOpacity(0.5),
-                                      //         AppColor.greenG3.withOpacity(0.5),
-                                      //         AppColor.white.withOpacity(0.5),
-                                      //         AppColor.white,
-                                      //         AppColor.white,
-                                      //       ],
-                                      //       begin: Alignment.topCenter,
-                                      //       end: Alignment.bottomCenter,
-                                      //     ),
-                                      //     borderRadius: BorderRadius.circular(16),
-                                      //   ),
-                                      //   child: Stack(
-                                      //     children: [
-                                      //       Image.asset(
-                                      //         AppImages.bcImage,
-                                      //         height: 249,
-                                      //         width: 187,
-                                      //       ),
-                                      //       Positioned(
-                                      //         child: Padding(
-                                      //           padding: const EdgeInsets.all(25.0),
-                                      //           child: Column(
-                                      //             crossAxisAlignment:
-                                      //                 CrossAxisAlignment.start,
-                                      //             children: [
-                                      //               Text(
-                                      //                 'Assign',
-                                      //                 style: GoogleFont.ibmPlexSans(
-                                      //                   fontSize: 22,
-                                      //                   fontWeight: FontWeight.w800,
-                                      //                   color: AppColor.white,
-                                      //                 ),
-                                      //               ),
-                                      //               Text(
-                                      //                 'Homework',
-                                      //                 style: GoogleFont.ibmPlexSans(
-                                      //                   fontSize: 22,
-                                      //                   fontWeight: FontWeight.w500,
-                                      //                   color: AppColor.white,
-                                      //                 ),
-                                      //               ),
-                                      //               SizedBox(height: 10),
-                                      //               Image.asset(
-                                      //                 AppImages.Homework,
-                                      //                 height: 113,
-                                      //                 width: 139,
-                                      //               ),
-                                      //             ],
-                                      //           ),
-                                      //         ),
-                                      //       ),
-                                      //     ],
-                                      //   ),
-                                      // ),
                                       SizedBox(
-                                        height: 210,
-                                        child: CarouselSlider.builder(
-                                          itemCount: sliderItems.length,
-                                          options: CarouselOptions(
-                                            enlargeCenterPage: false,
-                                            viewportFraction: 0.5,
-                                            padEnds: true,
-                                            initialPage: 0,
-                                            enableInfiniteScroll: false,
-                                            autoPlay: false,
-                                            autoPlayInterval: Duration(
-                                              seconds: 3,
-                                            ),
-                                            autoPlayAnimationDuration: Duration(
-                                              milliseconds: 500,
-                                            ),
-                                            autoPlayCurve: Curves.easeInBack,
-                                            onPageChanged: (index, reason) {
-                                              setState(() {
-                                                _currentIndex = index;
-                                              });
-                                            },
-                                          ),
-                                          itemBuilder: (
-                                              context,
-                                              index,
-                                              realIndex,
-                                              ) {
-                                            final bool isSelected =
-                                                index == _currentIndex;
-                                            final bool isLeft =
-                                                index == _currentIndex - 1;
-                                            final bool isRight =
-                                                index == _currentIndex + 1;
+                                        height: 250,
+                                        child: LayoutBuilder(
+                                          builder: (context, c) {
+                                            final panelW = c.maxWidth;
+                                            final cardW =
+                                                panelW *
+                                                0.58; // Figma-ish card width
+                                            final insetX =
+                                                cardW *
+                                                0.42; // side peek spacing
+                                            const dropSide = 50.0;
+                                            // Sizes per card
+                                            const cardIconSizes = [
+                                              {
+                                                "selectedH": 200,
+                                                "selectedW": 220,
+                                                "sideH": 160,
+                                                "sideW": 170,
+                                              }, // card 0
+                                              {
+                                                "selectedH": 450,
+                                                "selectedW": 400,
+                                                "sideH": 150,
+                                                "sideW": 156,
+                                              }, // card 1 (bigger)
+                                              {
+                                                "selectedH": 410,
+                                                "selectedW": 450,
+                                                "sideH": 190,
+                                                "sideW": 200,
+                                              }, // card 2
+                                            ];
 
-                                            final double scale =
-                                            isSelected ? 1.0 : 0.8;
-                                            final double elevation =
-                                            isSelected ? 0 : 0;
-                                            final double offsetY =
-                                            isSelected ? 0 : 40;
-                                            final double opacity =
-                                            isSelected ? 1.0 : 0.6;
+                                            return Stack(
+                                              clipBehavior: Clip.none,
+                                              children: [
+                                                // gestures
+                                                PageView.builder(
+                                                  controller: _pageController,
+                                                  itemCount: sliderItems.length,
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
+                                                  onPageChanged:
+                                                      (i) => setState(
+                                                        () =>
+                                                            currentPage =
+                                                                i.toDouble(),
+                                                      ),
+                                                  itemBuilder:
+                                                      (_, __) =>
+                                                          const SizedBox.shrink(),
+                                                ),
 
-                                            return Transform.translate(
-                                              offset: Offset(0, offsetY),
-                                              child: Transform.scale(
-                                                scale: scale,
-                                                child: AnimatedOpacity(
-                                                  duration: Duration(
-                                                    milliseconds: 300,
-                                                  ),
-                                                  opacity: opacity,
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      // boxShadow: [
-                                                      //   BoxShadow(
-                                                      //     color: Colors.black.withOpacity(0.2),
-                                                      //     blurRadius: elevation,
-                                                      //     spreadRadius: 1,
-                                                      //     offset: Offset(0, 5),
-                                                      //   ),
-                                                      // ],
-                                                    ),
-                                                    child: CommonContainer.carouselSlider(
-                                                      bcImage:
-                                                      sliderItems[index]['bcImage'],
-                                                      gradient:
-                                                      sliderItems[index]['gradient'],
-                                                      mainText1:
-                                                      sliderItems[index]['mainText1'],
-                                                      mainText2:
-                                                      sliderItems[index]['mainText2'],
-                                                      iconImage:
-                                                      sliderItems[index]['iconImage'],
+                                                // visuals
+                                                Positioned.fill(
+                                                  child: IgnorePointer(
+                                                    ignoring: true,
+                                                    child: AnimatedBuilder(
+                                                      animation:
+                                                          _pageController,
+                                                      builder: (context, _) {
+                                                        final page =
+                                                            _pageController
+                                                                    .hasClients
+                                                                ? (_pageController
+                                                                        .page ??
+                                                                    _pageController
+                                                                        .initialPage
+                                                                        .toDouble())
+                                                                : currentPage;
+
+                                                        // paint center last (on top)
+                                                        final order = List<
+                                                          int
+                                                        >.generate(
+                                                          sliderItems.length,
+                                                          (i) => i,
+                                                        )..sort((a, b) {
+                                                          final fa =
+                                                              1 -
+                                                              (page - a)
+                                                                  .abs()
+                                                                  .clamp(
+                                                                    0.0,
+                                                                    1.0,
+                                                                  );
+                                                          final fb =
+                                                              1 -
+                                                              (page - b)
+                                                                  .abs()
+                                                                  .clamp(
+                                                                    0.0,
+                                                                    1.0,
+                                                                  );
+                                                          return fa.compareTo(
+                                                            fb,
+                                                          );
+                                                        });
+
+                                                        double lerp(
+                                                          double a,
+                                                          double b,
+                                                          double t,
+                                                        ) => a + (b - a) * t;
+
+                                                        return Stack(
+                                                          clipBehavior:
+                                                              Clip.none,
+                                                          children: [
+                                                            for (final i
+                                                                in order)
+                                                              Builder(
+                                                                builder: (
+                                                                  context,
+                                                                ) {
+                                                                  final delta =
+                                                                      page - i;
+                                                                  final dist =
+                                                                      delta
+                                                                          .abs()
+                                                                          .clamp(
+                                                                            0.0,
+                                                                            1.0,
+                                                                          );
+                                                                  final focus =
+                                                                      1.0 -
+                                                                      dist;
+                                                                  final isCenter =
+                                                                      dist <
+                                                                      0.001;
+
+                                                                  // zoom/position
+                                                                  final scale =
+                                                                      lerp(
+                                                                        0.70,
+                                                                        0.75,
+                                                                        focus,
+                                                                      );
+                                                                  final dx = lerp(
+                                                                    (page > i)
+                                                                        ? insetX
+                                                                        : -insetX,
+                                                                    0,
+                                                                    focus,
+                                                                  );
+                                                                  final dy =
+                                                                      lerp(
+                                                                        dropSide,
+                                                                        0,
+                                                                        focus,
+                                                                      );
+
+                                                                  final m =
+                                                                      Matrix4.identity()
+                                                                        ..setEntry(
+                                                                          3,
+                                                                          2,
+                                                                          0.001,
+                                                                        )
+                                                                        ..translate(
+                                                                          dx,
+                                                                          dy,
+                                                                        )
+                                                                        ..scale(
+                                                                          scale,
+                                                                        );
+
+                                                                  Alignment
+                                                                  iconAlign;
+                                                                  TextAlign
+                                                                  textAlign;
+                                                                  if (i == 0) {
+                                                                    iconAlign =
+                                                                        Alignment
+                                                                            .centerRight;
+                                                                    textAlign =
+                                                                        TextAlign
+                                                                            .end;
+                                                                  } else if (i ==
+                                                                      sliderItems
+                                                                              .length -
+                                                                          1) {
+                                                                    iconAlign =
+                                                                        Alignment
+                                                                            .centerLeft;
+                                                                    textAlign =
+                                                                        TextAlign
+                                                                            .start;
+                                                                  } else {
+                                                                    iconAlign =
+                                                                        Alignment
+                                                                            .center;
+                                                                    textAlign =
+                                                                        TextAlign
+                                                                            .left;
+                                                                  }
+
+                                                                  //                                                               // ✅ Use separate width/height for center card vs side cards
+                                                                  //                                                               final double iconY = isCenter ? 40.0 : 35.0;
+                                                                  //
+                                                                  // // you can tweak these numbers as you want
+                                                                  //                                                               final int iconH = isCenter
+                                                                  //                                                                   ? (230 * scale).toInt()   // center card bigger
+                                                                  //                                                                   : (150 * scale).toInt();  // side cards smaller
+                                                                  //
+                                                                  //                                                               final int iconW = isCenter
+                                                                  //                                                                   ? (290 * scale).toInt()   // center card wider
+                                                                  //                                                                   : (156 * scale).toInt();  // side cards narrower
+
+                                                                  final sizes =
+                                                                      cardIconSizes[i];
+
+                                                                  // vertical offset (optional tweak per card too)
+                                                                  final double
+                                                                  iconY =
+                                                                      isCenter
+                                                                          ? 40.0
+                                                                          : -10.0;
+
+                                                                  final int
+                                                                  iconH =
+                                                                      isCenter
+                                                                          ? (sizes["selectedH"]! *
+                                                                                  scale)
+                                                                              .toInt()
+                                                                          : (sizes["sideH"]! *
+                                                                                  scale)
+                                                                              .toInt();
+
+                                                                  final int
+                                                                  iconW =
+                                                                      isCenter
+                                                                          ? (sizes["selectedW"]! *
+                                                                                  scale)
+                                                                              .toInt()
+                                                                          : (sizes["sideW"]! *
+                                                                                  scale)
+                                                                              .toInt();
+
+                                                                  return Positioned.fill(
+                                                                    child: Center(
+                                                                      child: SizedBox(
+                                                                        width:
+                                                                            cardW,
+                                                                        child: Transform(
+                                                                          alignment:
+                                                                              Alignment.center,
+                                                                          transform:
+                                                                              m,
+                                                                          child: Material(
+                                                                            color:
+                                                                                Colors.transparent,
+                                                                            elevation: lerp(
+                                                                              0.0,
+                                                                              0.0,
+                                                                              focus,
+                                                                            ),
+                                                                            borderRadius: BorderRadius.circular(
+                                                                              22,
+                                                                            ),
+                                                                            shadowColor: Colors.black.withOpacity(
+                                                                              0.22,
+                                                                            ),
+                                                                            child: Opacity(
+                                                                              opacity:
+                                                                                  1.0, // always visible
+                                                                              child: CommonContainer.carouselSlider(
+                                                                                isSelect:
+                                                                                    isCenter,
+                                                                                mainText1:
+                                                                                    sliderItems[i]['mainText1'],
+                                                                                mainText2:
+                                                                                    sliderItems[i]['mainText2'],
+                                                                                iconImage:
+                                                                                    sliderItems[i]['iconImage'],
+                                                                                bcImage:
+                                                                                    sliderItems[i]['bcImage'],
+                                                                                gradient:
+                                                                                    sliderItems[i]['gradient'],
+                                                                                iconHeight:
+                                                                                    iconH,
+                                                                                iconWidth:
+                                                                                    iconW,
+                                                                                iconAlignment:
+                                                                                    iconAlign,
+                                                                                iconYOffset:
+                                                                                    iconY,
+                                                                                textAlign:
+                                                                                    textAlign,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                          ],
+                                                        );
+                                                      },
                                                     ),
                                                   ),
                                                 ),
-                                              ),
+                                              ],
                                             );
                                           },
                                         ),
                                       ),
-                                      SizedBox(height: 10),
+
+                                      SizedBox(height: 2),
                                       InkWell(
                                         onTap: () {},
                                         child: Container(
@@ -470,18 +669,18 @@ class _HomeState extends State<Home> {
                                               right: 0,
                                               child: ListView.builder(
                                                 scrollDirection:
-                                                Axis.horizontal,
+                                                    Axis.horizontal,
                                                 itemCount: classData.length,
                                                 padding:
-                                                const EdgeInsets.symmetric(
-                                                  horizontal: 2,
-                                                  vertical: 5,
-                                                ),
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 2,
+                                                      vertical: 5,
+                                                    ),
                                                 itemBuilder: (context, index) {
                                                   final item = classData[index];
                                                   final grade = item['grade']!;
                                                   final section =
-                                                  item['section']!;
+                                                      item['section']!;
                                                   final isSelected =
                                                       index == selectedIndex;
 
@@ -498,256 +697,208 @@ class _HomeState extends State<Home> {
                                                       curve: Curves.easeInOut,
                                                       width: 75,
                                                       height:
-                                                      isSelected ? 50 : 50,
+                                                          isSelected ? 50 : 50,
                                                       margin:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 0,
-                                                      ),
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 0,
+                                                          ),
                                                       decoration: BoxDecoration(
                                                         color:
-                                                        isSelected
-                                                            ? AppColor.white
-                                                            : Colors
-                                                            .transparent,
+                                                            isSelected
+                                                                ? AppColor.white
+                                                                : Colors
+                                                                    .transparent,
                                                         borderRadius:
-                                                        BorderRadius.circular(
-                                                          16,
-                                                        ),
+                                                            BorderRadius.circular(
+                                                              16,
+                                                            ),
                                                         border:
-                                                        isSelected
-                                                            ? Border.all(
-                                                          color:
-                                                          AppColor
-                                                              .black,
-                                                          width: 1.5,
-                                                        )
-                                                            : null,
+                                                            isSelected
+                                                                ? Border.all(
+                                                                  color:
+                                                                      AppColor
+                                                                          .black,
+                                                                  width: 1.5,
+                                                                )
+                                                                : null,
                                                         boxShadow:
-                                                        isSelected
-                                                            ? [
-                                                          BoxShadow(
-                                                            color: AppColor
-                                                                .white
-                                                                .withOpacity(
-                                                              0.5,
-                                                            ),
-                                                            blurRadius:
-                                                            10,
-                                                            offset:
-                                                            Offset(
-                                                              0,
-                                                              4,
-                                                            ),
-                                                          ),
-                                                        ]
-                                                            : [],
+                                                            isSelected
+                                                                ? [
+                                                                  BoxShadow(
+                                                                    color: AppColor
+                                                                        .white
+                                                                        .withOpacity(
+                                                                          0.5,
+                                                                        ),
+                                                                    blurRadius:
+                                                                        10,
+                                                                    offset:
+                                                                        Offset(
+                                                                          0,
+                                                                          4,
+                                                                        ),
+                                                                  ),
+                                                                ]
+                                                                : [],
                                                       ),
                                                       child:
-                                                      isSelected
-                                                          ? Column(
-                                                        mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                        children: [
-                                                          SizedBox(
-                                                            height: 8,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                            children: [
-                                                              ShaderMask(
-                                                                shaderCallback:
-                                                                    (
-                                                                    bounds,
-                                                                    ) => const LinearGradient(
-                                                                  colors: [
-                                                                    AppColor.black,
-                                                                    AppColor.black,
-                                                                  ],
-                                                                  begin:
-                                                                  Alignment.topLeft,
-                                                                  end:
-                                                                  Alignment.bottomRight,
-                                                                ).createShader(
-                                                                  Rect.fromLTWH(
-                                                                    0,
-                                                                    0,
-                                                                    bounds.width,
-                                                                    bounds.height,
+                                                          isSelected
+                                                              ? Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  SizedBox(
+                                                                    height: 8,
                                                                   ),
-                                                                ),
-                                                                blendMode:
-                                                                BlendMode.srcIn,
-                                                                child: Text(
-                                                                  '${grade}',
-                                                                  style: GoogleFont.ibmPlexSans(
-                                                                    fontSize:
-                                                                    28,
-                                                                    color:
-                                                                    AppColor.black,
-                                                                    fontWeight:
-                                                                    FontWeight.bold,
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      ShaderMask(
+                                                                        shaderCallback:
+                                                                            (
+                                                                              bounds,
+                                                                            ) => const LinearGradient(
+                                                                              colors: [
+                                                                                AppColor.black,
+                                                                                AppColor.black,
+                                                                              ],
+                                                                              begin:
+                                                                                  Alignment.topLeft,
+                                                                              end:
+                                                                                  Alignment.bottomRight,
+                                                                            ).createShader(
+                                                                              Rect.fromLTWH(
+                                                                                0,
+                                                                                0,
+                                                                                bounds.width,
+                                                                                bounds.height,
+                                                                              ),
+                                                                            ),
+                                                                        blendMode:
+                                                                            BlendMode.srcIn,
+                                                                        child: Text(
+                                                                          '${grade}',
+                                                                          style: GoogleFont.ibmPlexSans(
+                                                                            fontSize:
+                                                                                28,
+                                                                            color:
+                                                                                AppColor.black,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                ),
-                                                              ),
-                                                              // Padding(
-                                                              //   padding:
-                                                              //       const EdgeInsets.only(
-                                                              //         top: 8.0,
-                                                              //       ),
-                                                              //   child: ShaderMask(
-                                                              //     shaderCallback:
-                                                              //         (
-                                                              //           bounds,
-                                                              //         ) => const LinearGradient(
-                                                              //           colors: [
-                                                              //             AppColor
-                                                              //                 .blueG1,
-                                                              //             AppColor
-                                                              //                 .blue,
-                                                              //           ],
-                                                              //           begin:
-                                                              //               Alignment.topLeft,
-                                                              //           end:
-                                                              //               Alignment.bottomRight,
-                                                              //         ).createShader(
-                                                              //           Rect.fromLTWH(
-                                                              //             0,
-                                                              //             0,
-                                                              //             bounds
-                                                              //                 .width,
-                                                              //             bounds
-                                                              //                 .height,
-                                                              //           ),
-                                                              //         ),
-                                                              //     blendMode:
-                                                              //         BlendMode
-                                                              //             .srcIn,
-                                                              //     child: Text(
-                                                              //       'th',
-                                                              //       style: GoogleFont.ibmPlexSans(
-                                                              //         fontSize:
-                                                              //             14,
-                                                              //         color:
-                                                              //             Colors
-                                                              //                 .white,
-                                                              //         fontWeight:
-                                                              //             FontWeight
-                                                              //                 .bold,
-                                                              //       ),
-                                                              //     ),
-                                                              //   ),
-                                                              // ),
-                                                            ],
-                                                          ),
-                                                          Container(
-                                                            margin:
-                                                            EdgeInsets.only(
-                                                              bottom:
-                                                              0,
-                                                            ),
-                                                            padding: EdgeInsets.symmetric(
-                                                              horizontal:
-                                                              12,
-                                                              vertical:
-                                                              5,
-                                                            ),
-                                                            decoration: BoxDecoration(
-                                                              color:
-                                                              AppColor
-                                                                  .black,
-                                                              borderRadius: BorderRadius.only(
-                                                                topLeft:
-                                                                Radius.circular(
-                                                                  40,
-                                                                ),
-                                                                topRight:
-                                                                Radius.circular(
-                                                                  40,
-                                                                ),
-                                                                bottomLeft:
-                                                                Radius.circular(
-                                                                  0,
-                                                                ),
-                                                                bottomRight:
-                                                                Radius.circular(
-                                                                  0,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              section,
-                                                              style: GoogleFont.ibmPlexSans(
-                                                                fontSize:
-                                                                20,
-                                                                color:
-                                                                AppColor.white,
-                                                                fontWeight:
-                                                                FontWeight.bold,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      )
-                                                          : Center(
-                                                        child: Padding(
-                                                          padding:
-                                                          const EdgeInsets.symmetric(
-                                                            vertical:
-                                                            12.0,
-                                                          ),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                            MainAxisSize
-                                                                .min,
-                                                            children: [
-                                                              Container(
-                                                                padding: const EdgeInsets.symmetric(
-                                                                  horizontal:
-                                                                  25,
-                                                                  vertical:
-                                                                  3,
-                                                                ),
-                                                                decoration: BoxDecoration(
-                                                                  color:
-                                                                  AppColor.white,
-                                                                  borderRadius: BorderRadius.circular(
-                                                                    20,
+                                                                  Container(
+                                                                    margin:
+                                                                        EdgeInsets.only(
+                                                                          bottom:
+                                                                              0,
+                                                                        ),
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          12,
+                                                                      vertical:
+                                                                          5,
+                                                                    ),
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          AppColor
+                                                                              .black,
+                                                                      borderRadius: BorderRadius.only(
+                                                                        topLeft:
+                                                                            Radius.circular(
+                                                                              40,
+                                                                            ),
+                                                                        topRight:
+                                                                            Radius.circular(
+                                                                              40,
+                                                                            ),
+                                                                        bottomLeft:
+                                                                            Radius.circular(
+                                                                              0,
+                                                                            ),
+                                                                        bottomRight:
+                                                                            Radius.circular(
+                                                                              0,
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                    child: Text(
+                                                                      section,
+                                                                      style: GoogleFont.ibmPlexSans(
+                                                                        fontSize:
+                                                                            20,
+                                                                        color:
+                                                                            AppColor.white,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                                child: Text(
-                                                                  grade,
-                                                                  style: GoogleFont.ibmPlexSans(
-                                                                    fontSize:
-                                                                    14,
-                                                                    color:
-                                                                    AppColor.gray,
-                                                                    fontWeight:
-                                                                    FontWeight.w600,
+                                                                ],
+                                                              )
+                                                              : Center(
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            12.0,
+                                                                      ),
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children: [
+                                                                      Container(
+                                                                        padding: const EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              25,
+                                                                          vertical:
+                                                                              3,
+                                                                        ),
+                                                                        decoration: BoxDecoration(
+                                                                          color:
+                                                                              AppColor.white,
+                                                                          borderRadius: BorderRadius.circular(
+                                                                            20,
+                                                                          ),
+                                                                        ),
+                                                                        child: Text(
+                                                                          grade,
+                                                                          style: GoogleFont.ibmPlexSans(
+                                                                            fontSize:
+                                                                                14,
+                                                                            color:
+                                                                                AppColor.gray,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Text(
+                                                                        section,
+                                                                        style: GoogleFont.ibmPlexSans(
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              AppColor.lightgray,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ),
-                                                              SizedBox(
-                                                                height:
-                                                                5,
-                                                              ),
-                                                              Text(
-                                                                section,
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize:
-                                                                  20,
-                                                                  color:
-                                                                  AppColor.lightgray,
-                                                                  fontWeight:
-                                                                  FontWeight.bold,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
                                                     ),
                                                   );
                                                 },
@@ -765,7 +916,7 @@ class _HomeState extends State<Home> {
                                               MaterialPageRoute(
                                                 builder:
                                                     (context) =>
-                                                    AttendanceStart(),
+                                                        AttendanceStart(),
                                               ),
                                             );
                                           },
@@ -780,7 +931,7 @@ class _HomeState extends State<Home> {
                                             ),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                              BorderRadius.circular(50),
+                                                  BorderRadius.circular(50),
                                             ),
                                           ),
                                           child: Row(
