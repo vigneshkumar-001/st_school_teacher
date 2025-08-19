@@ -994,258 +994,7 @@ class CommonContainer {
       ),
     );
   }
-  //************* OLD CAROSEL SLIDER *********************************/
-  // static carouselSlider({
-  //   required String mainText1,
-  //   required String mainText2,
-  //   required String iconImage,
-  //   required String bcImage,
-  //   Gradient? gradient,
-  //   required int iconHeight,
-  //   required int iconWidth,
-  // }) {
-  //   return
-  //     Container(
-  //     decoration: BoxDecoration(
-  //       gradient: gradient,
-  //       borderRadius: BorderRadius.circular(16),
-  //     ),
-  //     child: Stack(
-  //       children: [
-  //         Image.asset(bcImage, height: 169.3, width: 187),
-  //         Positioned(
-  //           child: Padding(
-  //             padding: const EdgeInsets.all(25.0),
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Flexible(
-  //                   child: Text(
-  //                     mainText1,
-  //                     style: GoogleFont.ibmPlexSans(
-  //                       fontSize: 22,
-  //                       fontWeight: FontWeight.w800,
-  //                       color: AppColor.white,
-  //                     ),
-  //                     overflow: TextOverflow.ellipsis,
-  //                   ),
-  //                 ),
-  //
-  //                 Flexible(
-  //                   child: Text(
-  //                     mainText2,
-  //                     style: GoogleFont.ibmPlexSans(
-  //                       fontSize: 22,
-  //                       fontWeight: FontWeight.w500,
-  //                       color: AppColor.white,
-  //                     ),
-  //                     overflow: TextOverflow.ellipsis,
-  //                   ),
-  //                 ),
-  //                 Spacer(),
-  //                 Align(
-  //                   alignment: Alignment.center,
-  //                   child: AnimatedContainer(
-  //                     duration: Duration(milliseconds: 300),
-  //                     curve: Curves.easeInOut,
-  //                     height: iconHeight.toDouble(),
-  //                     width: iconWidth.toDouble(),
-  //                     child: Image.asset(iconImage, fit: BoxFit.contain),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
-  //********** NEW CURSOULE ****************//
-  // CommonContainer.dart
-  // Add this import at top of the file if not present
-  // static Widget carouselSlider({
-  //   required String mainText1,
-  //   required String mainText2,
-  //   required String iconImage,
-  //   required String bcImage,
-  //   Gradient? gradient,
-  //   required int iconHeight,
-  //   required int iconWidth,
-  //   double focus = 1.0,
-  // }) {
-  //
-  //   final scale = 0.88 + (0.12 * focus); // sides ~0.88, center 1.0
-  //   final drop = 18.0 * (1.0 - focus); // push sides slightly down
-  //   final elevation = 2.0 + (14.0 * focus); // center has stronger shadow
-  //   final plateOpacity = 0.70 + (0.30 * focus);
-  //
-  //   final h = iconHeight * (0.85 + 0.35 * focus);
-  //   final w = iconWidth * (0.85 + 0.35 * focus);
-  //
-  //   return Transform.translate(
-  //     offset: Offset(0, drop),
-  //     child: Transform.scale(
-  //       scale: scale,
-  //       alignment: Alignment.center,
-  //       child: Material(
-  //         color: Colors.transparent,
-  //         elevation: elevation,
-  //         shadowColor: Colors.black.withOpacity(0.00),
-  //         borderRadius: BorderRadius.circular(20),
-  //         child: ClipRRect(
-  //
-  //           borderRadius: BorderRadius.circular(20),
-  //           child:
-  //           Container(
-  //             decoration: BoxDecoration(gradient: gradient),
-  //             child: Stack(
-  //               alignment: Alignment.center,
-  //               children: [
-  //
-  //                 Positioned.fill(
-  //                   child: IgnorePointer(
-  //                     child: Image.asset(bcImage, fit: BoxFit.cover),
-  //                   ),
-  //                 ),
-  //
-  //
-  //                 Positioned(
-  //                   left: 20,
-  //                   right: 20,
-  //                   top: 18,
-  //                   child: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       Text(
-  //                         mainText1,
-  //                         maxLines: 1,
-  //                         overflow: TextOverflow.ellipsis,
-  //                         style: GoogleFont.ibmPlexSans(
-  //                           fontSize: 22,
-  //                           fontWeight: FontWeight.w800,
-  //                           color: AppColor.white,
-  //                         ),
-  //                       ),
-  //                       Text(
-  //                         mainText2,
-  //                         maxLines: 1,
-  //                         overflow: TextOverflow.ellipsis,
-  //                         style: GoogleFont.ibmPlexSans(
-  //                           fontSize: 22,
-  //                           fontWeight: FontWeight.w500,
-  //                           color: AppColor.white,
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //
-  //
-  //                 Align(
-  //                   alignment: Alignment.center,
-  //                   child: SizedBox(
-  //                     height: h,
-  //                     width: w,
-  //                     child: Image.asset(iconImage, fit: BoxFit.contain),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // static Widget carouselSlider({
-  //   required String mainText1,
-  //   required String mainText2,
-  //   required String iconImage,
-  //   required String bcImage,
-  //   Gradient? gradient,
-  //   required int iconHeight,
-  //   required int iconWidth,
-  //   Alignment iconAlignment = Alignment.center, // NEW
-  //   double iconYOffset = 0,                     // NEW (positive = move down)
-  //   EdgeInsets? iconPadding,                    // NEW (for side padding)
-  // }) {
-  //   return Material(
-  //     color: Colors.transparent,
-  //     elevation: 0, // outer caller controls elevation
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //         gradient: gradient,
-  //         borderRadius: BorderRadius.circular(22),
-  //       ),
-  //       clipBehavior: Clip.antiAlias,
-  //       child: Stack(
-  //         children: [
-  //           // bg
-  //           Positioned.fill(
-  //             child: IgnorePointer(
-  //               child: Image.asset(bcImage, fit: BoxFit.cover),
-  //             ),
-  //           ),
-  //
-  //           // texts
-  //           Positioned(
-  //             left: 20,
-  //             right: 20,
-  //             top: 18,
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Text(
-  //                   mainText1,
-  //                   maxLines: 1,
-  //                   overflow: TextOverflow.ellipsis,
-  //                   style: GoogleFont.ibmPlexSans(
-  //                     fontSize: 22,
-  //                     fontWeight: FontWeight.w800,
-  //                     color: AppColor.white,
-  //                   ),
-  //                 ),
-  //                 Text(
-  //                   mainText2,
-  //                   maxLines: 1,
-  //                   overflow: TextOverflow.ellipsis,
-  //                   style: GoogleFont.ibmPlexSans(
-  //                     fontSize: 22,
-  //                     fontWeight: FontWeight.w500,
-  //                     color: AppColor.white,
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //
-  //           // illustration (NEW: alignment + offset + padding)
-  //           Positioned.fill(
-  //             child: Padding(
-  //               padding: iconPadding ?? const EdgeInsets.symmetric(horizontal: 16),
-  //               child: Align(
-  //                 alignment: iconAlignment,
-  //                 child: Transform.translate(
-  //                   offset: Offset(0, iconYOffset),
-  //                   child: SizedBox(
-  //                     height: iconHeight.toDouble(),
-  //                     width:  iconWidth.toDouble(),
-  //                     child: Image.asset(iconImage, fit: BoxFit.contain),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // CommonContainer.carouselSlider
   static Widget carouselSlider({
     required String mainText1,
     required String mainText2,
@@ -1257,101 +1006,113 @@ class CommonContainer {
     required int iconWidth,
     Alignment iconAlignment = Alignment.center,
     double iconYOffset = 0,
-    EdgeInsets? iconPadding,
-    // NEW: control text block position/alignment like Figma
+    EdgeInsets? iconPadding,                 // (kept for backwards-compat)
     TextAlign textAlign = TextAlign.start,
     EdgeInsets? textPadding,
+
+    // NEW: easy control over selected/unselected image padding
+    EdgeInsets selectedIconPadding = const EdgeInsets.symmetric(horizontal: 0),
+    EdgeInsets unselectedIconPadding = const EdgeInsets.symmetric(horizontal: 25),
+
+    // NEW: give more breathing room at the bottom of the card
+    double bottomPad = 0,
   }) {
     final CrossAxisAlignment textCross =
-        (textAlign == TextAlign.end)
-            ? CrossAxisAlignment.end
-            : (textAlign == TextAlign.center)
-            ? CrossAxisAlignment.center
-            : CrossAxisAlignment.start;
+    (textAlign == TextAlign.end)
+        ? CrossAxisAlignment.end
+        : (textAlign == TextAlign.center)
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
+
+    // Fonts exactly as requested:
+    // - selected: 22 / 22
+    // - unselected: 11 / 18
+    final double titleSize    = isSelect ? 22 : 11;
+    final double subtitleSize = isSelect ? 22 : 18;
 
     return Material(
-      color: Colors.transparent,
+
       elevation: 0,
       child: Container(
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(22),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            // background
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Image.asset(bcImage, fit: BoxFit.cover),
-              ),
-            ),
-
-            // TEXTS (now alignable)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 20,
-              child: Padding(
-                padding:
-                    textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
-                child: Column(
-                  crossAxisAlignment: textCross,
-                  children: [
-                    Text(
-                      mainText1,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: textAlign,
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: isSelect ? 22 : 15,
-                        fontWeight:
-                            isSelect ? FontWeight.w800 : FontWeight.w500,
-                        color: AppColor.white,
-                      ),
-                    ),
-                    Text(
-                      mainText2,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: textAlign,
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: isSelect ? 22 : 20,
-                        fontWeight:
-                            isSelect ? FontWeight.w500 : FontWeight.w800,
-                        color: AppColor.white,
-                      ),
-                    ),
-                  ],
+        // clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottomPad),
+          child: Stack(
+            children: [
+              // Background image
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Image.asset(bcImage, fit: BoxFit.cover),
                 ),
               ),
-            ),
 
-            // ILLUSTRATION (align + offset + padding)
-            Positioned.fill(
-              child: Padding(
-                padding:
-                    isSelect
-                        ? const EdgeInsets.symmetric(horizontal: 0)
-                        : const EdgeInsets.symmetric(horizontal: 25),
-                child: Align(
-                  alignment: iconAlignment,
-                  child: Transform.translate(
-                    offset: Offset(0, iconYOffset),
-                    child: SizedBox(
-                      height: iconHeight.toDouble(),
-                      width: iconWidth.toDouble(),
-                      child: Image.asset(iconImage, fit: BoxFit.contain),
+              // Texts
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 20,
+                child: Padding(
+                  padding: textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
+                  child: Column(
+                    crossAxisAlignment: textCross,
+                    children: [
+                      Text(
+                        mainText1,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: textAlign,
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: titleSize,
+                          fontWeight: isSelect ? FontWeight.w800 : FontWeight.w500,
+                          color: AppColor.white,
+                        ),
+                      ),
+                      Text(
+                        mainText2,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: textAlign,
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: subtitleSize,
+                          fontWeight: isSelect ? FontWeight.w500 : FontWeight.w800,
+                          color: AppColor.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Illustration
+              Positioned.fill(
+                child: Padding(
+                  // Priority: explicit iconPadding (for legacy) → selected/unselected defaults
+                  padding: iconPadding ??
+                      (isSelect ? selectedIconPadding : unselectedIconPadding),
+                  child: Align(
+                    alignment: iconAlignment,
+                    child: Transform.translate(
+                      offset: Offset(0, iconYOffset),
+                      child: SizedBox(
+                        height: iconHeight.toDouble(),
+                        width:  iconWidth.toDouble(),
+                        child: Image.asset(iconImage, fit: BoxFit.contain),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
 
   static checkMark({required VoidCallback onTap, String? imagePath}) {
     return Center(
