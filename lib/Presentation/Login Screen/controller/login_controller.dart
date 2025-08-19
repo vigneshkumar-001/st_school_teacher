@@ -4,6 +4,7 @@ import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Home/home.dart';
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
+import '../../../Core/Utility/snack_bar.dart';
 import '../../Menu/menu_screen.dart';
 import '../otp_screen.dart';
 
@@ -26,10 +27,12 @@ class LoginController extends GetxController {
         (failure) {
           isLoading.value = false;
           AppLogger.log.e(failure.message);
+          CustomSnackBar.showError(failure.message);
         },
         (response) async {
           isLoading.value = false;
           accessToken = response.token;
+
           AppLogger.log.i(response.message);
 
           Get.to(() => OtpScreen(mobileNumber: phone, pages: 'splash'));
@@ -50,6 +53,7 @@ class LoginController extends GetxController {
       results.fold(
         (failure) {
           isOtpLoading.value = false;
+          CustomSnackBar.showError(failure.message);
           AppLogger.log.e(failure.message);
         },
         (response) async {

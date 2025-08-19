@@ -4,6 +4,7 @@ import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
+import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'package:get/get.dart';
@@ -36,33 +37,6 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
       body: SafeArea(
         child: Obx(() {
           final details = controller.homeworkDetails.value;
-
-          if (details == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          // Pick first image from tasks (cover)
-          final tasks = details.tasks ?? [];
-
-          // Get first image task
-          Map<String, dynamic>? firstImageTask;
-          for (var t in tasks) {
-            if (t['type'] == 'image') {
-              firstImageTask = t;
-              break;
-            }
-          }
-
-          // Remaining tasks, excluding the first image
-          final remainingTasks =
-              tasks.where((t) => t != firstImageTask).toList();
-
-          // Separate remaining images and paragraphs
-          final remainingImages =
-              remainingTasks.where((t) => t['type'] == 'image').toList();
-          final remainingParagraphs =
-              remainingTasks.where((t) => t['type'] == 'paragraph').toList();
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
@@ -76,7 +50,7 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                     onIconTap: () => Navigator.pop(context),
                     border: Border.all(color: AppColor.lightgray, width: 0.3),
                   ),
-                  const SizedBox(height: 35),
+                  SizedBox(height: 35),
                   Center(
                     child: Text(
                       'Homework Preview',
@@ -87,105 +61,87 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColor.white,
+                      // gradient: LinearGradient(
+                      //   colors: [
+                      //     AppColor.lowLightYellow,
+                      //     AppColor.lowLightYellow,
+                      //     AppColor.lowLightYellow,
+                      //     AppColor.lowLightYellow,
+                      //     AppColor.lowLightYellow,
+                      //     AppColor.lowLightYellow,
+                      //     AppColor.lowLightYellow.withOpacity(0.2),
+                      //   ], // gradient top to bottom
+                      //   begin: Alignment.topCenter,
+                      //   end: Alignment.bottomCenter,
+                      // ),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 30,
-                        horizontal: 20,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 30),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // --- First image ---
-                          if (firstImageTask != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                firstImageTask['content'] ?? '',
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (context, error, stackTrace) => Image.asset(
-                                      AppImages.homeworkPreviewImage2,
-                                    ),
-                              ),
-                            )
-                          else
-                            Image.asset(
-                              AppImages.homeworkPreviewImage2,
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 30),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset(AppImages.homeworkPreviewImage1),
+                                SizedBox(height: 20),
+                                Image.asset(AppImages.homeworkPreviewImage2),
+                                SizedBox(height: 20),
+                                Text(
+                                  details?.title ?? '',
+                                  style: GoogleFont.inter(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 24,
+                                    color: AppColor.lightBlack,
+                                  ),
+                                ),
+                                SizedBox(height: 15),
+                                Text(
+                                  details?.description ?? '',
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    color: AppColor.gray,
+                                  ),
+                                ),
+                                SizedBox(height: 15),
 
-                          const SizedBox(height: 20),
-
-                          // --- Title & main description ---
-                          Text(
-                            details.title ?? '',
-                            style: GoogleFont.inter(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 24,
-                              color: AppColor.lightBlack,
-                            ),
-                          ),
-                          if (details.description != null)
-                            Text(
-                              details.description,
-                              style: GoogleFont.inter(
-                                fontSize: 12,
-                                color: AppColor.gray,
-                              ),
-                            ),
-
-                          const SizedBox(height: 16),
-
-                          // --- Remaining images ---
-                          ...remainingImages.map<Widget>(
-                            (task) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  task['content'] ?? '',
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                          Image.asset(
-                                            AppImages.homeworkPreviewImage2,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ...List.generate(
+                                      details?.tasks.length ?? 0,
+                                          (index) {
+                                        final task = details!.tasks[index];
+                                        final content = task['content'] ?? '';
+                                        return Text(
+                                          '${index + 1}. $content',
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.gray,
                                           ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
-                              ),
+                              ],
                             ),
                           ),
+                          SizedBox(height: 20),
 
-                          const SizedBox(height: 16),
-
-                          // --- Paragraphs ---
-                          ...remainingParagraphs.map<Widget>(
-                            (task) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                task['content'] ?? '',
-                                style: GoogleFont.inter(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                  color: AppColor.gray,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 25,
+                              ),
                               child: Row(
                                 children: [
                                   Container(

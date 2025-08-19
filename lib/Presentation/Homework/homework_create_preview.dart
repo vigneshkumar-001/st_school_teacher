@@ -17,8 +17,10 @@ import 'package:get/get.dart';
 class HomeworkCreatePreview extends StatefulWidget {
   final String subjects;
   final List<String> description; // paragraphs
-  final List<File?> images; // image files
+  final List<File> images;
+
   final List<String> listPoints;
+  final File? permanentImage;
 
   final String heading;
 
@@ -28,7 +30,7 @@ class HomeworkCreatePreview extends StatefulWidget {
     super.key,
     required this.subjects,
     required this.description,
-
+    this.permanentImage, // 👈 optional
     required this.heading,
     this.subjectId,
     required this.images,
@@ -134,22 +136,39 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              widget.images != null && widget.images!.isNotEmpty
-                                  ? Column(
-                                    children:
-                                        widget.images!.map((img) {
-                                          return Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Image.file(
-                                              File(img?.path.toString() ?? ''),
-                                              fit: BoxFit.cover,
-                                              height: 200,
-                                              width: double.infinity,
-                                            ),
-                                          );
-                                        }).toList(),
-                                  )
-                                  : const SizedBox.shrink(),
+                              Column(
+                                children: [
+                                  if (widget.permanentImage != null)
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.file(
+                                        widget.permanentImage!,
+                                        fit: BoxFit.cover,
+                                        height: 200,
+                                        width: double.infinity,
+                                      ),
+                                    ),
+                                  widget.images != null &&
+                                          widget.images.isNotEmpty
+                                      ? Column(
+                                        children:
+                                            widget.images.map((img) {
+                                              return Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: Image.file(
+                                                  img, // ✅ Directly pass File
+                                                  fit: BoxFit.cover,
+                                                  height: 200,
+                                                  width: double.infinity,
+                                                ),
+                                              );
+                                            }).toList(),
+                                      )
+                                      : const SizedBox.shrink(),
+                                ],
+                              ),
 
                               SizedBox(height: 20),
                               // Image.asset(AppImages.homeworkPreviewImage2),
@@ -317,7 +336,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                 ),
                               ),
                               SizedBox(width: 10),
-                              AppButton.button(
+                          /*    AppButton.button(
                                 onTap: () async {
                                   List<Map<String, dynamic>> contents = [];
 
@@ -352,12 +371,19 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     }
                                   }
 
-                                  // The first description string goes to 'description' field, or empty string if none
                                   String mainDescription =
                                       widget.description.isNotEmpty
                                           ? widget.description[0]
                                           : '';
-
+                                  for (var image
+                                      in widget.images.whereType<File>()) {
+                                    contents.add({
+                                      "type": "image",
+                                      "content":
+                                          image
+                                              .path, // or just include the file for backend upload
+                                    });
+                                  }
                                   await homeworkController.createHomeWork(
                                     showLoader: true,
                                     classId: widget.selectedClassId,
@@ -366,6 +392,10 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     description: mainDescription,
                                     publish: true,
                                     contents: contents,
+                                    imageFiles:
+                                        widget.images
+                                            .whereType<File>()
+                                            .toList(),
                                   );
                                 },
 
@@ -373,7 +403,58 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                 height: 60,
                                 text: 'Publish',
                                 image: AppImages.buttonArrow,
-                              ),
+                              ),*/
+                              AppButton.button(
+                                onTap: () async {
+                                  List<Map<String, dynamic>> contents = [];
+
+                                  // Add list items
+                                  for (var listItem in widget.listPoints) {
+                                    contents.add({
+                                      "type": "list",
+                                      "content": listItem,
+                                    });
+                                  }
+
+                                  // Add paragraph contents
+                                  if (widget.description.length > 1) {
+                                    for (var i = 1; i < widget.description.length; i++) {
+                                      var para = widget.description[i];
+                                      if (para.trim().isNotEmpty) {
+                                        contents.add({
+                                          "type": "paragraph",
+                                          "content": para,
+                                        });
+                                      }
+                                    }
+                                  }
+
+                                  // First description goes to 'description' field
+                                  String mainDescription =
+                                  widget.description.isNotEmpty ? widget.description[0] : '';
+
+                                  // Only pass files for upload, do NOT add their paths manually
+                                  await homeworkController.createHomeWork(
+                                    showLoader: true,
+                                    classId: widget.selectedClassId,
+                                    subjectId: widget.subjectId,
+                                    heading: widget.heading ?? '',
+                                    description: mainDescription,
+                                    publish: true,
+                                    contents: contents,
+                                    imageFiles: [
+                                      if (widget.permanentImage != null) widget.permanentImage!,
+                                      ...widget.images.whereType<File>(),
+                                    ],
+                                  );
+                                },
+                                width: 145,
+                                height: 60,
+                                text: 'Publish',
+                                image: AppImages.buttonArrow,
+                              )
+
+
                             ],
                           ),
                         ),

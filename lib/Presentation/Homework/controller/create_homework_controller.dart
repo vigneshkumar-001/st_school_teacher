@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +11,7 @@ import 'package:st_teacher_app/Presentation/Homework/model/teacher_class_respons
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 import 'package:st_teacher_app/Core/consents.dart';
 
+import '../../../Core/Utility/snack_bar.dart';
 import '../model/get_homework_response.dart';
 
 class CreateHomeworkController extends GetxController {
@@ -17,6 +20,7 @@ class CreateHomeworkController extends GetxController {
   RxBool isLoading = false.obs;
 
   String accessToken = '';
+  RxString frontImageUrl = ''.obs;
   var homeworkList = <Homework>[].obs;
   Rxn<HomeworkDetails> homeworkDetails = Rxn<HomeworkDetails>();
 
@@ -30,19 +34,37 @@ class CreateHomeworkController extends GetxController {
     fetchHomeworks();
   }
 
-  Future<String?> createHomeWork({
+  Future<void> createHomeWork({
     int? classId,
     int? subjectId,
     String heading = '',
     String description = '',
     bool publish = false,
     bool showLoader = true,
-    contents,
-
-    // Dynamic contents
-  }) async {
+    List<File>? imageFiles,
+    required List<Map<String, dynamic>> contents,
+  }) async
+  {
     try {
-      if (showLoader) showPopupLoader(); // show popup loader
+      if (showLoader) showPopupLoader();
+
+      if (imageFiles != null && imageFiles.isNotEmpty) {
+        for (var file in imageFiles) {
+          final uploadResult = await apiDataSource.userProfileUpload(
+            imageFile: file,
+          );
+
+          String? imageUrl = uploadResult.fold((failure) {
+            CustomSnackBar.showError("Image Upload Failed: ${failure.message}");
+            return null;
+          }, (success) => success.message);
+
+          if (imageUrl != null) {
+            contents.add({"type": "image", "content": imageUrl});
+          }
+        }
+      }
+
       final results = await apiDataSource.createHomeWork(
         classId: classId ?? 0,
         subjectId: subjectId ?? 0,
@@ -51,9 +73,10 @@ class CreateHomeworkController extends GetxController {
         publish: publish,
         contents: contents,
       );
+
       results.fold(
         (failure) {
-          if (showLoader) hidePopupLoader(); // hide popup loader
+          if (showLoader) hidePopupLoader();
           AppLogger.log.e(failure.message);
         },
         (response) async {
@@ -65,9 +88,7 @@ class CreateHomeworkController extends GetxController {
     } catch (e) {
       if (showLoader) hidePopupLoader();
       AppLogger.log.e(e);
-      return e.toString();
     }
-    return null;
   }
 
   Future<void> fetchHomeworks() async {
