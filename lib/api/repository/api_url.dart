@@ -39,10 +39,17 @@ class ApiUrl {
     return '$baseUrl/teacher-student-attendance/student-day-attendance?class_id=$classId&date=$date&student_id=$studentId';
   }
 
-  static String homeWorkDetails({
-    required int classId,
-
-  }) {
+  static String homeWorkDetails({required int classId}) {
     return '$baseUrl/teacher-homework/details/$classId';
   }
+
+  static String getAttendanceMonth({required int month, required int year}) {
+    return '$baseUrl/teacher-home/attendance?month=$month&year=$year';
+  }
+
+  static String getTeacherDailyAttendance({required String formattedDate}) {
+    return '$baseUrl/teacher-home/attendance/daily?date=$formattedDate';
+  }
+
+  static String imageUrl = "https://next.fenizotechnologies.com/Adrox/api/image-save";
 }

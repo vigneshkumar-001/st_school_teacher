@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Core/consents.dart';
+import 'package:st_teacher_app/Presentation/Attendance-teacher/model/teacher_attendance_response.dart';
+import 'package:st_teacher_app/Presentation/Attendance-teacher/model/teacher_daily_attendance_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendance_history_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_history.dart';
@@ -10,6 +15,7 @@ import 'package:st_teacher_app/api/repository/api_url.dart';
 
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
 import '../../Presentation/Homework/model/homework_details_response.dart';
+import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
 import '../../Presentation/Profile/model/teacher_data_response.dart';
 import '../repository/failure.dart';
@@ -35,14 +41,30 @@ class ApiDataSource extends BaseApiDataSource {
         false,
       );
       AppLogger.log.i(response);
-      if (response is! DioException && response.statusCode == 201) {
-        if (response.data['status'] == true) {
-          return Right(LoginResponse.fromJson(response.data));
+      if (response is! DioException) {
+        // If status code is success
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (response.data['status'] == true) {
+            return Right(LoginResponse.fromJson(response.data));
+          } else {
+            return Left(
+              ServerFailure(response.data['message'] ?? "Login failed"),
+            );
+          }
         } else {
-          return Left(ServerFailure(response.data['message']));
+          // ❗ API returned non-success code but has JSON error message
+          return Left(
+            ServerFailure(response.data['message'] ?? "Something went wrong"),
+          );
         }
-      } else {
-        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+      // Is DioException
+      else {
+        final errorData = response.response?.data;
+        if (errorData is Map && errorData.containsKey('message')) {
+          return Left(ServerFailure(errorData['message']));
+        }
+        return Left(ServerFailure(response.message ?? "Unknown Dio error"));
       }
     } catch (e) {
       return Left(ServerFailure(''));
@@ -63,14 +85,30 @@ class ApiDataSource extends BaseApiDataSource {
         false,
       );
       AppLogger.log.i(response);
-      if (response is! DioException && response.statusCode == 201) {
-        if (response.data['status'] == true) {
-          return Right(LoginResponse.fromJson(response.data));
+      if (response is! DioException) {
+        // If status code is success
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (response.data['status'] == true) {
+            return Right(LoginResponse.fromJson(response.data));
+          } else {
+            return Left(
+              ServerFailure(response.data['message'] ?? "Login failed"),
+            );
+          }
         } else {
-          return Left(ServerFailure(response.data['message']));
+          // ❗ API returned non-success code but has JSON error message
+          return Left(
+            ServerFailure(response.data['message'] ?? "Something went wrong"),
+          );
         }
-      } else {
-        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+      // Is DioException
+      else {
+        final errorData = response.response?.data;
+        if (errorData is Map && errorData.containsKey('message')) {
+          return Left(ServerFailure(errorData['message']));
+        }
+        return Left(ServerFailure(response.message ?? "Unknown Dio error"));
       }
     } catch (e) {
       return Left(ServerFailure(''));
@@ -370,6 +408,94 @@ class ApiDataSource extends BaseApiDataSource {
       }
     } catch (e) {
       return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, TeacherAttendanceResponse>> getTeacherAttendanceMonth({
+    required int month,
+    required int year,
+  }) async {
+    try {
+      String url = ApiUrl.getAttendanceMonth(month: month, year: year);
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(TeacherAttendanceResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, TeacherDailyAttendanceResponse>>
+  getTeacherDailyAttendance({required DateTime date}) async {
+    try {
+      final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+      String url = ApiUrl.getTeacherDailyAttendance(
+        formattedDate: formattedDate,
+      );
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(TeacherDailyAttendanceResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, UserImageModels>> userProfileUpload({
+    required File imageFile,
+  }) async {
+    try {
+      if (!await imageFile.exists()) {
+        return Left(ServerFailure('Image file does not exist.'));
+      }
+
+      String url = ApiUrl.imageUrl;
+      FormData formData = FormData.fromMap({
+        'images': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: imageFile.path.split('/').last,
+        ),
+      });
+
+      final response = await Request.formData(url, formData, 'POST', true);
+      Map<String, dynamic> responseData =
+          jsonDecode(response.data) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        if (responseData['status'] == true) {
+          return Right(UserImageModels.fromJson(responseData));
+        } else {
+          return Left(ServerFailure(responseData['message']));
+        }
+      } else if (response is Response && response.statusCode == 409) {
+        return Left(ServerFailure(responseData['message']));
+      } else if (response is Response) {
+        return Left(ServerFailure(responseData['message'] ?? "Unknown error"));
+      } else {
+        return Left(ServerFailure("Unexpected error"));
+      }
+    } catch (e) {
+      // CommonLogger.log.e(e);
+      print(e);
+      return Left(ServerFailure('Something went wrong'));
     }
   }
 }

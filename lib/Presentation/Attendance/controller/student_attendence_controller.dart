@@ -29,7 +29,7 @@ class StudentAttendanceController extends GetxController {
     bool showLoader = true,
   }) async {
     try {
-      if (showLoader) showPopupLoader(); // show popup loader
+      if (showLoader) showPopupLoader();
       final results = await apiDataSource.studentDayAttendance(
         studentId: studentId,
         classId: classId,

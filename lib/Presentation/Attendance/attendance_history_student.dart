@@ -74,9 +74,9 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
     final dayData = attendanceByDate[formatted]!;
 
     if (dayData.fullDayAbsent) {
-      return AppColor.red; // Absent color
+      return AppColor.red;
     } else if (dayData.holidayStatus) {
-      return AppColor.green; // Holiday color
+      return AppColor.green;
     } else if (dayData.eventsStatus) {
       return AppColor.yellow;
     }
@@ -95,7 +95,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
 
     if (response != null) {
       setState(() {
-        attendanceData = response; // Assign the fetched data here
+        attendanceData = response;
       });
     } else {
       print("Failed to fetch attendance data");
@@ -201,7 +201,8 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                                         classId: selectedClass.id,
                                         studentName:
                                             attendanceData?.studentName,
-                                        className: selectedClass?.className ?? '',
+                                        className:
+                                            selectedClass?.className ?? '',
                                         section: selectedClass?.section ?? '',
                                       ),
                                 ),
@@ -330,7 +331,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                         Row(
                           children: [
                             Text(
-                              'July Overall Attendance ',
+                              '${attendanceData?.monthName} Overall Attendance ',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -361,7 +362,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                         SizedBox(height: 12),
 
                         Text(
-                          "$current Out of $total",
+                          "${attendanceData?.fullDayPresentCount ?? '0'} Out of ${attendanceData?.totalWorkingDays ?? '0'}",
                           style: GoogleFont.ibmPlexSans(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,

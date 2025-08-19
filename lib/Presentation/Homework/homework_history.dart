@@ -33,7 +33,6 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
