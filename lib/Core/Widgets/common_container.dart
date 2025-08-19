@@ -583,163 +583,389 @@ class CommonContainer {
     required String avatarImage,
     required String mainText,
     String? subText,
+    String? done,
     required String smaleText,
     required String time,
     required String className,
-
-    required String section,
     required String aText1,
     required String aText2,
     required Color backRoundColor,
     Color? backRoundColors,
     Gradient? gradient,
     VoidCallback? onIconTap,
+    VoidCallback? onTap,
     String? homeWorkImage,
+    String? view,
+    required String section,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Container(
         decoration: BoxDecoration(
           color: backRoundColor,
           border: Border.all(color: AppColor.lowLightgray, width: 1),
           borderRadius: BorderRadius.circular(15),
         ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                homeWorkText,
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: AppColor.gray,
+                ),
+              ),
+              SizedBox(height: 12),
+              Text(
+                mainText,
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColor.black,
+                ),
+              ),
+              // SizedBox(height: 6),
+              // subText.toString().isEmpty
+              //     ? Container()
+              //     : Text(
+              //       subText ?? '',
+              //       style: GoogleFonts.inter(
+              //         fontSize: 15,
+              //         fontWeight: FontWeight.w500,
+              //         color: AppColor.lightBlack,
+              //       ),
+              //     ),
+              // SizedBox(height: 6),
+              // Text(
+              //   smaleText,
+              //   style: GoogleFonts.inter(
+              //     fontSize: 12,
+              //     color: AppColor.gray,
+              //   ),
+              // ),
+              RichText(
+                text: TextSpan(
+                  text: subText,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColor.black,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: done,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: AppColor.gray,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    homeWorkText,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.gray,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.black.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(50),
                     ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    mainText,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColor.black,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  // subText.toString().isEmpty
-                  //     ? Container()
-                  //     : Text(
-                  //       subText ?? '',
-                  //       style: GoogleFonts.inter(
-                  //         fontSize: 15,
-                  //         fontWeight: FontWeight.w500,
-                  //         color: AppColor.lightBlack,
-                  //       ),
-                  //     ),
-                  // SizedBox(height: 6),
-                  // Text(
-                  //   smaleText,
-                  //   style: GoogleFonts.inter(
-                  //     fontSize: 12,
-                  //     color: AppColor.gray,
-                  //   ),
-                  // ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColor.black.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 25,
-                            vertical: 10,
-                          ),
-                          child: Row(
-                            children: [
-                              RichText(
-                                text: TextSpan(
-                                  text: section,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 25,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              text: '7',
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.gray,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'th ',
                                   style: GoogleFont.ibmPlexSans(
-                                    fontSize: 12,
+                                    fontSize: 9,
                                     fontWeight: FontWeight.w500,
                                     color: AppColor.gray,
                                   ),
-                                  children: [
-                                    // TextSpan(
-                                    //   text: section,
-                                    //   style: GoogleFont.ibmPlexSans(
-                                    //     fontSize: 12,
-                                    //     fontWeight: FontWeight.w800,
-                                    //     color: AppColor.gray,
-                                    //   ),
-                                    // ),
-                                  ],
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                              Container(
-                                width: 2,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.grey.shade200,
-                                      Colors.grey.shade300,
-                                      Colors.grey.shade200,
-                                    ],
+                                TextSpan(
+                                  text: 'C',
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColor.gray,
                                   ),
-                                  borderRadius: BorderRadius.circular(1),
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                time,
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: AppColor.gray,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
+                          SizedBox(width: 10),
+                          Container(
+                            width: 2,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.grey.shade200,
+                                  Colors.grey.shade300,
+                                  Colors.grey.shade200,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            time,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: AppColor.gray,
+                            ),
+                          ),
+                        ],
                       ),
-                      InkWell(
-                        onTap: onIconTap,
+                    ),
+                  ),
+                  view != null
+                      ? InkWell(
+                        onTap: onTap,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: gradient == null ? backRoundColors : null,
-                            gradient: gradient,
-                            border: Border.all(
-                              color: AppColor.lowLightgray,
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(color: AppColor.borderGary),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Icon(
-                              color: AppColor.white,
-                              CupertinoIcons.right_chevron,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25,
+                              vertical: 10,
+                            ),
+                            child: Text(
+                              view ?? '',
+                              style: GoogleFont.inter(
+                                fontSize: 12,
+                                color: AppColor.black,
+                              ),
                             ),
                           ),
                         ),
+                      )
+                      : SizedBox.shrink(),
+                  InkWell(
+                    onTap: onIconTap,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: gradient == null ? backRoundColors : null,
+                        gradient: gradient,
+                        border: Border.all(
+                          color: AppColor.lowLightgray,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                    ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Icon(
+                          color: AppColor.white,
+                          CupertinoIcons.right_chevron,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget quizContainer({
+    required String leftTextNumber,
+    required String leftValue,
+    required String rightTextNumber,
+    required String rightValue,
+    required bool leftSelected,
+    required bool rightSelected,
+    required bool isQuizCompleted,
+    VoidCallback? leftOnTap,
+    VoidCallback? rightOnTap,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: leftOnTap,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              decoration: BoxDecoration(
+                gradient:
+                    leftSelected
+                        ? LinearGradient(
+                          colors: [Colors.white, AppColor.white],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )
+                        : null,
+                color: leftSelected ? null : AppColor.lowLightgray,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color:
+                      leftSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
+                  width: leftSelected ? 3 : 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(text: leftTextNumber),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: leftValue,
+                      fontWeight:
+                          leftSelected ? FontWeight.w800 : FontWeight.w500,
+
+                      color:
+                          leftSelected
+                              ? (isQuizCompleted
+                                  ? AppColor.green
+                                  : AppColor.black)
+                              : AppColor.black,
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
+
+        SizedBox(width: 20),
+
+        Expanded(
+          child: GestureDetector(
+            onTap: rightOnTap,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              decoration: BoxDecoration(
+                gradient:
+                    rightSelected
+                        ? LinearGradient(
+                          colors: [Colors.white, AppColor.white],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )
+                        : null,
+                color: rightSelected ? null : AppColor.lowLightgray,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color:
+                      rightSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
+                  width: rightSelected ? 3 : 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(text: rightTextNumber),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightValue,
+                      fontWeight:
+                          rightSelected ? FontWeight.w800 : FontWeight.w500,
+
+                      color:
+                          rightSelected
+                              ? (isQuizCompleted
+                                  ? AppColor.green
+                                  : AppColor.green)
+                              : AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static quizContainer1({
+    required String leftTextNumber,
+    required String leftValue,
+    required bool isSelected,
+    VoidCallback? onTap,
+    required bool isQuizCompleted,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColor.white : AppColor.lowLightgray,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color:
+                      isSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
+                  width: isSelected ? 3 : 1,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: CustomTextField.textWithSmall(
+                        text: leftTextNumber,
+
+                        color: AppColor.borderGary,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 6,
+                      child: CustomTextField.textWithSmall(
+                        text: leftValue,
+
+                        color:
+                            isSelected
+                                ? (isQuizCompleted
+                                    ? AppColor.green
+                                    : AppColor.green)
+                                : AppColor.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

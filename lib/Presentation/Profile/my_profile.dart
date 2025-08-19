@@ -155,7 +155,7 @@ class _MyProfileState extends State<MyProfile> {
                       image: DecorationImage(
                         image: AssetImage(AppImages.profileBCImage),
                         fit: BoxFit.cover,
-                        alignment: Alignment(-4, -0.8),
+                        alignment: Alignment(-8, -0.8),
                       ),
                       gradient: LinearGradient(
                         begin: Alignment.topRight,
@@ -177,16 +177,24 @@ class _MyProfileState extends State<MyProfile> {
                           ),
                           SizedBox(height: 20),
                           ListTile(
-                            title: RichText(
-                              text: TextSpan(
-                                text: profile.staffName,
-                                style: GoogleFont.ibmPlexSans(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 24,
-                                  color: AppColor.black,
+                            title: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    maxLines: 2,
+                                    profile.staffName,
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 24,
+                                      color: AppColor.black,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                SizedBox(width: 10),
+                                Expanded(child: Text('')),
+                              ],
                             ),
+
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -230,9 +238,70 @@ class _MyProfileState extends State<MyProfile> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: 15),
+                                SizedBox(height: 5),
                                 InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          backgroundColor: AppColor.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            'Log Out',
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          content: Text(
+                                            'Are you sure you want to log out?',
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text(
+                                                'Cancel',
+                                                style: GoogleFont.ibmPlexSans(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: AppColor.gray,
+                                                ),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (context) =>
+                                                            ChangeMobileNumber(
+                                                              page: 'splash',
+                                                            ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Text(
+                                                'Log Out',
+                                                style: GoogleFont.ibmPlexSans(
+                                                  color: AppColor.red,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
                                   child: Row(
                                     children: [
                                       Image.asset(AppImages.logOut, height: 20),
@@ -256,14 +325,14 @@ class _MyProfileState extends State<MyProfile> {
                     ),
                   ),
                   Positioned(
-                    right: 10,
-                    bottom: 35,
+                    right: 35,
+                    bottom: 20,
                     child: InkWell(
                       onTap: () {},
                       child: Image.asset(
                         AppImages.schoolGirl,
-                        height: 95,
-                        width: 95,
+                        height: 100,
+                        width: 100,
                       ),
                     ),
                   ),

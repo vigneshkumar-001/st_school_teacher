@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../Core/Utility/app_color.dart';
 import 'Core/Utility/app_images.dart';
 import 'Core/Utility/google_fonts.dart';
+import 'Presentation/Home/home.dart';
 import 'Presentation/Login Screen/change_mobile_number.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-     _startLoading();
+    _startLoading();
   }
 
   void _startLoading() {
@@ -50,7 +51,6 @@ class _SplashScreenState extends State<SplashScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             children: [
-              // ✅ Expanded is now wrapping the Stack (correct usage)
               Expanded(
                 child: Stack(
                   children: [
@@ -60,77 +60,85 @@ class _SplashScreenState extends State<SplashScreen> {
                         Image.asset(AppImages.splashBackImage1),
                         Image.asset(AppImages.schoolLogo1),
                         Image.asset(AppImages.splashBackImage2),
+                        SizedBox(height: 35),
+                        Container(
+                          width: width,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColor.blue, width: 2),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(1.5),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0, end: _progress),
+                                duration: const Duration(milliseconds: 500),
+                                builder: (context, value, _) {
+                                  return Stack(
+                                    children: [
+                                      Container(color: AppColor.white),
+                                      FractionallySizedBox(
+                                        alignment: Alignment.centerLeft,
+                                        widthFactor: value,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                AppColor.blueG1,
+                                                AppColor.blue,
+                                              ],
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+
+                        Text(
+                          'V 1.2',
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.lightgray,
+                          ),
+                        ),
                       ],
                     ),
 
                     Positioned(
-                      bottom: 25,
+                      bottom: 120,
                       left: 0,
                       right: 0,
                       child: Text(
                         'For Teachers',
                         textAlign: TextAlign.center,
-
-                  ),
-                 
-              ),
-
-              // Progress bar
-              Container(
-                width: width,
-                height: 12,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColor.blue, width: 2),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(1.5),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0, end: _progress),
-                      duration: const Duration(milliseconds: 500),
-                      builder: (context, value, _) {
-                        return Stack(
-                          children: [
-                            Container(color: AppColor.white),
-                            FractionallySizedBox(
-                              alignment: Alignment.centerLeft,
-                              widthFactor: value,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  gradient: LinearGradient(
-                                    colors: [AppColor.blueG1, AppColor.blue],
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: AppColor.black,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 15),
-
-              Text(
-                'V 1.2',
-                style: GoogleFont.ibmPlexSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColor.lightgray,
-                ),
-              ),
-              const SizedBox(height: 15),
             ],
           ),
         ),
-      ]),
-    )));
+      ),
+    );
   }
 }

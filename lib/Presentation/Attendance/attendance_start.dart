@@ -7,6 +7,7 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
+import 'attendance_history.dart';
 import 'model/attendence_response.dart';
 
 class AttendanceStart extends StatefulWidget {
@@ -73,21 +74,19 @@ class _AttendanceStartState extends State<AttendanceStart> {
               selectedLaterStudentIndex =
                   (selectedLaterStudentIndex + 1) % laterStudents.length;
             } else {
-              selectedLaterStudentIndex = 0; // or handle as needed
+              selectedLaterStudentIndex = 0;
             }
           } else {
             if (pendingStudents.isNotEmpty) {
               pendingStudentIndex =
                   (pendingStudentIndex + 1) % pendingStudents.length;
             } else {
-              pendingStudentIndex = 0; // or handle as needed
+              pendingStudentIndex = 0;
             }
           }
         });
       }
-    } else {
-      // Handle failure case here (optional)
-    }
+    } else {}
 
     attendanceController.isPresentLoading.value = false;
     attendanceController.currentLoadingStatus.value = '';
@@ -155,7 +154,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 15,
                             vertical: 18,
                           ),
@@ -173,23 +172,38 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                       width: 0.3,
                                     ),
                                   ),
-                                  const Spacer(),
-                                  Text(
-                                    'History',
-                                    style: GoogleFont.ibmPlexSans(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColor.gray,
+                                  Spacer(),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => AttendanceHistory(),
+                                        ),
+                                      );
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'History',
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColor.gray,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Image.asset(
+                                          AppImages.historyImage,
+                                          height: 24,
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Image.asset(
-                                    AppImages.historyImage,
-                                    height: 24,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 40),
+                              SizedBox(height: 40),
                               RichText(
                                 text: TextSpan(
                                   text: selectedClass?.className ?? '',
