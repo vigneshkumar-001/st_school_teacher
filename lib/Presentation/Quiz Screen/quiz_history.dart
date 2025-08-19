@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_details.dart';
+import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_screen_create.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
+import '../Homework/homework_create.dart';
+import 'details_attend_history.dart';
 
 class QuizHistory extends StatefulWidget {
   const QuizHistory({super.key});
@@ -38,7 +41,7 @@ class _QuizHistoryState extends State<QuizHistory> {
       'subText': '0 out 50 ',
       'done': 'Done',
       'view': 'View',
-      'screen1': () {},
+      'screen1': () => DetailsAttendHistory(),
       'screen': () => QuizDetails(),
       'bgColor': AppColor.lowLightBlue,
       'gradient': LinearGradient(
@@ -75,7 +78,7 @@ class _QuizHistoryState extends State<QuizHistory> {
       'smaleText': '',
       'className': '6th B',
       'time': '1.30Pm',
-      'supText': '0 out 50',
+      'supText': '0 out 60',
       'done': 'Done',
       'view': 'View',
       'screen1': () {},
@@ -132,18 +135,18 @@ class _QuizHistoryState extends State<QuizHistory> {
                     Spacer(),
                     InkWell(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => HomeworkCreate(),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizScreenCreate(),
+                          ),
+                        );
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Create Quiz',
+                            'Create Quiz  ',
                             style: GoogleFont.ibmPlexSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -256,6 +259,7 @@ class _QuizHistoryState extends State<QuizHistory> {
                                           ),
                                           child:
                                               CommonContainer.homeworkhistory(
+                                                section: task['section'] ?? '',
                                                 className:
                                                     task['className'] ?? '',
                                                 subText: task['subText'] ?? '',

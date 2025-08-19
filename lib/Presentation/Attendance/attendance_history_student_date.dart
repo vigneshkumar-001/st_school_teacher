@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Core/Utility/google_fonts.dart';
 import 'package:st_teacher_app/Presentation/Attendance/controller/student_attendence_controller.dart';
@@ -421,6 +422,7 @@ class _AttendanceHistoryStudentDateState
               Center(
                 child: OutlinedButton(
                   onPressed: () {
+                    HapticFeedback.heavyImpact();
                     Navigator.push(
                       context,
                       MaterialPageRoute(

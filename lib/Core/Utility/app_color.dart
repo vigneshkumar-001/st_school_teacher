@@ -26,6 +26,7 @@ class AppColor {
   static const greenG1 = Color(0xff4ED382);
   static const greenG2 = Color(0xff42C287);
   static const greenG3 = Color(0xffDBFFEF);
+  static const greenG4 = Color(0xff3DB98A);
   static const bluehG1 = Color(0xff5BC9FE);
   static const bluehG2 = Color(0xff309FD4);
   static const orangeG1 = Color(0xffFBBF30);
@@ -48,6 +49,7 @@ class AppColor {
   static const profileClass12th = Color(0xffF6EEEE);
   static const lowlightWhite = Color(0xffF4FBFF);
   static const quizGreen = Color(0xffEDFAF2);
+  static const blueStdContainer = Color(0xffEFF6FF);
 }
 
 

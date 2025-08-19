@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:st_teacher_app/Core/Utility/app_color.dart';
 import 'package:st_teacher_app/Core/Utility/app_images.dart';
@@ -65,7 +66,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
   List<Map<String, dynamic>> getFullMonthDates(DateTime currentMonth) {
     final firstDay = DateTime(currentMonth.year, currentMonth.month, 1);
     final lastDay = DateTime(currentMonth.year, currentMonth.month + 1, 0);
-    // late ScrollController _scrollController;
+
 
     return List.generate(lastDay.day, (i) {
       final date = firstDay.add(Duration(days: i));
@@ -95,7 +96,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
     if (attendanceController.classList.isNotEmpty) {
       selectedClass = attendanceController.classList.first;
     } else {
-      // Handle empty class list, maybe show error or fallback
+
       print('Class list is empty!');
       return;
     }
@@ -263,7 +264,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const SizedBox(height: 16),
+                                     SizedBox(height: 16),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 16,
@@ -325,8 +326,8 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                               setState(() {
                                                 selectedDate = date;
                                               });
-                                              loadAttendance(); // Fetch new data for this date
-                                              scrollToSelectedDate(); // Scroll the list to center the selected date
+                                              loadAttendance();
+                                              scrollToSelectedDate();
                                             },
 
                                             child: Container(
@@ -592,7 +593,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                     attendanceData!.morningAbsentStudents;
                               }
 
-                              // Apply search filter:
+
                               final filteredStudents =
                                   students.where((student) {
                                     final name =
@@ -605,10 +606,12 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                 return Center(child: Text('No students found'));
                               }
 
-                              return Column(
+                              return
+                                Column(
                                 children:
                                     filteredStudents.map<Widget>((student) {
-                                      return CommonContainer.StudentsList(
+                                      return
+                                        CommonContainer.StudentsList(
                                         mainText: student.name,
                                         onIconTap: () {
                                           Navigator.push(
@@ -620,10 +623,10 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                                   ) => AttendanceHistoryStudent(
                                                     studentId:
                                                         student
-                                                            .id, // pass student id
+                                                            .id,
                                                     classId:
                                                         selectedClass
-                                                            .id, // pass class id (or variable)
+                                                            .id,
                                                   ),
                                             ),
                                           );
@@ -696,6 +699,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
 
                 return GestureDetector(
                   onTap: () {
+                    HapticFeedback.heavyImpact();
                     // First update the state synchronously
                     setState(() {
                       subjectIndex = index;

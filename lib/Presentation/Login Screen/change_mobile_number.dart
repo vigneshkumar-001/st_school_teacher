@@ -9,11 +9,11 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/custom_textfield.dart';
 import '../../Core/Utility/google_fonts.dart';
- 
+
 import '../../Core/Widgets/common_container.dart';
- 
+
 import 'controller/login_controller.dart';
- 
+
 import 'otp_screen.dart';
 import 'package:get/get.dart';
 
@@ -93,203 +93,201 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      if (widget.page == 'splash') ...[
-                        Image.asset(AppImages.schoolLogo1),
-                        const SizedBox(height: 30),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          child: Text(
-                            'Enter Registered Mobile Number',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              color: AppColor.lightBlack,
-                            ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    if (widget.page == 'splash') ...[
+                      Image.asset(AppImages.schoolLogo1),
+                      const SizedBox(height: 30),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          'Enter Mobile Number',
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.lightBlack,
                           ),
                         ),
-                      ] else ...[
-                        CommonContainer.NavigatArrow(
-                          image: AppImages.leftSideArrow,
-                          imageColor: AppColor.lightBlack,
-                          container: AppColor.lowLightgray,
-                          onIconTap: () => Navigator.pop(context),
-                          border: Border.all(
-                            color: AppColor.lightgray,
-                            width: 0.3,
+                      ),
+                    ] else ...[
+                      CommonContainer.NavigatArrow(
+                        image: AppImages.leftSideArrow,
+                        imageColor: AppColor.lightBlack,
+                        container: AppColor.lowLightgray,
+                        onIconTap: () => Navigator.pop(context),
+                        border: Border.all(
+                          color: AppColor.lightgray,
+                          width: 0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          'Change to New Mobile Number',
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.lightBlack,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          child: Text(
-                            'Change to New Mobile Number',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              color: AppColor.lightBlack,
-                            ),
-                          ),
+                      ),
+                    ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 11,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColor.lowLightgray,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color:
+                              mobileNumberController.text.isNotEmpty
+                                  ? AppColor.black
+                                  : AppColor.lowLightgray,
+                          width: mobileNumberController.text.isNotEmpty ? 2 : 1,
                         ),
-                      ],
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 11,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColor.lowLightgray,
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                            color:
-                                mobileNumberController.text.isNotEmpty
-                                    ? AppColor.black
-                                    : AppColor.lowLightgray,
-                            width: mobileNumberController.text.isNotEmpty ? 2 : 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '+91',
-                                  style: GoogleFont.inter(
-                                    fontSize: 14,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                                Text(
-                                  'India',
-                                  style: GoogleFont.inter(
-                                    fontSize: 10,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(width: 10),
-                            SizedBox(height: 35, child: VerticalDivider()),
-                            SizedBox(width: 10),
-                            Expanded(
-                              flex: 9,
-                              child: TextFormField(
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                controller: mobileNumberController,
-                                keyboardType: TextInputType.phone,
+                      ),
+                      child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '+91',
                                 style: GoogleFont.inter(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 20,
-                                ),
-                                maxLength: 12,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                onChanged: (value) {
-                                  _formatPhoneNumber(value);
-                                  setState(() {});
-                                },
-                                decoration: InputDecoration(
-                                  counterText: '',
-                                  hintText: '9000 000 000',
-                                  hintStyle: GoogleFont.inter(
-                                    color: AppColor.borderGary,
-                                    fontSize: 20,
-                                  ),
-                                  border: InputBorder.none,
-                                  suffixIcon:
-                                      mobileNumberController.text.isNotEmpty
-                                          ? GestureDetector(
-                                            onTap: () {
-                                              mobileNumberController.clear();
-                                              setState(() {});
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 12,
-                                                right: 8,
-                                              ),
-                                              child: Text(
-                                                'Clear',
-                                                style: GoogleFont.ibmPlexSans(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppColor.lightgray,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                          : null,
+                                  fontSize: 14,
+                                  color: AppColor.gray,
                                 ),
                               ),
+                              Text(
+                                'India',
+                                style: GoogleFont.inter(
+                                  fontSize: 10,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 10),
+                          SizedBox(height: 35, child: VerticalDivider()),
+                          SizedBox(width: 10),
+                          Expanded(
+                            flex: 9,
+                            child: TextFormField(
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              controller: mobileNumberController,
+                              keyboardType: TextInputType.phone,
+                              style: GoogleFont.inter(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                              ),
+                              maxLength: 12,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              onChanged: (value) {
+                                _formatPhoneNumber(value);
+                                setState(() {});
+                              },
+                              decoration: InputDecoration(
+                                counterText: '',
+                                hintText: '9000 000 000',
+                                hintStyle: GoogleFont.inter(
+                                  color: AppColor.borderGary,
+                                  fontSize: 20,
+                                ),
+                                border: InputBorder.none,
+                                suffixIcon:
+                                    mobileNumberController.text.isNotEmpty
+                                        ? GestureDetector(
+                                          onTap: () {
+                                            mobileNumberController.clear();
+                                            setState(() {});
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 12,
+                                              right: 8,
+                                            ),
+                                            child: Text(
+                                              'Clear',
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColor.lightgray,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        : null,
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0, top: 4),
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: Text(
-                            errorText,
-                            style:  GoogleFont.ibmPlexSans(
-                              color: Colors.red,
-                              fontSize: 12,
-                            ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0, top: 4),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          errorText,
+                          style:  TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 25),
-                      Obx(() {
-                        return AppButton.button(
-                          text: 'Get OTP',
-                          loader:
-                              loginController.isLoading.value
-                                  ? SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColor.white,
-                                    ),
-                                  )
-                                  : null,
-                          width: double.infinity,
-                          onTap: () {
-                            final String mbl = mobileNumberController.text
-                                .replaceAll(' ', '');
-                            if (mbl.isEmpty) {
-                              setState(() {
-                                errorText = 'Mobile Number is Required';
-                              });
-                            } else if (mbl.length != 10) {
-                              setState(() {
-                                errorText =
-                                    'Mobile Number must be exactly 10 digits';
-                              });
-                            } else {
-                              setState(() {
-                                errorText = '';
-                              });
-                              loginController.mobileNumberLogin('8870210295');
-                            }
-                          },
-                        );
-                      }),
-                    ],
-                  ),
+                    ),
+                     SizedBox(height: 25),
+                    Obx(() {
+                      return AppButton.button(
+                        text: 'Get OTP',
+                        loader:
+                            loginController.isLoading.value
+                                ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : null,
+                        width: double.infinity,
+                        onTap: () {
+                          final String mbl = mobileNumberController.text
+                              .replaceAll(' ', '');
+                          if (mbl.isEmpty) {
+                            setState(() {
+                              errorText = 'Mobile Number is Required';
+                            });
+                          } else if (mbl.length != 10) {
+                            setState(() {
+                              errorText =
+                                  'Mobile Number must be exactly 10 digits';
+                            });
+                          } else {
+                            setState(() {
+                              errorText = '';
+                            });
+                            loginController.mobileNumberLogin('8870210295');
+                          }
+                        },
+                      );
+                    }),
+                  ],
                 ),
               ),
             ),

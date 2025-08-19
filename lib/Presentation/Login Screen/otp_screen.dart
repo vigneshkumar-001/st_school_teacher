@@ -180,19 +180,18 @@ class _OtpScreenState extends State<OtpScreen> {
                       return;
                     }
 
-
-
                     if (widget.pages == 'splash') {
                       String Otp = otp.text.toString();
                       String mobileNumber =
                           widget.mobileNumber.toString() ?? '';
                       otpController.otpLogin(phone: mobileNumber, otp: Otp);
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => Home(pages: 'homeScreen'),
-                      //   ),
-                      // );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => Home(pages: 'homeScreen', page: ''),
+                        ),
+                      );
                     } else {
                       // Navigator.push(
                       //   context,

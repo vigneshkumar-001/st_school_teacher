@@ -7,9 +7,9 @@ import 'package:st_teacher_app/Core/Utility/custom_textfield.dart';
 import '../Utility/app_color.dart';
 import '../Utility/app_images.dart';
 import '../Utility/google_fonts.dart';
+import 'package:flutter/material.dart';
 
 final FocusNode nextFieldFocusNode = FocusNode();
-String? selectedSection;
 
 class CommonContainer {
   static Menu_Students({
@@ -147,6 +147,7 @@ class CommonContainer {
     Color? imageColor,
     VoidCallback? onIconTap,
     Border? border,
+    bool? blueContainer,
   }) {
     return InkWell(
       onTap: onIconTap,
@@ -164,14 +165,18 @@ class CommonContainer {
     );
   }
 
-  static StudentsList({required String mainText, VoidCallback? onIconTap}) {
+  static StudentsList({
+    required String mainText,
+    VoidCallback? onIconTap,
+    bool blueContainer = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: onIconTap,
-            child: Row(
+      child: InkWell(
+        onTap: onIconTap,
+        child: Column(
+          children: [
+            Row(
               children: [
                 Text(
                   mainText,
@@ -181,20 +186,39 @@ class CommonContainer {
                   ),
                 ),
                 Spacer(),
-                InkWell(
-                  onTap: onIconTap,
-                  child: Image.asset(
-                    AppImages.rightSideArrow,
-                    height: 10,
-                    color: AppColor.lightgray,
+                if (blueContainer)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.blueStdContainer,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 20,
+                      ),
+                      child: Text(
+                        '7 out of 10',
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: AppColor.blue,
+                        ),
+                      ),
+                    ),
                   ),
+                SizedBox(width: 10),
+                Image.asset(
+                  AppImages.rightSideArrow,
+                  height: 10,
+                  color: AppColor.lightgray,
                 ),
               ],
             ),
-          ),
-          SizedBox(height: 10),
-          Divider(color: AppColor.lowLightgray),
-        ],
+            SizedBox(height: 10),
+            Divider(color: AppColor.lowLightgray),
+          ],
+        ),
       ),
     );
   }
@@ -597,6 +621,7 @@ class CommonContainer {
     VoidCallback? onTap,
     String? homeWorkImage,
     String? view,
+    required String section,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -794,239 +819,6 @@ class CommonContainer {
     );
   }
 
-  static Widget carouselSlider({
-    required String mainText1,
-    required String mainText2,
-    required String iconImage,
-    required String bcImage,
-    Gradient? gradient,
-    double iconHeight = 120,
-    double iconWidth = 120,
-  }) {
-    return Container(
-      width: double.infinity,
-      height: 220,
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              bcImage,
-              height: 250,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: Text(
-                    mainText1,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: AppColor.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-
-                Flexible(
-                  child: Text(
-                    mainText2,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: iconHeight,
-                  width: iconWidth,
-                  child: Image.asset(iconImage, fit: BoxFit.contain),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static checkMark({required VoidCallback onTap, String? imagePath}) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.zero),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          ),
-          elevation: MaterialStateProperty.all(0),
-          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColor.blueG1, AppColor.blue],
-                begin: Alignment.topRight,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(17.0),
-              child: Image.asset(imagePath ?? '', height: 20, width: 20),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget myProfileContainer({
-    required String standardText1,
-    required String standardText2,
-    required String standardText3,
-    required List<String> sections,
-    String? selectedSection,
-    Function(String section)? onSectionTap,
-    List<EdgeInsets>? paddings,
-    EdgeInsetsGeometry? containerPadding,
-    EdgeInsetsGeometry? sectionTextPadding,
-    Color? backgroundColor,
-    Color? sectionBgColor,
-  }) {
-    String getSectionDetails(String section) {
-      switch (section) {
-        case 'A':
-          return 'A - Social Science';
-        case 'B':
-          return 'B - Mathematics';
-        case 'C':
-          return 'C - Science';
-        default:
-          return '';
-      }
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundColor ?? AppColor.profileClass1st,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding:
-            containerPadding ??
-            const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                text: standardText1,
-                style: GoogleFont.ibmPlexSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColor.black,
-                ),
-                children: [
-                  TextSpan(
-                    text: standardText2,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.black,
-                    ),
-                  ),
-                  TextSpan(
-                    text: standardText3,
-                    style: GoogleFont.ibmPlexSans(
-                      fontSize: 16,
-                      color: AppColor.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children:
-                  sections.map((section) {
-                    final isSelected = selectedSection == section;
-
-                    return GestureDetector(
-                      onTap: () {
-                        if (onSectionTap != null) {
-                          onSectionTap(section);
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              isSelected
-                                  ? AppColor.white.withOpacity(0.5)
-                                  : AppColor.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected ? AppColor.white : AppColor.white,
-                            width: 2,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              section,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                color:
-                                    isSelected
-                                        ? AppColor.black
-                                        : AppColor.black,
-                              ),
-                            ),
-                            if (isSelected) ...[
-                              SizedBox(height: 8),
-                              Text(
-                                getSectionDetails(section),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   static Widget quizContainer({
     required String leftTextNumber,
     required String leftValue,
@@ -1197,6 +989,618 @@ class CommonContainer {
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+  //************* OLD CAROSEL SLIDER *********************************/
+  // static carouselSlider({
+  //   required String mainText1,
+  //   required String mainText2,
+  //   required String iconImage,
+  //   required String bcImage,
+  //   Gradient? gradient,
+  //   required int iconHeight,
+  //   required int iconWidth,
+  // }) {
+  //   return
+  //     Container(
+  //     decoration: BoxDecoration(
+  //       gradient: gradient,
+  //       borderRadius: BorderRadius.circular(16),
+  //     ),
+  //     child: Stack(
+  //       children: [
+  //         Image.asset(bcImage, height: 169.3, width: 187),
+  //         Positioned(
+  //           child: Padding(
+  //             padding: const EdgeInsets.all(25.0),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Flexible(
+  //                   child: Text(
+  //                     mainText1,
+  //                     style: GoogleFont.ibmPlexSans(
+  //                       fontSize: 22,
+  //                       fontWeight: FontWeight.w800,
+  //                       color: AppColor.white,
+  //                     ),
+  //                     overflow: TextOverflow.ellipsis,
+  //                   ),
+  //                 ),
+  //
+  //                 Flexible(
+  //                   child: Text(
+  //                     mainText2,
+  //                     style: GoogleFont.ibmPlexSans(
+  //                       fontSize: 22,
+  //                       fontWeight: FontWeight.w500,
+  //                       color: AppColor.white,
+  //                     ),
+  //                     overflow: TextOverflow.ellipsis,
+  //                   ),
+  //                 ),
+  //                 Spacer(),
+  //                 Align(
+  //                   alignment: Alignment.center,
+  //                   child: AnimatedContainer(
+  //                     duration: Duration(milliseconds: 300),
+  //                     curve: Curves.easeInOut,
+  //                     height: iconHeight.toDouble(),
+  //                     width: iconWidth.toDouble(),
+  //                     child: Image.asset(iconImage, fit: BoxFit.contain),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  //********** NEW CURSOULE ****************//
+  // CommonContainer.dart
+  // Add this import at top of the file if not present
+  // static Widget carouselSlider({
+  //   required String mainText1,
+  //   required String mainText2,
+  //   required String iconImage,
+  //   required String bcImage,
+  //   Gradient? gradient,
+  //   required int iconHeight,
+  //   required int iconWidth,
+  //   double focus = 1.0,
+  // }) {
+  //
+  //   final scale = 0.88 + (0.12 * focus); // sides ~0.88, center 1.0
+  //   final drop = 18.0 * (1.0 - focus); // push sides slightly down
+  //   final elevation = 2.0 + (14.0 * focus); // center has stronger shadow
+  //   final plateOpacity = 0.70 + (0.30 * focus);
+  //
+  //   final h = iconHeight * (0.85 + 0.35 * focus);
+  //   final w = iconWidth * (0.85 + 0.35 * focus);
+  //
+  //   return Transform.translate(
+  //     offset: Offset(0, drop),
+  //     child: Transform.scale(
+  //       scale: scale,
+  //       alignment: Alignment.center,
+  //       child: Material(
+  //         color: Colors.transparent,
+  //         elevation: elevation,
+  //         shadowColor: Colors.black.withOpacity(0.00),
+  //         borderRadius: BorderRadius.circular(20),
+  //         child: ClipRRect(
+  //
+  //           borderRadius: BorderRadius.circular(20),
+  //           child:
+  //           Container(
+  //             decoration: BoxDecoration(gradient: gradient),
+  //             child: Stack(
+  //               alignment: Alignment.center,
+  //               children: [
+  //
+  //                 Positioned.fill(
+  //                   child: IgnorePointer(
+  //                     child: Image.asset(bcImage, fit: BoxFit.cover),
+  //                   ),
+  //                 ),
+  //
+  //
+  //                 Positioned(
+  //                   left: 20,
+  //                   right: 20,
+  //                   top: 18,
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         mainText1,
+  //                         maxLines: 1,
+  //                         overflow: TextOverflow.ellipsis,
+  //                         style: GoogleFont.ibmPlexSans(
+  //                           fontSize: 22,
+  //                           fontWeight: FontWeight.w800,
+  //                           color: AppColor.white,
+  //                         ),
+  //                       ),
+  //                       Text(
+  //                         mainText2,
+  //                         maxLines: 1,
+  //                         overflow: TextOverflow.ellipsis,
+  //                         style: GoogleFont.ibmPlexSans(
+  //                           fontSize: 22,
+  //                           fontWeight: FontWeight.w500,
+  //                           color: AppColor.white,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //
+  //
+  //                 Align(
+  //                   alignment: Alignment.center,
+  //                   child: SizedBox(
+  //                     height: h,
+  //                     width: w,
+  //                     child: Image.asset(iconImage, fit: BoxFit.contain),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+  //
+  // static Widget carouselSlider({
+  //   required String mainText1,
+  //   required String mainText2,
+  //   required String iconImage,
+  //   required String bcImage,
+  //   Gradient? gradient,
+  //   required int iconHeight,
+  //   required int iconWidth,
+  //   Alignment iconAlignment = Alignment.center, // NEW
+  //   double iconYOffset = 0,                     // NEW (positive = move down)
+  //   EdgeInsets? iconPadding,                    // NEW (for side padding)
+  // }) {
+  //   return Material(
+  //     color: Colors.transparent,
+  //     elevation: 0, // outer caller controls elevation
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         gradient: gradient,
+  //         borderRadius: BorderRadius.circular(22),
+  //       ),
+  //       clipBehavior: Clip.antiAlias,
+  //       child: Stack(
+  //         children: [
+  //           // bg
+  //           Positioned.fill(
+  //             child: IgnorePointer(
+  //               child: Image.asset(bcImage, fit: BoxFit.cover),
+  //             ),
+  //           ),
+  //
+  //           // texts
+  //           Positioned(
+  //             left: 20,
+  //             right: 20,
+  //             top: 18,
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   mainText1,
+  //                   maxLines: 1,
+  //                   overflow: TextOverflow.ellipsis,
+  //                   style: GoogleFont.ibmPlexSans(
+  //                     fontSize: 22,
+  //                     fontWeight: FontWeight.w800,
+  //                     color: AppColor.white,
+  //                   ),
+  //                 ),
+  //                 Text(
+  //                   mainText2,
+  //                   maxLines: 1,
+  //                   overflow: TextOverflow.ellipsis,
+  //                   style: GoogleFont.ibmPlexSans(
+  //                     fontSize: 22,
+  //                     fontWeight: FontWeight.w500,
+  //                     color: AppColor.white,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //
+  //           // illustration (NEW: alignment + offset + padding)
+  //           Positioned.fill(
+  //             child: Padding(
+  //               padding: iconPadding ?? const EdgeInsets.symmetric(horizontal: 16),
+  //               child: Align(
+  //                 alignment: iconAlignment,
+  //                 child: Transform.translate(
+  //                   offset: Offset(0, iconYOffset),
+  //                   child: SizedBox(
+  //                     height: iconHeight.toDouble(),
+  //                     width:  iconWidth.toDouble(),
+  //                     child: Image.asset(iconImage, fit: BoxFit.contain),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // CommonContainer.carouselSlider
+  static Widget carouselSlider({
+    required String mainText1,
+    required String mainText2,
+    required String iconImage,
+    required String bcImage,
+    bool isSelect = false,
+    Gradient? gradient,
+    required int iconHeight,
+    required int iconWidth,
+    Alignment iconAlignment = Alignment.center,
+    double iconYOffset = 0,
+    EdgeInsets? iconPadding,
+    // NEW: control text block position/alignment like Figma
+    TextAlign textAlign = TextAlign.start,
+    EdgeInsets? textPadding,
+  }) {
+    final CrossAxisAlignment textCross =
+        (textAlign == TextAlign.end)
+            ? CrossAxisAlignment.end
+            : (textAlign == TextAlign.center)
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start;
+
+    return Material(
+      color: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(22),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            // background
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Image.asset(bcImage, fit: BoxFit.cover),
+              ),
+            ),
+
+            // TEXTS (now alignable)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 20,
+              child: Padding(
+                padding:
+                    textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: textCross,
+                  children: [
+                    Text(
+                      mainText1,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: isSelect ? 22 : 15,
+                        fontWeight:
+                            isSelect ? FontWeight.w800 : FontWeight.w500,
+                        color: AppColor.white,
+                      ),
+                    ),
+                    Text(
+                      mainText2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: isSelect ? 22 : 20,
+                        fontWeight:
+                            isSelect ? FontWeight.w500 : FontWeight.w800,
+                        color: AppColor.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ILLUSTRATION (align + offset + padding)
+            Positioned.fill(
+              child: Padding(
+                padding:
+                    isSelect
+                        ? const EdgeInsets.symmetric(horizontal: 0)
+                        : const EdgeInsets.symmetric(horizontal: 25),
+                child: Align(
+                  alignment: iconAlignment,
+                  child: Transform.translate(
+                    offset: Offset(0, iconYOffset),
+                    child: SizedBox(
+                      height: iconHeight.toDouble(),
+                      width: iconWidth.toDouble(),
+                      child: Image.asset(iconImage, fit: BoxFit.contain),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static checkMark({required VoidCallback onTap, String? imagePath}) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ),
+          elevation: MaterialStateProperty.all(0),
+          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColor.blueG1, AppColor.blue],
+                begin: Alignment.topRight,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(17.0),
+              child: Image.asset(imagePath ?? '', height: 20, width: 20),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /*
+ static Widget myProfileContainer({
+   required String standardText1,
+   required String standardText2,
+   required String standardText3,
+   required List<String> sections,
+   VoidCallback? onIconTap,
+   List<EdgeInsets>? paddings,
+   EdgeInsetsGeometry? containerPadding,
+   EdgeInsetsGeometry? sectionTextPadding,
+   Color? backgroundColor,
+   Color? sectionBgColor,
+ }) {
+   return Container(
+     decoration: BoxDecoration(
+       color: backgroundColor ?? AppColor.profileClass1st,
+       borderRadius: BorderRadius.circular(16),
+     ),
+     child: Padding(
+       padding:
+           containerPadding ??
+           const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+         children: [
+           RichText(
+             text: TextSpan(
+               text: standardText1,
+               style: GoogleFont.ibmPlexSans(
+                 fontSize: 16,
+                 fontWeight: FontWeight.w500,
+                 color: AppColor.black,
+               ),
+               children: [
+                 TextSpan(
+                   text: standardText2,
+                   style: GoogleFont.ibmPlexSans(
+                     fontSize: 12,
+                     fontWeight: FontWeight.w500,
+                     color: AppColor.black,
+                   ),
+                 ),
+                 TextSpan(
+                   text: standardText3,
+                   style: GoogleFont.ibmPlexSans(
+                     fontSize: 16,
+
+                     color: AppColor.black,
+                   ),
+                 ),
+               ],
+             ),
+           ),
+           SizedBox(height: 15),
+           Row(
+             children:
+                 sections.asMap().entries.map((entry) {
+                   final index = entry.key;
+                   final section = entry.value;
+                   final padding =
+                       paddings != null && paddings.length > index
+                           ? paddings[index]
+                           : const EdgeInsets.only(right: 10);
+
+                   return Padding(
+                     padding: padding,
+                     child: InkWell(
+                       onTap: onIconTap,
+                       child: Container(
+                         decoration: BoxDecoration(
+                           color:
+                               sectionBgColor ??
+                               AppColor.white.withOpacity(0.5),
+                           borderRadius: BorderRadius.circular(12),
+                           border: Border.all(color: AppColor.white),
+                         ),
+                         child: Padding(
+                           padding:
+                               sectionTextPadding ??
+                               const EdgeInsets.symmetric(
+                                 horizontal: 39,
+                                 vertical: 22,
+                               ),
+                           child: Text(
+                             section,
+                             style: GoogleFont.ibmPlexSans(
+                               fontSize: 18,
+                               fontWeight: FontWeight.w500,
+                               color: AppColor.black,
+                             ),
+                           ),
+                         ),
+                       ),
+                     ),
+                   );
+                 }).toList(),
+           ),
+         ],
+       ),
+     ),
+   );
+ }*/
+  static Widget myProfileContainer({
+    required String standardText1,
+    required String standardText2,
+    required String standardText3,
+    required List<String> sections,
+    Map<String, List<String>>? sectionSubjects, // Map section -> subjects
+    String? expandedSection, // currently expanded section
+    Function(String section)? onSectionTap,
+    List<EdgeInsets>? paddings,
+    EdgeInsetsGeometry? containerPadding,
+    EdgeInsetsGeometry? sectionTextPadding,
+    Color? backgroundColor,
+    Color? sectionBgColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor ?? AppColor.profileClass1st,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding:
+          containerPadding ??
+          EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              text: standardText1,
+              style: GoogleFont.ibmPlexSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColor.black,
+              ),
+              children: [
+                TextSpan(
+                  text: standardText2,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColor.black,
+                  ),
+                ),
+                TextSpan(
+                  text: standardText3,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 16,
+                    color: AppColor.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 15),
+          Row(
+            children:
+                sections.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final section = entry.value;
+                  final padding =
+                      paddings != null && paddings.length > index
+                          ? paddings[index]
+                          : EdgeInsets.only(right: 10);
+
+                  bool isExpanded = section == expandedSection;
+                  List<String> subjects = sectionSubjects?[section] ?? [];
+
+                  return Padding(
+                    padding: padding,
+                    child: InkWell(
+                      onTap: () {
+                        if (onSectionTap != null) {
+                          onSectionTap(
+                            isExpanded ? '' : section,
+                          ); // collapse if tapped again
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              sectionBgColor ?? AppColor.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColor.white),
+                        ),
+                        padding:
+                            sectionTextPadding ??
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Row(
+                          children: [
+                            Text(
+                              section,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.black,
+                              ),
+                            ),
+                            if (isExpanded && subjects.isNotEmpty) ...[
+                              SizedBox(width: 8),
+                              Text(
+                                '- ${subjects.join(", ")}',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ],
       ),

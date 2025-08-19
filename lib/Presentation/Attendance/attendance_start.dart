@@ -74,21 +74,19 @@ class _AttendanceStartState extends State<AttendanceStart> {
               selectedLaterStudentIndex =
                   (selectedLaterStudentIndex + 1) % laterStudents.length;
             } else {
-              selectedLaterStudentIndex = 0; // or handle as needed
+              selectedLaterStudentIndex = 0;
             }
           } else {
             if (pendingStudents.isNotEmpty) {
               pendingStudentIndex =
                   (pendingStudentIndex + 1) % pendingStudents.length;
             } else {
-              pendingStudentIndex = 0; // or handle as needed
+              pendingStudentIndex = 0;
             }
           }
         });
       }
-    } else {
-      // Handle failure case here (optional)
-    }
+    } else {}
 
     attendanceController.isPresentLoading.value = false;
     attendanceController.currentLoadingStatus.value = '';
@@ -156,7 +154,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 15,
                             vertical: 18,
                           ),
@@ -370,7 +368,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                               horizontal: 12.0,
                                               vertical: 20,
                                             ),
-                                             child: Row(
+                                            child: Row(
                                               children: [
                                                 InkWell(
                                                   onTap:
@@ -625,9 +623,9 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                         ),
                                       ),
 
-                                      const SizedBox(height: 10),
+                                       SizedBox(height: 10),
 
-                                      // Student Lists
+
                                       if (selectedIndex == 0) ...[
                                         for (var student in presentStudents)
                                           CommonContainer.StudentsList(
@@ -645,8 +643,8 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           Center(
                                             child: Text(
                                               'No pending students',
-                                              style: TextStyle(
-                                                color: Colors.grey,
+                                              style: GoogleFont.ibmPlexSans(
+                                                color: AppColor.gray,
                                               ),
                                             ),
                                           )
@@ -661,8 +659,8 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           Center(
                                             child: Text(
                                               'No students',
-                                              style: TextStyle(
-                                                color: Colors.grey,
+                                              style: GoogleFont.ibmPlexSans(
+                                                color: AppColor.gray,
                                               ),
                                             ),
                                           )

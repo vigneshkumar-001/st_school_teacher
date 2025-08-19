@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
@@ -107,16 +109,30 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                       border: Border.all(color: AppColor.lightgray, width: 0.3),
                     ),
                     Spacer(),
-                    Text(
-                      'History',
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.gray,
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizHistory(),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            'History',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.gray,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Image.asset(AppImages.historyImage, height: 24),
+                        ],
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Image.asset(AppImages.historyImage, height: 24),
                   ],
                 ),
                 SizedBox(height: 35),
@@ -771,12 +787,13 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                         SizedBox(height: 40),
                         AppButton.button(
                           onTap: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => HomeworkCreatePreview(),
-                            //   ),
-                            // );
+                            HapticFeedback.heavyImpact();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QuizHistory(),
+                              ),
+                            );
                           },
                           width: 145,
                           height: 60,

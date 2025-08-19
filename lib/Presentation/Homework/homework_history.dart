@@ -37,7 +37,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
       'smaleText': '',
       'className': '7th C',
       'time': '4.30Pm',
-      'screen': () => HomeworkHistoryDetails(),
+      'screen': () {},
       'bgColor': AppColor.lowLightBlue,
       'gradient': LinearGradient(
         colors: [AppColor.black, AppColor.black],
@@ -238,7 +238,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                             bottom: 16,
                                           ),
                                           child:
-                                              CommonContainer.homeworkhistory(
+                                              CommonContainer.homeworkhistory(section:task['section'] ?? '',
                                                 className:
                                                     task['className'] ?? '',
                                                 subText: task['subText'] ?? '',

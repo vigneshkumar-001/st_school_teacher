@@ -2,13 +2,17 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:st_teacher_app/Core/Utility/custom_app_button.dart';
+import 'package:st_teacher_app/Presentation/Homework/controller/teacher_class_controller.dart';
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'homework_create_preview.dart';
+import 'package:get/get.dart';
+
 import 'homework_history.dart';
 
 class HomeworkCreate extends StatefulWidget {
@@ -44,11 +48,30 @@ class SectionItem {
 
 class _HomeworkCreateState extends State<HomeworkCreate> {
   List<String> _listTextFields = [];
+  List<TextEditingController> descriptionControllers = [];
   bool _listSectionOpened = false;
   bool showParagraphField = false;
   List<SectionItem> _sections = [];
-  final ImagePicker _picker = ImagePicker();
+  int selectedIndex = 0;
+  int subjectIndex = 0;
+  String? selectedSubject;
+  int? selectedSubjectId;
+  int? selectedClassId;
   XFile? _permanentImage;
+  final List<XFile?> _pickedImages = [];
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage(int index) async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _pickedImages[index] = picked;
+        if (index == _pickedImages.length - 1) {
+          _pickedImages.add(null);
+        }
+      });
+    }
+  }
 
   Future<void> _pickPermanentImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
@@ -59,16 +82,9 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     }
   }
 
-  final List<XFile?> _pickedImages = [];
-
-  Future<void> _pickImage(int index) async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _sections[index] = SectionItem.image(picked);
-      });
-    }
-  }
+  final TeacherClassController teacherClassController = Get.put(
+    TeacherClassController(),
+  );
 
   void _removeImage(int index) {
     setState(() {
@@ -114,10 +130,38 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   bool showClearIcon = false;
   TextEditingController headingController = TextEditingController();
   final TextEditingController Description = TextEditingController();
+  void addDescriptionField() {
+    setState(() {
+      descriptionControllers.add(TextEditingController());
+    });
+  }
+
+  void removeDescriptionField(int index) {
+    setState(() {
+      descriptionControllers[index].dispose();
+      descriptionControllers.removeAt(index);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+
+    teacherClassController.getTeacherClass().then((_) {
+      if (teacherClassController.classList.isNotEmpty) {
+        selectedClassId = teacherClassController.classList[0].id;
+        selectedIndex = 0;
+      }
+      if (teacherClassController.subjectList.isNotEmpty) {
+        selectedSubjectId = teacherClassController.subjectList[0].id;
+        subjectIndex = 0;
+        selectedSubject = teacherClassController.subjectList[0].name;
+      }
+      setState(() {});
+    });
+
+    descriptionControllers.add(TextEditingController());
+
     headingController.addListener(() {
       setState(() {
         showClearIcon = headingController.text.isNotEmpty;
@@ -132,15 +176,12 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   }
 
   final List<Map<String, String>> classData = [
-    {'grade': '8', 'section': 'A'},
-    {'grade': '8', 'section': 'B'},
-    {'grade': '8', 'section': 'C'},
-    {'grade': '9', 'section': 'A'},
-    {'grade': '9', 'section': 'C'},
+    // {'grade': '8', 'section': 'A'},
+    // {'grade': '8', 'section': 'B'},
+    // {'grade': '8', 'section': 'C'},
+    // {'grade': '9', 'section': 'A'},
+    // {'grade': '9', 'section': 'C'},
   ];
-
-  int selectedIndex = 0;
-  int subjectIndex = 0;
 
   final List<Map<String, dynamic>> tabs = [
     {"label": "Social Science"},
@@ -778,9 +819,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
 
                         SizedBox(height: 40),
                         AppButton.button(
-                          onTap: () {
-
-                          },
+                          onTap: () {},
                           width: 145,
                           height: 60,
                           text: 'Preview',
