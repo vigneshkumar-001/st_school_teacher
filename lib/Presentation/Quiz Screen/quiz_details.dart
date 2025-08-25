@@ -27,6 +27,7 @@ class _QuizDetailsState extends State<QuizDetails> {
     return Scaffold(
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
+
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
@@ -269,6 +270,8 @@ class _QuizDetailsState extends State<QuizDetails> {
                   ),
                 ),
               ],
+
+
             ),
           ),
         ),

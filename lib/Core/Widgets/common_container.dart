@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 
 final FocusNode nextFieldFocusNode = FocusNode();
 
+enum DatePickMode { none, single, range }
+
 class CommonContainer {
   static Menu_Students({
     required String mainText,
@@ -653,25 +655,7 @@ class CommonContainer {
                   color: AppColor.black,
                 ),
               ),
-              // SizedBox(height: 6),
-              // subText.toString().isEmpty
-              //     ? Container()
-              //     : Text(
-              //       subText ?? '',
-              //       style: GoogleFonts.inter(
-              //         fontSize: 15,
-              //         fontWeight: FontWeight.w500,
-              //         color: AppColor.lightBlack,
-              //       ),
-              //     ),
-              // SizedBox(height: 6),
-              // Text(
-              //   smaleText,
-              //   style: GoogleFonts.inter(
-              //     fontSize: 12,
-              //     color: AppColor.gray,
-              //   ),
-              // ),
+
               RichText(
                 text: TextSpan(
                   text: subText,
@@ -806,6 +790,241 @@ class CommonContainer {
                         child: Icon(
                           color: AppColor.white,
                           CupertinoIcons.right_chevron,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static examHistory({
+    required Color backRoundColor,
+    required String mainText,
+    String? subText1,
+    String? subText2,
+    String? subText21,
+    String? subText3Text,
+    required String time,
+    VoidCallback? onIconTap,
+    Gradient? gradient,
+    Color? backRoundColors,
+  }) {
+    final bool showSubText3 =
+        subText3Text != null && subText3Text!.trim().isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 18.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: backRoundColor,
+          border: Border.all(color: AppColor.lowLightgray, width: 1),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                mainText,
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColor.black,
+                ),
+              ),
+              SizedBox(height: 15),
+              RichText(
+                text: TextSpan(
+                  text: 'Announce on ',
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 11,
+                    color: AppColor.gray,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: subText1 ?? '',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 3),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Scheduled on ',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 11,
+                        color: AppColor.gray,
+                      ),
+                    ),
+                    TextSpan(
+                      text: subText2 ?? '',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.black,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' to ',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 11,
+                        color: AppColor.gray,
+                      ),
+                    ),
+                    TextSpan(
+                      text: subText21 ?? '',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 3),
+              if (showSubText3)
+                RichText(
+                  text: TextSpan(
+                    text: 'Result filled on ',
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 11,
+                      color: AppColor.gray,
+                    ),
+                    children: [
+                      TextSpan(
+                        // CHANGE: use the actual value
+                        text: subText3Text!,
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppColor.gray,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.black.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 25,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              text: '7',
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.gray,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'th ',
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.gray,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'C',
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColor.gray,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Container(
+                            width: 2,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.grey.shade200,
+                                  Colors.grey.shade300,
+                                  Colors.grey.shade200,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            time,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: AppColor.gray,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: onIconTap,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: gradient == null ? backRoundColors : null,
+                        gradient: gradient,
+                        border: Border.all(
+                          color: AppColor.lowLightgray,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 11,
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Result',
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: AppColor.white,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Image.asset(
+                              AppImages.rightSideArrow,
+                              height: 10,
+                              color: AppColor.white,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -1006,113 +1225,97 @@ class CommonContainer {
     required int iconWidth,
     Alignment iconAlignment = Alignment.center,
     double iconYOffset = 0,
-    EdgeInsets? iconPadding,                 // (kept for backwards-compat)
+    EdgeInsets? iconPadding,
     TextAlign textAlign = TextAlign.start,
     EdgeInsets? textPadding,
-
-    // NEW: easy control over selected/unselected image padding
-    EdgeInsets selectedIconPadding = const EdgeInsets.symmetric(horizontal: 0),
-    EdgeInsets unselectedIconPadding = const EdgeInsets.symmetric(horizontal: 25),
-
-    // NEW: give more breathing room at the bottom of the card
-    double bottomPad = 0,
   }) {
     final CrossAxisAlignment textCross =
-    (textAlign == TextAlign.end)
-        ? CrossAxisAlignment.end
-        : (textAlign == TextAlign.center)
-        ? CrossAxisAlignment.center
-        : CrossAxisAlignment.start;
-
-    // Fonts exactly as requested:
-    // - selected: 22 / 22
-    // - unselected: 11 / 18
-    final double titleSize    = isSelect ? 22 : 11;
-    final double subtitleSize = isSelect ? 22 : 18;
+        (textAlign == TextAlign.end)
+            ? CrossAxisAlignment.end
+            : (textAlign == TextAlign.center)
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start;
 
     return Material(
-
+      color: Colors.transparent,
       elevation: 0,
       child: Container(
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(22),
         ),
-        // clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: EdgeInsets.only(bottom: bottomPad),
-          child: Stack(
-            children: [
-              // Background image
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: Image.asset(bcImage, fit: BoxFit.cover),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Image.asset(bcImage, fit: BoxFit.cover),
+              ),
+            ),
+
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 20,
+              child: Padding(
+                padding:
+                    textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: textCross,
+                  children: [
+                    Text(
+                      mainText1,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: isSelect ? 22 : 15,
+                        fontWeight:
+                            isSelect ? FontWeight.w800 : FontWeight.w500,
+                        color: AppColor.white,
+                      ),
+                    ),
+                    Text(
+                      mainText2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: isSelect ? 22 : 20,
+                        fontWeight:
+                            isSelect ? FontWeight.w500 : FontWeight.w800,
+                        color: AppColor.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            ),
 
-              // Texts
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 20,
-                child: Padding(
-                  padding: textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
-                  child: Column(
-                    crossAxisAlignment: textCross,
-                    children: [
-                      Text(
-                        mainText1,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: textAlign,
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: titleSize,
-                          fontWeight: isSelect ? FontWeight.w800 : FontWeight.w500,
-                          color: AppColor.white,
-                        ),
-                      ),
-                      Text(
-                        mainText2,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: textAlign,
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: subtitleSize,
-                          fontWeight: isSelect ? FontWeight.w500 : FontWeight.w800,
-                          color: AppColor.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Illustration
-              Positioned.fill(
-                child: Padding(
-                  // Priority: explicit iconPadding (for legacy) → selected/unselected defaults
-                  padding: iconPadding ??
-                      (isSelect ? selectedIconPadding : unselectedIconPadding),
-                  child: Align(
-                    alignment: iconAlignment,
-                    child: Transform.translate(
-                      offset: Offset(0, iconYOffset),
-                      child: SizedBox(
-                        height: iconHeight.toDouble(),
-                        width:  iconWidth.toDouble(),
-                        child: Image.asset(iconImage, fit: BoxFit.contain),
-                      ),
+            Positioned.fill(
+              child: Padding(
+                padding:
+                    isSelect
+                        ? const EdgeInsets.symmetric(horizontal: 0)
+                        : const EdgeInsets.symmetric(horizontal: 25),
+                child: Align(
+                  alignment: iconAlignment,
+                  child: Transform.translate(
+                    offset: Offset(0, iconYOffset),
+                    child: SizedBox(
+                      height: iconHeight.toDouble(),
+                      width: iconWidth.toDouble(),
+                      child: Image.asset(iconImage, fit: BoxFit.contain),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
-
 
   static checkMark({required VoidCallback onTap, String? imagePath}) {
     return Center(
@@ -1147,115 +1350,13 @@ class CommonContainer {
     );
   }
 
-  /*
- static Widget myProfileContainer({
-   required String standardText1,
-   required String standardText2,
-   required String standardText3,
-   required List<String> sections,
-   VoidCallback? onIconTap,
-   List<EdgeInsets>? paddings,
-   EdgeInsetsGeometry? containerPadding,
-   EdgeInsetsGeometry? sectionTextPadding,
-   Color? backgroundColor,
-   Color? sectionBgColor,
- }) {
-   return Container(
-     decoration: BoxDecoration(
-       color: backgroundColor ?? AppColor.profileClass1st,
-       borderRadius: BorderRadius.circular(16),
-     ),
-     child: Padding(
-       padding:
-           containerPadding ??
-           const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-       child: Column(
-         crossAxisAlignment: CrossAxisAlignment.start,
-         children: [
-           RichText(
-             text: TextSpan(
-               text: standardText1,
-               style: GoogleFont.ibmPlexSans(
-                 fontSize: 16,
-                 fontWeight: FontWeight.w500,
-                 color: AppColor.black,
-               ),
-               children: [
-                 TextSpan(
-                   text: standardText2,
-                   style: GoogleFont.ibmPlexSans(
-                     fontSize: 12,
-                     fontWeight: FontWeight.w500,
-                     color: AppColor.black,
-                   ),
-                 ),
-                 TextSpan(
-                   text: standardText3,
-                   style: GoogleFont.ibmPlexSans(
-                     fontSize: 16,
-
-                     color: AppColor.black,
-                   ),
-                 ),
-               ],
-             ),
-           ),
-           SizedBox(height: 15),
-           Row(
-             children:
-                 sections.asMap().entries.map((entry) {
-                   final index = entry.key;
-                   final section = entry.value;
-                   final padding =
-                       paddings != null && paddings.length > index
-                           ? paddings[index]
-                           : const EdgeInsets.only(right: 10);
-
-                   return Padding(
-                     padding: padding,
-                     child: InkWell(
-                       onTap: onIconTap,
-                       child: Container(
-                         decoration: BoxDecoration(
-                           color:
-                               sectionBgColor ??
-                               AppColor.white.withOpacity(0.5),
-                           borderRadius: BorderRadius.circular(12),
-                           border: Border.all(color: AppColor.white),
-                         ),
-                         child: Padding(
-                           padding:
-                               sectionTextPadding ??
-                               const EdgeInsets.symmetric(
-                                 horizontal: 39,
-                                 vertical: 22,
-                               ),
-                           child: Text(
-                             section,
-                             style: GoogleFont.ibmPlexSans(
-                               fontSize: 18,
-                               fontWeight: FontWeight.w500,
-                               color: AppColor.black,
-                             ),
-                           ),
-                         ),
-                       ),
-                     ),
-                   );
-                 }).toList(),
-           ),
-         ],
-       ),
-     ),
-   );
- }*/
   static Widget myProfileContainer({
     required String standardText1,
     required String standardText2,
     required String standardText3,
     required List<String> sections,
-    Map<String, List<String>>? sectionSubjects, // Map section -> subjects
-    String? expandedSection, // currently expanded section
+    Map<String, List<String>>? sectionSubjects,
+    String? expandedSection,
     Function(String section)? onSectionTap,
     List<EdgeInsets>? paddings,
     EdgeInsetsGeometry? containerPadding,
@@ -1320,9 +1421,7 @@ class CommonContainer {
                     child: InkWell(
                       onTap: () {
                         if (onSectionTap != null) {
-                          onSectionTap(
-                            isExpanded ? '' : section,
-                          ); // collapse if tapped again
+                          onSectionTap(isExpanded ? '' : section);
                         }
                       },
                       child: Container(
@@ -1365,6 +1464,343 @@ class CommonContainer {
           ),
         ],
       ),
+    );
+  }
+
+  static Widget studentInfoScreen({
+    required String text,
+    required TextEditingController controller,
+    String? imagePath,
+    bool verticalDivider = true,
+    Function(String)? onChanged,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    double imageSize = 20,
+    int? maxLine,
+    int flex = 4,
+    bool isTamil = false,
+    bool isAadhaar = false,
+    bool isDOB = false,
+    bool isMobile = false,
+    bool isPincode = false,
+    BuildContext? context,
+    FormFieldValidator<String>? validator,
+    bool isError = false,
+    String? errorText,
+    bool? hasError = false,
+    FocusNode? focusNode,
+    FocusNode? nextFocus,
+    Color borderColor = AppColor.red,
+    DateTime? firstDate,
+    DateTime? lastDate,
+    ValueChanged<DateTime>? onDatePicked,
+    DatePickMode datePickMode = DatePickMode.none,
+    bool styledRangeText = false,
+  }) {
+    final DateTime _first = firstDate ?? DateTime(1900, 1, 1);
+    final DateTime _last = lastDate ?? DateTime(2100, 12, 31);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: AppColor.lightWhite,
+            border: Border.all(
+              color: isError ? AppColor.red : Colors.transparent,
+              width: 1.5,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: flex,
+                  child: GestureDetector(
+                    onTap:
+                        (datePickMode != DatePickMode.none && context != null)
+                            ? () async {
+                              String dd(int v) => v.toString().padLeft(2, '0');
+                              String fmt(DateTime d) =>
+                                  '${dd(d.day)}-${dd(d.month)}-${d.year}';
+
+                              if (datePickMode == DatePickMode.single) {
+                                final picked = await showDatePicker(
+                                  context: context!,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime(2100),
+                                  builder:
+                                      (ctx, child) => Theme(
+                                        data: Theme.of(ctx).copyWith(
+                                          dialogBackgroundColor: AppColor.white,
+                                          colorScheme: ColorScheme.light(
+                                            primary: AppColor.blue,
+                                            onPrimary: Colors.white,
+                                            onSurface: AppColor.black,
+                                          ),
+                                          textButtonTheme: TextButtonThemeData(
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: AppColor.blue,
+                                            ),
+                                          ),
+                                        ),
+                                        child: child!,
+                                      ),
+                                );
+                                if (picked != null) {
+                                  controller.text = fmt(picked);
+                                }
+                              } else if (datePickMode == DatePickMode.range) {
+                                final picked = await showDateRangePicker(
+                                  context: context!,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                  initialDateRange: DateTimeRange(
+                                    start: DateTime.now(),
+                                    end: DateTime.now().add(
+                                      const Duration(days: 7),
+                                    ),
+                                  ),
+                                  builder:
+                                      (ctx, child) => Theme(
+                                        data: Theme.of(ctx).copyWith(
+                                          dialogBackgroundColor: AppColor.white,
+                                          colorScheme: ColorScheme.light(
+                                            primary: AppColor.blue,
+                                            onPrimary: Colors.white,
+                                            onSurface: AppColor.black,
+                                          ),
+                                          textButtonTheme: TextButtonThemeData(
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: AppColor.blue,
+                                            ),
+                                          ),
+                                        ),
+                                        child: child!,
+                                      ),
+                                );
+                                if (picked != null) {
+                                  controller.text =
+                                      '${fmt(picked.start)}  to  ${fmt(picked.end)}';
+                                }
+                              }
+                            }
+                            : null,
+
+                    child: AbsorbPointer(
+                      absorbing: datePickMode != DatePickMode.none,
+                      child:
+                          styledRangeText
+                              ? Stack(
+                                alignment: Alignment.centerLeft,
+                                children: [
+                                  Opacity(
+                                    opacity: 0,
+                                    child: TextFormField(
+                                      controller: controller,
+                                      validator: validator,
+                                      readOnly: true,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        isDense: true,
+                                        contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  ValueListenableBuilder<TextEditingValue>(
+                                    valueListenable: controller,
+                                    builder: (context, value, _) {
+                                      final raw = value.text.trim();
+                                      if (raw.isEmpty) {
+                                        return Text(
+                                          text,
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            color: AppColor.gray,
+                                          ),
+                                        );
+                                      }
+
+                                      final parts = raw.split(
+                                        RegExp(
+                                          r'\s+to\s+',
+                                          caseSensitive: false,
+                                        ),
+                                      );
+                                      if (parts.length == 1) {
+                                        // single date style
+                                        return Text(
+                                          parts[0],
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColor.black,
+                                          ),
+                                        );
+                                      }
+
+                                      final startTxt = parts[0];
+                                      final endTxt = parts[1];
+
+                                      return RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: startTxt,
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.black,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: '   to   ',
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.gray,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: endTxt,
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )
+                              : TextFormField(
+                                controller: controller,
+                                validator: validator,
+                                readOnly: datePickMode != DatePickMode.none,
+                                onChanged: onChanged,
+                                maxLines: maxLine,
+                                keyboardType: keyboardType,
+                                inputFormatters: inputFormatters,
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.black,
+                                ),
+                                decoration: const InputDecoration(
+                                  hintText: '',
+                                  counterText: '',
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                              ),
+                    ),
+                  ),
+                ),
+
+                if (verticalDivider)
+                  Container(
+                    width: 2,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.grey.shade200,
+                          Colors.grey.shade300,
+                          Colors.grey.shade200,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                SizedBox(width: 20),
+
+                if (imagePath == null)
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: text,
+                      fontSize: 14,
+                      color: AppColor.gray,
+                    ),
+                  ),
+                if (imagePath != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 15),
+                    child: Image.asset(
+                      imagePath,
+                      height: imageSize,
+                      width: imageSize,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        if (errorText != null && errorText.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, top: 4),
+            child: Text(
+              errorText,
+              style: GoogleFont.ibmPlexSans(color: AppColor.red, fontSize: 12),
+            ),
+          ),
+      ],
+    );
+  }
+
+  static Widget numberButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: pill(
+            child: Icon(icon, size: 22, color: Colors.black87),
+            padding: EdgeInsets.all(16),
+          ),
+        ),
+        SizedBox(height: 6),
+        Text(label, style: TextStyle(fontSize: 11, color: Colors.black45)),
+      ],
+    );
+  }
+
+  static Widget pill({
+    required Widget child,
+    EdgeInsets padding = const EdgeInsets.all(14),
+    double radius = 16,
+  }) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: AppColor.white,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: const Color(0xFFE8E8E8)),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 10,
+            color: Color(0x14000000),
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 }

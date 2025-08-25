@@ -7,6 +7,7 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../Homework/homework_create.dart';
+
 import 'details_attend_history.dart';
 
 class QuizHistory extends StatefulWidget {
@@ -41,7 +42,9 @@ class _QuizHistoryState extends State<QuizHistory> {
       'subText': '0 out 50 ',
       'done': 'Done',
       'view': 'View',
+
       'screen1': () => DetailsAttendHistory(),
+
       'screen': () => QuizDetails(),
       'bgColor': AppColor.lowLightBlue,
       'gradient': LinearGradient(
@@ -78,7 +81,9 @@ class _QuizHistoryState extends State<QuizHistory> {
       'smaleText': '',
       'className': '6th B',
       'time': '1.30Pm',
+
       'supText': '0 out 60',
+
       'done': 'Done',
       'view': 'View',
       'screen1': () {},
@@ -173,7 +178,10 @@ class _QuizHistoryState extends State<QuizHistory> {
                 ),
                 SizedBox(height: 20),
                 Container(
-                  decoration: BoxDecoration(color: AppColor.white),
+                  decoration: BoxDecoration(
+                    color: AppColor.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Column(
                     children: [
                       SingleChildScrollView(

@@ -47,8 +47,7 @@ class AppImages {
   static String numberAdd = 'asset/Images/numberADD.png';
   static String schoolGirl = 'asset/Images/schoolGirl.png';
   static String logOut = 'asset/Images/Logout.png';
-
-
+  static String calander = 'asset/Images/Calander.png';
   static String attendanceTick = 'asset/Images/attendanceTick.png';
   static String attendanceAbsent = 'asset/Images/attendanceAbsent.png';
 }

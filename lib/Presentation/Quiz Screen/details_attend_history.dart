@@ -30,8 +30,30 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
     ['Kanjana', 'Juliya', 'Marie'],
     ['Christiana', 'Olivia', 'Stella'],
   ];
+  void _navigateToStudent(String name) {
+    final Map<String, WidgetBuilder> screens = {
+      'Kanjana': (_) => QuizDetails(),
+      // 'Juliya': (_) => JuliyaDetails(),
+      // 'Marie': (_) => MarieDetails(),
+      // 'Christiana': (_) => ChristianaDetails(),
+      // 'Olivia': (_) => OliviaDetails(),
+      // 'Stella': (_) => StellaDetails(),
+    };
+
+    final builder = screens[name];
+    if (builder == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No screen mapped for $name yet')));
+      return;
+    }
+
+    Navigator.push(context, MaterialPageRoute(builder: builder));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final students = studentsPerTab[selectedIndex];
     return Scaffold(
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
@@ -371,15 +393,22 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                           ),
                         ),
                         SizedBox(height: 15),
-                        Column(
-                          children: List.generate(
-                            studentsPerTab[selectedIndex].length,
-                            (i) => CommonContainer.StudentsList(
-                              blueContainer: true,
-                              mainText: studentsPerTab[selectedIndex][i],
-                              onIconTap: () {},
-                            ),
-                          ),
+                        ListView.builder(
+                          shrinkWrap: true, // 👈 add this
+                          physics:
+                              const NeverScrollableScrollPhysics(), // 👈 and this
+                          itemCount: students.length,
+                          itemBuilder: (_, i) {
+                            final name = students[i];
+                            return ListTile(
+                              title: Text(name),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                              ),
+                              onTap: () => _navigateToStudent(name),
+                            );
+                          },
                         ),
                       ],
                     ),
