@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:st_teacher_app/Presentation/Exam%20Screen/result_list.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import 'dummy.dart';
+import 'exam_result_done.dart';
 
 class ExamResult extends StatefulWidget {
   const ExamResult({super.key});
@@ -14,12 +15,11 @@ class ExamResult extends StatefulWidget {
 }
 
 class _ExamResultState extends State<ExamResult> {
-  // data
-  late List<List<int?>> marks; // [student][subject]
+  late List<List<int?>> marks;
   int studentIndex = 0;
   int subjectIndex = 0;
 
-  final List<String> students = ['Anjana', 'Arun', 'Anjana'];
+  final List<String> students = ['Anjana', 'Arun', 'Bala'];
   final List<String> subjects = [
     'Tamil',
     'English',
@@ -28,20 +28,16 @@ class _ExamResultState extends State<ExamResult> {
     'Social Science',
   ];
 
-  // INIT marks so 'late' has a value
   @override
   void initState() {
     super.initState();
     marks = List.generate(
       students.length,
-      (_) => List<int?>.filled(subjects.length, null, growable: false),
-      growable: false,
+      (_) => List<int?>.filled(subjects.length, null),
     );
   }
 
-  int get doneCount => marks[studentIndex].where((e) => e != null).length;
-
-  // ---- navigation helpers ----
+  // ---------- navigation helpers ----------
   void _nextStudent({bool resetSubject = false}) {
     if (studentIndex < students.length - 1) {
       setState(() {
@@ -64,7 +60,8 @@ class _ExamResultState extends State<ExamResult> {
     if (subjectIndex < subjects.length - 1) {
       setState(() => subjectIndex += 1);
     } else {
-      _nextStudent(resetSubject: true);
+      // last subject; don’t change student automatically.
+      // Navigation will be handled after entry when all subjects are filled.
     }
   }
 
@@ -74,6 +71,20 @@ class _ExamResultState extends State<ExamResult> {
     }
   }
 
+  // ---------- completion & routing ----------
+  bool _allSubjectsFilledFor(int i) {
+    // Treat 0 as "not entered" (same as your UI showing '--' for 0)
+    return marks[i].every((v) => v != null && v != 0);
+  }
+
+  void _goToNextScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ExamResultDone()),
+    );
+  }
+
+  // ---------- keypad actions ----------
   void _typeDigit(int d) {
     final current = marks[studentIndex][subjectIndex];
     final nextText =
@@ -83,44 +94,42 @@ class _ExamResultState extends State<ExamResult> {
 
     setState(() => marks[studentIndex][subjectIndex] = nextVal);
 
+    // If this entry completes the set (all 5 subjects have non-zero values), go next.
+    if (_allSubjectsFilledFor(studentIndex)) {
+      // Let UI paint the last value, then navigate.
+      Future.microtask(_goToNextScreen);
+      return;
+    }
+
+    // Auto-advance to next subject once 2 digits or 100
     final len = nextVal.toString().length;
     if (nextVal == 100 || len >= 2) {
       Future.microtask(_nextSubject);
     }
   }
 
-  void _backspace() {
-    final current = marks[studentIndex][subjectIndex];
-    if (current == null || current == 0) return;
-    final s = current.toString();
-    final ns = (s.length <= 1) ? '0' : s.substring(0, s.length - 1);
-    setState(() => marks[studentIndex][subjectIndex] = int.tryParse(ns) ?? 0);
-  }
-
   void _clear() {
     setState(() => marks[studentIndex][subjectIndex] = 0);
   }
 
-  Widget _numKey(String label, {VoidCallback? onTap}) {
+  Widget _clearChip() {
     return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
-      child: CommonContainer.pill(
-        child: Center(
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-        ),
-        radius: 20,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-      ),
+      borderRadius: BorderRadius.circular(10),
+      onTap: _clear,
+      child: Image.asset(AppImages.clear, height: 24, width: 25),
     );
+  }
+
+  int _enteredCountForStudent() {
+    final row = marks[studentIndex];
+    // Count only non-zero entries to match your display logic
+    return row.where((v) => v != null && v != 0).length;
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentStudent = students[studentIndex];
+    final enteredCount = _enteredCountForStudent();
+    final totalSubjects = subjects.length;
 
     return Scaffold(
       backgroundColor: AppColor.white,
@@ -139,13 +148,13 @@ class _ExamResultState extends State<ExamResult> {
                       onIconTap: () => Navigator.pop(context),
                       border: Border.all(color: AppColor.lightgray, width: 0.3),
                     ),
-                    Spacer(),
+                     Spacer(),
                     InkWell(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MarkEntryScreen(),
+                            builder: (context) => ResultList(),
                           ),
                         );
                       },
@@ -197,7 +206,7 @@ class _ExamResultState extends State<ExamResult> {
                     ],
                   ),
                 ),
-                SizedBox(height: 9),
+                 SizedBox(height: 9),
                 Text(
                   'Lorem ipsum donae Exam',
                   style: GoogleFont.ibmPlexSans(
@@ -206,8 +215,9 @@ class _ExamResultState extends State<ExamResult> {
                     color: AppColor.black,
                   ),
                 ),
-                SizedBox(height: 20),
+                 SizedBox(height: 20),
 
+                // --- Card ---
                 Container(
                   decoration: BoxDecoration(
                     color: AppColor.lowLightBlue,
@@ -231,9 +241,9 @@ class _ExamResultState extends State<ExamResult> {
                                       color: AppColor.gray,
                                     ),
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    currentStudent,
+                                    students[studentIndex],
                                     style: GoogleFont.ibmPlexSans(
                                       fontSize: 26,
                                       fontWeight: FontWeight.w500,
@@ -244,7 +254,7 @@ class _ExamResultState extends State<ExamResult> {
                               ),
                             ),
                             Text(
-                              '$doneCount',
+                              '$enteredCount',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -252,7 +262,7 @@ class _ExamResultState extends State<ExamResult> {
                               ),
                             ),
                             Text(
-                              ' Out of ${subjects.length}',
+                              ' Out of $totalSubjects',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 12,
                                 color: AppColor.lightgray,
@@ -260,161 +270,191 @@ class _ExamResultState extends State<ExamResult> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
+                        // Subjects list
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            // border: Border.all(color:  Color(0xFFE8E8E8)),
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          child: Column(
-                            children: List.generate(subjects.length, (i) {
-                              final isActive = i == subjectIndex;
-                              final value = marks[studentIndex][i];
-                              return Container(
-                                padding:  EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  border:
-                                      i == subjects.length - 1
-                                          ? null
-                                          : const Border(
-                                            bottom: BorderSide(
-                                              color: Color(0xFFEDEDED),
-                                              width: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            child: Column(
+                              children: List.generate(subjects.length, (i) {
+                                final isActive = i == subjectIndex;
+                                final value = marks[studentIndex][i];
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        i == subjects.length - 1
+                                            ? null
+                                            : const Border(
+                                              bottom: BorderSide(
+                                                color: AppColor.lowLightgray,
+                                                width: 1,
+                                              ),
                                             ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          subjects[i],
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            fontWeight:
+                                                isActive
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w500,
+                                            color:
+                                                isActive
+                                                    ? AppColor.black
+                                                    : AppColor.lightgray,
                                           ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        subjects[i],
+                                        ),
+                                      ),
+                                      Text(
+                                        (value == null || value == 0)
+                                            ? '--'
+                                            : '$value',
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight:
                                               isActive
                                                   ? FontWeight.w700
-                                                  : FontWeight.w500,
+                                                  : FontWeight.w600,
                                           color:
                                               isActive
                                                   ? Colors.black87
                                                   : Colors.black38,
                                         ),
                                       ),
-                                    ),
-                                    Text(
-                                      (value == null || value == 0)
-                                          ? '--'
-                                          : '$value',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight:
-                                            isActive
-                                                ? FontWeight.w700
-                                                : FontWeight.w600,
-                                        color:
-                                            isActive
-                                                ? Colors.black87
-                                                : Colors.black38,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
 
+                const SizedBox(height: 50),
+
+                // --- Controls (0 under 8) ---
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Left: Student Next/Prev
                       Column(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          CommonContainer.numberButton(
+                          CommonContainer.sidePill(
                             icon: Icons.chevron_right,
                             label: 'Next',
                             onTap: () => _nextStudent(resetSubject: true),
                           ),
-                          SizedBox(height: 22),
-                          CommonContainer.numberButton(
+                          const SizedBox(height: 10),
+                          Text(
+                            'Student',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          CommonContainer.sidePill(
                             icon: Icons.chevron_left,
                             label: 'Prev',
                             onTap: _prevStudent,
                           ),
-                          SizedBox(height: 6),
-                          Text(
-                            'Student',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.black45,
-                            ),
-                          ),
                         ],
                       ),
 
-                      SizedBox(width: 12),
+                      const SizedBox(width: 16),
 
+                      // Center keypad: 4x3 grid (1..9, [empty, 0, clear])
                       Expanded(
-                        child: AspectRatio(
-                          aspectRatio: 1.05,
-                          child: GridView.count(
-                            crossAxisCount: 3,
-                            physics: const NeverScrollableScrollPhysics(),
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            children: [
-                              _numKey('1', onTap: () => _typeDigit(1)),
-                              _numKey('2', onTap: () => _typeDigit(2)),
-                              _numKey('3', onTap: () => _typeDigit(3)),
-                              _numKey('4', onTap: () => _typeDigit(4)),
-                              _numKey('5', onTap: () => _typeDigit(5)),
-                              _numKey('6', onTap: () => _typeDigit(6)),
-                              _numKey('7', onTap: () => _typeDigit(7)),
-                              _numKey('8', onTap: () => _typeDigit(8)),
-                              _numKey('9', onTap: () => _typeDigit(9)),
-                              _numKey('⌫', onTap: _backspace),
-                              _numKey('0', onTap: () => _typeDigit(0)),
-                              _numKey('×', onTap: _clear),
-                            ],
-                          ),
+                        child: LayoutBuilder(
+                          builder: (context, c) {
+                            const cross = 3;
+                            const gap = 14.0;
+                            final keySize =
+                                (c.maxWidth - (gap * (cross - 1))) / cross;
+                            final gridH = keySize * 4 + gap * 3;
+
+                            return SizedBox(
+                              height: gridH,
+                              child: GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.zero,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: cross,
+                                      mainAxisSpacing: gap,
+                                      crossAxisSpacing: gap,
+                                      childAspectRatio: 1,
+                                    ),
+                                itemCount: 12,
+                                itemBuilder: (context, i) {
+                                  if (i >= 0 && i <= 8) {
+                                    final n = i + 1;
+                                    return CommonContainer.padKey(
+                                      '$n',
+                                      onTap: () => _typeDigit(n),
+                                    );
+                                  }
+                                  if (i == 9) return const SizedBox.shrink();
+                                  if (i == 10) {
+                                    return CommonContainer.padKey(
+                                      '0',
+                                      onTap: () => _typeDigit(0),
+                                    );
+                                  }
+                                  return Center(child: _clearChip());
+                                },
+                              ),
+                            );
+                          },
                         ),
                       ),
 
-                      SizedBox(width: 12),
+                      const SizedBox(width: 16),
 
+                      // Right: Subject Up/Down
                       Column(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          CommonContainer.numberButton(
+                          CommonContainer.sidePill(
                             icon: Icons.keyboard_arrow_up,
                             label: 'Up',
                             onTap: _prevSubject,
                           ),
-                          SizedBox(height: 22),
-                          CommonContainer.numberButton(
+                          const SizedBox(height: 10),
+                          Text(
+                            'Subject',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          CommonContainer.sidePill(
                             icon: Icons.keyboard_arrow_down,
                             label: 'Down',
                             onTap: _nextSubject,
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            'Subject',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.black45,
-                            ),
                           ),
                         ],
                       ),

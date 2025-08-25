@@ -10,6 +10,7 @@ import '../Attendance-teacher/attendance_history_teacher.dart';
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
 import '../Exam Screen/exam_create.dart';
+import '../Exam Screen/exam_history.dart';
 import '../Homework/homework_create.dart';
 import '../Homework/homework_history.dart';
 import '../Profile/my_profile.dart';
@@ -150,7 +151,12 @@ class _MenuScreenState extends State<MenuScreen> {
                       MaterialPageRoute(builder: (context) => ExamCreate()),
                     );
                   },
-                  onIconTap: () {},
+                  onIconTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ExamHistory()),
+                    );
+                  },
                   mainText: 'Exam',
                   subText: 'Create',
                   image: AppImages.Exam,

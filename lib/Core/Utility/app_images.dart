@@ -50,4 +50,6 @@ class AppImages {
   static String calander = 'asset/Images/Calander.png';
   static String attendanceTick = 'asset/Images/attendanceTick.png';
   static String attendanceAbsent = 'asset/Images/attendanceAbsent.png';
+  static String clear = 'asset/Images/Clear.png';
+  static String greenTick = 'asset/Images/Green Tick.png';
 }

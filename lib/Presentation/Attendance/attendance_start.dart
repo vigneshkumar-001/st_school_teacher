@@ -598,7 +598,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
-                                                    "${tabs[index]['count']} ${tabs[index]['label']}",
+                                                     "${tabs[index]['count']} ${tabs[index]['label']}",
                                                     style:
                                                         GoogleFont.ibmPlexSans(
                                                           fontSize: 12,

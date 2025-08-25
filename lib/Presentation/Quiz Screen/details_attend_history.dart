@@ -26,10 +26,15 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
     {"count": 43, "label": "Unfinished"},
   ];
 
-  final List<List<String>> studentsPerTab = [
-    ['Kanjana', 'Juliya', 'Marie'],
-    ['Christiana', 'Olivia', 'Stella'],
+  final List<Map<String, dynamic>> studentsFilled = [
+    {"name": "Kanjana", "score": 7, "total": 10},
+    {"name": "Juliya", "score": 9, "total": 10},
+    {"name": "Marie", "score": 7, "total": 10},
+    {"name": "Christiana", "score": 7, "total": 10},
+    {"name": "Olivia", "score": 7, "total": 10},
+    {"name": "Stella", "score": 7, "total": 10},
   ];
+
   void _navigateToStudent(String name) {
     final Map<String, WidgetBuilder> screens = {
       'Kanjana': (_) => QuizDetails(),
@@ -53,7 +58,7 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
 
   @override
   Widget build(BuildContext context) {
-    final students = studentsPerTab[selectedIndex];
+    final students = studentsFilled[selectedIndex];
     return Scaffold(
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
@@ -393,18 +398,48 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                           ),
                         ),
                         SizedBox(height: 15),
-                        ListView.builder(
-                          shrinkWrap: true, // 👈 add this
-                          physics:
-                              const NeverScrollableScrollPhysics(), // 👈 and this
-                          itemCount: students.length,
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: studentsFilled.length,
+                          separatorBuilder:
+                              (_, __) => Divider(
+                                color: AppColor.lowLightgray,
+                                height: 1,
+                              ),
                           itemBuilder: (_, i) {
-                            final name = students[i];
+                            final item = studentsFilled[i];
+                            final name = item['name'] as String;
+                            final score = item['score'] ?? 0;
+                            final total = item['total'] as int;
+
                             return ListTile(
-                              title: Text(name),
-                              trailing: const Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
+                              dense: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              title: Text(
+                                name,
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.lightBlack,
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CommonContainer.totalsPill(
+                                    score: score,
+                                    total: total,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ],
                               ),
                               onTap: () => _navigateToStudent(name),
                             );

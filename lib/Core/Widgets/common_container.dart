@@ -1759,48 +1759,235 @@ class CommonContainer {
     );
   }
 
-  static Widget numberButton({
+  static Widget padKey(String label, {VoidCallback? onTap}) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColor.lowLightgray,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: GoogleFont.ibmPlexSans(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget sidePill({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
-          child: pill(
-            child: Icon(icon, size: 22, color: Colors.black87),
-            padding: EdgeInsets.all(16),
-          ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(22),
+      onTap: onTap,
+      child: Container(
+        width: 68,
+        height: 96,
+        decoration: BoxDecoration(
+          color: AppColor.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: AppColor.lowLightgray),
         ),
-        SizedBox(height: 6),
-        Text(label, style: TextStyle(fontSize: 11, color: Colors.black45)),
-      ],
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 22),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(icon, color: AppColor.gray, size: 28),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: GoogleFont.ibmPlexSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: AppColor.gray,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  static Widget pill({
+  static Widget topLinkTab({
+    required String text,
+    required bool active,
+    required VoidCallback onTap,
+    bool alignRight = false,
+  }) {
+    final color = active ? const Color(0xFF2F80ED) : const Color(0xFF9AA0A6);
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: 2,
+          bottom: 6,
+          left: alignRight ? 8 : 0,
+          right: alignRight ? 0 : 8,
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // CommonContainer.whiteCard(...) – Figma-style white rounded card
+  static Widget whiteCard({
     required Widget child,
-    EdgeInsets padding = const EdgeInsets.all(14),
-    double radius = 16,
+    EdgeInsets margin = const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 10,
+    ),
+    EdgeInsets padding = const EdgeInsets.all(6),
+    double radius = 12,
+    Color? color,
+    List<BoxShadow>? shadows,
   }) {
     return Container(
+      margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: AppColor.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: const Color(0xFFE8E8E8)),
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 10,
-            color: Color(0x14000000),
-            offset: Offset(0, 4),
-          ),
-        ],
+        boxShadow:
+            shadows ??
+            [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
       ),
       child: child,
+    );
+  }
+
+  static Widget searchField({
+    required TextEditingController controller,
+    required String searchText,
+    required ValueChanged<String> onChanged,
+    required VoidCallback onClear,
+  }) {
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        suffixIcon:
+            searchText.isNotEmpty
+                ? GestureDetector(
+                  onTap: onClear,
+                  child: Icon(Icons.clear, size: 20, color: AppColor.gray),
+                )
+                : null,
+        hintText: 'Search',
+        hintStyle: GoogleFont.ibmPlexSans(fontSize: 14, color: AppColor.gray),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(left: 25.0, right: 6),
+          child: Icon(Icons.search_rounded, size: 20, color: AppColor.gray),
+        ),
+        filled: true,
+        fillColor: AppColor.lowLightgray,
+        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  /// Horizontal chip row like "7 Done / 43 Unfinished"
+  static Widget statusChips({
+    required List<Map<String, dynamic>> tabs,
+    required int selectedIndex,
+    required ValueChanged<int> onSelect,
+  }) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(tabs.length, (index) {
+          final isSelected = selectedIndex == index;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: GestureDetector(
+              onTap: () => onSelect(index),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 9,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: isSelected ? AppColor.blue : AppColor.borderGary,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  "${tabs[index]['label']}",
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 12,
+                    color: isSelected ? AppColor.blue : AppColor.gray,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  // inside CommonContainer class
+  static Widget totalPill({required int total}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColor.blue.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        "Total $total",
+        style: GoogleFont.ibmPlexSans(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          color: AppColor.blue,
+        ),
+      ),
+    );
+  }
+
+  static Widget totalsPill({required int score, required int total}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColor.blue.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        "$score out of $total",
+        style: GoogleFont.ibmPlexSans(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColor.blue,
+        ),
+      ),
     );
   }
 }

@@ -10,6 +10,7 @@ class GoogleFont {
     FontWeight? fontWeight,
     letterSpacing,
     Color? color,  Paint? foreground,
+    TextDecoration? decoration,
   }) {
     return GoogleFonts.ibmPlexSans(
       fontSize: fontSize,
