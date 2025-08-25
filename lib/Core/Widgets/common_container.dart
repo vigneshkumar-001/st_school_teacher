@@ -165,10 +165,78 @@ class CommonContainer {
       ),
     );
   }
+  static StudentsList({
+    required String mainText,
+    String? subText,   // 👈 added
+    VoidCallback? onIconTap,
+    bool blueContainer = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      child: InkWell(
+        onTap: onIconTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  mainText,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 14,
+                    color: AppColor.black,
+                  ),
+                ),
+                Spacer(),
+                if (blueContainer)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.blueStdContainer,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      child: Text(
+                        '7 out of 10',
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: AppColor.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                SizedBox(width: 10),
+                Image.asset(
+                  AppImages.rightSideArrow,
+                  height: 10,
+                  color: AppColor.lightgray,
+                ),
+              ],
+            ),
+            if (subText != null) ...[
+              SizedBox(height: 4),
+              Text(
+                subText,
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 12,
+                  color: AppColor.lightgray,
+                ),
+              ),
+            ],
+            SizedBox(height: 10),
+            Divider(color: AppColor.lowLightgray),
+          ],
+        ),
+      ),
+    );
+  }
 
+/*
   static StudentsList({
     required String mainText,
     VoidCallback? onIconTap,
+
     bool blueContainer = false,
   }) {
     return Padding(
@@ -223,6 +291,7 @@ class CommonContainer {
       ),
     );
   }
+*/
 
   static announcementsScreen({
     required String mainText,

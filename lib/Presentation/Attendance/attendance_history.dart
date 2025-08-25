@@ -43,9 +43,10 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
   int selectedIndex = 0;
 
   final List<Map<String, dynamic>> tabs = [
-    {"count": 7, "label": "Full Present"},
-    {"count": 2, "label": "Full Absent"},
-    {"count": 2, "label": "Morning Absent"},
+    {"count": 0, "label": "Full Present"},
+    {"count": 0, "label": "Full Absent"},
+    {"count": 0, "label": "Morning Absent"},
+    {"count": 0, "label": "Afternoon Absent"},
   ];
 
   int selectedDateIndex = 0;
@@ -66,7 +67,6 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
   List<Map<String, dynamic>> getFullMonthDates(DateTime currentMonth) {
     final firstDay = DateTime(currentMonth.year, currentMonth.month, 1);
     final lastDay = DateTime(currentMonth.year, currentMonth.month + 1, 0);
-
 
     return List.generate(lastDay.day, (i) {
       final date = firstDay.add(Duration(days: i));
@@ -96,7 +96,6 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
     if (attendanceController.classList.isNotEmpty) {
       selectedClass = attendanceController.classList.first;
     } else {
-
       print('Class list is empty!');
       return;
     }
@@ -114,6 +113,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
         tabs[0]['count'] = data.fullPresentCount;
         tabs[1]['count'] = data.fullAbsentCount;
         tabs[2]['count'] = data.morningAbsentCount;
+        tabs[3]['count'] = data.afternoonAbsentCount;
       });
     }
   }
@@ -264,7 +264,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                     SizedBox(height: 16),
+                                    SizedBox(height: 16),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 16,
@@ -591,6 +591,9 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                               } else if (selectedIndex == 2) {
                                 students =
                                     attendanceData!.morningAbsentStudents;
+                              } else if (selectedIndex == 3) {
+                                students =
+                                    attendanceData!.afternoonAbsentStudents;
                               }
 
                               // Apply search filter:

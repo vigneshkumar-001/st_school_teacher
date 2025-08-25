@@ -1062,6 +1062,7 @@ class _HomeState extends State<Home> {
       viewportFraction: 0.70, // shows side peeks; adjust 0.66–0.75
       initialPage: 1, // middle card selected on start
     );
+    controller.getTeacherClassData();
     currentPage = 1;
   }
 
@@ -1309,16 +1310,45 @@ class _HomeState extends State<Home> {
                                     color: AppColor.white,
                                   ),
                                 ),
-                                Obx(
-                                  () => Text(
-                                    '${controller.teacherDataResponse.value!.data.profile.staffName}!',
+                                Obx(() {
+                                  final staffName =
+                                      controller
+                                          .teacherDataResponse
+                                          .value
+                                          ?.data
+                                          .profile
+                                          .staffName;
+
+                                  if (staffName == null || staffName.isEmpty) {
+                                    return Text(
+                                      '',
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 20,
+                                        color: AppColor.white,
+                                      ),
+                                    );
+                                  }
+
+                                  return Text(
+                                    '$staffName!',
                                     style: GoogleFont.ibmPlexSans(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 25,
                                       color: AppColor.white,
                                     ),
-                                  ),
-                                ),
+                                  );
+                                }),
+                                // Obx(
+                                //   () => Text(
+                                //     '${controller.teacherDataResponse.value?.data.profile.staffName ?? ''}!',
+                                //     style: GoogleFont.ibmPlexSans(
+                                //       fontWeight: FontWeight.w900,
+                                //       fontSize: 25,
+                                //       color: AppColor.white,
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),

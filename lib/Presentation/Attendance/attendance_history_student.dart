@@ -63,7 +63,6 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
     });
     loadStudentAttendance(_focusedDay);
   }*/
-
   @override
   void initState() {
     super.initState();
@@ -85,7 +84,6 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
       }
     });
   }
-
 
   Color? getAttendanceColor(
     DateTime day,

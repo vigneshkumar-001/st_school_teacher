@@ -61,7 +61,7 @@ class LoginController extends GetxController {
         (response) async {
           Get.offAll(Home(page: 'page'));
           isOtpLoading.value = false;
-          controller.getTeacherClassData();
+
           AppLogger.log.i(response.message);
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', response.token);

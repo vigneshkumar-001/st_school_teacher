@@ -283,6 +283,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                             setState(() {
                               errorText = '';
                             });
+                            /*7904005315*/
                             /*8870210295*/
                             AppLogger.log.i(mbl);
                             loginController.mobileNumberLogin(mbl);
@@ -315,50 +316,57 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                       child: Column(
                         children: [
                           if (!isKeyboardOpen) ...[
-                            CarouselSlider(
-                              items:
-                                  images.map((imagePath) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                        width: 280, // 👈 2 images per screen
-                                      ),
-                                    );
-                                  }).toList(),
-                              options: CarouselOptions(
-                                height: 120,
-                                autoPlay: true,
-                                autoPlayInterval: Duration(seconds: 3),
-                                viewportFraction:
-                                    0.75, // 👈 ensures 2 per screen
-                                enlargeCenterPage: false,
-                                padEnds: false,
+                            SizedBox(
+                              height: 120,
+                              child: CarouselSlider(
+                                items:
+                                    images.map((imagePath) {
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          imagePath,
+                                          fit: BoxFit.cover,
+                                          width: 280, // 👈 2 images per screen
+                                        ),
+                                      );
+                                    }).toList(),
+                                options: CarouselOptions(
+
+                                  height: 120,
+                                  autoPlay: true,
+                                  autoPlayInterval: Duration(seconds: 3),
+                                  viewportFraction:
+                                      0.75, // 👈 ensures 2 per screen
+                                  enlargeCenterPage: false,
+                                  padEnds: false,
+                                ),
                               ),
                             ),
                             SizedBox(height: 25),
-                            CarouselSlider(
-                              items:
-                                  images1.map((imagePath) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(15),
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                        width: 280, // 👈 2 images per screen
-                                      ),
-                                    );
-                                  }).toList(),
-                              options: CarouselOptions(
-                                height: 120,
-                                autoPlay: true,
-                                autoPlayInterval: Duration(seconds: 3),
-                                viewportFraction:
-                                    0.75, // 👈 ensures 2 per screen
-                                enlargeCenterPage: false,
-                                padEnds: false,
-                                reverse: true,
+                            SizedBox(
+                              height: 120,
+                              child: CarouselSlider(
+                                items:
+                                    images1.map((imagePath) {
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Image.asset(
+                                          imagePath,
+                                          fit: BoxFit.cover,
+                                          width: 280, // 👈 2 images per screen
+                                        ),
+                                      );
+                                    }).toList(),
+                                options: CarouselOptions(
+                                  height: 120,
+                                  autoPlay: true,
+                                  autoPlayInterval: Duration(seconds: 3),
+                                  viewportFraction:
+                                      0.75, // 👈 ensures 2 per screen
+                                  enlargeCenterPage: false,
+                                  padEnds: false,
+                                  reverse: true,
+                                ),
                               ),
                             ),
 
