@@ -40,7 +40,9 @@ class SectionItem {
 }
 
 class HomeworkCreate extends StatefulWidget {
-  const HomeworkCreate({super.key});
+  final String? className;
+  final String? section;
+  const HomeworkCreate({super.key, this.className, this.section});
 
   @override
   State<HomeworkCreate> createState() => _HomeworkCreateState();
@@ -98,19 +100,17 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     }
   }
 
+  List<TextEditingController> _listControllers = [];
   void _addMoreListPoint() {
     setState(() {
-      _listTextFields.add('');
+      _listControllers.add(TextEditingController());
     });
   }
 
   void _removeListItem(int index) {
     setState(() {
-      _listTextFields.removeAt(index);
-
-      if (_listTextFields.isEmpty) {
-        _listSectionOpened = false;
-      }
+      _listControllers[index].dispose();
+      _listControllers.removeAt(index);
     });
   }
 
@@ -141,7 +141,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     return count;
   }
 
-  @override
+  /*  @override
   void initState() {
     super.initState();
 
@@ -165,6 +165,47 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
         showClearIcon = headingController.text.isNotEmpty;
       });
     });
+  }*/
+
+  String? selectedClassName;
+  String? selectedSection;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (teacherClassController.classList.isEmpty) return;
+
+      final defaultClass = teacherClassController.classList.firstWhere(
+        (c) => c.name == widget.className && c.section == widget.section,
+        orElse: () => teacherClassController.classList.first,
+      );
+
+      teacherClassController.selectedClass.value = defaultClass;
+      if (teacherClassController.subjectList.isNotEmpty) {
+        selectedSubjectId = teacherClassController.subjectList[0].id;
+        subjectIndex = 0;
+        selectedSubject = teacherClassController.subjectList[0].name;
+      }
+
+      // Update selectedIndex for UI highlight
+      final idx = teacherClassController.classList.indexOf(defaultClass);
+      setState(() {
+        selectedIndex = idx;
+      });
+
+      print(
+        "Default selected class: ${defaultClass.name} - ${defaultClass.section}",
+      );
+    });
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final defaultClass = teacherClassController.classList.firstWhere(
+    //         (c) => c.name == widget.className && c.section == widget.section,
+    //     orElse: () => teacherClassController.classList.first,
+    //   );
+    //   teacherClassController.selectedClass.value = defaultClass;
+    //   print("Default selected class: ${defaultClass.name} - ${defaultClass.section}");
+    // });
   }
 
   @override
@@ -235,8 +276,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Image.asset(AppImages.historyImage, height: 24),
+
                     ],
                   ),
                   SizedBox(height: 35),
@@ -321,6 +361,8 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                           setState(() {
                                             selectedIndex = index;
                                             selectedClassId = item.id;
+                                            selectedClassName = item.name;
+                                            selectedSection = item.section;
                                           });
                                         },
                                         child: AnimatedContainer(
@@ -1074,6 +1116,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                         SizedBox(width: 10),
                                         Expanded(
                                           child: TextField(
+                                            controller: _listControllers[index],
                                             decoration: InputDecoration(
                                               hintStyle: GoogleFont.ibmPlexSans(
                                                 fontSize: 14,
@@ -1192,59 +1235,34 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                             ],
                           ),
 
-                          /*     Row(
-                            children: [
-                              Text(
-                                'Add',
-                                style: GoogleFont.ibmPlexSans(
-                                  fontSize: 14,
-                                  color: AppColor.black,
-                                ),
-                              ),
-                              SizedBox(width: 25),
-                              CommonContainer.addMore(
-                                onTap: () {
-                                  setState(() {
-                                    _pickedImages.add(null);
-                                  });
-                                },
-                                mainText: 'Image',
-                                imagePath: AppImages.picherImageDark,
-                              ),
-                              SizedBox(width: 10),
-                              CommonContainer.addMore(
-                                onTap: () {
-                                  setState(() {
-                                    descriptionControllers.add(
-                                      TextEditingController(),
-                                    );
-                                  });
-                                },
-                                mainText: 'Paragraph',
-                                imagePath: AppImages.paragraph,
-                              ),
-
-                              SizedBox(width: 10),
-                              CommonContainer.addMore(
-                                onTap: _openListSection,
-                                mainText: 'List',
-                                imagePath: AppImages.list,
-                              ),
-                            ],
-                          ),*/
                           SizedBox(height: 40),
                           AppButton.button(
                             onTap: () {
+                              final selected =
+                                  teacherClassController.selectedClass.value ??
+                                  teacherClassController.classList.first;
+                              final selectedSubId = selectedSubjectId;
                               HapticFeedback.heavyImpact();
+                              final listPoints =
+                                  _sections
+                                      .where((s) => s.type == SectionType.list)
+                                      .expand((s) => s.listPoints)
+                                      .where((p) => p.trim().isNotEmpty)
+                                      .toList();
+
+                              print("Passing listPoints: $listPoints");
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder:
                                       (context) => HomeworkCreatePreview(
-                                        listPoints: _listTextFields,
+                                        listPoints: listPoints,
                                         subjectId: selectedSubjectId,
-                                        selectedClassId: selectedClassId,
+
+                                        // selectedClassId: selectedClassId,
                                         subjects: selectedSubject ?? '',
+                                        selectedClassId: selected.id,
+
                                         description: [
                                           // take from old descriptionControllers
                                           ...descriptionControllers
@@ -1434,6 +1452,9 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                       ),
                       Expanded(
                         child: TextField(
+                          controller: TextEditingController(
+                            text: item.listPoints[listIndex],
+                          ),
                           decoration: InputDecoration(
                             hintStyle: GoogleFont.ibmPlexSans(
                               fontSize: 14,

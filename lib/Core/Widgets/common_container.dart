@@ -7,6 +7,7 @@ import 'package:st_teacher_app/Core/Utility/custom_textfield.dart';
 import '../Utility/app_color.dart';
 import '../Utility/app_images.dart';
 import '../Utility/google_fonts.dart';
+import 'package:flutter/material.dart';
 
 final FocusNode nextFieldFocusNode = FocusNode();
 
@@ -18,10 +19,11 @@ class CommonContainer {
     bool addButton = false,
     VoidCallback? onIconTap,
     VoidCallback? Start,
+    Color? color =AppColor.white,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColor.white,
+        color: color,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
@@ -42,34 +44,34 @@ class CommonContainer {
 
             addButton
                 ? InkWell(
-                  onTap: Start,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColor.lowLightBlue,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8.0,
-                        horizontal: 18,
-                      ),
-                      child: Row(
-                        children: [
-                          Image.asset(AppImages.plus, height: 12.57, width: 13),
-                          SizedBox(width: 7),
-                          Text(
-                            subText,
-                            style: GoogleFont.ibmPlexSans(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: AppColor.blue,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+              onTap: Start,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColor.lowLightBlue,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 18,
                   ),
-                )
+                  child: Row(
+                    children: [
+                      Image.asset(AppImages.plus, height: 12.57, width: 13),
+                      SizedBox(width: 7),
+                      Text(
+                        subText,
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: AppColor.blue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
                 : SizedBox.shrink(),
             SizedBox(width: 10),
             // InkWell(
@@ -146,6 +148,7 @@ class CommonContainer {
     Color? imageColor,
     VoidCallback? onIconTap,
     Border? border,
+    bool? blueContainer,
   }) {
     return InkWell(
       onTap: onIconTap,
@@ -163,14 +166,18 @@ class CommonContainer {
     );
   }
 
-  static StudentsList({required String mainText, VoidCallback? onIconTap}) {
+  static StudentsList({
+    required String mainText,
+    VoidCallback? onIconTap,
+    bool blueContainer = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: onIconTap,
-            child: Row(
+      child: InkWell(
+        onTap: onIconTap,
+        child: Column(
+          children: [
+            Row(
               children: [
                 Text(
                   mainText,
@@ -180,20 +187,39 @@ class CommonContainer {
                   ),
                 ),
                 Spacer(),
-                InkWell(
-                  onTap: onIconTap,
-                  child: Image.asset(
-                    AppImages.rightSideArrow,
-                    height: 10,
-                    color: AppColor.lightgray,
+                if (blueContainer)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.blueStdContainer,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 20,
+                      ),
+                      child: Text(
+                        '7 out of 10',
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: AppColor.blue,
+                        ),
+                      ),
+                    ),
                   ),
+                SizedBox(width: 10),
+                Image.asset(
+                  AppImages.rightSideArrow,
+                  height: 10,
+                  color: AppColor.lightgray,
                 ),
               ],
             ),
-          ),
-          SizedBox(height: 10),
-          Divider(color: AppColor.lowLightgray),
-        ],
+            SizedBox(height: 10),
+            Divider(color: AppColor.lowLightgray),
+          ],
+        ),
       ),
     );
   }
@@ -358,59 +384,59 @@ class CommonContainer {
                   flex: flex,
                   child: GestureDetector(
                     onTap:
-                        isDOB && context != null
-                            ? () async {
-                              final DateTime startDate = DateTime(2021, 6, 1);
-                              final DateTime endDate = DateTime(2022, 5, 31);
-                              final DateTime initialDate = DateTime(2021, 6, 2);
+                    isDOB && context != null
+                        ? () async {
+                      final DateTime startDate = DateTime(2021, 6, 1);
+                      final DateTime endDate = DateTime(2022, 5, 31);
+                      final DateTime initialDate = DateTime(2021, 6, 2);
 
-                              final pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: initialDate,
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime(2025),
-                                builder: (context, child) {
-                                  return Theme(
-                                    data: Theme.of(context).copyWith(
-                                      dialogBackgroundColor: AppColor.white,
-                                      colorScheme: ColorScheme.light(
-                                        primary: AppColor.blue,
-                                        onPrimary: Colors.white,
-                                        onSurface: AppColor.black,
-                                      ),
-                                      textButtonTheme: TextButtonThemeData(
-                                        style: TextButton.styleFrom(
-                                          foregroundColor: AppColor.blue,
-                                        ),
-                                      ),
-                                    ),
-                                    child: child!,
-                                  );
-                                },
-                              );
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: initialDate,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2025),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              dialogBackgroundColor: AppColor.white,
+                              colorScheme: ColorScheme.light(
+                                primary: AppColor.blue,
+                                onPrimary: Colors.white,
+                                onSurface: AppColor.black,
+                              ),
+                              textButtonTheme: TextButtonThemeData(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColor.blue,
+                                ),
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
 
-                              if (pickedDate != null) {
-                                if (pickedDate.isBefore(startDate) ||
-                                    pickedDate.isAfter(endDate)) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Invalid Date of Birth!\nPlease select a date between 01-06-2021 and 31-05-2022.',
-                                      ),
-                                      backgroundColor: Colors.red,
-                                      duration: Duration(seconds: 3),
-                                    ),
-                                  );
-                                } else {
-                                  controller?.text =
-                                      "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
-                                  FocusScope.of(
-                                    context,
-                                  ).requestFocus(nextFieldFocusNode);
-                                }
-                              }
-                            }
-                            : null,
+                      if (pickedDate != null) {
+                        if (pickedDate.isBefore(startDate) ||
+                            pickedDate.isAfter(endDate)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Invalid Date of Birth!\nPlease select a date between 01-06-2021 and 31-05-2022.',
+                              ),
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        } else {
+                          controller?.text =
+                          "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
+                          FocusScope.of(
+                            context,
+                          ).requestFocus(nextFieldFocusNode);
+                        }
+                      }
+                    }
+                        : null,
 
                     child: AbsorbPointer(
                       absorbing: isDOB,
@@ -422,13 +448,13 @@ class CommonContainer {
                         validator: validator,
                         maxLines: maxLine,
                         maxLength:
-                            isMobile
-                                ? 10
-                                : isAadhaar
-                                ? 12
-                                : isPincode
-                                ? 6
-                                : null,
+                        isMobile
+                            ? 10
+                            : isAadhaar
+                            ? 12
+                            : isPincode
+                            ? 6
+                            : null,
                         // keyboardType:
                         // isMobile || isAadhaar || isPincode
                         //     ? TextInputType.number
@@ -437,18 +463,18 @@ class CommonContainer {
                         //     : TextInputType.emailAddress,
                         keyboardType: keyboardType,
                         inputFormatters:
-                            isMobile || isAadhaar || isPincode
-                                ? [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(
-                                    isMobile
-                                        ? 10
-                                        : isAadhaar
-                                        ? 12
-                                        : 6,
-                                  ),
-                                ]
-                                : [],
+                        isMobile || isAadhaar || isPincode
+                            ? [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(
+                            isMobile
+                                ? 10
+                                : isAadhaar
+                                ? 12
+                                : 6,
+                          ),
+                        ]
+                            : [],
                         style: GoogleFont.ibmPlexSans(
                           fontSize: 14,
                           color: AppColor.black,
@@ -526,6 +552,8 @@ class CommonContainer {
       ],
     );
   }
+
+
 
   static textWithSmall({
     required String text,
@@ -742,27 +770,27 @@ class CommonContainer {
                   ),
                   view != null
                       ? InkWell(
-                        onTap: onTap,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border.all(color: AppColor.borderGary),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 25,
-                              vertical: 10,
-                            ),
-                            child: Text(
-                              view ?? '',
-                              style: GoogleFont.inter(
-                                fontSize: 12,
-                                color: AppColor.black,
-                              ),
-                            ),
+                    onTap: onTap,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: AppColor.borderGary),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 25,
+                          vertical: 10,
+                        ),
+                        child: Text(
+                          view ?? '',
+                          style: GoogleFont.inter(
+                            fontSize: 12,
+                            color: AppColor.black,
                           ),
                         ),
-                      )
+                      ),
+                    ),
+                  )
                       : SizedBox.shrink(),
                   InkWell(
                     onTap: onIconTap,
@@ -814,20 +842,20 @@ class CommonContainer {
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               decoration: BoxDecoration(
                 gradient:
-                    leftSelected
-                        ? LinearGradient(
-                          colors: [Colors.white, AppColor.white],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        )
-                        : null,
+                leftSelected
+                    ? LinearGradient(
+                  colors: [Colors.white, AppColor.white],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )
+                    : null,
                 color: leftSelected ? null : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color:
-                      leftSelected
-                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                          : AppColor.lowLightgray,
+                  leftSelected
+                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                      : AppColor.lowLightgray,
                   width: leftSelected ? 3 : 1,
                 ),
               ),
@@ -840,14 +868,14 @@ class CommonContainer {
                     child: CustomTextField.textWithSmall(
                       text: leftValue,
                       fontWeight:
-                          leftSelected ? FontWeight.w800 : FontWeight.w500,
+                      leftSelected ? FontWeight.w800 : FontWeight.w500,
 
                       color:
-                          leftSelected
-                              ? (isQuizCompleted
-                                  ? AppColor.green
-                                  : AppColor.black)
-                              : AppColor.black,
+                      leftSelected
+                          ? (isQuizCompleted
+                          ? AppColor.green
+                          : AppColor.black)
+                          : AppColor.black,
                     ),
                   ),
                 ],
@@ -865,20 +893,20 @@ class CommonContainer {
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               decoration: BoxDecoration(
                 gradient:
-                    rightSelected
-                        ? LinearGradient(
-                          colors: [Colors.white, AppColor.white],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        )
-                        : null,
+                rightSelected
+                    ? LinearGradient(
+                  colors: [Colors.white, AppColor.white],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )
+                    : null,
                 color: rightSelected ? null : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color:
-                      rightSelected
-                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                          : AppColor.lowLightgray,
+                  rightSelected
+                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                      : AppColor.lowLightgray,
                   width: rightSelected ? 3 : 1,
                 ),
               ),
@@ -891,14 +919,14 @@ class CommonContainer {
                     child: CustomTextField.textWithSmall(
                       text: rightValue,
                       fontWeight:
-                          rightSelected ? FontWeight.w800 : FontWeight.w500,
+                      rightSelected ? FontWeight.w800 : FontWeight.w500,
 
                       color:
-                          rightSelected
-                              ? (isQuizCompleted
-                                  ? AppColor.green
-                                  : AppColor.green)
-                              : AppColor.black,
+                      rightSelected
+                          ? (isQuizCompleted
+                          ? AppColor.green
+                          : AppColor.green)
+                          : AppColor.black,
                     ),
                   ),
                 ],
@@ -929,9 +957,9 @@ class CommonContainer {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color:
-                      isSelected
-                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                          : AppColor.lowLightgray,
+                  isSelected
+                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                      : AppColor.lowLightgray,
                   width: isSelected ? 3 : 1,
                 ),
               ),
@@ -953,11 +981,11 @@ class CommonContainer {
                         text: leftValue,
 
                         color:
-                            isSelected
-                                ? (isQuizCompleted
-                                    ? AppColor.green
-                                    : AppColor.green)
-                                : AppColor.black,
+                        isSelected
+                            ? (isQuizCompleted
+                            ? AppColor.green
+                            : AppColor.green)
+                            : AppColor.black,
                       ),
                     ),
                   ],
@@ -969,65 +997,109 @@ class CommonContainer {
       ),
     );
   }
-
-  static carouselSlider({
+  static Widget carouselSlider({
     required String mainText1,
     required String mainText2,
     required String iconImage,
     required String bcImage,
+    bool isSelect = false,
     Gradient? gradient,
+    required int iconHeight,
+    required int iconWidth,
+    Alignment iconAlignment = Alignment.center,
+    double iconYOffset = 0,
+    EdgeInsets? iconPadding,
+    // NEW: control text block position/alignment like Figma
+    TextAlign textAlign = TextAlign.start,
+    EdgeInsets? textPadding,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
-        children: [
-          Image.asset(bcImage, height: 249, width: 187),
-          Positioned(
-            child: Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Text(
-                      mainText1,
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: AppColor.white,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+    final CrossAxisAlignment textCross =
+    (textAlign == TextAlign.end)
+        ? CrossAxisAlignment.end
+        : (textAlign == TextAlign.center)
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
 
-                  Flexible(
-                    child: Text(
-                      mainText2,
+    return Material(
+      color: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(22),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            // background
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Image.asset(bcImage, fit: BoxFit.cover),
+              ),
+            ),
+
+            // TEXTS (now alignable)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 20,
+              child: Padding(
+                padding:
+                textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: textCross,
+                  children: [
+                    Text(
+                      mainText1,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
                       style: GoogleFont.ibmPlexSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
+                        fontSize: isSelect ? 22 : 15,
+                        fontWeight:
+                        isSelect ? FontWeight.w800 : FontWeight.w500,
                         color: AppColor.white,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Spacer(),
-                  Align(
-                    alignment: Alignment.center,
+                    Text(
+                      mainText2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: isSelect ? 22 : 20,
+                        fontWeight:
+                        isSelect ? FontWeight.w500 : FontWeight.w800,
+                        color: AppColor.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ILLUSTRATION (align + offset + padding)
+            Positioned.fill(
+              child: Padding(
+                padding:
+                isSelect
+                    ? const EdgeInsets.symmetric(horizontal: 0)
+                    : const EdgeInsets.symmetric(horizontal: 25),
+                child: Align(
+                  alignment: iconAlignment,
+                  child: Transform.translate(
+                    offset: Offset(0, iconYOffset),
                     child: SizedBox(
-                      height: 80,
-                      width: 80,
+                      height: iconHeight.toDouble(),
+                      width: iconWidth.toDouble(),
                       child: Image.asset(iconImage, fit: BoxFit.contain),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1187,7 +1259,7 @@ class CommonContainer {
         borderRadius: BorderRadius.circular(16),
       ),
       padding:
-          containerPadding ??
+      containerPadding ??
           EdgeInsets.symmetric(horizontal: 30, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1222,64 +1294,64 @@ class CommonContainer {
           SizedBox(height: 15),
           Row(
             children:
-                sections.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final section = entry.value;
-                  final padding =
-                      paddings != null && paddings.length > index
-                          ? paddings[index]
-                          : EdgeInsets.only(right: 10);
+            sections.asMap().entries.map((entry) {
+              final index = entry.key;
+              final section = entry.value;
+              final padding =
+              paddings != null && paddings.length > index
+                  ? paddings[index]
+                  : EdgeInsets.only(right: 10);
 
-                  bool isExpanded = section == expandedSection;
-                  List<String> subjects = sectionSubjects?[section] ?? [];
+              bool isExpanded = section == expandedSection;
+              List<String> subjects = sectionSubjects?[section] ?? [];
 
-                  return Padding(
-                    padding: padding,
-                    child: InkWell(
-                      onTap: () {
-                        if (onSectionTap != null) {
-                          onSectionTap(
-                            isExpanded ? '' : section,
-                          ); // collapse if tapped again
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color:
-                              sectionBgColor ?? AppColor.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColor.white),
-                        ),
-                        padding:
-                            sectionTextPadding ??
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: Row(
-                          children: [
-                            Text(
-                              section,
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.black,
-                              ),
-                            ),
-                            if (isExpanded && subjects.isNotEmpty) ...[
-                              SizedBox(width: 8),
-                              Text(
-                                '- ${subjects.join(", ")}',
-                                style: GoogleFont.ibmPlexSans(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.black,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
+              return Padding(
+                padding: padding,
+                child: InkWell(
+                  onTap: () {
+                    if (onSectionTap != null) {
+                      onSectionTap(
+                        isExpanded ? '' : section,
+                      ); // collapse if tapped again
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color:
+                      sectionBgColor ?? AppColor.white.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColor.white),
                     ),
-                  );
-                }).toList(),
+                    padding:
+                    sectionTextPadding ??
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        Text(
+                          section,
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.black,
+                          ),
+                        ),
+                        if (isExpanded && subjects.isNotEmpty) ...[
+                          SizedBox(width: 8),
+                          Text(
+                            '- ${subjects.join(", ")}',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColor.black,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),

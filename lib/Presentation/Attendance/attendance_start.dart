@@ -8,6 +8,7 @@ import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'attendance_history.dart';
+import 'attendance_history_student.dart';
 import 'model/attendence_response.dart';
 
 class AttendanceStart extends StatefulWidget {
@@ -398,48 +399,56 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                             horizontal: 32,
                                                             vertical: 13,
                                                           ),
-                                                      child: Row(
-                                                        children: [
-                                                          if (currentStatusLoading ==
-                                                                  'absent' &&
-                                                              loading)
-                                                            SizedBox(
-                                                              height: 18,
-                                                              width: 18,
-                                                              child: CircularProgressIndicator(
-                                                                strokeWidth: 2,
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                              ),
-                                                            )
-                                                          else ...[
-                                                            Image.asset(
-                                                              AppImages.close,
-                                                              height: 20.86,
-                                                              color:
-                                                                  AppColor
-                                                                      .white,
-                                                            ),
-                                                            SizedBox(width: 7),
-                                                            Text(
-                                                              'Absent',
-                                                              style: GoogleFont.ibmPlexSans(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
+                                                      child: SizedBox(
+                                                        width: 80,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            if (currentStatusLoading ==
+                                                                    'absent' &&
+                                                                loading)
+                                                              SizedBox(
+                                                                height: 24,
+                                                                width: 24,
+                                                                child:
+                                                                    AppLoader.circularLoader(
+                                                                      Colors
+                                                                          .white,
+                                                                    ),
+                                                              )
+                                                            else ...[
+                                                              Image.asset(
+                                                                AppImages.close,
+                                                                height: 19.62,
                                                                 color:
                                                                     AppColor
                                                                         .white,
                                                               ),
-                                                            ),
+                                                              SizedBox(
+                                                                width: 7,
+                                                              ),
+                                                              Text(
+                                                                'Absent',
+                                                                style: GoogleFont.ibmPlexSans(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color:
+                                                                      AppColor
+                                                                          .white,
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ],
-                                                        ],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
+
                                                 Spacer(),
                                                 InkWell(
                                                   onTap:
@@ -470,7 +479,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                             vertical: 13,
                                                           ),
                                                       child: SizedBox(
-                                                        width: 90,
+                                                        width: 80,
                                                         child: Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
@@ -652,7 +661,17 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           for (var student in pendingStudents)
                                             CommonContainer.StudentsList(
                                               mainText: student['name'],
-                                              onIconTap: () {},
+                                              onIconTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => AttendanceHistoryStudent(
+                                                      studentId: student['id'],      // ✅ use actual key from map
+                                                      classId: selectedClass.id,     // ✅ pass classId
+                                                    ),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                       ] else if (selectedIndex == 3) ...[
                                         if (laterStudents.isEmpty)

@@ -62,6 +62,8 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
               remainingTasks.where((t) => t['type'] == 'image').toList();
           final remainingParagraphs =
               remainingTasks.where((t) => t['type'] == 'paragraph').toList();
+          final remainingLists =
+              remainingTasks.where((t) => t['type'] == 'list').toList();
 
           return SingleChildScrollView(
             child: Padding(
@@ -143,7 +145,36 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                 color: AppColor.gray,
                               ),
                             ),
-
+                          if (remainingLists.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Text(
+                              "List Points:",
+                              style: GoogleFont.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.black,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: List.generate(remainingLists.length, (
+                                  index,
+                                  ) {
+                                final task = remainingLists[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Text(
+                                    "${index + 1}. ${task['content'] ?? ''}",
+                                    style: GoogleFont.inter(
+                                      fontSize: 13,
+                                      color: AppColor.gray,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ],
                           const SizedBox(height: 16),
 
                           // --- Remaining images ---
@@ -181,6 +212,9 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                               ),
                             ),
                           ),
+                          // --- List Points ---
+
+
                           const SizedBox(height: 16),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,

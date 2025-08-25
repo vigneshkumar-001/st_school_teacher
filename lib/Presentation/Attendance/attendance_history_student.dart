@@ -46,7 +46,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
   int current = 15;
   int total = 20;
   @override
-  void initState() {
+  /*void initState() {
     super.initState();
     loadStudentAttendance(_focusedDay);
 
@@ -62,7 +62,30 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
       }
     });
     loadStudentAttendance(_focusedDay);
+  }*/
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Load local data (safe)
+    loadStudentAttendance(_focusedDay);
+
+    // Delay reactive updates until after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await attendanceController.getClassList();
+      if (attendanceController.classList.isNotEmpty) {
+        selectedClass = attendanceController.classList.first;
+
+        final attendanceData = await attendanceController.getTodayStatus(
+          selectedClass.id,
+        );
+
+        setState(() {}); // safe now
+      }
+    });
   }
+
 
   Color? getAttendanceColor(
     DateTime day,
