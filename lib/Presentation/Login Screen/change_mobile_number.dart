@@ -244,14 +244,14 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                         alignment: Alignment.topRight,
                         child: Text(
                           errorText,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             color: Colors.red,
                             fontSize: 12,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 25),
+                     SizedBox(height: 25),
                     Obx(() {
                       return AppButton.button(
                         text: 'Get OTP',

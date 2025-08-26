@@ -161,7 +161,10 @@ class _OtpScreenState extends State<OtpScreen> {
                   Center(
                     child: Text(
                       otpError!,
-                      style: TextStyle(color: Colors.red, fontSize: 14),
+                      style: GoogleFont.ibmPlexSans(
+                        color: AppColor.red,
+                        fontSize: 14,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -177,19 +180,18 @@ class _OtpScreenState extends State<OtpScreen> {
                       return;
                     }
 
-                    // Proceed if OTP is valid
-
                     if (widget.pages == 'splash') {
                       String Otp = otp.text.toString();
                       String mobileNumber =
                           widget.mobileNumber.toString() ?? '';
                       otpController.otpLogin(phone: mobileNumber, otp: Otp);
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => Home(pages: 'homeScreen'),
-                      //   ),
-                      // );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => Home(pages: 'homeScreen', page: ''),
+                        ),
+                      );
                     } else {
                       // Navigator.push(
                       //   context,
