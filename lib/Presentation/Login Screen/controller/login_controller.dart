@@ -4,9 +4,14 @@ import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Home/home.dart';
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
+ 
 import '../../../Core/Utility/snack_bar.dart';
 import '../../Menu/menu_screen.dart';
+
 import '../../Profile/controller/teacher_data_controller.dart';
+
+ 
+
 import '../otp_screen.dart';
 
 class LoginController extends GetxController {
@@ -59,7 +64,11 @@ class LoginController extends GetxController {
           AppLogger.log.e(failure.message);
         },
         (response) async {
+
           Get.offAll(Home(page: 'page'));
+
+          // Get.offAll(Home(pages: 'homeScreen'));
+
           isOtpLoading.value = false;
 
           AppLogger.log.i(response.message);
