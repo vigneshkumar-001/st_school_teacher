@@ -124,14 +124,15 @@ class _MenuScreenState extends State<MenuScreen> {
                   addButton: true,
                 ),
                 SizedBox(height: 20),
-                CommonContainer.Menu_Students(
+                /* CommonContainer.Menu_Students(
+                  color: Colors.grey.shade300,
                   Start: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => QuizScreenCreate(),
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => QuizScreenCreate(),
+                    //   ),
+                    // );
                   },
                   onIconTap: () {
                     Navigator.push(
@@ -145,6 +146,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   addButton: true,
                 ),
                 SizedBox(height: 20),
+
                 CommonContainer.Menu_Students(
                   Start: () {
                     Navigator.push(
@@ -158,12 +160,14 @@ class _MenuScreenState extends State<MenuScreen> {
                       MaterialPageRoute(builder: (context) => ExamHistory()),
                     );
                   },
+
                   mainText: 'Exam',
                   subText: 'Create',
                   image: AppImages.Exam,
                   addButton: true,
                 ),
                 SizedBox(height: 20),
+
                 CommonContainer.Menu_Students(
                   Start: () {
                     Navigator.push(
@@ -173,13 +177,14 @@ class _MenuScreenState extends State<MenuScreen> {
                       ),
                     );
                   },
+
                   onIconTap: () {},
                   mainText: 'Announcement',
                   subText: 'Create',
                   image: AppImages.Announcement,
                   addButton: true,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 20),*/
                 // CommonContainer.Menu_Students(
                 //   onIconTap: () {},
                 //   mainText: 'Events',
@@ -187,7 +192,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 //   image: AppImages.Events,
                 //   addButton: false,
                 // ),
-                SizedBox(height: 35),
+                SizedBox(height: 10),
                 Text(
                   'About Me',
                   style: GoogleFont.ibmPlexSans(
