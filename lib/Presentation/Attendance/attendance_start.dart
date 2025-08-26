@@ -8,7 +8,26 @@ import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'attendance_history.dart';
+import 'attendance_history_student.dart';
 import 'model/attendence_response.dart';
+
+class AttendanceModel {
+  final int studentId;
+  final int classId;
+  String status; // "present", "absent", "later"
+
+  AttendanceModel({
+    required this.studentId,
+    required this.classId,
+    this.status = "",
+  });
+
+  Map<String, dynamic> toJson() => {
+    "studentId": studentId,
+    "classId": classId,
+    "status": status,
+  };
+}
 
 class AttendanceStart extends StatefulWidget {
   const AttendanceStart({super.key});
@@ -33,63 +52,168 @@ class _AttendanceStartState extends State<AttendanceStart> {
   List<Map<String, dynamic>> laterStudents = [];
 
   int pendingStudentIndex = 0;
+  List<AttendanceModel> markedAttendance = [];
 
-  void markAttendanceForCurrentStudent(String status) async {
-    // Determine student & index based on selected tab
-    Map<String, dynamic>? student;
+  /*  void markAttendance(Map<String, dynamic> student, String status) {
+    final studentId = student['id'];
+    final studentName = student['name'];
 
-    if (selectedIndex == 3) {
-      if (laterStudents.isEmpty ||
-          selectedLaterStudentIndex >= laterStudents.length)
-        return;
-      student = laterStudents[selectedLaterStudentIndex];
+    // update local markedAttendance
+    final existing = markedAttendance.indexWhere(
+      (s) => s.studentId == studentId,
+    );
+    if (existing != -1) {
+      markedAttendance[existing].status = status;
     } else {
-      if (pendingStudents.isEmpty ||
-          pendingStudentIndex >= pendingStudents.length)
-        return;
-      student = pendingStudents[pendingStudentIndex];
+      markedAttendance.add(
+        AttendanceModel(
+          studentId: studentId,
+          classId: selectedClass.id,
+          status: status,
+        ),
+      );
     }
 
-    attendanceController.currentLoadingStatus.value = status;
-    attendanceController.isPresentLoading.value = true;
+    // remove from pending & add to correct list
+    setState(() {
+      pendingStudents.removeWhere((s) => s['id'] == studentId);
+      laterStudents.removeWhere((s) => s['id'] == studentId); // 👈 FIX
 
-    bool success = await attendanceController.presentOrAbsent(
-      studentId: student['id'],
-      status: status,
-      classId: selectedClass.id,
-    );
-
-    if (success) {
-      final updatedData = await attendanceController.getTodayStatus(
-        selectedClass.id,
-        showLoader: false,
-      );
-
-      if (updatedData != null) {
-        _prepareTabs(updatedData);
-
-        setState(() {
-          if (selectedIndex == 3) {
-            if (laterStudents.isNotEmpty) {
-              selectedLaterStudentIndex =
-                  (selectedLaterStudentIndex + 1) % laterStudents.length;
-            } else {
-              selectedLaterStudentIndex = 0;
-            }
-          } else {
-            if (pendingStudents.isNotEmpty) {
-              pendingStudentIndex =
-                  (pendingStudentIndex + 1) % pendingStudents.length;
-            } else {
-              pendingStudentIndex = 0;
-            }
-          }
-        });
+      if (status == "present") {
+        presentStudents.add(student);
+      } else if (status == "absent") {
+        absentStudents.add(student);
+      } else if (status == "late") {
+        laterStudents.add(student);
       }
-    } else {}
+      _saveAttendanceInBackground(studentId, status);
+      // update tabs count
+      tabs = [
+        {'label': 'Present', 'count': presentStudents.length},
+        {'label': 'Absent', 'count': absentStudents.length},
+        {'label': 'Pending', 'count': pendingStudents.length},
+        {'label': 'Later', 'count': laterStudents.length},
+      ];
+    });
 
-    attendanceController.isPresentLoading.value = false;
-    attendanceController.currentLoadingStatus.value = '';
+    print("✅ Marked $studentName as $status");
+
+    // 🔥 Run insert in background (non-blocking)
+  }*/
+  void markAttendance(Map<String, dynamic> student, String status) {
+    final studentId = student['id'];
+    final studentName = student['name'];
+
+    final existing = markedAttendance.indexWhere(
+      (s) => s.studentId == studentId,
+    );
+    if (existing != -1) {
+      markedAttendance[existing].status = status;
+    } else {
+      markedAttendance.add(
+        AttendanceModel(
+          studentId: studentId,
+          classId: selectedClass.id,
+          status: status,
+        ),
+      );
+    }
+    setState(() {
+      // remove student from all lists first
+      pendingStudents.removeWhere((s) => s['id'] == studentId);
+      laterStudents.removeWhere((s) => s['id'] == studentId);
+
+      if (status == "present") {
+        presentStudents.add(student);
+      } else if (status == "absent") {
+        absentStudents.add(student);
+      } else if (status == "late") {
+        laterStudents.add(student);
+      }
+
+      // 👇 reset later index safely
+      if (selectedLaterStudentIndex >= laterStudents.length) {
+        selectedLaterStudentIndex = 0;
+      }
+
+      tabs = [
+        {'label': 'Present', 'count': presentStudents.length},
+        {'label': 'Absent', 'count': absentStudents.length},
+        {'label': 'Pending', 'count': pendingStudents.length},
+        {'label': 'Later', 'count': laterStudents.length},
+      ];
+    });
+
+    print("✅ Marked $studentName as $status");
+
+    // background insert
+    _saveAttendanceInBackground(studentId, status);
+  }
+
+  /// Background insert function (non-blocking)
+  Future<void> _saveAttendanceInBackground(int studentId, String status) async {
+    try {
+      await attendanceController.presentOrAbsent(
+        studentId: studentId,
+        status: status,
+        classId: selectedClass.id,
+      );
+      print("📡 Synced attendance for $studentId → $status");
+    } catch (e) {
+      print("❌ Failed to sync $studentId: $e");
+    }
+  }
+
+  /*  void markAttendance(Map<String, dynamic> student, String status) {
+    final studentId = student['id'];
+    final studentName = student['name'];
+
+    // update local markedAttendance
+    final existing = markedAttendance.indexWhere(
+      (s) => s.studentId == studentId,
+    );
+    if (existing != -1) {
+      markedAttendance[existing].status = status;
+    } else {
+      markedAttendance.add(
+        AttendanceModel(
+          studentId: studentId,
+          classId: selectedClass.id,
+          status: status,
+        ),
+      );
+    }
+
+    // remove from pending & add to correct list
+    setState(() {
+      pendingStudents.removeWhere((s) => s['id'] == studentId);
+
+      if (status == "present") {
+        presentStudents.add(student);
+      } else if (status == "absent") {
+        absentStudents.add(student);
+      } else if (status == "late") {
+        laterStudents.add(student);
+      }
+
+      // update tabs count
+      tabs = [
+        {'label': 'Present', 'count': presentStudents.length},
+        {'label': 'Absent', 'count': absentStudents.length},
+        {'label': 'Pending', 'count': pendingStudents.length},
+        {'label': 'Later', 'count': laterStudents.length},
+      ];
+    });
+
+    print("✅ Marked $studentName as $status");
+  }*/
+
+  String getStudentStatus(int studentId) {
+    final entry = markedAttendance.firstWhere(
+      (s) => s.studentId == studentId,
+      orElse: () => AttendanceModel(studentId: -1, classId: -1, status: ""),
+    );
+    return entry.status;
   }
 
   bool morningDone = false;
@@ -124,7 +248,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
         morningDone ? data.absentStudentsAfternoon : data.absentStudentsMorning;
     final late =
         morningDone ? data.lateStudentsAfternoon : data.lateStudentsMorning;
-    final pending = data.pendingAttendance; // pending probably stays the same
+    final pending = data.pendingAttendance;
 
     presentStudents = present.map((s) => {'name': s.name, 'id': s.id}).toList();
     absentStudents = absent.map((s) => {'name': s.name, 'id': s.id}).toList();
@@ -270,47 +394,45 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                               onTap:
                                                   loading
                                                       ? null
-                                                      : () =>
-                                                          markAttendanceForCurrentStudent(
+                                                      : () {
+                                                        if (selectedIndex ==
+                                                                3 &&
+                                                            laterStudents
+                                                                .isNotEmpty) {
+                                                          markAttendance(
+                                                            laterStudents[selectedLaterStudentIndex],
                                                             'late',
-                                                          ),
+                                                          );
+                                                        } else if (selectedIndex ==
+                                                                2 &&
+                                                            pendingStudents
+                                                                .isNotEmpty) {
+                                                          markAttendance(
+                                                            pendingStudents[pendingStudentIndex],
+                                                            'late',
+                                                          );
+                                                        }
+                                                      },
                                               child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 10,
-                                                  vertical: 5,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 5,
+                                                    ),
+                                                child: Text(
+                                                  'Later',
+                                                  style: GoogleFont.ibmPlexSans(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        loading
+                                                            ? AppColor.blue
+                                                                .withOpacity(
+                                                                  0.6,
+                                                                )
+                                                            : AppColor.blue,
+                                                  ),
                                                 ),
-                                                child:
-                                                    currentStatusLoading ==
-                                                                'late' &&
-                                                            loading
-                                                        ? SizedBox(
-                                                          height: 18,
-                                                          width: 18,
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                                strokeWidth: 2,
-                                                                color:
-                                                                    AppColor
-                                                                        .blue,
-                                                              ),
-                                                        )
-                                                        : Text(
-                                                          'Later',
-                                                          style: GoogleFont.ibmPlexSans(
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            color:
-                                                                loading
-                                                                    ? AppColor
-                                                                        .blue
-                                                                        .withOpacity(
-                                                                          0.6,
-                                                                        )
-                                                                    : AppColor
-                                                                        .blue,
-                                                          ),
-                                                        ),
                                               ),
                                             ),
                                           ],
@@ -370,14 +492,81 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                             ),
                                             child: Row(
                                               children: [
+                                                /* InkWell(
+                                                  onTap:
+                                                      loading
+                                                          ? null
+                                                          : () {
+                                                            if (selectedIndex ==
+                                                                    2 &&
+                                                                pendingStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                pendingStudents[pendingStudentIndex],
+                                                                'absent',
+                                                              );
+                                                            } else if (selectedIndex ==
+                                                                    3 &&
+                                                                laterStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                laterStudents[selectedLaterStudentIndex],
+                                                                'absent',
+                                                              );
+                                                            }
+                                                          },
+                                                  child: Text("Absent"),
+                                                ),
+
+                                                Spacer(),
                                                 InkWell(
                                                   onTap:
                                                       loading
                                                           ? null
-                                                          : () =>
-                                                              markAttendanceForCurrentStudent(
+                                                          : () {
+                                                            if (selectedIndex ==
+                                                                    2 &&
+                                                                pendingStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                pendingStudents[pendingStudentIndex],
+                                                                'present',
+                                                              );
+                                                            } else if (selectedIndex ==
+                                                                    3 &&
+                                                                laterStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                laterStudents[selectedLaterStudentIndex],
+                                                                'present',
+                                                              );
+                                                            }
+                                                          },
+                                                  child: Text("Present"),
+                                                ),*/
+                                                InkWell(
+                                                  onTap:
+                                                      loading
+                                                          ? null
+                                                          : () {
+                                                            if (selectedIndex ==
+                                                                    2 &&
+                                                                pendingStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                pendingStudents[pendingStudentIndex],
                                                                 'absent',
-                                                              ),
+                                                              );
+                                                            } else if (selectedIndex ==
+                                                                    3 &&
+                                                                laterStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                laterStudents[selectedLaterStudentIndex],
+                                                                'absent',
+                                                              );
+                                                            }
+                                                          },
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       color:
@@ -398,25 +587,16 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                             horizontal: 32,
                                                             vertical: 13,
                                                           ),
-                                                      child: Row(
-                                                        children: [
-                                                          if (currentStatusLoading ==
-                                                                  'absent' &&
-                                                              loading)
-                                                            SizedBox(
-                                                              height: 18,
-                                                              width: 18,
-                                                              child: CircularProgressIndicator(
-                                                                strokeWidth: 2,
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                              ),
-                                                            )
-                                                          else ...[
+                                                      child: SizedBox(
+                                                        width: 80,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
                                                             Image.asset(
                                                               AppImages.close,
-                                                              height: 20.86,
+                                                              height: 19.62,
                                                               color:
                                                                   AppColor
                                                                       .white,
@@ -435,20 +615,36 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                               ),
                                                             ),
                                                           ],
-                                                        ],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
+
                                                 Spacer(),
                                                 InkWell(
                                                   onTap:
                                                       loading
                                                           ? null
-                                                          : () =>
-                                                              markAttendanceForCurrentStudent(
+                                                          : () {
+                                                            if (selectedIndex ==
+                                                                    2 &&
+                                                                pendingStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                pendingStudents[pendingStudentIndex],
                                                                 'present',
-                                                              ),
+                                                              );
+                                                            } else if (selectedIndex ==
+                                                                    3 &&
+                                                                laterStudents
+                                                                    .isNotEmpty) {
+                                                              markAttendance(
+                                                                laterStudents[selectedLaterStudentIndex],
+                                                                'present',
+                                                              );
+                                                            }
+                                                          },
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       color:
@@ -470,48 +666,32 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                             vertical: 13,
                                                           ),
                                                       child: SizedBox(
-                                                        width: 90,
+                                                        width: 80,
                                                         child: Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
                                                                   .center,
                                                           children: [
-                                                            if (currentStatusLoading ==
-                                                                    'present' &&
-                                                                loading)
-                                                              SizedBox(
-                                                                height: 24,
-                                                                width: 24,
-                                                                child:
-                                                                    AppLoader.circularLoader(
-                                                                      Colors
-                                                                          .white,
-                                                                    ),
-                                                              )
-                                                            else ...[
-                                                              Image.asset(
-                                                                AppImages.tick,
-                                                                height: 19.62,
+                                                            Image.asset(
+                                                              AppImages.tick,
+                                                              height: 19.62,
+                                                              color:
+                                                                  AppColor
+                                                                      .white,
+                                                            ),
+                                                            SizedBox(width: 7),
+                                                            Text(
+                                                              'Present',
+                                                              style: GoogleFont.ibmPlexSans(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
                                                                 color:
                                                                     AppColor
                                                                         .white,
                                                               ),
-                                                              SizedBox(
-                                                                width: 7,
-                                                              ),
-                                                              Text(
-                                                                'Present',
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color:
-                                                                      AppColor
-                                                                          .white,
-                                                                ),
-                                                              ),
-                                                            ],
+                                                            ),
                                                           ],
                                                         ),
                                                       ),
@@ -652,7 +832,23 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           for (var student in pendingStudents)
                                             CommonContainer.StudentsList(
                                               mainText: student['name'],
-                                              onIconTap: () {},
+                                              onIconTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (
+                                                          context,
+                                                        ) => AttendanceHistoryStudent(
+                                                          studentId:
+                                                              student['id'], // ✅ use actual key from map
+                                                          classId:
+                                                              selectedClass
+                                                                  .id, // ✅ pass classId
+                                                        ),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                       ] else if (selectedIndex == 3) ...[
                                         if (laterStudents.isEmpty)
@@ -675,8 +871,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                   laterStudents[i]['name'],
                                               onIconTap: () {
                                                 setState(() {
-                                                  selectedLaterStudentIndex =
-                                                      i; // update selected student
+                                                  selectedLaterStudentIndex = i;
                                                 });
                                               },
                                             ),
@@ -694,7 +889,6 @@ class _AttendanceStartState extends State<AttendanceStart> {
         ),
       ),
 
-      // Bottom nav - class selection
       bottomNavigationBar: Obx(() {
         return Container(
           decoration: BoxDecoration(color: AppColor.white),

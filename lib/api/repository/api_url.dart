@@ -51,5 +51,6 @@ class ApiUrl {
     return '$baseUrl/teacher-home/attendance/daily?date=$formattedDate';
   }
 
-  static String imageUrl = "https://next.fenizotechnologies.com/Adrox/api/image-save";
+  static String imageUrl =
+      "https://next.fenizotechnologies.com/Adrox/api/image-save";
 }

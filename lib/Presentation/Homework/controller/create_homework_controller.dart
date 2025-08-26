@@ -42,9 +42,9 @@ class CreateHomeworkController extends GetxController {
     bool publish = false,
     bool showLoader = true,
     List<File>? imageFiles,
+    BuildContext? context,
     required List<Map<String, dynamic>> contents,
-  }) async
-  {
+  }) async {
     try {
       if (showLoader) showPopupLoader();
 
@@ -82,6 +82,8 @@ class CreateHomeworkController extends GetxController {
         (response) async {
           fetchHomeworks();
           if (showLoader) hidePopupLoader();
+          Navigator.pop(context!);
+          Navigator.pop(context!);
           Get.to(HomeworkHistory());
         },
       );
@@ -216,6 +218,7 @@ class CreateHomeworkController extends GetxController {
     bool showLoader = true,
   }) async {
     try {
+      homeworkDetails.value = null;
       if (showLoader) showPopupLoader(); // show popup loader
       final results = await apiDataSource.getHomeWorkDetails(
         classId: classId ?? 0,

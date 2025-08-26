@@ -200,11 +200,16 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                   children: List.generate(
                                     widget.listPoints.length,
                                     (index) {
-                                      return Text(
-                                        '${index + 1}. ${widget.listPoints[index]}',
-                                        style: GoogleFont.inter(
-                                          fontSize: 12,
-                                          color: AppColor.gray,
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 4.0,
+                                        ),
+                                        child: Text(
+                                          '${index + 1}. ${widget.listPoints[index]}',
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.gray,
+                                          ),
                                         ),
                                       );
                                     },
@@ -336,7 +341,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                 ),
                               ),
                               SizedBox(width: 10),
-                          /*    AppButton.button(
+                              /*    AppButton.button(
                                 onTap: () async {
                                   List<Map<String, dynamic>> contents = [];
 
@@ -418,7 +423,11 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
 
                                   // Add paragraph contents
                                   if (widget.description.length > 1) {
-                                    for (var i = 1; i < widget.description.length; i++) {
+                                    for (
+                                      var i = 1;
+                                      i < widget.description.length;
+                                      i++
+                                    ) {
                                       var para = widget.description[i];
                                       if (para.trim().isNotEmpty) {
                                         contents.add({
@@ -431,10 +440,13 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
 
                                   // First description goes to 'description' field
                                   String mainDescription =
-                                  widget.description.isNotEmpty ? widget.description[0] : '';
+                                      widget.description.isNotEmpty
+                                          ? widget.description[0]
+                                          : '';
 
                                   // Only pass files for upload, do NOT add their paths manually
                                   await homeworkController.createHomeWork(
+                                    context: context,
                                     showLoader: true,
                                     classId: widget.selectedClassId,
                                     subjectId: widget.subjectId,
@@ -443,7 +455,8 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     publish: true,
                                     contents: contents,
                                     imageFiles: [
-                                      if (widget.permanentImage != null) widget.permanentImage!,
+                                      if (widget.permanentImage != null)
+                                        widget.permanentImage!,
                                       ...widget.images.whereType<File>(),
                                     ],
                                   );
@@ -452,9 +465,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                 height: 60,
                                 text: 'Publish',
                                 image: AppImages.buttonArrow,
-                              )
-
-
+                              ),
                             ],
                           ),
                         ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:st_teacher_app/Core/Utility/app_loader.dart';
+import 'package:st_teacher_app/Core/consents.dart';
 
 import '../../../../Core/Utility/app_color.dart' show AppColor;
 import '../../Core/Utility/app_images.dart';
@@ -282,7 +283,10 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                             setState(() {
                               errorText = '';
                             });
-                            loginController.mobileNumberLogin('8870210295');
+                            /*7904005315*/
+                            /*8870210295*/
+                            AppLogger.log.i(mbl);
+                            loginController.mobileNumberLogin(mbl);
                           }
                         },
                       );
@@ -312,7 +316,61 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                       child: Column(
                         children: [
                           if (!isKeyboardOpen) ...[
-                            CarouselSlider(
+                            SizedBox(
+                              height: 120,
+                              child: CarouselSlider(
+                                items:
+                                    images.map((imagePath) {
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          imagePath,
+                                          fit: BoxFit.cover,
+                                          width: 280, // 👈 2 images per screen
+                                        ),
+                                      );
+                                    }).toList(),
+                                options: CarouselOptions(
+
+                                  height: 120,
+                                  autoPlay: true,
+                                  autoPlayInterval: Duration(seconds: 3),
+                                  viewportFraction:
+                                      0.75, // 👈 ensures 2 per screen
+                                  enlargeCenterPage: false,
+                                  padEnds: false,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 25),
+                            SizedBox(
+                              height: 120,
+                              child: CarouselSlider(
+                                items:
+                                    images1.map((imagePath) {
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Image.asset(
+                                          imagePath,
+                                          fit: BoxFit.cover,
+                                          width: 280, // 👈 2 images per screen
+                                        ),
+                                      );
+                                    }).toList(),
+                                options: CarouselOptions(
+                                  height: 120,
+                                  autoPlay: true,
+                                  autoPlayInterval: Duration(seconds: 3),
+                                  viewportFraction:
+                                      0.75, // 👈 ensures 2 per screen
+                                  enlargeCenterPage: false,
+                                  padEnds: false,
+                                  reverse: true,
+                                ),
+                              ),
+                            ),
+
+                            /*  CarouselSlider(
                               items:
                                   images.map((imagePath) {
                                     return ClipRRect(
@@ -327,9 +385,12 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                               options: CarouselOptions(
                                 height: 120,
                                 autoPlayInterval: Duration(seconds: 3),
+                                viewportFraction: 0.75,   // 👈 two images fit in one view
+                                enlargeCenterPage: false, // 👈 no zoom on center image
+                                disableCenter: true,      // 👈 removes centering
                                 autoPlay: true,
-                                viewportFraction: 0.7,
-                                enlargeCenterPage: false,
+                                // viewportFraction: 0.70,
+                                // enlargeCenterPage: false,
                               ),
                             ),
                             SizedBox(height: 20),
@@ -341,19 +402,19 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                                       child: Image.asset(
                                         imagePath,
                                         fit: BoxFit.cover,
-                                        width: 265,
+                                        width: 320,
                                       ),
                                     );
                                   }).toList(),
                               options: CarouselOptions(
-                                height: 120,
+                                height: 115,
                                 autoPlay: true,
                                 autoPlayInterval: Duration(seconds: 3),
-                                viewportFraction: 0.7,
+                                viewportFraction: 0.85,
                                 enlargeCenterPage: false,
                                 reverse: true,
                               ),
-                            ),
+                            ),*/
                             SizedBox(height: 25),
                           ],
                         ],
