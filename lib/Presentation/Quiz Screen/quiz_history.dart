@@ -266,7 +266,7 @@ class _QuizHistoryState extends State<QuizHistory> {
                                             bottom: 16,
                                           ),
                                           child:
-                                              CommonContainer.homeworkhistory(
+                                              CommonContainer.homeworkhistory(CText1: '',
                                                 section: task['section'] ?? '',
                                                 className:
                                                     task['className'] ?? '',

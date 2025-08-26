@@ -21,7 +21,7 @@ class CommonContainer {
     bool addButton = false,
     VoidCallback? onIconTap,
     VoidCallback? Start,
-    Color? color =AppColor.white,
+    Color? color = AppColor.white,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -46,34 +46,34 @@ class CommonContainer {
 
             addButton
                 ? InkWell(
-              onTap: Start,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColor.lowLightBlue,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                    horizontal: 18,
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset(AppImages.plus, height: 12.57, width: 13),
-                      SizedBox(width: 7),
-                      Text(
-                        subText,
-                        style: GoogleFont.ibmPlexSans(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                          color: AppColor.blue,
-                        ),
+                  onTap: Start,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.lowLightBlue,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                        horizontal: 18,
                       ),
-                    ],
+                      child: Row(
+                        children: [
+                          Image.asset(AppImages.plus, height: 12.57, width: 13),
+                          SizedBox(width: 7),
+                          Text(
+                            subText,
+                            style: GoogleFont.ibmPlexSans(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                              color: AppColor.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            )
+                )
                 : SizedBox.shrink(),
             SizedBox(width: 10),
             // InkWell(
@@ -167,9 +167,10 @@ class CommonContainer {
       ),
     );
   }
+
   static StudentsList({
     required String mainText,
-    String? subText,   // 👈 added
+    String? subText, // 👈 added
     VoidCallback? onIconTap,
     bool blueContainer = false,
   }) {
@@ -197,7 +198,10 @@ class CommonContainer {
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 20,
+                      ),
                       child: Text(
                         '7 out of 10',
                         style: GoogleFont.ibmPlexSans(
@@ -234,7 +238,7 @@ class CommonContainer {
     );
   }
 
-/*
+  /*
   static StudentsList({
     required String mainText,
     VoidCallback? onIconTap,
@@ -305,8 +309,6 @@ class CommonContainer {
     required String backRoundImage,
     required String additionalText1,
     required String additionalText2,
-    required String additionalText3,
-    required String additionalText4,
     VoidCallback? onDetailsTap,
     IconData? iconData,
     double verticalPadding = 9,
@@ -366,42 +368,23 @@ class CommonContainer {
                                 additionalText1,
                                 style: GoogleFont.ibmPlexSans(
                                   fontSize: 12,
-                                  color: AppColor.lightgray,
+                                  color: AppColor.lowLightgray,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            Row(
-                              children: [
-                                Text(
-                                  additionalText2,
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  additionalText3,
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                Text(
-                                  additionalText4,
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              additionalText2,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 14,
+                                color: AppColor.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
                       ],
                     ),
+                    SizedBox(height: 5),
                   ],
                 ),
               ),
@@ -460,59 +443,59 @@ class CommonContainer {
                   flex: flex,
                   child: GestureDetector(
                     onTap:
-                    isDOB && context != null
-                        ? () async {
-                      final DateTime startDate = DateTime(2021, 6, 1);
-                      final DateTime endDate = DateTime(2022, 5, 31);
-                      final DateTime initialDate = DateTime(2021, 6, 2);
+                        isDOB && context != null
+                            ? () async {
+                              final DateTime startDate = DateTime(2021, 6, 1);
+                              final DateTime endDate = DateTime(2022, 5, 31);
+                              final DateTime initialDate = DateTime(2021, 6, 2);
 
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: initialDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2025),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              dialogBackgroundColor: AppColor.white,
-                              colorScheme: ColorScheme.light(
-                                primary: AppColor.blue,
-                                onPrimary: Colors.white,
-                                onSurface: AppColor.black,
-                              ),
-                              textButtonTheme: TextButtonThemeData(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColor.blue,
-                                ),
-                              ),
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
+                              final pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: initialDate,
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime(2025),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor: AppColor.white,
+                                      colorScheme: ColorScheme.light(
+                                        primary: AppColor.blue,
+                                        onPrimary: Colors.white,
+                                        onSurface: AppColor.black,
+                                      ),
+                                      textButtonTheme: TextButtonThemeData(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: AppColor.blue,
+                                        ),
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
 
-                      if (pickedDate != null) {
-                        if (pickedDate.isBefore(startDate) ||
-                            pickedDate.isAfter(endDate)) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Invalid Date of Birth!\nPlease select a date between 01-06-2021 and 31-05-2022.',
-                              ),
-                              backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        } else {
-                          controller?.text =
-                          "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
-                          FocusScope.of(
-                            context,
-                          ).requestFocus(nextFieldFocusNode);
-                        }
-                      }
-                    }
-                        : null,
+                              if (pickedDate != null) {
+                                if (pickedDate.isBefore(startDate) ||
+                                    pickedDate.isAfter(endDate)) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Invalid Date of Birth!\nPlease select a date between 01-06-2021 and 31-05-2022.',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                } else {
+                                  controller?.text =
+                                      "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
+                                  FocusScope.of(
+                                    context,
+                                  ).requestFocus(nextFieldFocusNode);
+                                }
+                              }
+                            }
+                            : null,
 
                     child: AbsorbPointer(
                       absorbing: isDOB,
@@ -524,13 +507,13 @@ class CommonContainer {
                         validator: validator,
                         maxLines: maxLine,
                         maxLength:
-                        isMobile
-                            ? 10
-                            : isAadhaar
-                            ? 12
-                            : isPincode
-                            ? 6
-                            : null,
+                            isMobile
+                                ? 10
+                                : isAadhaar
+                                ? 12
+                                : isPincode
+                                ? 6
+                                : null,
                         // keyboardType:
                         // isMobile || isAadhaar || isPincode
                         //     ? TextInputType.number
@@ -539,18 +522,18 @@ class CommonContainer {
                         //     : TextInputType.emailAddress,
                         keyboardType: keyboardType,
                         inputFormatters:
-                        isMobile || isAadhaar || isPincode
-                            ? [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(
-                            isMobile
-                                ? 10
-                                : isAadhaar
-                                ? 12
-                                : 6,
-                          ),
-                        ]
-                            : [],
+                            isMobile || isAadhaar || isPincode
+                                ? [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(
+                                    isMobile
+                                        ? 10
+                                        : isAadhaar
+                                        ? 12
+                                        : 6,
+                                  ),
+                                ]
+                                : [],
                         style: GoogleFont.ibmPlexSans(
                           fontSize: 14,
                           color: AppColor.black,
@@ -629,8 +612,6 @@ class CommonContainer {
     );
   }
 
-
-
   static textWithSmall({
     required String text,
     Color? color = AppColor.gray,
@@ -693,6 +674,7 @@ class CommonContainer {
     required String className,
     required String aText1,
     required String aText2,
+    required String CText1,
     required Color backRoundColor,
     Color? backRoundColors,
     Gradient? gradient,
@@ -769,34 +751,15 @@ class CommonContainer {
                       ),
                       child: Row(
                         children: [
-                          RichText(
-                            text: TextSpan(
-                              text: '7',
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.gray,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'th ',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'C',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            CText1,
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.gray,
                             ),
                           ),
+
                           SizedBox(width: 10),
                           Container(
                             width: 2,
@@ -828,27 +791,27 @@ class CommonContainer {
                   ),
                   view != null
                       ? InkWell(
-                    onTap: onTap,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: AppColor.borderGary),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 25,
-                          vertical: 10,
-                        ),
-                        child: Text(
-                          view ?? '',
-                          style: GoogleFont.inter(
-                            fontSize: 12,
-                            color: AppColor.black,
+                        onTap: onTap,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(color: AppColor.borderGary),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25,
+                              vertical: 10,
+                            ),
+                            child: Text(
+                              view ?? '',
+                              style: GoogleFont.inter(
+                                fontSize: 12,
+                                color: AppColor.black,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
                       : SizedBox.shrink(),
                   InkWell(
                     onTap: onIconTap,
@@ -1135,20 +1098,20 @@ class CommonContainer {
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               decoration: BoxDecoration(
                 gradient:
-                leftSelected
-                    ? LinearGradient(
-                  colors: [Colors.white, AppColor.white],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-                    : null,
+                    leftSelected
+                        ? LinearGradient(
+                          colors: [Colors.white, AppColor.white],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )
+                        : null,
                 color: leftSelected ? null : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color:
-                  leftSelected
-                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                      : AppColor.lowLightgray,
+                      leftSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
                   width: leftSelected ? 3 : 1,
                 ),
               ),
@@ -1161,14 +1124,14 @@ class CommonContainer {
                     child: CustomTextField.textWithSmall(
                       text: leftValue,
                       fontWeight:
-                      leftSelected ? FontWeight.w800 : FontWeight.w500,
+                          leftSelected ? FontWeight.w800 : FontWeight.w500,
 
                       color:
-                      leftSelected
-                          ? (isQuizCompleted
-                          ? AppColor.green
-                          : AppColor.black)
-                          : AppColor.black,
+                          leftSelected
+                              ? (isQuizCompleted
+                                  ? AppColor.green
+                                  : AppColor.black)
+                              : AppColor.black,
                     ),
                   ),
                 ],
@@ -1186,20 +1149,20 @@ class CommonContainer {
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               decoration: BoxDecoration(
                 gradient:
-                rightSelected
-                    ? LinearGradient(
-                  colors: [Colors.white, AppColor.white],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-                    : null,
+                    rightSelected
+                        ? LinearGradient(
+                          colors: [Colors.white, AppColor.white],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )
+                        : null,
                 color: rightSelected ? null : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color:
-                  rightSelected
-                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                      : AppColor.lowLightgray,
+                      rightSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
                   width: rightSelected ? 3 : 1,
                 ),
               ),
@@ -1212,14 +1175,14 @@ class CommonContainer {
                     child: CustomTextField.textWithSmall(
                       text: rightValue,
                       fontWeight:
-                      rightSelected ? FontWeight.w800 : FontWeight.w500,
+                          rightSelected ? FontWeight.w800 : FontWeight.w500,
 
                       color:
-                      rightSelected
-                          ? (isQuizCompleted
-                          ? AppColor.green
-                          : AppColor.green)
-                          : AppColor.black,
+                          rightSelected
+                              ? (isQuizCompleted
+                                  ? AppColor.green
+                                  : AppColor.green)
+                              : AppColor.black,
                     ),
                   ),
                 ],
@@ -1250,9 +1213,9 @@ class CommonContainer {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color:
-                  isSelected
-                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                      : AppColor.lowLightgray,
+                      isSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
                   width: isSelected ? 3 : 1,
                 ),
               ),
@@ -1274,11 +1237,11 @@ class CommonContainer {
                         text: leftValue,
 
                         color:
-                        isSelected
-                            ? (isQuizCompleted
-                            ? AppColor.green
-                            : AppColor.green)
-                            : AppColor.black,
+                            isSelected
+                                ? (isQuizCompleted
+                                    ? AppColor.green
+                                    : AppColor.green)
+                                : AppColor.black,
                       ),
                     ),
                   ],
@@ -1308,13 +1271,11 @@ class CommonContainer {
     EdgeInsets? textPadding,
   }) {
     final CrossAxisAlignment textCross =
-
         (textAlign == TextAlign.end)
             ? CrossAxisAlignment.end
             : (textAlign == TextAlign.center)
             ? CrossAxisAlignment.center
             : CrossAxisAlignment.start;
-
 
     return Material(
       color: Colors.transparent,
@@ -1327,7 +1288,6 @@ class CommonContainer {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-
             Positioned.fill(
               child: IgnorePointer(
                 child: Image.asset(bcImage, fit: BoxFit.cover),
@@ -1340,7 +1300,6 @@ class CommonContainer {
               top: 20,
               child: Padding(
                 padding:
-
                     textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
 
                 child: Column(
@@ -1354,7 +1313,6 @@ class CommonContainer {
                       style: GoogleFont.ibmPlexSans(
                         fontSize: isSelect ? 22 : 15,
                         fontWeight:
-
                             isSelect ? FontWeight.w800 : FontWeight.w500,
 
                         color: AppColor.white,
@@ -1368,7 +1326,6 @@ class CommonContainer {
                       style: GoogleFont.ibmPlexSans(
                         fontSize: isSelect ? 22 : 20,
                         fontWeight:
-
                             isSelect ? FontWeight.w500 : FontWeight.w800,
 
                         color: AppColor.white,
@@ -1378,7 +1335,6 @@ class CommonContainer {
                 ),
               ),
             ),
-
 
             Positioned.fill(
               child: Padding(
@@ -1459,7 +1415,7 @@ class CommonContainer {
         borderRadius: BorderRadius.circular(16),
       ),
       padding:
-      containerPadding ??
+          containerPadding ??
           EdgeInsets.symmetric(horizontal: 30, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1492,54 +1448,54 @@ class CommonContainer {
             ),
           ),
           SizedBox(height: 15),
-          Row(
-            children:
-            sections.asMap().entries.map((entry) {
-              final index = entry.key;
-              final section = entry.value;
-              final padding =
-              paddings != null && paddings.length > index
-                  ? paddings[index]
-                  : EdgeInsets.only(right: 10);
-
-              bool isExpanded = section == expandedSection;
-              List<String> subjects = sectionSubjects?[section] ?? [];
-
-
-                  return Padding(
-                    padding: padding,
-                    child: InkWell(
-                      onTap: () {
-                        if (onSectionTap != null) {
-                          onSectionTap(isExpanded ? '' : section);
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color:
-                              sectionBgColor ?? AppColor.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColor.white),
-
-                        ),
-                        if (isExpanded && subjects.isNotEmpty) ...[
-                          SizedBox(width: 8),
-                          Text(
-                            '- ${subjects.join(", ")}',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.black,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+          // Row(
+          //   children:
+          //   sections.asMap().entries.map((entry) {
+          //     final index = entry.key;
+          //     final section = entry.value;
+          //     final padding =
+          //     paddings != null && paddings.length > index
+          //         ? paddings[index]
+          //         : EdgeInsets.only(right: 10);
+          //
+          //     bool isExpanded = section == expandedSection;
+          //     List<String> subjects = sectionSubjects?[section] ?? [];
+          //
+          //
+          //         return Padding(
+          //           padding: padding,
+          //           child: InkWell(
+          //             onTap: () {
+          //               if (onSectionTap != null) {
+          //                 onSectionTap(isExpanded ? '' : section);
+          //               }
+          //             },
+          //             child: Container(
+          //               decoration: BoxDecoration(
+          //                 color:
+          //                     sectionBgColor ?? AppColor.white.withOpacity(0.5),
+          //                 borderRadius: BorderRadius.circular(12),
+          //                 border: Border.all(color: AppColor.white),
+          //
+          //               ),
+          //               if (isExpanded && subjects.isNotEmpty) ...[
+          //                 SizedBox(width: 8),
+          //                 Text(
+          //                   '- ${subjects.join(", ")}',
+          //                   style: GoogleFont.ibmPlexSans(
+          //                     fontSize: 18,
+          //                     fontWeight: FontWeight.bold,
+          //                     color: AppColor.black,
+          //                   ),
+          //                 ),
+          //               ],
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     );
+          //   }).toList(),
+          // ),
         ],
       ),
     );
@@ -1993,10 +1949,12 @@ class CommonContainer {
     required List<Map<String, dynamic>> tabs,
     required int selectedIndex,
     required ValueChanged<int> onSelect,
+    double horizontalPadding = 40,
   }) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(tabs.length, (index) {
           final isSelected = selectedIndex == index;
           return Padding(
@@ -2004,8 +1962,8 @@ class CommonContainer {
             child: GestureDetector(
               onTap: () => onSelect(index),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
                   vertical: 9,
                 ),
                 decoration: BoxDecoration(

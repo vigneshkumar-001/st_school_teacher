@@ -13,6 +13,7 @@ import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../Homework/controller/teacher_class_controller.dart';
+import 'list_general.dart';
 
 enum SectionType { image, paragraph, list }
 
@@ -212,12 +213,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                       Spacer(),
                       InkWell(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => HomeworkHistory(),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ListGeneral(),
+                            ),
+                          );
                         },
                         child: Row(
                           children: [
@@ -269,7 +270,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                               color: AppColor.black,
                             ),
                           ),
-                          SizedBox(height: 20),
+                          SizedBox(height: 30),
                           SizedBox(
                             height: 100,
                             child: Stack(
@@ -573,170 +574,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                             ),
                           ),
                           SizedBox(height: 10),
-                          Row(
-                            children: List.generate(
-                              teacherClassController.subjectList.length,
-                              (index) {
-                                final sub =
-                                    teacherClassController.subjectList[index];
-                                final isSelected = subjectIndex == index;
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        subjectIndex = index;
-                                        selectedSubject = sub.name;
-                                        selectedSubjectId = sub.id;
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: isSelected ? 25 : 35,
-                                        vertical: isSelected ? 14 : 14,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isSelected
-                                                ? AppColor.white
-                                                : AppColor.white,
-                                        borderRadius: BorderRadius.circular(30),
-                                        border: Border.all(
-                                          color:
-                                              isSelected
-                                                  ? AppColor.blue
-                                                  : AppColor.borderGary,
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          isSelected
-                                              ? Image.asset(
-                                                AppImages.tick,
-                                                height: 15,
-                                                color: AppColor.blue,
-                                              )
-                                              : SizedBox.shrink(),
-                                          SizedBox(width: isSelected ? 10 : 0),
-                                          Text(
-                                            sub.name,
-                                            style: GoogleFont.ibmPlexSans(
-                                              fontSize: 12,
-                                              color:
-                                                  isSelected
-                                                      ? AppColor.blue
-                                                      : AppColor.gray,
-                                              fontWeight:
-                                                  isSelected
-                                                      ? FontWeight.w700
-                                                      : FontWeight.w700,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          SizedBox(height: 25),
-                          // GestureDetector(
-                          //   onTap: _pickPermanentImage,
-                          //   child: DottedBorder(
-                          //     borderType: BorderType.RRect,
-                          //     radius: const Radius.circular(20),
-                          //     color: AppColor.lightgray,
-                          //     strokeWidth: 1.5,
-                          //     dashPattern: const [8, 4],
-                          //     padding: const EdgeInsets.all(1),
-                          //     child: Container(
-                          //       height: 120,
-                          //       padding: const EdgeInsets.symmetric(
-                          //         horizontal: 12,
-                          //       ),
-                          //       decoration: BoxDecoration(
-                          //         color: AppColor.lightWhite,
-                          //         borderRadius: BorderRadius.circular(20),
-                          //       ),
-                          //       child: Row(
-                          //         children: [
-                          //           if (_permanentImage == null)
-                          //             Expanded(
-                          //               child: Row(
-                          //                 mainAxisAlignment:
-                          //                 MainAxisAlignment.center,
-                          //                 children: [
-                          //                   Image.asset(
-                          //                     AppImages.uploadImage,
-                          //                     height: 30,
-                          //                   ),
-                          //                   const SizedBox(width: 10),
-                          //                   Text(
-                          //                     'Upload',
-                          //                     style: GoogleFont.ibmPlexSans(
-                          //                       fontSize: 14,
-                          //                       fontWeight: FontWeight.w500,
-                          //                       color: AppColor.lightgray,
-                          //                     ),
-                          //                   ),
-                          //                 ],
-                          //               ),
-                          //             )
-                          //           else ...[
-                          //             ClipRRect(
-                          //               borderRadius: BorderRadius.circular(12),
-                          //               child: Image.file(
-                          //                 File(_permanentImage!.path),
-                          //                 width: 200,
-                          //                 height: 100,
-                          //                 fit: BoxFit.cover,
-                          //               ),
-                          //             ),
-                          //             const Spacer(),
-                          //             Padding(
-                          //               padding: const EdgeInsets.symmetric(
-                          //                 vertical: 35.0,
-                          //               ),
-                          //               child: InkWell(
-                          //                 onTap: () {
-                          //                   setState(() {
-                          //                     _permanentImage = null;
-                          //                   });
-                          //                 },
-                          //                 child: Column(
-                          //                   children: [
-                          //                     Image.asset(
-                          //                       AppImages.close,
-                          //                       height: 26,
-                          //                       color: AppColor.gray,
-                          //                     ),
-                          //                     Text(
-                          //                       'Clear',
-                          //                       style: GoogleFont.ibmPlexSans(
-                          //                         fontSize: 14,
-                          //                         fontWeight: FontWeight.w400,
-                          //                         color: AppColor.lightgray,
-                          //                       ),
-                          //                     ),
-                          //                   ],
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //           ],
-                          //         ],
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                           CommonContainer.fillingContainer(
                             text: '',
                             controller: Category,
                             verticalDivider: false,
-                            imagePath: AppImages.downArrow,imageSize: 11,
+                            imagePath: AppImages.downArrow,
+                            imageSize: 11,
                           ),
                           SizedBox(height: 25),
                           Text(
@@ -799,31 +642,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                                       controller: descriptionControllers[index],
                                       verticalDivider: false,
                                     ),
-                                    const SizedBox(height: 16),
                                   ],
                                 );
                               },
                             ),
                           ),
 
-                          //
-                          // if (showParagraphField) ...[
-                          //   const SizedBox(height: 16),
-                          //   Text(
-                          //     'Description',
-                          //     style: GoogleFont.ibmPlexSans(
-                          //       fontSize: 14,
-                          //       color: AppColor.black,
-                          //     ),
-                          //   ),
-                          //   const SizedBox(height: 10),
-                          //   CommonContainer.fillingContainer(
-                          //     maxLine: 10,
-                          //     text: '',
-                          //     controller: ,
-                          //     verticalDivider: false,
-                          //   ),
-                          // ],
                           if (_pickedImages.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: 28.0),
@@ -1151,7 +975,6 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                             },
                           ),
 
-                          SizedBox(height: 25),
                           Row(
                             children: [
                               Text(
@@ -1197,46 +1020,6 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                             ],
                           ),
 
-                          /*     Row(
-                            children: [
-                              Text(
-                                'Add',
-                                style: GoogleFont.ibmPlexSans(
-                                  fontSize: 14,
-                                  color: AppColor.black,
-                                ),
-                              ),
-                              SizedBox(width: 25),
-                              CommonContainer.addMore(
-                                onTap: () {
-                                  setState(() {
-                                    _pickedImages.add(null);
-                                  });
-                                },
-                                mainText: 'Image',
-                                imagePath: AppImages.picherImageDark,
-                              ),
-                              SizedBox(width: 10),
-                              CommonContainer.addMore(
-                                onTap: () {
-                                  setState(() {
-                                    descriptionControllers.add(
-                                      TextEditingController(),
-                                    );
-                                  });
-                                },
-                                mainText: 'Paragraph',
-                                imagePath: AppImages.paragraph,
-                              ),
-
-                              SizedBox(width: 10),
-                              CommonContainer.addMore(
-                                onTap: _openListSection,
-                                mainText: 'List',
-                                imagePath: AppImages.list,
-                              ),
-                            ],
-                          ),*/
                           SizedBox(height: 40),
                           AppButton.button(
                             onTap: () {

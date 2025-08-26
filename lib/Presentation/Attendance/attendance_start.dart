@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
@@ -10,11 +9,12 @@ import '../../Core/Widgets/common_container.dart';
 import 'attendance_history.dart';
 import 'attendance_history_student.dart';
 import 'model/attendence_response.dart';
+import 'controller/attendance_controller.dart';
 
 class AttendanceModel {
   final int studentId;
   final int classId;
-  String status; // "present", "absent", "later"
+  String status; // "present", "absent", "late"
 
   AttendanceModel({
     required this.studentId,
@@ -37,8 +37,11 @@ class AttendanceStart extends StatefulWidget {
 }
 
 class _AttendanceStartState extends State<AttendanceStart> {
-  int selectedIndex = 0;
+  int selectedIndex = 0; // 0:Present 1:Absent 2:Pending 3:Later
   int subjectIndex = 0;
+  bool _pendingTabTapped = false;
+  bool _laterTabTapped = false;
+
   var selectedClass;
   int selectedLaterStudentIndex = 0;
   final AttendanceController attendanceController = Get.put(
@@ -53,168 +56,6 @@ class _AttendanceStartState extends State<AttendanceStart> {
 
   int pendingStudentIndex = 0;
   List<AttendanceModel> markedAttendance = [];
-
-  /*  void markAttendance(Map<String, dynamic> student, String status) {
-    final studentId = student['id'];
-    final studentName = student['name'];
-
-    // update local markedAttendance
-    final existing = markedAttendance.indexWhere(
-      (s) => s.studentId == studentId,
-    );
-    if (existing != -1) {
-      markedAttendance[existing].status = status;
-    } else {
-      markedAttendance.add(
-        AttendanceModel(
-          studentId: studentId,
-          classId: selectedClass.id,
-          status: status,
-        ),
-      );
-    }
-
-    // remove from pending & add to correct list
-    setState(() {
-      pendingStudents.removeWhere((s) => s['id'] == studentId);
-      laterStudents.removeWhere((s) => s['id'] == studentId); // 👈 FIX
-
-      if (status == "present") {
-        presentStudents.add(student);
-      } else if (status == "absent") {
-        absentStudents.add(student);
-      } else if (status == "late") {
-        laterStudents.add(student);
-      }
-      _saveAttendanceInBackground(studentId, status);
-      // update tabs count
-      tabs = [
-        {'label': 'Present', 'count': presentStudents.length},
-        {'label': 'Absent', 'count': absentStudents.length},
-        {'label': 'Pending', 'count': pendingStudents.length},
-        {'label': 'Later', 'count': laterStudents.length},
-      ];
-    });
-
-    print("✅ Marked $studentName as $status");
-
-    // 🔥 Run insert in background (non-blocking)
-  }*/
-  void markAttendance(Map<String, dynamic> student, String status) {
-    final studentId = student['id'];
-    final studentName = student['name'];
-
-    final existing = markedAttendance.indexWhere(
-      (s) => s.studentId == studentId,
-    );
-    if (existing != -1) {
-      markedAttendance[existing].status = status;
-    } else {
-      markedAttendance.add(
-        AttendanceModel(
-          studentId: studentId,
-          classId: selectedClass.id,
-          status: status,
-        ),
-      );
-    }
-    setState(() {
-
-      pendingStudents.removeWhere((s) => s['id'] == studentId);
-      laterStudents.removeWhere((s) => s['id'] == studentId);
-
-      if (status == "present") {
-        presentStudents.add(student);
-      } else if (status == "absent") {
-        absentStudents.add(student);
-      } else if (status == "late") {
-        laterStudents.add(student);
-      }
-
-      // 👇 reset later index safely
-      if (selectedLaterStudentIndex >= laterStudents.length) {
-        selectedLaterStudentIndex = 0;
-      }
-
-      tabs = [
-        {'label': 'Present', 'count': presentStudents.length},
-        {'label': 'Absent', 'count': absentStudents.length},
-        {'label': 'Pending', 'count': pendingStudents.length},
-        {'label': 'Later', 'count': laterStudents.length},
-      ];
-    });
-
-    print("✅ Marked $studentName as $status");
-
-
-    _saveAttendanceInBackground(studentId, status);
-  }
-
-
-  Future<void> _saveAttendanceInBackground(int studentId, String status) async {
-    try {
-      await attendanceController.presentOrAbsent(
-        studentId: studentId,
-        status: status,
-        classId: selectedClass.id,
-      );
-      print("📡 Synced attendance for $studentId → $status");
-    } catch (e) {
-      print("❌ Failed to sync $studentId: $e");
-    }
-  }
-
-  /*  void markAttendance(Map<String, dynamic> student, String status) {
-    final studentId = student['id'];
-    final studentName = student['name'];
-
-    // update local markedAttendance
-    final existing = markedAttendance.indexWhere(
-      (s) => s.studentId == studentId,
-    );
-    if (existing != -1) {
-      markedAttendance[existing].status = status;
-    } else {
-      markedAttendance.add(
-        AttendanceModel(
-          studentId: studentId,
-          classId: selectedClass.id,
-          status: status,
-        ),
-      );
-    }
-
-    // remove from pending & add to correct list
-    setState(() {
-      pendingStudents.removeWhere((s) => s['id'] == studentId);
-
-      if (status == "present") {
-        presentStudents.add(student);
-      } else if (status == "absent") {
-        absentStudents.add(student);
-      } else if (status == "late") {
-        laterStudents.add(student);
-      }
-
-      // update tabs count
-      tabs = [
-        {'label': 'Present', 'count': presentStudents.length},
-        {'label': 'Absent', 'count': absentStudents.length},
-        {'label': 'Pending', 'count': pendingStudents.length},
-        {'label': 'Later', 'count': laterStudents.length},
-      ];
-    });
-
-    print("✅ Marked $studentName as $status");
-  }*/
-
-  String getStudentStatus(int studentId) {
-    final entry = markedAttendance.firstWhere(
-      (s) => s.studentId == studentId,
-      orElse: () => AttendanceModel(studentId: -1, classId: -1, status: ""),
-    );
-    return entry.status;
-  }
 
   bool morningDone = false;
 
@@ -255,7 +96,52 @@ class _AttendanceStartState extends State<AttendanceStart> {
     laterStudents = late.map((s) => {'name': s.name, 'id': s.id}).toList();
     pendingStudents = pending.map((s) => {'name': s.name, 'id': s.id}).toList();
 
+    tabs = [
+      {'label': 'Present', 'count': presentStudents.length},
+      {'label': 'Absent', 'count': absentStudents.length},
+      {'label': 'Pending', 'count': pendingStudents.length},
+      {'label': 'Later', 'count': laterStudents.length},
+    ];
+    setState(() {});
+  }
+
+  void markAttendance(Map<String, dynamic> student, String status) {
+    final studentId = student['id'];
+    final studentName = student['name'];
+
+    final existing = markedAttendance.indexWhere(
+      (s) => s.studentId == studentId,
+    );
+    if (existing != -1) {
+      markedAttendance[existing].status = status;
+    } else {
+      markedAttendance.add(
+        AttendanceModel(
+          studentId: studentId,
+          classId: selectedClass.id,
+          status: status,
+        ),
+      );
+    }
+
     setState(() {
+      // remove from pending & later lists first
+      pendingStudents.removeWhere((s) => s['id'] == studentId);
+      laterStudents.removeWhere((s) => s['id'] == studentId);
+
+      // add to target
+      if (status == "present") {
+        presentStudents.add(student);
+      } else if (status == "absent") {
+        absentStudents.add(student);
+      } else if (status == "late") {
+        laterStudents.add(student);
+      }
+
+      if (selectedLaterStudentIndex >= laterStudents.length) {
+        selectedLaterStudentIndex = 0;
+      }
+
       tabs = [
         {'label': 'Present', 'count': presentStudents.length},
         {'label': 'Absent', 'count': absentStudents.length},
@@ -263,6 +149,276 @@ class _AttendanceStartState extends State<AttendanceStart> {
         {'label': 'Later', 'count': laterStudents.length},
       ];
     });
+
+    _saveAttendanceInBackground(studentId, status);
+  }
+
+  Future<void> _saveAttendanceInBackground(int studentId, String status) async {
+    try {
+      await attendanceController.presentOrAbsent(
+        studentId: studentId,
+        status: status,
+        classId: selectedClass.id,
+      );
+    } catch (e) {
+      // handle/log if needed
+    }
+  }
+
+  Widget _buildActionCard(bool loading) {
+    // Hide the card on Present(0) & Absent(1)
+    if (selectedIndex == 0 || selectedIndex == 1)
+      return const SizedBox.shrink();
+
+    // Hide on Pending when empty *until* user taps that tab
+    if (selectedIndex == 2 && pendingStudents.isEmpty && !_pendingTabTapped) {
+      return const SizedBox.shrink();
+    }
+
+    // Hide on Later when empty *until* user taps that tab
+    if (selectedIndex == 3 && laterStudents.isEmpty && !_laterTabTapped) {
+      return const SizedBox.shrink();
+    }
+
+    final showButtons =
+        (selectedIndex == 2 && pendingStudents.isNotEmpty) ||
+        (selectedIndex == 3 && laterStudents.isNotEmpty);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColor.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Spacer(),
+                InkWell(
+                  onTap:
+                      loading
+                          ? null
+                          : () {
+                            if (selectedIndex == 3 &&
+                                laterStudents.isNotEmpty) {
+                              markAttendance(
+                                laterStudents[selectedLaterStudentIndex],
+                                'late',
+                              );
+                            } else if (selectedIndex == 2 &&
+                                pendingStudents.isNotEmpty) {
+                              markAttendance(
+                                pendingStudents[pendingStudentIndex],
+                                'late',
+                              );
+                            }
+                          },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    child: Text(
+                      'Later',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color:
+                            loading
+                                ? AppColor.blue.withOpacity(0.6)
+                                : AppColor.blue,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Title or Empty text (only after tab is tapped)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder:
+                  (child, animation) => SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: FadeTransition(opacity: animation, child: child),
+                  ),
+              child: Builder(
+                key: ValueKey('title-$selectedIndex'),
+                builder: (_) {
+                  if (selectedIndex == 3) {
+                    if (laterStudents.isNotEmpty) {
+                      return Text(
+                        laterStudents[selectedLaterStudentIndex]['name'],
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
+                    return Text(
+                      _laterTabTapped ? 'No Later Students' : '',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  } else {
+                    if (pendingStudents.isNotEmpty) {
+                      return Text(
+                        pendingStudents[pendingStudentIndex]['name'],
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
+                    return Text(
+                      _pendingTabTapped ? 'No Pending Students' : '',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+
+            if (showButtons)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 20,
+                ),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap:
+                          loading
+                              ? null
+                              : () {
+                                if (selectedIndex == 2 &&
+                                    pendingStudents.isNotEmpty) {
+                                  markAttendance(
+                                    pendingStudents[pendingStudentIndex],
+                                    'absent',
+                                  );
+                                } else if (selectedIndex == 3 &&
+                                    laterStudents.isNotEmpty) {
+                                  markAttendance(
+                                    laterStudents[selectedLaterStudentIndex],
+                                    'absent',
+                                  );
+                                }
+                              },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              loading
+                                  ? AppColor.red.withOpacity(0.6)
+                                  : AppColor.red,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 13,
+                          ),
+                          child: SizedBox(
+                            width: 80,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  AppImages.close,
+                                  height: 19.62,
+                                  color: AppColor.white,
+                                ),
+                                const SizedBox(width: 7),
+                                Text(
+                                  'Absent',
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap:
+                          loading
+                              ? null
+                              : () {
+                                if (selectedIndex == 2 &&
+                                    pendingStudents.isNotEmpty) {
+                                  markAttendance(
+                                    pendingStudents[pendingStudentIndex],
+                                    'present',
+                                  );
+                                } else if (selectedIndex == 3 &&
+                                    laterStudents.isNotEmpty) {
+                                  markAttendance(
+                                    laterStudents[selectedLaterStudentIndex],
+                                    'present',
+                                  );
+                                }
+                              },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              loading
+                                  ? AppColor.green.withOpacity(0.6)
+                                  : AppColor.green,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 13,
+                          ),
+                          child: SizedBox(
+                            width: 80,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  AppImages.tick,
+                                  height: 19.62,
+                                  color: AppColor.white,
+                                ),
+                                const SizedBox(width: 7),
+                                Text(
+                                  'Present',
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -278,7 +434,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 15,
                             vertical: 18,
                           ),
@@ -296,14 +452,15 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                       width: 0.3,
                                     ),
                                   ),
-                                  Spacer(),
+                                  const Spacer(),
                                   InkWell(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder:
-                                              (context) => AttendanceHistory(),
+                                              (context) =>
+                                                  const AttendanceHistory(),
                                         ),
                                       );
                                     },
@@ -317,7 +474,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                             color: AppColor.gray,
                                           ),
                                         ),
-                                        SizedBox(width: 8),
+                                        const SizedBox(width: 8),
                                         Image.asset(
                                           AppImages.historyImage,
                                           height: 24,
@@ -327,7 +484,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 40),
+                              const SizedBox(height: 40),
                               RichText(
                                 text: TextSpan(
                                   text: selectedClass?.className ?? '',
@@ -354,9 +511,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   ],
                                 ),
                               ),
-
-                              SizedBox(height: 3),
-
+                              const SizedBox(height: 3),
                               Text(
                                 attendanceController
                                         .attendance
@@ -369,342 +524,13 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   color: AppColor.black,
                                 ),
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
+
+                              // === ACTION CARD (hidden on Present/Absent) ===
                               Obx(() {
                                 final loading =
                                     attendanceController.isPresentLoading.value;
-                                final currentStatusLoading =
-                                    attendanceController
-                                        .currentLoadingStatus
-                                        .value;
-
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColor.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Spacer(),
-                                            InkWell(
-                                              onTap:
-                                                  loading
-                                                      ? null
-                                                      : () {
-                                                        if (selectedIndex ==
-                                                                3 &&
-                                                            laterStudents
-                                                                .isNotEmpty) {
-                                                          markAttendance(
-                                                            laterStudents[selectedLaterStudentIndex],
-                                                            'late',
-                                                          );
-                                                        } else if (selectedIndex ==
-                                                                2 &&
-                                                            pendingStudents
-                                                                .isNotEmpty) {
-                                                          markAttendance(
-                                                            pendingStudents[pendingStudentIndex],
-                                                            'late',
-                                                          );
-                                                        }
-                                                      },
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5,
-                                                    ),
-                                                child: Text(
-                                                  'Later',
-                                                  style: GoogleFont.ibmPlexSans(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w500,
-                                                    color:
-                                                        loading
-                                                            ? AppColor.blue
-                                                                .withOpacity(
-                                                                  0.6,
-                                                                )
-                                                            : AppColor.blue,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        // AnimatedSwitcher for student name
-                                        AnimatedSwitcher(
-                                          duration: Duration(milliseconds: 300),
-                                          transitionBuilder:
-                                              (child, animation) =>
-                                                  SlideTransition(
-                                                    position: Tween<Offset>(
-                                                      begin: const Offset(1, 0),
-                                                      end: Offset.zero,
-                                                    ).animate(animation),
-                                                    child: FadeTransition(
-                                                      opacity: animation,
-                                                      child: child,
-                                                    ),
-                                                  ),
-                                          child: Text(
-                                            selectedIndex == 3
-                                                ? (laterStudents.isNotEmpty
-                                                    ? laterStudents[selectedLaterStudentIndex]['name']
-                                                    : 'No Later Students')
-                                                : (pendingStudents.isNotEmpty
-                                                    ? pendingStudents[pendingStudentIndex]['name']
-                                                    : 'No Pending Students'),
-                                            key: ValueKey(
-                                              selectedIndex == 3
-                                                  ? (laterStudents.isNotEmpty
-                                                      ? laterStudents[selectedLaterStudentIndex]['id']
-                                                      : 'empty-later')
-                                                  : (pendingStudents.isNotEmpty
-                                                      ? pendingStudents[pendingStudentIndex]['id']
-                                                      : 'empty-pending'),
-                                            ),
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-
-                                        if ((selectedIndex == 2 &&
-                                                pendingStudents.isNotEmpty &&
-                                                pendingStudentIndex <
-                                                    pendingStudents.length) ||
-                                            (selectedIndex == 3 &&
-                                                laterStudents.isNotEmpty &&
-                                                selectedLaterStudentIndex <
-                                                    laterStudents.length))
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12.0,
-                                              vertical: 20,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                /* InkWell(
-                                                  onTap:
-                                                      loading
-                                                          ? null
-                                                          : () {
-                                                            if (selectedIndex ==
-                                                                    2 &&
-                                                                pendingStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                pendingStudents[pendingStudentIndex],
-                                                                'absent',
-                                                              );
-                                                            } else if (selectedIndex ==
-                                                                    3 &&
-                                                                laterStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                laterStudents[selectedLaterStudentIndex],
-                                                                'absent',
-                                                              );
-                                                            }
-                                                          },
-                                                  child: Text("Absent"),
-                                                ),
-
-                                                Spacer(),
-                                                InkWell(
-                                                  onTap:
-                                                      loading
-                                                          ? null
-                                                          : () {
-                                                            if (selectedIndex ==
-                                                                    2 &&
-                                                                pendingStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                pendingStudents[pendingStudentIndex],
-                                                                'present',
-                                                              );
-                                                            } else if (selectedIndex ==
-                                                                    3 &&
-                                                                laterStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                laterStudents[selectedLaterStudentIndex],
-                                                                'present',
-                                                              );
-                                                            }
-                                                          },
-                                                  child: Text("Present"),
-                                                ),*/
-                                                InkWell(
-                                                  onTap:
-                                                      loading
-                                                          ? null
-                                                          : () {
-                                                            if (selectedIndex ==
-                                                                    2 &&
-                                                                pendingStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                pendingStudents[pendingStudentIndex],
-                                                                'absent',
-                                                              );
-                                                            } else if (selectedIndex ==
-                                                                    3 &&
-                                                                laterStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                laterStudents[selectedLaterStudentIndex],
-                                                                'absent',
-                                                              );
-                                                            }
-                                                          },
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          loading
-                                                              ? AppColor.red
-                                                                  .withOpacity(
-                                                                    0.6,
-                                                                  )
-                                                              : AppColor.red,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            16,
-                                                          ),
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 32,
-                                                            vertical: 13,
-                                                          ),
-                                                      child: SizedBox(
-                                                        width: 80,
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Image.asset(
-                                                              AppImages.close,
-                                                              height: 19.62,
-                                                              color:
-                                                                  AppColor
-                                                                      .white,
-                                                            ),
-                                                            SizedBox(width: 7),
-                                                            Text(
-                                                              'Absent',
-                                                              style: GoogleFont.ibmPlexSans(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color:
-                                                                    AppColor
-                                                                        .white,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-
-                                                Spacer(),
-                                                InkWell(
-                                                  onTap:
-                                                      loading
-                                                          ? null
-                                                          : () {
-                                                            if (selectedIndex ==
-                                                                    2 &&
-                                                                pendingStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                pendingStudents[pendingStudentIndex],
-                                                                'present',
-                                                              );
-                                                            } else if (selectedIndex ==
-                                                                    3 &&
-                                                                laterStudents
-                                                                    .isNotEmpty) {
-                                                              markAttendance(
-                                                                laterStudents[selectedLaterStudentIndex],
-                                                                'present',
-                                                              );
-                                                            }
-                                                          },
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          loading
-                                                              ? AppColor.green
-                                                                  .withOpacity(
-                                                                    0.6,
-                                                                  )
-                                                              : AppColor.green,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            16,
-                                                          ),
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 32,
-                                                            vertical: 13,
-                                                          ),
-                                                      child: SizedBox(
-                                                        width: 80,
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Image.asset(
-                                                              AppImages.tick,
-                                                              height: 19.62,
-                                                              color:
-                                                                  AppColor
-                                                                      .white,
-                                                            ),
-                                                            SizedBox(width: 7),
-                                                            Text(
-                                                              'Present',
-                                                              style: GoogleFont.ibmPlexSans(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color:
-                                                                    AppColor
-                                                                        .white,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                );
+                                return _buildActionCard(loading);
                               }),
 
                               const SizedBox(height: 20),
@@ -716,22 +542,23 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   color: AppColor.black,
                                 ),
                               ),
+                              const SizedBox(height: 10),
 
-                              SizedBox(height: 10),
                               Container(
                                 decoration: BoxDecoration(
                                   color: AppColor.white,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 20,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
+                                child: Column(
+                                  children: [
+                                    // Top chips
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 20.0,
+                                          horizontal: 10,
+                                        ),
                                         child: Row(
                                           children: List.generate(tabs.length, (
                                             index,
@@ -745,10 +572,14 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                   ),
                                               child: GestureDetector(
                                                 onTap:
-                                                    () => setState(
-                                                      () =>
-                                                          selectedIndex = index,
-                                                    ),
+                                                    () => setState(() {
+                                                      selectedIndex = index;
+                                                      if (index == 2)
+                                                        _pendingTabTapped =
+                                                            true;
+                                                      if (index == 3)
+                                                        _laterTabTapped = true;
+                                                    }),
                                                 child: Container(
                                                   padding:
                                                       const EdgeInsets.symmetric(
@@ -775,10 +606,10 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                     ),
                                                   ),
                                                   child: Text(
+                                                    "${tabs[index]['count']} ${tabs[index]['label']}",
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
-                                                     "${tabs[index]['count']} ${tabs[index]['label']}",
                                                     style:
                                                         GoogleFont.ibmPlexSans(
                                                           fontSize: 12,
@@ -802,82 +633,91 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                           }),
                                         ),
                                       ),
-
-                                       SizedBox(height: 10),
-
-
-                                      if (selectedIndex == 0) ...[
-                                        for (var student in presentStudents)
-                                          CommonContainer.StudentsList(
-                                            mainText: student['name'],
-                                            onIconTap: () {},
-                                          ),
-                                      ] else if (selectedIndex == 1) ...[
-                                        for (var student in absentStudents)
-                                          CommonContainer.StudentsList(
-                                            mainText: student['name'],
-                                            onIconTap: () {},
-                                          ),
-                                      ] else if (selectedIndex == 2) ...[
-                                        if (pendingStudents.isEmpty)
-                                          Center(
-                                            child: Text(
-                                              'No pending students',
-                                              style: GoogleFont.ibmPlexSans(
-                                                color: AppColor.gray,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 20,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          if (selectedIndex == 0) ...[
+                                            for (var student in presentStudents)
+                                              CommonContainer.StudentsList(
+                                                mainText: student['name'],
+                                                onIconTap: () {},
                                               ),
-                                            ),
-                                          )
-                                        else
-                                          for (var student in pendingStudents)
-                                            CommonContainer.StudentsList(
-                                              mainText: student['name'],
-                                              onIconTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (
-                                                          context,
-                                                        ) => AttendanceHistoryStudent(
-                                                          studentId:
-                                                              student['id'], // ✅ use actual key from map
-                                                          classId:
-                                                              selectedClass
-                                                                  .id, // ✅ pass classId
-                                                        ),
+                                          ] else if (selectedIndex == 1) ...[
+                                            for (var student in absentStudents)
+                                              CommonContainer.StudentsList(
+                                                mainText: student['name'],
+                                                onIconTap: () {},
+                                              ),
+                                          ] else if (selectedIndex == 2) ...[
+                                            if (pendingStudents.isEmpty)
+                                              Center(
+                                                child: Text(
+                                                  'No pending students',
+                                                  style: GoogleFont.ibmPlexSans(
+                                                    color: AppColor.gray,
                                                   ),
-                                                );
-                                              },
-                                            ),
-                                      ] else if (selectedIndex == 3) ...[
-                                        if (laterStudents.isEmpty)
-                                          Center(
-                                            child: Text(
-                                              'No students',
-                                              style: GoogleFont.ibmPlexSans(
-                                                color: AppColor.gray,
-                                              ),
-                                            ),
-                                          )
-                                        else
-                                          for (
-                                            var i = 0;
-                                            i < laterStudents.length;
-                                            i++
-                                          )
-                                            CommonContainer.StudentsList(
-                                              mainText:
-                                                  laterStudents[i]['name'],
-                                              onIconTap: () {
-                                                setState(() {
-                                                  selectedLaterStudentIndex = i;
-                                                });
-                                              },
-                                            ),
-                                      ],
-                                    ],
-                                  ),
+                                                ),
+                                              )
+                                            else
+                                              for (var student
+                                                  in pendingStudents)
+                                                CommonContainer.StudentsList(
+                                                  mainText: student['name'],
+                                                  onIconTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (
+                                                              context,
+                                                            ) => AttendanceHistoryStudent(
+                                                              studentId:
+                                                                  student['id'],
+                                                              classId:
+                                                                  selectedClass
+                                                                      .id,
+                                                            ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                          ] else if (selectedIndex == 3) ...[
+                                            if (laterStudents.isEmpty)
+                                              Center(
+                                                child: Text(
+                                                  'No students',
+                                                  style: GoogleFont.ibmPlexSans(
+                                                    color: AppColor.gray,
+                                                  ),
+                                                ),
+                                              )
+                                            else
+                                              for (
+                                                var i = 0;
+                                                i < laterStudents.length;
+                                                i++
+                                              )
+                                                CommonContainer.StudentsList(
+                                                  mainText:
+                                                      laterStudents[i]['name'],
+                                                  onIconTap: () {
+                                                    setState(() {
+                                                      selectedLaterStudentIndex =
+                                                          i;
+                                                    });
+                                                  },
+                                                ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -889,9 +729,10 @@ class _AttendanceStartState extends State<AttendanceStart> {
         ),
       ),
 
+      // Bottom class switcher
       bottomNavigationBar: Obx(() {
         return Container(
-          decoration: BoxDecoration(color: AppColor.white),
+          decoration: const BoxDecoration(color: AppColor.white),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
@@ -904,13 +745,17 @@ class _AttendanceStartState extends State<AttendanceStart> {
 
                 return GestureDetector(
                   onTap: () {
-                    // First update the state synchronously
                     setState(() {
                       subjectIndex = index;
                       selectedClass = attendanceController.classList[index];
+                      // reset per-class temp state
+                      selectedIndex = 0;
+                      _pendingTabTapped = false;
+                      _laterTabTapped = false;
+                      pendingStudentIndex = 0;
+                      selectedLaterStudentIndex = 0;
                     });
 
-                    // Then fetch data async
                     attendanceController.getTodayStatus(selectedClass.id).then((
                       data,
                     ) {
@@ -919,7 +764,6 @@ class _AttendanceStartState extends State<AttendanceStart> {
                       }
                     });
                   },
-
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 55,

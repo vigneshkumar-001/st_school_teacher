@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
+import 'package:get/get.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import 'package:get/get.dart';
+import 'controller/create_homework_controller.dart';
 
 class HomeworkHistoryDetails extends StatefulWidget {
   final int homeworkId;
@@ -29,6 +29,58 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
     });
   }
 
+  // ---------- Image helpers (network) ----------
+  void _openFullScreenNetwork(String url) {
+    if (url.isEmpty) return;
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.9),
+      builder:
+          (_) => GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 5,
+                child: Image.network(
+                  url,
+                  errorBuilder:
+                      (_, __, ___) =>
+                          Image.asset(AppImages.homeworkPreviewImage2),
+                ),
+              ),
+            ),
+          ),
+    );
+  }
+
+  /// Full-width network image with large height, keeps aspect (no crop).
+  Widget _fullWidthNetImage(String url) {
+    final h = MediaQuery.of(context).size.height;
+    return GestureDetector(
+      onTap: () => _openFullScreenNetwork(url),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: h * 0.6), // big but safe
+          child: Image.network(
+            url,
+            width: double.infinity,
+            fit:
+                BoxFit
+                    .contain, // change to cover if you prefer edge-to-edge crop
+            errorBuilder:
+                (_, __, ___) => Image.asset(
+                  AppImages.homeworkPreviewImage2,
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,29 +93,34 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Pick first image from tasks (cover)
-          final tasks = details.tasks ?? [];
-
-          // Get first image task
+          final List<dynamic> tasks = (details.tasks ?? []);
           Map<String, dynamic>? firstImageTask;
-          for (var t in tasks) {
-            if (t['type'] == 'image') {
-              firstImageTask = t;
+          for (final t in tasks) {
+            if (t is Map &&
+                t['type'] == 'image' &&
+                (t['content'] ?? '').toString().isNotEmpty) {
+              firstImageTask = t.cast<String, dynamic>();
               break;
             }
           }
 
-          // Remaining tasks, excluding the first image
           final remainingTasks =
               tasks.where((t) => t != firstImageTask).toList();
-
-          // Separate remaining images and paragraphs
           final remainingImages =
-              remainingTasks.where((t) => t['type'] == 'image').toList();
+              remainingTasks
+                  .where((t) => t is Map && t['type'] == 'image')
+                  .cast<Map>()
+                  .toList();
           final remainingParagraphs =
-              remainingTasks.where((t) => t['type'] == 'paragraph').toList();
+              remainingTasks
+                  .where((t) => t is Map && t['type'] == 'paragraph')
+                  .cast<Map>()
+                  .toList();
           final remainingLists =
-              remainingTasks.where((t) => t['type'] == 'list').toList();
+              remainingTasks
+                  .where((t) => t is Map && t['type'] == 'list')
+                  .cast<Map>()
+                  .toList();
 
           return SingleChildScrollView(
             child: Padding(
@@ -90,6 +147,8 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Card
                   Container(
                     decoration: BoxDecoration(
                       color: AppColor.white,
@@ -103,48 +162,44 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // --- First image ---
-                          if (firstImageTask != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                firstImageTask['content'] ?? '',
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (context, error, stackTrace) => Image.asset(
-                                      AppImages.homeworkPreviewImage2,
-                                    ),
-                              ),
-                            )
-                          else
-                            Image.asset(
-                              AppImages.homeworkPreviewImage2,
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-
+                          // ---- First image (full width) ----
+                          // if (firstImageTask != null)
+                          //   _fullWidthNetImage((firstImageTask!['content'] ?? '').toString())
+                          // else
+                          //   ClipRRect(
+                          //     borderRadius: BorderRadius.circular(16),
+                          //     child: Image.asset(
+                          //       AppImages.homeworkPreviewImage2,
+                          //       width: double.infinity,
+                          //       fit: BoxFit.contain,
+                          //     ),
+                          //   ),
                           const SizedBox(height: 20),
 
-                          // --- Title & main description ---
+                          // ---- Title & main description ----
                           Text(
-                            details.title ?? '',
+                            (details.title ?? ''),
                             style: GoogleFont.inter(
                               fontWeight: FontWeight.w600,
                               fontSize: 24,
                               color: AppColor.lightBlack,
                             ),
                           ),
-                          if (details.description != null)
+                          if ((details.description ?? '')
+                              .toString()
+                              .trim()
+                              .isNotEmpty) ...[
+                            const SizedBox(height: 8),
                             Text(
-                              details.description,
+                              (details.description ?? '').toString(),
                               style: GoogleFont.inter(
                                 fontSize: 12,
                                 color: AppColor.gray,
                               ),
                             ),
+                          ],
+
+                          // ---- List points (if any) ----
                           if (remainingLists.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             Text(
@@ -159,13 +214,13 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: List.generate(remainingLists.length, (
-                                  index,
-                                  ) {
+                                index,
+                              ) {
                                 final task = remainingLists[index];
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 4),
                                   child: Text(
-                                    "${index + 1}. ${task['content'] ?? ''}",
+                                    "${index + 1}. ${(task['content'] ?? '').toString()}",
                                     style: GoogleFont.inter(
                                       fontSize: 13,
                                       color: AppColor.gray,
@@ -175,47 +230,39 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                               }),
                             ),
                           ],
+
                           const SizedBox(height: 16),
 
-                          // --- Remaining images ---
-                          ...remainingImages.map<Widget>(
-                            (task) => Padding(
+                          // ---- Remaining images (each full width) ----
+                          ...remainingImages.map<Widget>((task) {
+                            final url = (task['content'] ?? '').toString();
+                            return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  task['content'] ?? '',
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                          Image.asset(
-                                            AppImages.homeworkPreviewImage2,
-                                          ),
-                                ),
-                              ),
-                            ),
-                          ),
+                              child: _fullWidthNetImage(url),
+                            );
+                          }),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
-                          // --- Paragraphs ---
-                          ...remainingParagraphs.map<Widget>(
-                            (task) => Padding(
+                          // ---- Paragraphs ----
+                          ...remainingParagraphs.map<Widget>((task) {
+                            final txt = (task['content'] ?? '').toString();
+                            return Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: Text(
-                                task['content'] ?? '',
+                                txt,
                                 style: GoogleFont.inter(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 14,
                                   color: AppColor.gray,
                                 ),
                               ),
-                            ),
-                          ),
-                          // --- List Points ---
-
+                            );
+                          }),
 
                           const SizedBox(height: 16),
+
+                          // ---- Subject / Time chips ----
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Padding(
@@ -236,20 +283,21 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                               AppImages.avatar1,
                                             ),
                                           ),
-                                          SizedBox(width: 10),
+                                          const SizedBox(width: 10),
                                           Text(
-                                            '${details?.subject.name}',
+                                            (details.subject?.name ?? '')
+                                                .toString(),
                                             style: GoogleFont.inter(
                                               fontSize: 12,
                                               color: AppColor.lightBlack,
                                             ),
                                           ),
-                                          SizedBox(width: 20),
+                                          const SizedBox(width: 20),
                                         ],
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 20),
+                                  const SizedBox(width: 20),
                                   Container(
                                     decoration: BoxDecoration(
                                       color: AppColor.black.withOpacity(0.05),
@@ -265,17 +313,17 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                             color: AppColor.lightBlack
                                                 .withOpacity(0.3),
                                           ),
-                                          SizedBox(width: 10),
+                                          const SizedBox(width: 10),
                                           Text(
-                                            details?.time ?? '',
+                                            (details.time ?? '').toString(),
                                             style: GoogleFont.inter(
                                               fontSize: 12,
                                               color: AppColor.lightBlack,
                                             ),
                                           ),
-                                          SizedBox(width: 10),
+                                          const SizedBox(width: 10),
                                           Text(
-                                            details?.date ?? '',
+                                            (details.date ?? '').toString(),
                                             style: GoogleFont.inter(
                                               fontSize: 12,
                                               color: AppColor.gray,
