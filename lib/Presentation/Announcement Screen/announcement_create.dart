@@ -3,17 +3,16 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:st_teacher_app/Core/Utility/custom_app_button.dart';
-import 'package:st_teacher_app/Presentation/Homework/controller/teacher_class_controller.dart';
+
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
+import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import 'homework_create_preview.dart';
-import 'package:get/get.dart';
-
-import 'homework_history.dart';
+import '../Homework/controller/teacher_class_controller.dart';
 
 enum SectionType { image, paragraph, list }
 
@@ -39,16 +38,14 @@ class SectionItem {
       paragraph = '';
 }
 
-class HomeworkCreate extends StatefulWidget {
-  final String? className;
-  final String? section;
-  const HomeworkCreate({super.key, this.className, this.section});
+class AnnouncementCreate extends StatefulWidget {
+  const AnnouncementCreate({super.key});
 
   @override
-  State<HomeworkCreate> createState() => _HomeworkCreateState();
+  State<AnnouncementCreate> createState() => _AnnouncementCreateState();
 }
 
-class _HomeworkCreateState extends State<HomeworkCreate> {
+class _AnnouncementCreateState extends State<AnnouncementCreate> {
   List<String> _listTextFields = [];
   List<TextEditingController> descriptionControllers = [];
   bool _listSectionOpened = false;
@@ -63,6 +60,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   final List<XFile?> _pickedImages = [];
   final ImagePicker _picker = ImagePicker();
   final TextEditingController Description = TextEditingController();
+  final TextEditingController Category = TextEditingController();
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
@@ -100,17 +98,19 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     }
   }
 
-  List<TextEditingController> _listControllers = [];
   void _addMoreListPoint() {
     setState(() {
-      _listControllers.add(TextEditingController());
+      _listTextFields.add('');
     });
   }
 
   void _removeListItem(int index) {
     setState(() {
-      _listControllers[index].dispose();
-      _listControllers.removeAt(index);
+      _listTextFields.removeAt(index);
+
+      if (_listTextFields.isEmpty) {
+        _listSectionOpened = false;
+      }
     });
   }
 
@@ -141,7 +141,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     return count;
   }
 
-  /*  @override
+  @override
   void initState() {
     super.initState();
 
@@ -165,47 +165,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
         showClearIcon = headingController.text.isNotEmpty;
       });
     });
-  }*/
-
-  String? selectedClassName;
-  String? selectedSection;
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (teacherClassController.classList.isEmpty) return;
-
-      final defaultClass = teacherClassController.classList.firstWhere(
-        (c) => c.name == widget.className && c.section == widget.section,
-        orElse: () => teacherClassController.classList.first,
-      );
-
-      teacherClassController.selectedClass.value = defaultClass;
-      if (teacherClassController.subjectList.isNotEmpty) {
-        selectedSubjectId = teacherClassController.subjectList[0].id;
-        subjectIndex = 0;
-        selectedSubject = teacherClassController.subjectList[0].name;
-      }
-
-      // Update selectedIndex for UI highlight
-      final idx = teacherClassController.classList.indexOf(defaultClass);
-      setState(() {
-        selectedIndex = idx;
-      });
-
-      print(
-        "Default selected class: ${defaultClass.name} - ${defaultClass.section}",
-      );
-    });
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   final defaultClass = teacherClassController.classList.firstWhere(
-    //         (c) => c.name == widget.className && c.section == widget.section,
-    //     orElse: () => teacherClassController.classList.first,
-    //   );
-    //   teacherClassController.selectedClass.value = defaultClass;
-    //   print("Default selected class: ${defaultClass.name} - ${defaultClass.section}");
-    // });
   }
 
   @override
@@ -226,7 +185,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     {"label": "Social Science"},
     {"label": "English"},
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -254,12 +212,12 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                       Spacer(),
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeworkHistory(),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => HomeworkHistory(),
+                          //   ),
+                          // );
                         },
                         child: Row(
                           children: [
@@ -276,16 +234,17 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                           ],
                         ),
                       ),
-
                     ],
                   ),
                   SizedBox(height: 35),
-                  Text(
-                    'Create Homework',
-                    style: GoogleFont.ibmPlexSans(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 22,
-                      color: AppColor.black,
+                  Center(
+                    child: Text(
+                      'Create Announcement',
+                      style: GoogleFont.ibmPlexSans(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 22,
+                        color: AppColor.black,
+                      ),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -361,8 +320,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                           setState(() {
                                             selectedIndex = index;
                                             selectedClassId = item.id;
-                                            selectedClassName = item.name;
-                                            selectedSection = item.section;
                                           });
                                         },
                                         child: AnimatedContainer(
@@ -609,7 +566,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
 
                           SizedBox(height: 40),
                           Text(
-                            'Subject',
+                            'Category',
                             style: GoogleFont.ibmPlexSans(
                               fontSize: 14,
                               color: AppColor.black,
@@ -687,93 +644,99 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                             ),
                           ),
                           SizedBox(height: 25),
-                          GestureDetector(
-                            onTap: _pickPermanentImage,
-                            child: DottedBorder(
-                              borderType: BorderType.RRect,
-                              radius: const Radius.circular(20),
-                              color: AppColor.lightgray,
-                              strokeWidth: 1.5,
-                              dashPattern: const [8, 4],
-                              padding: const EdgeInsets.all(1),
-                              child: Container(
-                                height: 120,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColor.lightWhite,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  children: [
-                                    if (_permanentImage == null)
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image.asset(
-                                              AppImages.uploadImage,
-                                              height: 30,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              'Upload',
-                                              style: GoogleFont.ibmPlexSans(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColor.lightgray,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    else ...[
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.file(
-                                          File(_permanentImage!.path),
-                                          width: 200,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 35.0,
-                                        ),
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              _permanentImage = null;
-                                            });
-                                          },
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                AppImages.close,
-                                                height: 26,
-                                                color: AppColor.gray,
-                                              ),
-                                              Text(
-                                                'Clear',
-                                                style: GoogleFont.ibmPlexSans(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: AppColor.lightgray,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ),
+                          // GestureDetector(
+                          //   onTap: _pickPermanentImage,
+                          //   child: DottedBorder(
+                          //     borderType: BorderType.RRect,
+                          //     radius: const Radius.circular(20),
+                          //     color: AppColor.lightgray,
+                          //     strokeWidth: 1.5,
+                          //     dashPattern: const [8, 4],
+                          //     padding: const EdgeInsets.all(1),
+                          //     child: Container(
+                          //       height: 120,
+                          //       padding: const EdgeInsets.symmetric(
+                          //         horizontal: 12,
+                          //       ),
+                          //       decoration: BoxDecoration(
+                          //         color: AppColor.lightWhite,
+                          //         borderRadius: BorderRadius.circular(20),
+                          //       ),
+                          //       child: Row(
+                          //         children: [
+                          //           if (_permanentImage == null)
+                          //             Expanded(
+                          //               child: Row(
+                          //                 mainAxisAlignment:
+                          //                 MainAxisAlignment.center,
+                          //                 children: [
+                          //                   Image.asset(
+                          //                     AppImages.uploadImage,
+                          //                     height: 30,
+                          //                   ),
+                          //                   const SizedBox(width: 10),
+                          //                   Text(
+                          //                     'Upload',
+                          //                     style: GoogleFont.ibmPlexSans(
+                          //                       fontSize: 14,
+                          //                       fontWeight: FontWeight.w500,
+                          //                       color: AppColor.lightgray,
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //             )
+                          //           else ...[
+                          //             ClipRRect(
+                          //               borderRadius: BorderRadius.circular(12),
+                          //               child: Image.file(
+                          //                 File(_permanentImage!.path),
+                          //                 width: 200,
+                          //                 height: 100,
+                          //                 fit: BoxFit.cover,
+                          //               ),
+                          //             ),
+                          //             const Spacer(),
+                          //             Padding(
+                          //               padding: const EdgeInsets.symmetric(
+                          //                 vertical: 35.0,
+                          //               ),
+                          //               child: InkWell(
+                          //                 onTap: () {
+                          //                   setState(() {
+                          //                     _permanentImage = null;
+                          //                   });
+                          //                 },
+                          //                 child: Column(
+                          //                   children: [
+                          //                     Image.asset(
+                          //                       AppImages.close,
+                          //                       height: 26,
+                          //                       color: AppColor.gray,
+                          //                     ),
+                          //                     Text(
+                          //                       'Clear',
+                          //                       style: GoogleFont.ibmPlexSans(
+                          //                         fontSize: 14,
+                          //                         fontWeight: FontWeight.w400,
+                          //                         color: AppColor.lightgray,
+                          //                       ),
+                          //                     ),
+                          //                   ],
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ],
+                          //         ],
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                          CommonContainer.fillingContainer(
+                            text: '',
+                            controller: Category,
+                            verticalDivider: false,
+                            imagePath: AppImages.downArrow,imageSize: 11,
                           ),
                           SizedBox(height: 25),
                           Text(
@@ -1116,7 +1079,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                         SizedBox(width: 10),
                                         Expanded(
                                           child: TextField(
-                                            controller: _listControllers[index],
                                             decoration: InputDecoration(
                                               hintStyle: GoogleFont.ibmPlexSans(
                                                 fontSize: 14,
@@ -1235,81 +1197,106 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                             ],
                           ),
 
+                          /*     Row(
+                            children: [
+                              Text(
+                                'Add',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                              SizedBox(width: 25),
+                              CommonContainer.addMore(
+                                onTap: () {
+                                  setState(() {
+                                    _pickedImages.add(null);
+                                  });
+                                },
+                                mainText: 'Image',
+                                imagePath: AppImages.picherImageDark,
+                              ),
+                              SizedBox(width: 10),
+                              CommonContainer.addMore(
+                                onTap: () {
+                                  setState(() {
+                                    descriptionControllers.add(
+                                      TextEditingController(),
+                                    );
+                                  });
+                                },
+                                mainText: 'Paragraph',
+                                imagePath: AppImages.paragraph,
+                              ),
+
+                              SizedBox(width: 10),
+                              CommonContainer.addMore(
+                                onTap: _openListSection,
+                                mainText: 'List',
+                                imagePath: AppImages.list,
+                              ),
+                            ],
+                          ),*/
                           SizedBox(height: 40),
                           AppButton.button(
                             onTap: () {
-                              final selected =
-                                  teacherClassController.selectedClass.value ??
-                                  teacherClassController.classList.first;
-                              final selectedSubId = selectedSubjectId;
                               HapticFeedback.heavyImpact();
-                              final listPoints =
-                                  _sections
-                                      .where((s) => s.type == SectionType.list)
-                                      .expand((s) => s.listPoints)
-                                      .where((p) => p.trim().isNotEmpty)
-                                      .toList();
-
-                              print("Passing listPoints: $listPoints");
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => HomeworkCreatePreview(
-                                        listPoints: listPoints,
-                                        subjectId: selectedSubjectId,
-
-                                        // selectedClassId: selectedClassId,
-                                        subjects: selectedSubject ?? '',
-                                        selectedClassId: selected.id,
-
-                                        description: [
-                                          // take from old descriptionControllers
-                                          ...descriptionControllers
-                                              .map(
-                                                (controller) => controller.text,
-                                              )
-                                              .where(
-                                                (text) =>
-                                                    text.trim().isNotEmpty,
-                                              ),
-
-                                          // also take from _sections
-                                          ..._sections
-                                              .where(
-                                                (s) =>
-                                                    s.type ==
-                                                        SectionType.paragraph &&
-                                                    s.paragraph
-                                                        .trim()
-                                                        .isNotEmpty,
-                                              )
-                                              .map((s) => s.paragraph),
-                                        ],
-
-                                        images:
-                                            _sections
-                                                .where(
-                                                  (s) =>
-                                                      s.type ==
-                                                          SectionType.image &&
-                                                      s.image != null,
-                                                )
-                                                .map((s) => File(s.image!.path))
-                                                .toList(),
-
-                                        permanentImage:
-                                            _permanentImage != null
-                                                ? File(_permanentImage!.path)
-                                                : null,
-                                        heading: headingController.text,
-                                      ),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder:
+                              //         (context) => HomeworkCreatePreview(
+                              //       listPoints: _listTextFields,
+                              //       subjectId: selectedSubjectId,
+                              //       selectedClassId: selectedClassId,
+                              //       subjects: selectedSubject ?? '',
+                              //       description: [
+                              //         // take from old descriptionControllers
+                              //         ...descriptionControllers
+                              //             .map(
+                              //               (controller) => controller.text,
+                              //         )
+                              //             .where(
+                              //               (text) =>
+                              //           text.trim().isNotEmpty,
+                              //         ),
+                              //
+                              //         // also take from _sections
+                              //         ..._sections
+                              //             .where(
+                              //               (s) =>
+                              //           s.type ==
+                              //               SectionType.paragraph &&
+                              //               s.paragraph
+                              //                   .trim()
+                              //                   .isNotEmpty,
+                              //         )
+                              //             .map((s) => s.paragraph),
+                              //       ],
+                              //
+                              //       images:
+                              //       _sections
+                              //           .where(
+                              //             (s) =>
+                              //         s.type ==
+                              //             SectionType.image &&
+                              //             s.image != null,
+                              //       )
+                              //           .map((s) => File(s.image!.path))
+                              //           .toList(),
+                              //
+                              //       permanentImage:
+                              //       _permanentImage != null
+                              //           ? File(_permanentImage!.path)
+                              //           : null,
+                              //       heading: headingController.text,
+                              //     ),
+                              //   ),
+                              // );
                             },
                             width: 145,
                             height: 60,
-                            text: 'Preview',
+                            text: 'Submit',
                             image: AppImages.buttonArrow,
                           ),
                         ],
@@ -1327,6 +1314,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
 
   Widget _buildParagraphContainer(SectionItem item, int index) {
     final paragraphNumber = _getTypeIndex(SectionType.paragraph, index);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Column(
@@ -1361,7 +1349,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
           CommonContainer.fillingContainer(
             maxLine: 5,
             text: item.paragraph,
-            controller: null,
+            controller: TextEditingController(),
             verticalDivider: false,
             onChanged: (val) {
               setState(() {
@@ -1452,9 +1440,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                       ),
                       Expanded(
                         child: TextField(
-                          controller: TextEditingController(
-                            text: item.listPoints[listIndex],
-                          ),
                           decoration: InputDecoration(
                             hintStyle: GoogleFont.ibmPlexSans(
                               fontSize: 14,

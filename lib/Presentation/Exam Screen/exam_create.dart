@@ -2,76 +2,34 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
+import 'package:st_teacher_app/Core/Utility/custom_app_button.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
-import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import '../Homework/homework_create_preview.dart';
+import '../Homework/controller/teacher_class_controller.dart';
+import 'exam_history.dart';
 
-class QuestionModel {
-  String question = '';
-  List<String> answers = List.generate(4, (_) => '');
-}
-
-class QuizScreenCreate extends StatefulWidget {
-  const QuizScreenCreate({super.key});
+class ExamCreate extends StatefulWidget {
+  const ExamCreate({super.key});
 
   @override
-  State<QuizScreenCreate> createState() => _QuizScreenCreateState();
+  State<ExamCreate> createState() => _ExamCreateState();
 }
 
-class _QuizScreenCreateState extends State<QuizScreenCreate> {
-  List<QuestionModel> questionList = [];
-
-  String getOrdinalSuffix(int number) {
-    if (number >= 11 && number <= 13) return 'th';
-    switch (number % 10) {
-      case 1:
-        return 'st';
-      case 2:
-        return 'nd';
-      case 3:
-        return 'rd';
-      default:
-        return 'th';
-    }
-  }
-
-  bool _listSectionOpened = false;
-  bool showParagraphField = false;
-
-  void _addMoreListPoint() {
-    setState(() {
-      questionList.add(QuestionModel());
-    });
-  }
-
+class _ExamCreateState extends State<ExamCreate> {
+  int selectedIndex = 0;
+  int? selectedClassId;
   bool showClearIcon = false;
+  final ImagePicker _picker = ImagePicker();
+  XFile? _permanentImage;
   TextEditingController headingController = TextEditingController();
-  TextEditingController Question = TextEditingController();
-  final TextEditingController Description = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    headingController.addListener(() {
-      setState(() {
-        showClearIcon = headingController.text.isNotEmpty;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    headingController.dispose();
-    super.dispose();
-  }
-
+  final TextEditingController dateRangeController = TextEditingController();
+  final TextEditingController singleDateController = TextEditingController();
   final List<Map<String, String>> classData = [
     {'grade': '8', 'section': 'A'},
     {'grade': '8', 'section': 'B'},
@@ -79,25 +37,23 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
     {'grade': '9', 'section': 'A'},
     {'grade': '9', 'section': 'C'},
   ];
-
-  int selectedIndex = 0;
-  int subjectIndex = 0;
-
-  final List<Map<String, dynamic>> tabs = [
-    {"label": "Social Science"},
-    {"label": "English"},
-  ];
+  Future<void> _pickPermanentImage() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _permanentImage = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -114,7 +70,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => QuizHistory(),
+                            builder: (context) => ExamHistory(),
                           ),
                         );
                       },
@@ -136,14 +92,12 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                   ],
                 ),
                 SizedBox(height: 35),
-                Center(
-                  child: Text(
-                    'Create Quiz',
-                    style: GoogleFont.ibmPlexSans(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 22,
-                      color: AppColor.black,
-                    ),
+                Text(
+                  'Create Exam',
+                  style: GoogleFont.ibmPlexSans(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 22,
+                    color: AppColor.black,
                   ),
                 ),
                 SizedBox(height: 20),
@@ -457,74 +411,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                         ),
 
                         SizedBox(height: 40),
-                        Text(
-                          'Subject',
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 14,
-                            color: AppColor.black,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: List.generate(tabs.length, (index) {
-                            final isSelected = subjectIndex == index;
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                              child: GestureDetector(
-                                onTap:
-                                    () => setState(() => subjectIndex = index),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isSelected ? 25 : 35,
-                                    vertical: isSelected ? 14 : 14,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        isSelected
-                                            ? AppColor.white
-                                            : AppColor.white,
-                                    borderRadius: BorderRadius.circular(30),
-                                    border: Border.all(
-                                      color:
-                                          isSelected
-                                              ? AppColor.blue
-                                              : AppColor.borderGary,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      isSelected
-                                          ? Image.asset(
-                                            AppImages.tick,
-                                            height: 15,
-                                            color: AppColor.blue,
-                                          )
-                                          : SizedBox.shrink(),
-                                      SizedBox(width: isSelected ? 10 : 0),
-                                      Text(
-                                        " ${tabs[index]['label']}",
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 12,
-                                          color:
-                                              isSelected
-                                                  ? AppColor.blue
-                                                  : AppColor.gray,
-                                          fontWeight:
-                                              isSelected
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
+                        SizedBox(height: 25),
+
                         SizedBox(height: 25),
                         Text(
                           'Heading',
@@ -550,257 +438,151 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                         ),
                         SizedBox(height: 25),
                         Text(
-                          'Time Limit',
+                          'Start & End Date',
                           style: GoogleFont.ibmPlexSans(
                             fontSize: 14,
                             color: AppColor.black,
                           ),
                         ),
                         SizedBox(height: 10),
-                        CommonContainer.fillingContainer(
-                          imagePath: AppImages.clock,
-                          imageColor: AppColor.lightgray,
-                          // maxLine: 10,
+                        CommonContainer.studentInfoScreen(
                           text: '',
-                          controller: Description,
-                          verticalDivider: false,
+                          controller: dateRangeController,
+                          context: context,
+                          imagePath: AppImages.calander,
+                          verticalDivider: true,
+                          datePickMode: DatePickMode.range,
+                          styledRangeText: true,
+                        ),
+
+                        SizedBox(height: 25),
+                        Text(
+                          'Announcement Date',
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 14,
+                            color: AppColor.black,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        CommonContainer.studentInfoScreen(
+                          text: 'Date',
+                          controller: singleDateController,
+                          context: context,
+                          imagePath: AppImages.calander,
+                          verticalDivider: true,
+                          datePickMode: DatePickMode.single,
+                          styledRangeText: false,
                         ),
                         SizedBox(height: 25),
-                        ListView.builder(
-                          itemCount: questionList.length,
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, qIndex) {
-                            final question = questionList[qIndex];
-
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 24),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColor.borderGary,
-                                      ),
-                                      children: [
-                                        TextSpan(text: '${qIndex + 1}'),
-                                        WidgetSpan(
-                                          child: Transform.translate(
-                                            offset: const Offset(2, -7),
-                                            child: Text(
-                                              getOrdinalSuffix(qIndex + 1),
-                                              textScaleFactor: 0.6,
-                                              style: GoogleFont.ibmPlexSans(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                                color: AppColor.borderGary,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  Text(
-                                    'Question',
-                                    style: GoogleFont.ibmPlexSans(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  CommonContainer.fillingContainer(
-                                    onDetailsTap: () {
-                                      Question.clear();
-                                      setState(() {
-                                        showClearIcon = false;
-                                      });
-                                    },
-                                    imagePath:
-                                        showClearIcon ? AppImages.close : null,
-                                    imageColor: AppColor.gray,
-
-                                    maxLine: 10,
-                                    text: question.question,
-                                    controller: TextEditingController(
-                                      text: question.question,
-                                    ),
-                                    verticalDivider: false,
-                                    onChanged: (val) => question.question = val,
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'Answer',
-                                    style: GoogleFont.ibmPlexSans(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  ListView.builder(
-                                    itemCount: 4,
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 14,
-                                        ),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                            vertical: 12,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColor.lightWhite,
-                                            borderRadius: BorderRadius.circular(
-                                              18,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Stack(
-                                                  children: [
-                                                    TextField(
-                                                      decoration: InputDecoration(
-                                                        hintText:
-                                                            'List ${index + 1}',
-                                                        hintStyle:
-                                                            GoogleFont.ibmPlexSans(
-                                                              fontSize: 14,
-                                                              color:
-                                                                  AppColor.gray,
-                                                            ),
-                                                        border:
-                                                            InputBorder.none,
-                                                        suffixIcon: Container(
-                                                          padding:
-                                                              const EdgeInsets.symmetric(
-                                                                vertical: 8,
-                                                              ),
-                                                          child: Container(
-                                                            width: 1.5,
-                                                            height:
-                                                                double.infinity,
-                                                            color:
-                                                                Colors
-                                                                    .grey
-                                                                    .shade400,
-                                                          ),
-                                                        ),
-                                                        suffixIconConstraints:
-                                                            const BoxConstraints(
-                                                              minWidth: 10,
-                                                              minHeight: 10,
-                                                            ),
-                                                      ),
-                                                      controller:
-                                                          TextEditingController(
-                                                            text:
-                                                                question
-                                                                    .answers[index],
-                                                          ),
-                                                      onChanged: (value) {
-                                                        question.answers[index] =
-                                                            value;
-                                                      },
-                                                    ),
-
-                                                    Positioned(
-                                                      right: 245,
-                                                      top: 10,
-                                                      bottom: 10,
-
-                                                      child: Container(
-                                                        width: 2,
-                                                        height: 40,
-                                                        decoration: BoxDecoration(
-                                                          gradient: LinearGradient(
-                                                            begin:
-                                                                Alignment
-                                                                    .topCenter,
-                                                            end:
-                                                                Alignment
-                                                                    .bottomCenter,
-                                                            colors: [
-                                                              Colors
-                                                                  .grey
-                                                                  .shade200,
-                                                              Colors
-                                                                  .grey
-                                                                  .shade300,
-                                                              Colors
-                                                                  .grey
-                                                                  .shade200,
-                                                            ],
-                                                          ),
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                1,
-                                                              ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  Divider(),
-                                ],
-                              ),
-                            );
-                          },
+                        Text(
+                          'Timetable',
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 14,
+                            color: AppColor.black,
+                          ),
                         ),
-                        SizedBox(height: 25),
-
+                        SizedBox(height: 10),
                         GestureDetector(
-                          onTap: _addMoreListPoint,
+                          onTap: _pickPermanentImage,
                           child: DottedBorder(
-                            color: AppColor.blue,
-                            strokeWidth: 1.5,
-                            dashPattern: [8, 4],
                             borderType: BorderType.RRect,
-                            radius: Radius.circular(20),
+                            radius: const Radius.circular(20),
+                            color: AppColor.lightgray,
+                            strokeWidth: 1.5,
+                            dashPattern: const [8, 4],
+                            padding: const EdgeInsets.all(1),
                             child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 14),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Add Question',
-                                style: GoogleFont.ibmPlexSans(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                  color: AppColor.blue,
-                                ),
+                              height: 120,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColor.lightWhite,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                children: [
+                                  if (_permanentImage == null)
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            AppImages.uploadImage,
+                                            height: 30,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            'Upload',
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColor.lightgray,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  else ...[
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.file(
+                                        File(_permanentImage!.path),
+                                        width: 200,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 35.0,
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _permanentImage = null;
+                                          });
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Image.asset(
+                                              AppImages.close,
+                                              height: 26,
+                                              color: AppColor.gray,
+                                            ),
+                                            Text(
+                                              'Clear',
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                color: AppColor.lightgray,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
                           ),
                         ),
-
                         SizedBox(height: 40),
                         AppButton.button(
+                          text: 'Submit',
+                          image: AppImages.buttonArrow,
+                          width: 139,
                           onTap: () {
-                            HapticFeedback.heavyImpact();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => QuizHistory(),
+                                builder: (context) => ExamHistory(),
                               ),
                             );
                           },
-                          width: 145,
-                          height: 60,
-                          text: 'Publish',
-                          image: AppImages.buttonArrow,
                         ),
                       ],
                     ),
@@ -812,12 +594,5 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
         ),
       ),
     );
-  }
-
-  String _getSuffix(int number) {
-    if (number == 1) return "st";
-    if (number == 2) return "nd";
-    if (number == 3) return "rd";
-    return "th";
   }
 }

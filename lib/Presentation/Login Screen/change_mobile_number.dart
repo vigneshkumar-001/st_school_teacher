@@ -9,11 +9,11 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/custom_textfield.dart';
 import '../../Core/Utility/google_fonts.dart';
- 
+
 import '../../Core/Widgets/common_container.dart';
- 
+
 import 'controller/login_controller.dart';
- 
+
 import 'otp_screen.dart';
 import 'package:get/get.dart';
 
@@ -243,14 +243,14 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                         alignment: Alignment.topRight,
                         child: Text(
                           errorText,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             color: Colors.red,
                             fontSize: 12,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 25),
+                     SizedBox(height: 25),
                     Obx(() {
                       return AppButton.button(
                         text: 'Get OTP',

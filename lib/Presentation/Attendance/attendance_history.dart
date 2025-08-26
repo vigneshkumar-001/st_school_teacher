@@ -258,7 +258,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           ),
                           Positioned.fill(
                             child: Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.symmetric(vertical: 20.0),
                               child: SingleChildScrollView(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -593,7 +593,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                     attendanceData!.morningAbsentStudents;
                               }
 
-                              // Apply search filter:
+
                               final filteredStudents =
                                   students.where((student) {
                                     final name =
@@ -606,10 +606,12 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                 return Center(child: Text('No students found'));
                               }
 
-                              return Column(
+                              return
+                                Column(
                                 children:
                                     filteredStudents.map<Widget>((student) {
-                                      return CommonContainer.StudentsList(
+                                      return
+                                        CommonContainer.StudentsList(
                                         mainText: student.name,
                                         onIconTap: () {
                                           Navigator.push(
@@ -621,10 +623,10 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                                   ) => AttendanceHistoryStudent(
                                                     studentId:
                                                         student
-                                                            .id, // pass student id
+                                                            .id,
                                                     classId:
                                                         selectedClass
-                                                            .id, // pass class id (or variable)
+                                                            .id,
                                                   ),
                                             ),
                                           );
