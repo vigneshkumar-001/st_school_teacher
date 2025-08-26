@@ -258,7 +258,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           ),
                           Positioned.fill(
                             child: Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.symmetric(vertical: 20.0),
                               child: SingleChildScrollView(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,

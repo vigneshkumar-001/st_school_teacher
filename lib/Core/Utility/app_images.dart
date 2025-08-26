@@ -52,4 +52,5 @@ class AppImages {
   static String attendanceAbsent = 'asset/Images/attendanceAbsent.png';
   static String clear = 'asset/Images/Clear.png';
   static String greenTick = 'asset/Images/Green Tick.png';
+  static String downArrow = 'asset/Images/down_arrow.png';
 }

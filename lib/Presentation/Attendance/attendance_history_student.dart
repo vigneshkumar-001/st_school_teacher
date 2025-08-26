@@ -95,7 +95,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
 
     if (response != null) {
       setState(() {
-        attendanceData = response; // Assign the fetched data here
+        attendanceData = response;
       });
     } else {
       print("Failed to fetch attendance data");
