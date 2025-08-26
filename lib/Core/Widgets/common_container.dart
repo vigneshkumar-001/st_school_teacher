@@ -339,7 +339,7 @@ class CommonContainer {
 
   static Widget fillingContainer({
     required String text,
-    required TextEditingController controller,
+    TextEditingController? controller,
     String? imagePath,
     bool verticalDivider = true,
     Function(String)? onChanged,
@@ -429,7 +429,7 @@ class CommonContainer {
                                     ),
                                   );
                                 } else {
-                                  controller.text =
+                                  controller?.text =
                                       "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
                                   FocusScope.of(
                                     context,
@@ -512,18 +512,18 @@ class CommonContainer {
                   ),
                 SizedBox(width: 20),
 
-                if (imagePath == null)
-                  Expanded(
-                    child: CustomTextField.textWithSmall(
-                      text: text,
-                      fontSize: 14,
-                      color: AppColor.gray,
-                    ),
-                  ),
+                // if (imagePath == null)
+                //   Expanded(
+                //     child: CustomTextField.textWithSmall(
+                //       text: text,
+                //       fontSize: 14,
+                //       color: AppColor.gray,
+                //     ),
+                //   ),
                 if (imagePath != null)
                   InkWell(
                     onTap: () {
-                      controller.clear();
+                      controller?.clear();
                       if (onDetailsTap != null) {
                         onDetailsTap();
                       }

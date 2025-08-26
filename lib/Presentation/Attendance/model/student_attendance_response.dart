@@ -30,6 +30,9 @@ class StudentAttendanceData {
   final bool fullDayPresent;
   final bool holidayStatus;
   final bool eventsStatus;
+  final String monthName;
+  final int totalWorkingDays;
+  final int fullDayPresentCount;
   final double thisMonthPresentPercentage;
   final List<MonthlyAttendanceSummary> monthlyAttendanceSummary;
 
@@ -45,29 +48,37 @@ class StudentAttendanceData {
     required this.fullDayPresent,
     required this.holidayStatus,
     required this.eventsStatus,
+    required this.monthName,
+    required this.totalWorkingDays,
+    required this.fullDayPresentCount,
     required this.thisMonthPresentPercentage,
     required this.monthlyAttendanceSummary,
   });
 
   factory StudentAttendanceData.fromJson(Map<String, dynamic> json) {
-    var list = json['monthly_attendance_summary'] as List;
+    var list = json['monthly_attendance_summary'] as List? ?? [];
     List<MonthlyAttendanceSummary> summaryList =
-        list.map((e) => MonthlyAttendanceSummary.fromJson(e)).toList();
+    list.map((e) => MonthlyAttendanceSummary.fromJson(e)).toList();
 
     return StudentAttendanceData(
       studentId: json['student_id'] as String,
       studentClass: json['class'] as String,
       section: json['section'] as String,
-      classId: json['class_id'] as String,
-      teacherId: json['teacher_id'] as int,
+      classId: json['class_id'].toString(),
+      teacherId: json['teacher_id'] is int
+          ? json['teacher_id'] as int
+          : int.tryParse(json['teacher_id'].toString()) ?? 0,
       date: json['date'] as String,
       morning: json['morning'] as String,
       afternoon: json['afternoon'] as String,
       fullDayPresent: json['full_day_present'] as bool,
       holidayStatus: json['holiday_status'] as bool,
       eventsStatus: json['events_status'] as bool,
+      monthName: json['monthName'] as String,
+      totalWorkingDays: json['totalWorkingDays'] as int,
+      fullDayPresentCount: json['fullDayPresentCount'] as int,
       thisMonthPresentPercentage:
-          (json['this_month_present_percentage'] as num).toDouble(),
+      (json['this_month_present_percentage'] as num).toDouble(),
       monthlyAttendanceSummary: summaryList,
     );
   }

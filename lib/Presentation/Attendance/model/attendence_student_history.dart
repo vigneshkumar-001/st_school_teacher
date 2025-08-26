@@ -13,9 +13,7 @@ class AttendanceStudentHistory {
     return AttendanceStudentHistory(
       status: json['status'] as bool,
       message: json['message'] as String,
-      data: AttendanceStudentData.fromJson(
-        json['data'] as Map<String, dynamic>,
-      ),
+      data: AttendanceStudentData.fromJson(json['data']),
     );
   }
 }
@@ -29,6 +27,9 @@ class AttendanceStudentData {
   final String classId;
   final String month;
   final String year;
+  final String monthName;
+  final int totalWorkingDays;
+  final int fullDayPresentCount;
   final double presentPercentage;
   final Map<String, AttendanceByDate> attendanceByDate;
 
@@ -41,6 +42,9 @@ class AttendanceStudentData {
     required this.classId,
     required this.month,
     required this.year,
+    required this.monthName,
+    required this.totalWorkingDays,
+    required this.fullDayPresentCount,
     required this.presentPercentage,
     required this.attendanceByDate,
   });
@@ -49,10 +53,9 @@ class AttendanceStudentData {
     final attendanceMap = <String, AttendanceByDate>{};
     final rawAttendance =
         json['attendance_by_date'] as Map<String, dynamic>? ?? {};
+
     rawAttendance.forEach((key, value) {
-      attendanceMap[key] = AttendanceByDate.fromJson(
-        value as Map<String, dynamic>,
-      );
+      attendanceMap[key] = AttendanceByDate.fromJson(value);
     });
 
     return AttendanceStudentData(
@@ -60,10 +63,16 @@ class AttendanceStudentData {
       studentName: json['student_name'] as String,
       studentClass: json['class'] as String,
       section: json['section'] as String,
-      teacherId: json['teacher_id'] as int,
-      classId: json['class_id'] as String,
+      teacherId:
+          json['teacher_id'] is int
+              ? json['teacher_id'] as int
+              : int.tryParse(json['teacher_id'].toString()) ?? 0,
+      classId: json['class_id'].toString().trim(),
       month: json['month'] as String,
       year: json['year'] as String,
+      monthName: json['monthName'] as String,
+      totalWorkingDays: json['totalWorkingDays'] as int,
+      fullDayPresentCount: json['fullDayPresentCount'] as int,
       presentPercentage: (json['present_percentage'] as num).toDouble(),
       attendanceByDate: attendanceMap,
     );
@@ -76,6 +85,7 @@ class AttendanceByDate {
   final bool fullDayAbsent;
   final bool holidayStatus;
   final bool eventsStatus;
+  final bool isNullStatus;
 
   AttendanceByDate({
     required this.morning,
@@ -83,6 +93,7 @@ class AttendanceByDate {
     required this.fullDayAbsent,
     required this.holidayStatus,
     required this.eventsStatus,
+    required this.isNullStatus,
   });
 
   factory AttendanceByDate.fromJson(Map<String, dynamic> json) {
@@ -92,6 +103,7 @@ class AttendanceByDate {
       fullDayAbsent: json['full_day_absent'] as bool,
       holidayStatus: json['holiday_status'] as bool,
       eventsStatus: json['events_status'] as bool,
+      isNullStatus: json['is_null_status'] as bool,
     );
   }
 }

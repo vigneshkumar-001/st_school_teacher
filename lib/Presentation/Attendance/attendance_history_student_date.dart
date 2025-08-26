@@ -58,9 +58,9 @@ class _AttendanceHistoryStudentDateState
 
     // Load class list and initial attendance data
     attendanceController.getClassList().then((_) async {
+      _fetchAttendance();
       if (attendanceController.classList.isNotEmpty) {
         selectedClass = attendanceController.classList.first;
-        _fetchAttendance(); // fetch after class selection
       }
     });
   }
@@ -311,7 +311,7 @@ class _AttendanceHistoryStudentDateState
                       Row(
                         children: [
                           Text(
-                            'July Overall Attendance ',
+                            '${attendanceData?.monthName ?? ''} Overall Attendance ',
                             style: GoogleFont.ibmPlexSans(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -407,7 +407,7 @@ class _AttendanceHistoryStudentDateState
                       SizedBox(height: 15),
 
                       Text(
-                        "$current Out of $total",
+                        "${attendanceData?.fullDayPresentCount ?? '0'} Out of ${attendanceData?.totalWorkingDays ?? '0'}",
                         style: GoogleFont.ibmPlexSans(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
