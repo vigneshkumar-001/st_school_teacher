@@ -119,7 +119,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
       );
     }
     setState(() {
-      // remove student from all lists first
+
       pendingStudents.removeWhere((s) => s['id'] == studentId);
       laterStudents.removeWhere((s) => s['id'] == studentId);
 
@@ -146,11 +146,11 @@ class _AttendanceStartState extends State<AttendanceStart> {
 
     print("✅ Marked $studentName as $status");
 
-    // background insert
+
     _saveAttendanceInBackground(studentId, status);
   }
 
-  /// Background insert function (non-blocking)
+
   Future<void> _saveAttendanceInBackground(int studentId, String status) async {
     try {
       await attendanceController.presentOrAbsent(
