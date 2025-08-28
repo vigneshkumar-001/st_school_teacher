@@ -9,7 +9,6 @@ import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_history_controller.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendance_history_response.dart';
-
 import '../../Core/Utility/google_fonts.dart';
 import 'attendance_history_student.dart';
 import 'attendance_start.dart';
@@ -258,7 +257,9 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           ),
                           Positioned.fill(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 20.0,
+                              ),
                               child: SingleChildScrollView(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -497,9 +498,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                             isSelected
                                                 ? AppColor.white
                                                 : AppColor.white,
-                                        borderRadius: BorderRadius.circular(
-                                          30,
-                                        ),
+                                        borderRadius: BorderRadius.circular(30),
                                         border: Border.all(
                                           color:
                                               isSelected
@@ -597,7 +596,6 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                     attendanceData!.afternoonAbsentStudents;
                               }
 
-
                               final filteredStudents =
                                   students.where((student) {
                                     final name =
@@ -610,28 +608,22 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                                 return Center(child: Text('No students found'));
                               }
 
-                              return
-                                Column(
+                              return Column(
                                 children:
                                     filteredStudents.map<Widget>((student) {
-                                      return
-                                        CommonContainer.StudentsList(
+                                      return CommonContainer.StudentsList(
                                         mainText: student.name,
                                         onIconTap: () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder:
-                                                  (
-                                                    context,
-                                                  ) => AttendanceHistoryStudent(
-                                                    studentId:
-                                                        student
-                                                            .id,
-                                                    classId:
-                                                        selectedClass
-                                                            .id,
-                                                  ),
+                                                  (context) =>
+                                                      AttendanceHistoryStudent(
+                                                        studentId: student.id,
+                                                        classId:
+                                                            selectedClass.id,
+                                                      ),
                                             ),
                                           );
                                         },

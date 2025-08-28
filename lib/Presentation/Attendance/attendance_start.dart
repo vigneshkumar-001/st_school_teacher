@@ -452,7 +452,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                       width: 0.3,
                                     ),
                                   ),
-                                  const Spacer(),
+                                    Spacer(),
                                   InkWell(
                                     onTap: () {
                                       Navigator.push(
@@ -474,7 +474,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                             color: AppColor.gray,
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
+                                          SizedBox(width: 8),
                                         Image.asset(
                                           AppImages.historyImage,
                                           height: 24,
@@ -484,7 +484,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 40),
+                              SizedBox(height: 40),
                               RichText(
                                 text: TextSpan(
                                   text: selectedClass?.className ?? '',
@@ -511,20 +511,33 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 3),
-                              Text(
-                                attendanceController
-                                        .attendance
-                                        .value
-                                        ?.messages ??
-                                    '',
-                                style: GoogleFont.ibmPlexSans(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColor.black,
+                              SizedBox(height: 15),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppColor.gray),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 30,
+                                    vertical: 10,
+                                  ),
+                                  child: Text(
+                                    attendanceController
+                                            .attendance
+                                            .value
+                                            ?.messages ??
+                                        '',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColor.black,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
 
                               // === ACTION CARD (hidden on Present/Absent) ===
                               Obx(() {
@@ -533,7 +546,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                 return _buildActionCard(loading);
                               }),
 
-                              const SizedBox(height: 20),
+                                SizedBox(height: 20),
                               Text(
                                 'Students List',
                                 style: GoogleFont.ibmPlexSans(
@@ -542,7 +555,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   color: AppColor.black,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                                SizedBox(height: 10),
 
                               Container(
                                 decoration: BoxDecoration(
@@ -732,9 +745,9 @@ class _AttendanceStartState extends State<AttendanceStart> {
       // Bottom class switcher
       bottomNavigationBar: Obx(() {
         return Container(
-          decoration: const BoxDecoration(color: AppColor.white),
+          decoration: BoxDecoration(color: AppColor.white),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding:   EdgeInsets.symmetric(vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(attendanceController.classList.length, (
@@ -765,7 +778,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 55,
                       vertical: 9,
                     ),

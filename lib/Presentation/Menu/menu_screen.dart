@@ -5,19 +5,11 @@ import 'package:st_teacher_app/Core/Utility/app_images.dart';
 import 'package:st_teacher_app/Core/Utility/google_fonts.dart';
 import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 import 'package:st_teacher_app/Presentation/Homework/homework_history.dart';
-
-import '../Announcement Screen/announcement_create.dart';
-import '../Announcement Screen/list_general.dart';
 import '../Attendance-teacher/attendance_history_teacher.dart';
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
-import '../Exam Screen/exam_create.dart';
-import '../Exam Screen/exam_history.dart';
 import '../Homework/homework_create.dart';
-import '../Homework/homework_history.dart';
 import '../Profile/my_profile.dart';
-import '../Quiz Screen/quiz_history.dart';
-import '../Quiz Screen/quiz_screen_create.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -124,7 +116,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   image: AppImages.Homework,
                   addButton: true,
                 ),
-                SizedBox(height: 20),
+                /*  SizedBox(height: 20),
                 CommonContainer.Menu_Students(
                   Start: () {
                     Navigator.push(
@@ -190,7 +182,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   subText: 'Create',
                   image: AppImages.Announcement,
                   addButton: true,
-                ),
+                ),*/
                 SizedBox(height: 20),
                 // CommonContainer.Menu_Students(
                 //   onIconTap: () {},

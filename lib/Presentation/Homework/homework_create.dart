@@ -1,14 +1,11 @@
 import 'dart:io';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:st_teacher_app/Core/Utility/custom_app_button.dart';
 import 'package:st_teacher_app/Presentation/Homework/controller/teacher_class_controller.dart';
-
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
@@ -55,6 +52,9 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     TeacherClassController(),
   );
 
+  // form
+  final _formKey = GlobalKey<FormState>();
+
   // class/subject pickers
   int selectedIndex = 0;
   int subjectIndex = 0;
@@ -71,7 +71,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   // old “multi description” (kept & fixed)
   final List<TextEditingController> descriptionControllers = [];
 
-  // “List” section (legacy add-on area) – keep controller/data in sync
+  // “List” section (legacy add-on area)
   final List<String> _listTextFields = [];
   final List<TextEditingController> _listControllers = [];
   bool _listSectionOpened = false;
@@ -83,7 +83,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   // picker
   final ImagePicker _picker = ImagePicker();
 
-  // ===== Init / Dispose =====
   @override
   void initState() {
     super.initState();
@@ -95,9 +94,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       setState(() => showClearIcon = headingController.text.isNotEmpty);
     });
 
-    // Defer defaults until lists are available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // If controller already has data (e.g. loaded earlier)
       if (teacherClassController.classList.isNotEmpty) {
         final defaultClass = teacherClassController.classList.firstWhere(
           (c) =>
@@ -174,7 +171,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       descriptionControllers[index].dispose();
       descriptionControllers.removeAt(index);
       if (descriptionControllers.isEmpty) {
-        descriptionControllers.add(TextEditingController()); // keep one visible
+        descriptionControllers.add(TextEditingController());
       }
     });
   }
@@ -187,6 +184,102 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     return count;
   }
 
+  bool _validateAtLeastOneDescriptionFilled() {
+    final legacy = descriptionControllers.any((c) => c.text.trim().isNotEmpty);
+    final modular = _sections.any(
+      (s) => s.type == SectionType.paragraph && s.paragraph.trim().isNotEmpty,
+    );
+    return legacy || modular;
+  }
+
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+  }
+
+  void _validateAndProceed() {
+    FocusScope.of(context).unfocus();
+
+    // Trigger TextFormFields’ validators
+    if (!_formKey.currentState!.validate()) return;
+
+    // Extra guards for Class/Subject
+    if (selectedClassId == null &&
+        (teacherClassController.selectedClass.value == null &&
+            teacherClassController.classList.isEmpty)) {
+      _showSnack('Please select a class.');
+      return;
+    }
+    if (selectedSubjectId == null &&
+        teacherClassController.subjectList.isEmpty) {
+      _showSnack('Please select a subject.');
+      return;
+    }
+
+    // At least 1 description paragraph overall (keep this if you still want the global rule)
+    if (!_validateAtLeastOneDescriptionFilled()) {
+      _showSnack('Please enter at least one description.');
+      return;
+    }
+
+    // ok → collect & go
+    final selected =
+        (teacherClassController.selectedClass.value ??
+            (teacherClassController.classList.isNotEmpty
+                ? teacherClassController.classList.first
+                : null));
+
+    final paragraphs = <String>[
+      // legacy descriptions
+      ...descriptionControllers
+          .map((c) => c.text)
+          .where((t) => t.trim().isNotEmpty),
+      // modular paragraph sections
+      ..._sections
+          .where(
+            (s) =>
+                s.type == SectionType.paragraph &&
+                s.paragraph.trim().isNotEmpty,
+          )
+          .map((s) => s.paragraph),
+    ];
+
+    final images =
+        _sections
+            .where((s) => s.type == SectionType.image && s.image != null)
+            .map((s) => File(s.image!.path))
+            .toList();
+
+    final listPoints = [
+      // legacy list block
+      ..._listTextFields.where((t) => t.trim().isNotEmpty),
+      // modular list sections
+      ..._sections
+          .where((s) => s.type == SectionType.list)
+          .expand((s) => s.listPoints)
+          .where((t) => t.trim().isNotEmpty),
+    ];
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => HomeworkCreatePreview(
+              listPoints: listPoints,
+              subjectId: selectedSubjectId,
+              subjects: selectedSubject ?? '',
+              selectedClassId: selected?.id ?? selectedClassId,
+              description: paragraphs,
+              images: images,
+              permanentImage:
+                  _permanentImage != null ? File(_permanentImage!.path) : null,
+              heading: headingController.text,
+            ),
+      ),
+    );
+  }
+
   // ===== UI =====
   @override
   Widget build(BuildContext context) {
@@ -196,239 +289,198 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
         child: Obx(() {
           final classes = teacherClassController.classList;
           final subjects = teacherClassController.subjectList;
-
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Row(
-                    children: [
-                      CommonContainer.NavigatArrow(
-                        image: AppImages.leftSideArrow,
-                        imageColor: AppColor.lightBlack,
-                        container: AppColor.lowLightgray,
-                        onIconTap: () => Navigator.pop(context),
-                        border: Border.all(
-                          color: AppColor.lightgray,
-                          width: 0.3,
+          return Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 18,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      children: [
+                        CommonContainer.NavigatArrow(
+                          image: AppImages.leftSideArrow,
+                          imageColor: AppColor.lightBlack,
+                          container: AppColor.lowLightgray,
+                          onIconTap: () => Navigator.pop(context),
+                          border: Border.all(
+                            color: AppColor.lightgray,
+                            width: 0.3,
+                          ),
+                        ),
+                        const Spacer(),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const HomeworkHistory(),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                'History',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+                                SizedBox(width: 8),
+                              Image.asset(AppImages.historyImage, height: 24),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                      SizedBox(height: 35),
+                    Center(
+                      child: Text(
+                        'Create Homework',
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 22,
+                          color: AppColor.black,
                         ),
                       ),
-                      const Spacer(),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const HomeworkHistory(),
-                            ),
-                          );
-                        },
-                        child: Row(
+                    ),
+                      SizedBox(height: 20),
+
+                    // Card
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColor.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 20,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Class picker
                             Text(
-                              'History',
+                              'Class',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.gray,
+                                color: AppColor.black,
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Image.asset(AppImages.historyImage, height: 24),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 35),
-                  Center(
-                    child: Text(
-                      'Create Homework',
-                      style: GoogleFont.ibmPlexSans(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 22,
-                        color: AppColor.black,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Card
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColor.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 20,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Class picker
-                          Text(
-                            'Class',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 14,
-                              color: AppColor.black,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            height: 100,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Positioned.fill(
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppColor.white.withOpacity(0.3),
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.white.withOpacity(0.3),
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.topRight,
+                              SizedBox(height: 35),
+                            SizedBox(
+                              height: 100,
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Positioned.fill(
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            AppColor.white.withOpacity(0.3),
+                                            AppColor.lowLightgray,
+                                            AppColor.lowLightgray,
+                                            AppColor.lowLightgray,
+                                            AppColor.lowLightgray,
+                                            AppColor.lowLightgray,
+                                            AppColor.white.withOpacity(0.3),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.topRight,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  top: -20,
-                                  bottom: -20,
-                                  left: 0,
-                                  right: 0,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: classes.length,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 2,
-                                    ),
-                                    itemBuilder: (context, index) {
-                                      final item = classes[index];
-                                      final isSelected = index == selectedIndex;
+                                  Positioned(
+                                    top: -20,
+                                    bottom: -20,
+                                    left: 0,
+                                    right: 0,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: classes.length,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 2,
+                                      ),
+                                      itemBuilder: (context, index) {
+                                        final item = classes[index];
+                                        final isSelected =
+                                            index == selectedIndex;
 
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedIndex = index;
-                                            selectedClassId = item.id;
-                                            teacherClassController
-                                                .selectedClass
-                                                .value = item;
-                                          });
-                                        },
-                                        child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 120,
-                                          ),
-                                          curve: Curves.easeInOut,
-                                          width: 90,
-                                          height: isSelected ? 120 : 80,
-                                          margin: const EdgeInsets.symmetric(
-                                            horizontal: 0,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                isSelected
-                                                    ? AppColor.white
-                                                    : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              24,
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedIndex = index;
+                                              selectedClassId = item.id;
+                                              teacherClassController
+                                                  .selectedClass
+                                                  .value = item;
+                                            });
+                                          },
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                              milliseconds: 120,
                                             ),
-                                            border:
-                                                isSelected
-                                                    ? Border.all(
-                                                      color: AppColor.blueG1,
-                                                      width: 1.5,
-                                                    )
-                                                    : null,
-                                            boxShadow:
-                                                isSelected
-                                                    ? [
-                                                      BoxShadow(
-                                                        color: AppColor.white
-                                                            .withOpacity(0.5),
-                                                        blurRadius: 10,
-                                                        offset: const Offset(
-                                                          0,
-                                                          4,
-                                                        ),
-                                                      ),
-                                                    ]
-                                                    : [],
-                                          ),
-                                          child:
-                                              isSelected
-                                                  ? Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      const SizedBox(height: 8),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          ShaderMask(
-                                                            shaderCallback:
-                                                                (
-                                                                  bounds,
-                                                                ) => const LinearGradient(
-                                                                  colors: [
-                                                                    AppColor
-                                                                        .blueG1,
-                                                                    AppColor
-                                                                        .blue,
-                                                                  ],
-                                                                  begin:
-                                                                      Alignment
-                                                                          .topLeft,
-                                                                  end:
-                                                                      Alignment
-                                                                          .bottomRight,
-                                                                ).createShader(
-                                                                  Rect.fromLTWH(
-                                                                    0,
-                                                                    0,
-                                                                    bounds
-                                                                        .width,
-                                                                    bounds
-                                                                        .height,
-                                                                  ),
-                                                                ),
-                                                            blendMode:
-                                                                BlendMode.srcIn,
-                                                            child: Text(
-                                                              item.name,
-                                                              style: GoogleFont.ibmPlexSans(
-                                                                fontSize: 28,
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
+                                            curve: Curves.easeInOut,
+                                            width: 90,
+                                            height: isSelected ? 120 : 80,
+                                            margin: const EdgeInsets.symmetric(
+                                              horizontal: 0,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  isSelected
+                                                      ? AppColor.white
+                                                      : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(24),
+                                              border:
+                                                  isSelected
+                                                      ? Border.all(
+                                                        color: AppColor.blueG1,
+                                                        width: 1.5,
+                                                      )
+                                                      : null,
+                                              boxShadow:
+                                                  isSelected
+                                                      ? [
+                                                        BoxShadow(
+                                                          color: AppColor.white
+                                                              .withOpacity(0.5),
+                                                          blurRadius: 10,
+                                                          offset: const Offset(
+                                                            0,
+                                                            4,
                                                           ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets.only(
-                                                                  top: 8.0,
-                                                                ),
-                                                            child: ShaderMask(
+                                                        ),
+                                                      ]
+                                                      : [],
+                                            ),
+                                            child:
+                                                isSelected
+                                                    ? Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        const SizedBox(
+                                                          height: 8,
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            ShaderMask(
                                                               shaderCallback:
                                                                   (
                                                                     bounds,
@@ -459,9 +511,9 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                                                   BlendMode
                                                                       .srcIn,
                                                               child: Text(
-                                                                'th',
+                                                                item.name,
                                                                 style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 14,
+                                                                  fontSize: 28,
                                                                   color:
                                                                       Colors
                                                                           .white,
@@ -471,596 +523,607 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                                                 ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Container(
-                                                        height: 55,
-                                                        width: double.infinity,
-                                                        decoration: const BoxDecoration(
-                                                          gradient: LinearGradient(
-                                                            colors: [
-                                                              AppColor.blueG1,
-                                                              AppColor.blue,
-                                                            ],
-                                                            begin:
-                                                                Alignment
-                                                                    .topLeft,
-                                                            end:
-                                                                Alignment
-                                                                    .topRight,
-                                                          ),
-                                                          borderRadius:
-                                                              BorderRadius.vertical(
-                                                                bottom:
-                                                                    Radius.circular(
-                                                                      22,
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets.only(
+                                                                    top: 8.0,
+                                                                  ),
+                                                              child: ShaderMask(
+                                                                shaderCallback:
+                                                                    (
+                                                                      bounds,
+                                                                    ) => const LinearGradient(
+                                                                      colors: [
+                                                                        AppColor
+                                                                            .blueG1,
+                                                                        AppColor
+                                                                            .blue,
+                                                                      ],
+                                                                      begin:
+                                                                          Alignment
+                                                                              .topLeft,
+                                                                      end:
+                                                                          Alignment
+                                                                              .bottomRight,
+                                                                    ).createShader(
+                                                                      Rect.fromLTWH(
+                                                                        0,
+                                                                        0,
+                                                                        bounds
+                                                                            .width,
+                                                                        bounds
+                                                                            .height,
+                                                                      ),
                                                                     ),
+                                                                blendMode:
+                                                                    BlendMode
+                                                                        .srcIn,
+                                                                child: Text(
+                                                                  'th',
+                                                                  style: GoogleFont.ibmPlexSans(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
                                                               ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: Text(
-                                                          item.section,
-                                                          style:
-                                                              GoogleFont.ibmPlexSans(
-                                                                fontSize: 20,
-                                                                color:
-                                                                    AppColor
-                                                                        .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                  : Center(
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
                                                         Container(
-                                                          padding:
-                                                              const EdgeInsets.symmetric(
-                                                                horizontal: 20,
-                                                                vertical: 3,
-                                                              ),
+                                                          height: 55,
+                                                          width:
+                                                              double.infinity,
                                                           decoration: BoxDecoration(
-                                                            color:
-                                                                AppColor.white,
+                                                            gradient: const LinearGradient(
+                                                              colors: [
+                                                                AppColor.blueG1,
+                                                                AppColor.blue,
+                                                              ],
+                                                              begin:
+                                                                  Alignment
+                                                                      .topLeft,
+                                                              end:
+                                                                  Alignment
+                                                                      .topRight,
+                                                            ),
                                                             borderRadius:
-                                                                BorderRadius.circular(
-                                                                  20,
+                                                                const BorderRadius.vertical(
+                                                                  bottom:
+                                                                      Radius.circular(
+                                                                        22,
+                                                                      ),
                                                                 ),
                                                           ),
+                                                          alignment:
+                                                              Alignment.center,
                                                           child: Text(
-                                                            item.name,
+                                                            item.section,
                                                             style:
                                                                 GoogleFont.ibmPlexSans(
-                                                                  fontSize: 14,
+                                                                  fontSize: 20,
                                                                   color:
                                                                       AppColor
-                                                                          .gray,
+                                                                          .white,
                                                                   fontWeight:
                                                                       FontWeight
-                                                                          .w600,
+                                                                          .bold,
                                                                 ),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Text(
-                                                          item.section,
-                                                          style: GoogleFont.ibmPlexSans(
-                                                            fontSize: 20,
-                                                            color:
-                                                                AppColor
-                                                                    .lightgray,
-                                                            fontWeight:
-                                                                FontWeight.bold,
                                                           ),
                                                         ),
                                                       ],
+                                                    )
+                                                    : Center(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Container(
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      20,
+                                                                  vertical: 3,
+                                                                ),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                  color:
+                                                                      AppColor
+                                                                          .white,
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        20,
+                                                                      ),
+                                                                ),
+                                                            child: Text(
+                                                              item.name,
+                                                              style: GoogleFont.ibmPlexSans(
+                                                                fontSize: 14,
+                                                                color:
+                                                                    AppColor
+                                                                        .gray,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            item.section,
+                                                            style: GoogleFont.ibmPlexSans(
+                                                              fontSize: 20,
+                                                              color:
+                                                                  AppColor
+                                                                      .lightgray,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 40),
-
-                          // Subject picker
-                          Text(
-                            'Subject',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 14,
-                              color: AppColor.black,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Wrap(
-                            spacing: 10,
-                            children: List.generate(subjects.length, (index) {
-                              final sub = subjects[index];
-                              final isSelected = subjectIndex == index;
-                              return GestureDetector(
-                                onTap:
-                                    () => setState(() {
-                                      subjectIndex = index;
-                                      selectedSubject = sub.name;
-                                      selectedSubjectId = sub.id;
-                                    }),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isSelected ? 25 : 35,
-                                    vertical: 14,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColor.white,
-                                    borderRadius: BorderRadius.circular(30),
-                                    border: Border.all(
-                                      color:
-                                          isSelected
-                                              ? AppColor.blue
-                                              : AppColor.borderGary,
-                                      width: 1.5,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (isSelected) ...[
-                                        Image.asset(
-                                          AppImages.tick,
-                                          height: 15,
-                                          color: AppColor.blue,
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 40),
+
+                            // Subject picker
+                            Text(
+                              'Subject',
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 14,
+                                color: AppColor.black,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 10,
+                              children: List.generate(subjects.length, (index) {
+                                final sub = subjects[index];
+                                final isSelected = subjectIndex == index;
+                                return GestureDetector(
+                                  onTap:
+                                      () => setState(() {
+                                        subjectIndex = index;
+                                        selectedSubject = sub.name;
+                                        selectedSubjectId = sub.id;
+                                      }),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isSelected ? 25 : 35,
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColor.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? AppColor.blue
+                                                : AppColor.borderGary,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (isSelected) ...[
+                                          Image.asset(
+                                            AppImages.tick,
+                                            height: 15,
+                                            color: AppColor.blue,
+                                          ),
+                                          const SizedBox(width: 10),
+                                        ],
+                                        Text(
+                                          sub.name,
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 12,
+                                            color:
+                                                isSelected
+                                                    ? AppColor.blue
+                                                    : AppColor.gray,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
-                                        const SizedBox(width: 10),
                                       ],
-                                      Text(
-                                        sub.name,
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 12,
-                                          color:
-                                              isSelected
-                                                  ? AppColor.blue
-                                                  : AppColor.gray,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            }),
-                          ),
+                                );
+                              }),
+                            ),
 
-                          const SizedBox(height: 25),
+                            const SizedBox(height: 25),
 
-                          // Permanent (hero) image
-                          GestureDetector(
-                            onTap: _pickPermanentImage,
-                            child: DottedBorder(
-                              borderType: BorderType.RRect,
-                              radius: const Radius.circular(20),
-                              color: AppColor.lightgray,
-                              strokeWidth: 1.5,
-                              dashPattern: const [8, 4],
-                              padding: const EdgeInsets.all(1),
-                              child: Container(
-                                height: 120,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColor.lightWhite,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  children: [
-                                    if (_permanentImage == null)
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image.asset(
-                                              AppImages.uploadImage,
-                                              height: 30,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              'Upload',
-                                              style: GoogleFont.ibmPlexSans(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColor.lightgray,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    else ...[
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.file(
-                                          File(_permanentImage!.path),
-                                          width: 200,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 35.0,
-                                        ),
-                                        child: InkWell(
-                                          onTap:
-                                              () => setState(
-                                                () => _permanentImage = null,
-                                              ),
-                                          child: Column(
+                            // Permanent (hero) image
+                            GestureDetector(
+                              onTap: _pickPermanentImage,
+                              child: DottedBorder(
+                                borderType: BorderType.RRect,
+                                radius: const Radius.circular(20),
+                                color: AppColor.lightgray,
+                                strokeWidth: 1.5,
+                                dashPattern: const [8, 4],
+                                padding: const EdgeInsets.all(1),
+                                child: Container(
+                                  height: 120,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColor.lightWhite,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      if (_permanentImage == null)
+                                        Expanded(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               Image.asset(
-                                                AppImages.close,
-                                                height: 26,
-                                                color: AppColor.gray,
+                                                AppImages.uploadImage,
+                                                height: 30,
                                               ),
+                                              const SizedBox(width: 10),
                                               Text(
-                                                'Clear',
+                                                'Upload',
                                                 style: GoogleFont.ibmPlexSans(
                                                   fontSize: 14,
-                                                  fontWeight: FontWeight.w400,
+                                                  fontWeight: FontWeight.w500,
                                                   color: AppColor.lightgray,
                                                 ),
                                               ),
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 25),
-
-                          // Heading
-                          Text(
-                            'Heading',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 14,
-                              color: AppColor.black,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          CommonContainer.fillingContainer(
-                            onDetailsTap: () {
-                              headingController.clear();
-                              setState(() => showClearIcon = false);
-                            },
-                            imagePath: showClearIcon ? AppImages.close : null,
-                            imageColor: AppColor.gray,
-                            text: '',
-                            controller: headingController,
-                            verticalDivider: false,
-                          ),
-
-                          const SizedBox(height: 25),
-
-                          // Descriptions (legacy block)
-                          Column(
-                            children: List.generate(
-                              descriptionControllers.length,
-                              (index) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Description',
-                                          style: GoogleFont.ibmPlexSans(
-                                            fontSize: 14,
-                                            color: AppColor.black,
+                                        )
+                                      else ...[
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          child: Image.file(
+                                            File(_permanentImage!.path),
+                                            width: 200,
+                                            height: 100,
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
                                         const Spacer(),
-                                        if (descriptionControllers.length > 1)
-                                          GestureDetector(
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 35.0,
+                                          ),
+                                          child: InkWell(
                                             onTap:
-                                                () => removeDescriptionField(
-                                                  index,
+                                                () => setState(
+                                                  () => _permanentImage = null,
                                                 ),
-                                            child: Image.asset(
-                                              AppImages.close,
-                                              height: 22,
+                                            child: Column(
+                                              children: [
+                                                Image.asset(
+                                                  AppImages.close,
+                                                  height: 26,
+                                                  color: AppColor.gray,
+                                                ),
+                                                Text(
+                                                  'Clear',
+                                                  style: GoogleFont.ibmPlexSans(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColor.lightgray,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 25),
+
+                            // Heading (validated)
+                            Text(
+                              'Heading',
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 14,
+                                color: AppColor.black,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            CommonContainer.fillingContainer(
+                              onDetailsTap: () {
+                                headingController.clear();
+                                setState(() => showClearIcon = false);
+                              },
+                              imagePath: showClearIcon ? AppImages.close : null,
+                              imageColor: AppColor.gray,
+                              text: '',
+                              controller: headingController,
+                              verticalDivider: false,
+                              validator: (v) {
+                                if (v == null || v.trim().isEmpty)
+                                  return 'Heading is required';
+                                if (v.trim().length < 3)
+                                  return 'Heading must be at least 3 characters';
+                                return null;
+                              },
+                              onChanged:
+                                  (v) => setState(
+                                    () => showClearIcon = v.isNotEmpty,
+                                  ),
+                            ),
+
+                            const SizedBox(height: 25),
+
+                            // Descriptions (each validated like Heading)
+                            Column(
+                              children: List.generate(
+                                descriptionControllers.length,
+                                (index) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Description',
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontSize: 14,
+                                              color: AppColor.black,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          if (descriptionControllers.length > 1)
+                                            GestureDetector(
+                                              onTap:
+                                                  () => removeDescriptionField(
+                                                    index,
+                                                  ),
+                                              child: Image.asset(
+                                                AppImages.close,
+                                                height: 22,
+                                                color: AppColor.gray,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      CommonContainer.fillingContainer(
+                                        maxLine: 10,
+                                        text: '',
+                                        controller:
+                                            descriptionControllers[index],
+                                        verticalDivider: false,
+                                        validator: (v) {
+                                          if (v == null || v.trim().isEmpty)
+                                            return 'Description is required';
+                                          if (v.trim().length < 3)
+                                            return 'Please enter at least 3 characters';
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+
+                            if (_listSectionOpened) ...[
+                              const SizedBox(height: 20),
+                              Text(
+                                'List',
+                                style: GoogleFont.ibmPlexSans(fontSize: 14),
+                              ),
+                              const SizedBox(height: 12),
+                              ListView.builder(
+                                itemCount: _listTextFields.length,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 14),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColor.lightWhite,
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            'List ${index + 1}',
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontSize: 14,
                                               color: AppColor.gray,
                                             ),
                                           ),
-                                      ],
+                                          const SizedBox(width: 10),
+                                          Container(
+                                            width: 2,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [
+                                                  Colors.grey.shade200,
+                                                  Colors.grey.shade300,
+                                                  Colors.grey.shade200,
+                                                ],
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(1),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: TextField(
+                                              controller:
+                                                  _listControllers[index],
+                                              decoration: InputDecoration(
+                                                hintStyle:
+                                                    GoogleFont.ibmPlexSans(
+                                                      fontSize: 14,
+                                                      color: AppColor.gray,
+                                                    ),
+                                                border: InputBorder.none,
+                                              ),
+                                              onChanged:
+                                                  (value) =>
+                                                      _listTextFields[index] =
+                                                          value,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          GestureDetector(
+                                            onTap: () => _removeListItem(index),
+                                            child: Image.asset(
+                                              AppImages.close,
+                                              height: 26,
+                                              color: AppColor.gray,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    const SizedBox(height: 10),
-                                    CommonContainer.fillingContainer(
-                                      maxLine: 10,
-                                      text: '',
-                                      controller: descriptionControllers[index],
-                                      verticalDivider: false,
+                                  );
+                                },
+                              ),
+                              GestureDetector(
+                                onTap: _addMoreListPoint,
+                                child: DottedBorder(
+                                  color: AppColor.blue,
+                                  strokeWidth: 1.5,
+                                  dashPattern: const [8, 4],
+                                  borderType: BorderType.RRect,
+                                  radius: const Radius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
                                     ),
-                                    const SizedBox(height: 16),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-
-                          if (_listSectionOpened) ...[
-                            const SizedBox(height: 20),
-                            Text(
-                              'List',
-                              style: GoogleFont.ibmPlexSans(fontSize: 14),
-                            ),
-                            const SizedBox(height: 12),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Add List ${_listTextFields.length + 1} Point',
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: AppColor.blue,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                             ListView.builder(
-                              itemCount: _listTextFields.length,
+                              itemCount: _sections.length,
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 14),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColor.lightWhite,
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          'List ${index + 1}',
-                                          style: GoogleFont.ibmPlexSans(
-                                            fontSize: 14,
-                                            color: AppColor.gray,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Container(
-                                          width: 2,
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: [
-                                                Colors.grey.shade200,
-                                                Colors.grey.shade300,
-                                                Colors.grey.shade200,
-                                              ],
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              1,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: TextField(
-                                            controller: _listControllers[index],
-                                            decoration: InputDecoration(
-                                              hintStyle: GoogleFont.ibmPlexSans(
-                                                fontSize: 14,
-                                                color: AppColor.gray,
-                                              ),
-                                              border: InputBorder.none,
-                                            ),
-                                            onChanged:
-                                                (value) =>
-                                                    _listTextFields[index] =
-                                                        value,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        GestureDetector(
-                                          onTap: () => _removeListItem(index),
-                                          child: Image.asset(
-                                            AppImages.close,
-                                            height: 26,
-                                            color: AppColor.gray,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
+                                final item = _sections[index];
+                                switch (item.type) {
+                                  case SectionType.image:
+                                    return _buildImageContainer(item, index);
+                                  case SectionType.paragraph:
+                                    return _buildParagraphContainer(
+                                      item,
+                                      index,
+                                    );
+                                  case SectionType.list:
+                                    return _buildListContainer(item, index);
+                                }
                               },
                             ),
-                            GestureDetector(
-                              onTap: _addMoreListPoint,
-                              child: DottedBorder(
-                                color: AppColor.blue,
-                                strokeWidth: 1.5,
-                                dashPattern: const [8, 4],
-                                borderType: BorderType.RRect,
-                                radius: const Radius.circular(20),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Add List ${_listTextFields.length + 1} Point',
-                                    style: GoogleFont.ibmPlexSans(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: AppColor.blue,
-                                    ),
+                            const SizedBox(height: 25),
+
+                            // Add buttons
+                            Row(
+                              children: [
+                                Text(
+                                  'Add',
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    color: AppColor.black,
                                   ),
                                 ),
-                              ),
+                                const SizedBox(width: 25),
+                                CommonContainer.addMore(
+                                  onTap:
+                                      () => setState(
+                                        () => _sections.add(
+                                          SectionItem.image(null),
+                                        ),
+                                      ),
+                                  mainText: 'Image',
+                                  imagePath: AppImages.picherImageDark,
+                                ),
+                                const SizedBox(width: 10),
+                                CommonContainer.addMore(
+                                  onTap:
+                                      () => setState(
+                                        () => _sections.add(
+                                          SectionItem.paragraph(''),
+                                        ),
+                                      ),
+                                  mainText: 'Paragraph',
+                                  imagePath: AppImages.paragraph,
+                                ),
+                                const SizedBox(width: 10),
+                                CommonContainer.addMore(
+                                  onTap:
+                                      () => setState(
+                                        () => _sections.add(
+                                          SectionItem.list(['']),
+                                        ),
+                                      ),
+                                  mainText: 'List',
+                                  imagePath: AppImages.list,
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 40),
+
+                            // Preview (validates)
+                            AppButton.button(
+                              onTap: _validateAndProceed,
+                              width: 145,
+                              height: 60,
+                              text: 'Preview',
+                              image: AppImages.buttonArrow,
                             ),
                           ],
-                          ListView.builder(
-                            itemCount: _sections.length,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              final item = _sections[index];
-                              switch (item.type) {
-                                case SectionType.image:
-                                  return _buildImageContainer(item, index);
-                                case SectionType.paragraph:
-                                  return _buildParagraphContainer(item, index);
-                                case SectionType.list:
-                                  return _buildListContainer(item, index);
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 25),
-
-                          // Add buttons
-                          Row(
-                            children: [
-                              Text(
-                                'Add',
-                                style: GoogleFont.ibmPlexSans(
-                                  fontSize: 14,
-                                  color: AppColor.black,
-                                ),
-                              ),
-                              const SizedBox(width: 25),
-                              CommonContainer.addMore(
-                                onTap:
-                                    () => setState(
-                                      () => _sections.add(
-                                        SectionItem.image(null),
-                                      ),
-                                    ),
-                                mainText: 'Image',
-                                imagePath: AppImages.picherImageDark,
-                              ),
-                              const SizedBox(width: 10),
-                              CommonContainer.addMore(
-                                onTap:
-                                    () => setState(
-                                      () => _sections.add(
-                                        SectionItem.paragraph(''),
-                                      ),
-                                    ),
-                                mainText: 'Paragraph',
-                                imagePath: AppImages.paragraph,
-                              ),
-                              const SizedBox(width: 10),
-                              CommonContainer.addMore(
-                                onTap:
-                                    () => setState(
-                                      () =>
-                                          _sections.add(SectionItem.list([''])),
-                                    ),
-                                mainText: 'List',
-                                imagePath: AppImages.list,
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 40),
-
-                          // Preview
-                          AppButton.button(
-                            onTap: () {
-                              HapticFeedback.heavyImpact();
-
-                              final selected =
-                                  (teacherClassController.selectedClass.value ??
-                                      (teacherClassController
-                                              .classList
-                                              .isNotEmpty
-                                          ? teacherClassController
-                                              .classList
-                                              .first
-                                          : null));
-
-                              final paragraphs = <String>[
-                                // legacy descriptions
-                                ...descriptionControllers
-                                    .map((c) => c.text)
-                                    .where((t) => t.trim().isNotEmpty),
-                                // modular paragraph sections
-                                ..._sections
-                                    .where(
-                                      (s) =>
-                                          s.type == SectionType.paragraph &&
-                                          s.paragraph.trim().isNotEmpty,
-                                    )
-                                    .map((s) => s.paragraph),
-                              ];
-
-                              final images =
-                                  _sections
-                                      .where(
-                                        (s) =>
-                                            s.type == SectionType.image &&
-                                            s.image != null,
-                                      )
-                                      .map((s) => File(s.image!.path))
-                                      .toList();
-
-                              final listPoints = [
-                                // legacy list block
-                                ..._listTextFields.where(
-                                  (t) => t.trim().isNotEmpty,
-                                ),
-                                // modular list sections
-                                ..._sections
-                                    .where((s) => s.type == SectionType.list)
-                                    .expand((s) => s.listPoints)
-                                    .where((t) => t.trim().isNotEmpty),
-                              ];
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => HomeworkCreatePreview(
-                                        listPoints: listPoints,
-                                        subjectId: selectedSubjectId,
-                                        subjects: selectedSubject ?? '',
-                                        selectedClassId:
-                                            selected?.id ?? selectedClassId,
-                                        description: paragraphs,
-                                        images: images,
-                                        permanentImage:
-                                            _permanentImage != null
-                                                ? File(_permanentImage!.path)
-                                                : null,
-                                        heading: headingController.text,
-                                      ),
-                                ),
-                              );
-                            },
-                            width: 145,
-                            height: 60,
-                            text: 'Preview',
-                            image: AppImages.buttonArrow,
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -1105,6 +1168,14 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
             controller: null,
             verticalDivider: false,
             onChanged: (val) => setState(() => item.paragraph = val),
+            // ✅ Same validator rules as Heading
+            validator: (v) {
+              if (v == null || v.trim().isEmpty)
+                return 'Description is required';
+              if (v.trim().length < 3)
+                return 'Please enter at least 3 characters';
+              return null;
+            },
           ),
         ],
       ),

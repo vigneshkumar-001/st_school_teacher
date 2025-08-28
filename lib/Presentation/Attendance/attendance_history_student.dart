@@ -296,7 +296,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                             ),
                           ),
                         ),
-
+                        SizedBox(height: 35),
                         Container(
                           decoration: BoxDecoration(
                             color: AppColor.lowLightgray,
@@ -376,7 +376,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 40),
                         Row(
                           children: [
                             Text(
@@ -405,11 +405,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                           progress:
                               (attendanceData?.presentPercentage ?? 0) / 100,
                         ),
-
                         SizedBox(height: 15),
-
-                        SizedBox(height: 12),
-
                         Text(
                           "${attendanceData?.fullDayPresentCount ?? '0'} Out of ${attendanceData?.totalWorkingDays ?? '0'}",
                           style: GoogleFont.ibmPlexSans(

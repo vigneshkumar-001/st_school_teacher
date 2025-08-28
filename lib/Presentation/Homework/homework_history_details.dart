@@ -154,191 +154,194 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                       color: AppColor.white,
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 30,
-                        horizontal: 20,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // ---- First image (full width) ----
-                          // if (firstImageTask != null)
-                          //   _fullWidthNetImage((firstImageTask!['content'] ?? '').toString())
-                          // else
-                          //   ClipRRect(
-                          //     borderRadius: BorderRadius.circular(16),
-                          //     child: Image.asset(
-                          //       AppImages.homeworkPreviewImage2,
-                          //       width: double.infinity,
-                          //       fit: BoxFit.contain,
-                          //     ),
-                          //   ),
-                          const SizedBox(height: 20),
-
-                          // ---- Title & main description ----
-                          Text(
-                            (details.title ?? ''),
-                            style: GoogleFont.inter(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 24,
-                              color: AppColor.lightBlack,
-                            ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            right: 30,
+                            left: 30,
+                            top: 30,
                           ),
-                          if ((details.description ?? '')
-                              .toString()
-                              .trim()
-                              .isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              (details.description ?? '').toString(),
-                              style: GoogleFont.inter(
-                                fontSize: 12,
-                                color: AppColor.gray,
-                              ),
-                            ),
-                          ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ---- First image (full width) ----
+                              // if (firstImageTask != null)
+                              //   _fullWidthNetImage((firstImageTask!['content'] ?? '').toString())
+                              // else
+                              //   ClipRRect(
+                              //     borderRadius: BorderRadius.circular(16),
+                              //     child: Image.asset(
+                              //       AppImages.homeworkPreviewImage2,
+                              //       width: double.infinity,
+                              //       fit: BoxFit.contain,
+                              //     ),
+                              //   ),
 
-                          // ---- List points (if any) ----
-                          if (remainingLists.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            Text(
-                              "List Points:",
-                              style: GoogleFont.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.black,
+                              // ---- Title & main description ----
+                              Text(
+                                (details.title ?? ''),
+                                style: GoogleFont.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 24,
+                                  color: AppColor.lightBlack,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(remainingLists.length, (
-                                index,
-                              ) {
-                                final task = remainingLists[index];
+                              if ((details.description ?? '')
+                                  .toString()
+                                  .trim()
+                                  .isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  (details.description ?? '').toString(),
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    color: AppColor.gray,
+                                  ),
+                                ),
+                              ],
+
+                              // ---- List points (if any) ----
+                              if (remainingLists.isNotEmpty) ...[
+                                const SizedBox(height: 16),
+                                Text(
+                                  "List Points:",
+                                  style: GoogleFont.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: List.generate(remainingLists.length, (
+                                    index,
+                                  ) {
+                                    final task = remainingLists[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 4),
+                                      child: Text(
+                                        "${index + 1}. ${(task['content'] ?? '').toString()}",
+                                        style: GoogleFont.inter(
+                                          fontSize: 13,
+                                          color: AppColor.gray,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ],
+
+                              const SizedBox(height: 16),
+
+                              // ---- Remaining images (each full width) ----
+                              ...remainingImages.map<Widget>((task) {
+                                final url = (task['content'] ?? '').toString();
                                 return Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _fullWidthNetImage(url),
+                                );
+                              }),
+
+                              const SizedBox(height: 12),
+
+                              // ---- Paragraphs ----
+                              ...remainingParagraphs.map<Widget>((task) {
+                                final txt = (task['content'] ?? '').toString();
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
                                   child: Text(
-                                    "${index + 1}. ${(task['content'] ?? '').toString()}",
+                                    txt,
                                     style: GoogleFont.inter(
-                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14,
                                       color: AppColor.gray,
                                     ),
                                   ),
                                 );
                               }),
+                            ],
+                          ),
+                        ),
+
+                        // ---- Subject / Time chips ----
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 30,
                             ),
-                          ],
-
-                          const SizedBox(height: 16),
-
-                          // ---- Remaining images (each full width) ----
-                          ...remainingImages.map<Widget>((task) {
-                            final url = (task['content'] ?? '').toString();
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: _fullWidthNetImage(url),
-                            );
-                          }),
-
-                          const SizedBox(height: 12),
-
-                          // ---- Paragraphs ----
-                          ...remainingParagraphs.map<Widget>((task) {
-                            final txt = (task['content'] ?? '').toString();
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                txt,
-                                style: GoogleFont.inter(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                  color: AppColor.gray,
+                            child: Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColor.black.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          child: Image.asset(AppImages.avatar1),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          (details.subject?.name ?? '')
+                                              .toString(),
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.lightBlack,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 20),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }),
-
-                          const SizedBox(height: 16),
-
-                          // ---- Subject / Time chips ----
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColor.black.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            child: Image.asset(
-                                              AppImages.avatar1,
-                                            ),
+                                const SizedBox(width: 20),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColor.black.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          CupertinoIcons.clock_fill,
+                                          size: 35,
+                                          color: AppColor.lightBlack
+                                              .withOpacity(0.3),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          (details.time ?? '').toString(),
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.lightBlack,
                                           ),
-                                          const SizedBox(width: 10),
-                                          Text(
-                                            (details.subject?.name ?? '')
-                                                .toString(),
-                                            style: GoogleFont.inter(
-                                              fontSize: 12,
-                                              color: AppColor.lightBlack,
-                                            ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          (details.date ?? '').toString(),
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.gray,
                                           ),
-                                          const SizedBox(width: 20),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(width: 20),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColor.black.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            CupertinoIcons.clock_fill,
-                                            size: 35,
-                                            color: AppColor.lightBlack
-                                                .withOpacity(0.3),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Text(
-                                            (details.time ?? '').toString(),
-                                            style: GoogleFont.inter(
-                                              fontSize: 12,
-                                              color: AppColor.lightBlack,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Text(
-                                            (details.date ?? '').toString(),
-                                            style: GoogleFont.inter(
-                                              fontSize: 12,
-                                              color: AppColor.gray,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
