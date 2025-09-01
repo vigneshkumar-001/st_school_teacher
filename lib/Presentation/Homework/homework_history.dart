@@ -189,7 +189,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                           Center(
                                             child: Text(
                                               dateLabel,
-                                              style: TextStyle(
+                                              style: GoogleFont.ibmPlexSans(
                                                 fontSize: 12,
                                                 color: AppColor.gray,
                                               ),

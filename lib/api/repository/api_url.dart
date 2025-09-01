@@ -1,5 +1,6 @@
 class ApiUrl {
-  static String baseUrl = 'https://school-back-end-594f59bea6cb.herokuapp.com';
+  static String baseUrl1 = 'https://school-back-end-594f59bea6cb.herokuapp.com';
+  static String baseUrl = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
 
   static String login = '$baseUrl/teacher-auth/login';
   static String verifyOtp = '$baseUrl/teacher-auth/verify-otp';
@@ -8,11 +9,21 @@ class ApiUrl {
   static String getHomeWork = '$baseUrl/teacher-homework/list';
   static String createHomework = '$baseUrl/teacher-homework/create';
   static String profile = '$baseUrl/teacher-home/profile';
+  static String teacherQuizCreate = '$baseUrl/teacher-quiz/create';
+  static String teacherQuizList = '$baseUrl/teacher-quiz/list';
+  // static String teacherQuizHistory = '$baseUrl/teacher-quiz/attend/';
+  static String teacherQuizAttend({required int classId}) =>
+      '$baseUrl/teacher-quiz/attend/$classId';
+
   static String attendance =
       '$baseUrl/teacher-student-attendance/mark-attendance';
 
   static String studentAttendance({required int classId}) {
     return '$baseUrl/teacher-student-attendance/today-status/?class_id=$classId';
+  }
+
+  static String quizDetailsPreview({required int classId}) {
+    return '$baseUrl/teacher-quiz/details/$classId';
   }
 
   static String attendanceByDate({

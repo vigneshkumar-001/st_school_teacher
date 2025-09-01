@@ -467,7 +467,7 @@ class CommonContainer {
               );
             } else {
               controller?.text =
-              "${pickedDate.day.toString().padLeft(2, '0')}-"
+                  "${pickedDate.day.toString().padLeft(2, '0')}-"
                   "${pickedDate.month.toString().padLeft(2, '0')}-"
                   "${pickedDate.year}";
               // optionally move focus
@@ -478,14 +478,14 @@ class CommonContainer {
         }
 
         final effectiveInputFormatters =
-        isMobile || isAadhaar || isPincode
-            ? <TextInputFormatter>[
-          FilteringTextInputFormatter.digitsOnly,
-          LengthLimitingTextInputFormatter(
-            isMobile ? 10 : (isAadhaar ? 12 : 6),
-          ),
-        ]
-            : (inputFormatters ?? const []);
+            isMobile || isAadhaar || isPincode
+                ? <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(
+                    isMobile ? 10 : (isAadhaar ? 12 : 6),
+                  ),
+                ]
+                : (inputFormatters ?? const []);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +500,10 @@ class CommonContainer {
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 15,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -513,9 +516,10 @@ class CommonContainer {
                             focusNode: focusNode,
                             controller: controller,
                             maxLines: maxLine,
-                            maxLength: isMobile
-                                ? 10
-                                : (isAadhaar ? 12 : (isPincode ? 6 : null)),
+                            maxLength:
+                                isMobile
+                                    ? 10
+                                    : (isAadhaar ? 12 : (isPincode ? 6 : null)),
                             keyboardType: keyboardType,
                             inputFormatters: effectiveInputFormatters,
                             style: GoogleFont.ibmPlexSans(
@@ -525,7 +529,9 @@ class CommonContainer {
                             decoration: const InputDecoration(
                               hintText: '',
                               counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
                               border: InputBorder.none,
                               isDense: true,
                               // we show our own error below; suppress TF default
@@ -594,7 +600,6 @@ class CommonContainer {
       },
     );
   }
-
 
   static textWithSmall({
     required String text,
@@ -783,7 +788,7 @@ class CommonContainer {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 25,
+                              horizontal: 18,
                               vertical: 10,
                             ),
                             child: Text(
@@ -811,9 +816,10 @@ class CommonContainer {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(14.0),
-                        child: Icon(
+                        child: Image.asset(
+                          AppImages.rightSideArrow,
                           color: AppColor.white,
-                          CupertinoIcons.right_chevron,
+                          height: 14,
                         ),
                       ),
                     ),
@@ -1062,6 +1068,7 @@ class CommonContainer {
     );
   }
 
+/*  // inside CommonContainer
   static Widget quizContainer({
     required String leftTextNumber,
     required String leftValue,
@@ -1070,21 +1077,28 @@ class CommonContainer {
     required bool leftSelected,
     required bool rightSelected,
     required bool isQuizCompleted,
+    Color? leftBorderColor,
+    Color? rightBorderColor,
     VoidCallback? leftOnTap,
     VoidCallback? rightOnTap,
   }) {
+    // If right side has no option, render a transparent placeholder
+    final bool rightIsPlaceholder =
+        rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
+
     return Row(
       children: [
+        // LEFT
         Expanded(
           child: GestureDetector(
             onTap: leftOnTap,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               decoration: BoxDecoration(
                 gradient:
                     leftSelected
-                        ? LinearGradient(
-                          colors: [Colors.white, AppColor.white],
+                        ? const LinearGradient(
+                          colors: [Colors.white, Colors.white],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         )
@@ -1109,60 +1123,8 @@ class CommonContainer {
                       text: leftValue,
                       fontWeight:
                           leftSelected ? FontWeight.w800 : FontWeight.w500,
-
                       color:
                           leftSelected
-                              ? (isQuizCompleted
-                                  ? AppColor.green
-                                  : AppColor.black)
-                              : AppColor.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: 20),
-
-        Expanded(
-          child: GestureDetector(
-            onTap: rightOnTap,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              decoration: BoxDecoration(
-                gradient:
-                    rightSelected
-                        ? LinearGradient(
-                          colors: [Colors.white, AppColor.white],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        )
-                        : null,
-                color: rightSelected ? null : AppColor.lowLightgray,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color:
-                      rightSelected
-                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                          : AppColor.lowLightgray,
-                  width: rightSelected ? 3 : 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField.textWithSmall(text: rightTextNumber),
-                  ),
-                  Expanded(
-                    child: CustomTextField.textWithSmall(
-                      text: rightValue,
-                      fontWeight:
-                          rightSelected ? FontWeight.w800 : FontWeight.w500,
-
-                      color:
-                          rightSelected
                               ? (isQuizCompleted
                                   ? AppColor.green
                                   : AppColor.green)
@@ -1174,6 +1136,80 @@ class CommonContainer {
             ),
           ),
         ),
+
+        const SizedBox(width: 20),
+
+        // RIGHT (real card or transparent placeholder)
+        Expanded(
+          child:
+              rightIsPlaceholder
+                  ? Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.transparent, width: 1),
+                    ),
+                    child: Row(
+                      children: const [
+                        Expanded(child: SizedBox()),
+                        Expanded(child: SizedBox()),
+                      ],
+                    ),
+                  )
+                  : GestureDetector(
+                    onTap: rightOnTap,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient:
+                            rightSelected
+                                ? const LinearGradient(
+                                  colors: [Colors.white, Colors.white],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                )
+                                : null,
+                        color: rightSelected ? null : AppColor.lowLightgray,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color:
+                              rightSelected
+                                  ? (isQuizCompleted
+                                      ? AppColor.green
+                                      : AppColor.green)
+                                  : AppColor.lowLightgray,
+                          width: rightSelected ? 3 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField.textWithSmall(
+                              text: rightTextNumber,
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomTextField.textWithSmall(
+                              text: rightValue,
+                              fontWeight:
+                                  rightSelected
+                                      ? FontWeight.w800
+                                      : FontWeight.w500,
+                              color: AppColor.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+        ),
       ],
     );
   }
@@ -1182,6 +1218,8 @@ class CommonContainer {
     required String leftTextNumber,
     required String leftValue,
     required bool isSelected,
+
+    Color? borderColor,
     VoidCallback? onTap,
     required bool isQuizCompleted,
   }) {
@@ -1195,6 +1233,7 @@ class CommonContainer {
               decoration: BoxDecoration(
                 color: isSelected ? AppColor.white : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
+
                 border: Border.all(
                   color:
                       isSelected
@@ -1220,12 +1259,174 @@ class CommonContainer {
                       child: CustomTextField.textWithSmall(
                         text: leftValue,
 
-                        color:
-                            isSelected
-                                ? (isQuizCompleted
-                                    ? AppColor.green
-                                    : AppColor.green)
-                                : AppColor.black,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }*/
+
+  // inside CommonContainer
+
+  static Widget quizContainer({
+    required String leftTextNumber,
+    required String leftValue,
+    required String rightTextNumber,
+    required String rightValue,
+    required bool leftSelected,      // kept for API compatibility (ignored)
+    required bool rightSelected,     // kept for API compatibility (ignored)
+    required bool isQuizCompleted,   // kept for API compatibility (ignored)
+    Color? leftBorderColor,
+    Color? rightBorderColor,
+    VoidCallback? leftOnTap,
+    VoidCallback? rightOnTap,
+  }) {
+    // If right side has no option, render a transparent placeholder
+    final bool rightIsPlaceholder =
+        rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
+
+    final Color lBorder = leftBorderColor ?? AppColor.lowLightgray;
+    final Color rBorder = rightIsPlaceholder
+        ? Colors.transparent
+        : (rightBorderColor ?? AppColor.lowLightgray);
+
+    return Row(
+      children: [
+        // LEFT
+        Expanded(
+          child: GestureDetector(
+            onTap: leftOnTap, // can be null to disable
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.transparent, // ✅ no fill
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: lBorder,          // ✅ border color from parent
+                  width: 2,                // thicker to show clearly
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(text: leftTextNumber),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: leftValue,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 20),
+
+        // RIGHT (real card or transparent placeholder)
+        Expanded(
+          child: rightIsPlaceholder
+              ? Container(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.transparent, width: 2),
+            ),
+            child: const Row(
+              children: [
+                Expanded(child: SizedBox()),
+                Expanded(child: SizedBox()),
+              ],
+            ),
+          )
+              : GestureDetector(
+            onTap: rightOnTap, // can be null to disable
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.transparent, // ✅ no fill
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: rBorder,          // ✅ border color from parent
+                  width: 2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightTextNumber,
+                    ),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightValue,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget quizContainer1({
+    required String leftTextNumber,
+    required String leftValue,
+    required bool isSelected,        // kept for API compatibility (ignored)
+    Color? borderColor,
+    VoidCallback? onTap,
+    required bool isQuizCompleted,   // kept for API compatibility (ignored)
+  }) {
+    final Color bColor = borderColor ?? AppColor.lowLightgray;
+
+    return GestureDetector(
+      onTap: onTap, // can be null to disable
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.transparent, // ✅ no fill
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: bColor,           // ✅ border color from parent
+                  width: 2,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: CustomTextField.textWithSmall(
+                        text: leftTextNumber,
+                        color: AppColor.borderGary,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 6,
+                      child: CustomTextField.textWithSmall(
+                        text: leftValue,
+                        color: AppColor.black,
                       ),
                     ),
                   ],
@@ -1237,6 +1438,7 @@ class CommonContainer {
       ),
     );
   }
+
 
   static Widget carouselSlider({
     required String mainText1,
@@ -1399,7 +1601,7 @@ class CommonContainer {
         borderRadius: BorderRadius.circular(16),
       ),
       padding:
-      containerPadding ??
+          containerPadding ??
           EdgeInsets.symmetric(horizontal: 30, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1434,64 +1636,64 @@ class CommonContainer {
           SizedBox(height: 15),
           Row(
             children:
-            sections.asMap().entries.map((entry) {
-              final index = entry.key;
-              final section = entry.value;
-              final padding =
-              paddings != null && paddings.length > index
-                  ? paddings[index]
-                  : EdgeInsets.only(right: 10);
+                sections.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final section = entry.value;
+                  final padding =
+                      paddings != null && paddings.length > index
+                          ? paddings[index]
+                          : EdgeInsets.only(right: 10);
 
-              bool isExpanded = section == expandedSection;
-              List<String> subjects = sectionSubjects?[section] ?? [];
+                  bool isExpanded = section == expandedSection;
+                  List<String> subjects = sectionSubjects?[section] ?? [];
 
-              return Padding(
-                padding: padding,
-                child: InkWell(
-                  onTap: () {
-                    if (onSectionTap != null) {
-                      onSectionTap(
-                        isExpanded ? '' : section,
-                      ); // collapse if tapped again
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color:
-                      sectionBgColor ?? AppColor.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColor.white),
-                    ),
-                    padding:
-                    sectionTextPadding ??
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          section,
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.black,
-                          ),
+                  return Padding(
+                    padding: padding,
+                    child: InkWell(
+                      onTap: () {
+                        if (onSectionTap != null) {
+                          onSectionTap(
+                            isExpanded ? '' : section,
+                          ); // collapse if tapped again
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              sectionBgColor ?? AppColor.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColor.white),
                         ),
-                        if (isExpanded && subjects.isNotEmpty) ...[
-                          SizedBox(width: 8),
-                          Text(
-                            '- ${subjects.join(", ")}',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.black,
+                        padding:
+                            sectionTextPadding ??
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Row(
+                          children: [
+                            Text(
+                              section,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.black,
+                              ),
                             ),
-                          ),
-                        ],
-                      ],
+                            if (isExpanded && subjects.isNotEmpty) ...[
+                              SizedBox(width: 8),
+                              Text(
+                                '- ${subjects.join(", ")}',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
           ),
         ],
       ),
