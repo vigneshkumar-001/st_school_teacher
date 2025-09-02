@@ -38,11 +38,12 @@ class _MyProfileState extends State<MyProfile> {
           final profile = teacherDataResponse.data.profile;
           final classes = teacherDataResponse.data.classes;
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
+                    padding:EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 20,
                     ),
@@ -69,33 +70,6 @@ class _MyProfileState extends State<MyProfile> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        /*    ...classes.map((classInfo) {
-                          // Convert className like "1" or "10" to separate number and suffix
-
-                          return Column(
-                            children: [
-                              CommonContainer.myProfileContainer(
-                                standardText1: classInfo.className,
-                                standardText2: '',
-                                standardText3: ' Standard',
-                                sections: classInfo.sections,
-                                sectionTextPadding: EdgeInsets.symmetric(
-                                  horizontal: 36,
-                                  vertical: 15,
-                                ),
-                                paddings: List.generate(
-                                  classInfo.sections.length,
-                                  (index) => EdgeInsets.symmetric(horizontal: 6),
-                                ),
-                                containerPadding: EdgeInsets.symmetric(
-                                  horizontal: 30,
-                                  vertical: 20,
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                            ],
-                          );
-                        }).toList(),*/
                         ...classes.map((classInfo) {
                           // In your state, keep a map like Map<String, String?> expandedSectionsPerClass;
 
@@ -110,19 +84,19 @@ class _MyProfileState extends State<MyProfile> {
                                 sectionSubjects: {
                                   for (var s in classInfo.sections)
                                     s:
-                                    classInfo.subjects
-                                        .map((e) => e.name)
-                                        .toList(),
+                                        classInfo.subjects
+                                            .map((e) => e.name)
+                                            .toList(),
                                 },
                                 expandedSection:
-                                expandedSections[classInfo.className],
+                                    expandedSections[classInfo.className],
 
                                 onSectionTap: (section) {
                                   setState(() {
                                     if (expandedSections['${classInfo.className}'] ==
                                         section) {
                                       expandedSections['${classInfo.className}'] =
-                                      null; // collapse if same tapped
+                                          null; // collapse if same tapped
                                     } else {
                                       expandedSections['${classInfo.className}'] =
                                           section;
@@ -131,7 +105,7 @@ class _MyProfileState extends State<MyProfile> {
                                 },
                                 paddings: List.generate(
                                   classInfo.sections.length,
-                                      (index) =>
+                                  (index) =>
                                       EdgeInsets.symmetric(horizontal: 6),
                                 ),
                                 containerPadding: EdgeInsets.symmetric(
@@ -194,7 +168,6 @@ class _MyProfileState extends State<MyProfile> {
                                 Expanded(child: Text('')),
                               ],
                             ),
-
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -252,7 +225,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                           ),
                                           title: Text(
-                                            'Log Out',
+                                            'Log out',
                                             style: GoogleFont.ibmPlexSans(
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -278,20 +251,20 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                Navigator.pushReplacement(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (context) =>
-                                                  ChangeMobileNumber(
-                                                              page: 'splash',
-                                                            ),
+                                                // close the dialog
+                                                Get.back();
 
+                                                // TODO: clear session/cache here
+
+                                                // remove all previous routes and go to splash/login
+                                                Get.offAll(
+                                                  () => ChangeMobileNumber(
+                                                    page: 'splash',
                                                   ),
                                                 );
                                               },
                                               child: Text(
-                                                'Log Out',
+                                                'Log out',
                                                 style: GoogleFont.ibmPlexSans(
                                                   color: AppColor.red,
                                                   fontWeight: FontWeight.w500,
@@ -308,10 +281,10 @@ class _MyProfileState extends State<MyProfile> {
                                       Image.asset(AppImages.logOut, height: 20),
                                       SizedBox(width: 15),
                                       Text(
-                                        'LogOut',
+                                        'Logout',
                                         style: GoogleFont.ibmPlexSans(
                                           fontSize: 14,
-                                          fontWeight: FontWeight.w800,
+                                          fontWeight: FontWeight.w600,
                                           color: AppColor.red,
                                         ),
                                       ),

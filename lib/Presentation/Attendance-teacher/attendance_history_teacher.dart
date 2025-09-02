@@ -305,187 +305,127 @@ class _AttendanceHistoryTeacherState extends State<AttendanceHistoryTeacher> {
                               ),
                             ),
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: AppColor.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 30,
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColor.lowLightgray,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 25,
-                                        vertical: 12,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.circle,
-                                                  size: 15,
-                                                  color: AppColor.yellow,
-                                                ),
-                                                SizedBox(width: 5),
-                                                Text(
-                                                  'Event',
-                                                  style: GoogleFont.ibmPlexSans(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: AppColor.gray,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.circle,
-                                                  size: 15,
-                                                  color: AppColor.green,
-                                                ),
-                                                SizedBox(width: 5),
-                                                Text(
-                                                  'Holidays',
-                                                  style: GoogleFont.ibmPlexSans(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: AppColor.gray,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.circle,
-                                                  size: 15,
-                                                  color: AppColor.red,
-                                                ),
-                                                SizedBox(width: 5),
-                                                Text(
-                                                  'Absent',
-                                                  style: GoogleFont.ibmPlexSans(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: AppColor.gray,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                          SizedBox(height: 35),
+                          Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: AppColor.lowLightgray,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 25,
+                                    vertical: 12,
                                   ),
-                                  SizedBox(height: 20),
-                                  Row(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        '${data.monthName} Overall Attendance ',
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColor.black,
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.circle,
+                                              size: 15,
+                                              color: AppColor.yellow,
+                                            ),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              'Event',
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColor.gray,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-
                                       Spacer(),
-                                      Text(
-                                        'Average',
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColor.orange,
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.circle,
+                                              size: 15,
+                                              color: AppColor.green,
+                                            ),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              'Holidays',
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColor.gray,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.circle,
+                                              size: 15,
+                                              color: AppColor.red,
+                                            ),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              'Absent',
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColor.gray,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-
-                                  SizedBox(height: 20),
-                                  GradientProgressBar(
-                                    progress:
-                                        (data.presentPercentage ?? 0) / 100,
-                                  ),
-
-                                  SizedBox(height: 15),
-
-                                  SizedBox(height: 12),
-
+                                ),
+                              ),
+                              SizedBox(height: 38),
+                              Row(
+                                children: [
                                   Text(
-                                    "${data.fullDayPresentCount} Out of ${data.totalWorkingDays}",
+                                    '${data.monthName} Overall Attendance ',
                                     style: GoogleFont.ibmPlexSans(
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColor.gray,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColor.black,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 27),
-                          Center(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => AttendanceHistory(),
-                                //   ),
-                                // );
-                              },
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                  color: AppColor.lightgray,
-                                  width: 1,
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 60,
-                                  vertical: 16,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    AppImages.leftSideArrow,
-                                    height: 14,
-                                  ),
-                                  SizedBox(width: 12),
+
+                                  Spacer(),
                                   Text(
-                                    'Back to Common History',
+                                    'Average',
                                     style: GoogleFont.ibmPlexSans(
-                                      fontSize: 13,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: AppColor.gray,
+                                      color: AppColor.orange,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
+                              SizedBox(height: 20),
+                              GradientProgressBar(
+                                progress: (data.presentPercentage ?? 0) / 100,
+                              ),
+
+                              SizedBox(height: 15),
+                              Text(
+                                "${data.fullDayPresentCount} Out of ${data.totalWorkingDays}",
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

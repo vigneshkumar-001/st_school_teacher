@@ -20,8 +20,8 @@ class _ResultListState extends State<ResultList> {
   static const double _outerStretchLeft = 52; // left tab stretch
   static const double _outerStretchRight =
       36; // right tab stretch (make smaller to reduce overshoot)
-  static const double _innerStretch = 6;
-  static const double _vPad = -8;
+  static const double _innerStretch = 10;
+  static const double _vPad = -10;
 
   final List<List<String>> studentsPerTab = const [
     ['Kanjana', 'Juliya', 'Marie'],
@@ -43,13 +43,20 @@ class _ResultListState extends State<ResultList> {
     super.dispose();
   }
 
-  EdgeInsets _indicatorPaddingFor(int index) {
-    const outer = 52.0, inner = 10.0, vPad = -8.0;
-    const rightBias = 6.0; // trims the right cap a bit
-    return index == 0
-        ? const EdgeInsets.fromLTRB(-outer, vPad, -inner, vPad)
-        : const EdgeInsets.fromLTRB(-inner, vPad, -(outer - rightBias), vPad);
+  EdgeInsets _indicatorPaddingFor(int currentIndex, int tabCount) {
+    const double inner = 14; // space near the other tab
+    const double edge  = 12; // space near screen/card edges
+
+    // first tab → keep left "edge" and right "inner"
+    if (currentIndex == 0) return const EdgeInsets.fromLTRB(edge, 0, inner, 0);
+    // last tab → keep left "inner" and right "edge"
+    if (currentIndex == tabCount - 1) {
+      return const EdgeInsets.fromLTRB(inner, 0, edge, 0);
+    }
+    // middle tabs (if you ever add more) → inner on both
+    return const EdgeInsets.symmetric(horizontal: inner);
   }
+
 
   void _navigateToStudent(String name) {
     if (name != 'Kanjana') return;
@@ -89,7 +96,7 @@ class _ResultListState extends State<ResultList> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
 
                 // ===== TAB STRIP + CONNECTOR + CARD =====
                 Expanded(
@@ -107,9 +114,8 @@ class _ResultListState extends State<ResultList> {
                             children: [
                               // --- Tab strip ---
                               Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 0.5,
-                                ),
+                                // keep this if you like a hairline outer margin
+                                margin: const EdgeInsets.symmetric(horizontal: 0.5),
                                 child: TabBar(
                                   controller: ctrl,
                                   isScrollable: true,
@@ -117,10 +123,12 @@ class _ResultListState extends State<ResultList> {
                                     Tab(text: '10 Mark Filled'),
                                     Tab(text: '10 Mark Unfilled'),
                                   ],
+
+                                  // COLORS
                                   labelColor: AppColor.blue,
                                   unselectedLabelColor: AppColor.gray,
 
-                                  // White cap (rounded top, flat bottom)
+                                  // The white rounded "cap"
                                   indicator: const BoxDecoration(
                                     color: AppColor.white,
                                     borderRadius: BorderRadius.vertical(
@@ -128,19 +136,23 @@ class _ResultListState extends State<ResultList> {
                                       bottom: Radius.zero,
                                     ),
                                   ),
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  indicatorPadding: _indicatorPaddingFor(
-                                    idx,
-                                  ), // asymmetric stretch
 
-                                  labelPadding: const EdgeInsets.symmetric(
-                                    horizontal: 22,
-                                    vertical: 8,
-                                  ),
+                                  // Use the full tab size, then push IN from both sides equally
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  // --- OPTION A (same both sides for all tabs)
+                                  // indicatorPadding: const EdgeInsets.symmetric(horizontal: 14),
+
+                                  // --- OPTION B (smart for edges: still keeps both sides!)
+                                  indicatorPadding: _indicatorPaddingFor(ctrl.index, 2),
+
+                                  // Add space around each label so you get the visible gap between tabs
+                                  labelPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
+
+                                  // Tiny padding around the whole bar so the cap doesn't hug the screen edge
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+
                                   dividerColor: Colors.transparent,
-                                  overlayColor: const MaterialStatePropertyAll(
-                                    Colors.transparent,
-                                  ),
+                                  overlayColor: const MaterialStatePropertyAll(Colors.transparent),
                                   splashFactory: NoSplash.splashFactory,
                                   labelStyle: GoogleFont.ibmPlexSans(
                                     fontSize: 13,
@@ -148,6 +160,7 @@ class _ResultListState extends State<ResultList> {
                                   ),
                                 ),
                               ),
+
 
                               // --- Big white card with content ---
                               Positioned.fill(

@@ -21,7 +21,7 @@ class CommonContainer {
     bool addButton = false,
     VoidCallback? onIconTap,
     VoidCallback? Start,
-    Color? color =AppColor.white,
+    Color? color = AppColor.white,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -46,34 +46,34 @@ class CommonContainer {
 
             addButton
                 ? InkWell(
-              onTap: Start,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColor.lowLightBlue,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                    horizontal: 18,
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset(AppImages.plus, height: 12.57, width: 13),
-                      SizedBox(width: 7),
-                      Text(
-                        subText,
-                        style: GoogleFont.ibmPlexSans(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                          color: AppColor.blue,
-                        ),
+                  onTap: Start,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.lowLightBlue,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                        horizontal: 18,
                       ),
-                    ],
+                      child: Row(
+                        children: [
+                          Image.asset(AppImages.plus, height: 12.57, width: 13),
+                          SizedBox(width: 7),
+                          Text(
+                            subText,
+                            style: GoogleFont.ibmPlexSans(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                              color: AppColor.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            )
+                )
                 : SizedBox.shrink(),
             SizedBox(width: 10),
             // InkWell(
@@ -167,9 +167,10 @@ class CommonContainer {
       ),
     );
   }
+
   static StudentsList({
     required String mainText,
-    String? subText,   // 👈 added
+    String? subText, // 👈 added
     VoidCallback? onIconTap,
     bool blueContainer = false,
   }) {
@@ -197,7 +198,10 @@ class CommonContainer {
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 20,
+                      ),
                       child: Text(
                         '7 out of 10',
                         style: GoogleFont.ibmPlexSans(
@@ -234,7 +238,7 @@ class CommonContainer {
     );
   }
 
-/*
+  /*
   static StudentsList({
     required String mainText,
     VoidCallback? onIconTap,
@@ -305,8 +309,6 @@ class CommonContainer {
     required String backRoundImage,
     required String additionalText1,
     required String additionalText2,
-    required String additionalText3,
-    required String additionalText4,
     VoidCallback? onDetailsTap,
     IconData? iconData,
     double verticalPadding = 9,
@@ -366,42 +368,23 @@ class CommonContainer {
                                 additionalText1,
                                 style: GoogleFont.ibmPlexSans(
                                   fontSize: 12,
-                                  color: AppColor.lightgray,
+                                  color: AppColor.lowLightgray,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            Row(
-                              children: [
-                                Text(
-                                  additionalText2,
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  additionalText3,
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                Text(
-                                  additionalText4,
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              additionalText2,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 14,
+                                color: AppColor.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
                       ],
                     ),
+                    SizedBox(height: 5),
                   ],
                 ),
               ),
@@ -431,205 +414,192 @@ class CommonContainer {
     bool isPincode = false,
     BuildContext? context,
     FormFieldValidator<String>? validator,
-    bool isError = false,
-    String? errorText,
-    bool? hasError = false,
     FocusNode? focusNode,
     Color borderColor = AppColor.red,
     Color? imageColor,
   }) {
-    DateTime today = DateTime.now();
+    return FormField<String>(
+      validator: validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      builder: (state) {
+        final hasError = state.hasError;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: AppColor.lightWhite,
-            border: Border.all(
-              color: isError ? AppColor.red : Colors.transparent,
-              width: 1.5,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: flex,
-                  child: GestureDetector(
-                    onTap:
-                    isDOB && context != null
-                        ? () async {
-                      final DateTime startDate = DateTime(2021, 6, 1);
-                      final DateTime endDate = DateTime(2022, 5, 31);
-                      final DateTime initialDate = DateTime(2021, 6, 2);
+        Future<void> _handleDobTap() async {
+          if (!isDOB || context == null) return;
 
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: initialDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2025),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              dialogBackgroundColor: AppColor.white,
-                              colorScheme: ColorScheme.light(
-                                primary: AppColor.blue,
-                                onPrimary: Colors.white,
-                                onSurface: AppColor.black,
-                              ),
-                              textButtonTheme: TextButtonThemeData(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColor.blue,
-                                ),
-                              ),
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
+          final DateTime startDate = DateTime(2021, 6, 1);
+          final DateTime endDate = DateTime(2022, 5, 31);
+          final DateTime initialDate = DateTime(2021, 6, 2);
 
-                      if (pickedDate != null) {
-                        if (pickedDate.isBefore(startDate) ||
-                            pickedDate.isAfter(endDate)) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Invalid Date of Birth!\nPlease select a date between 01-06-2021 and 31-05-2022.',
-                              ),
-                              backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        } else {
-                          controller?.text =
-                          "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
-                          FocusScope.of(
-                            context,
-                          ).requestFocus(nextFieldFocusNode);
-                        }
-                      }
-                    }
-                        : null,
-
-                    child: AbsorbPointer(
-                      absorbing: isDOB,
-                      child: TextFormField(
-                        focusNode: focusNode,
-                        onChanged: onChanged,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: controller,
-                        validator: validator,
-                        maxLines: maxLine,
-                        maxLength:
-                        isMobile
-                            ? 10
-                            : isAadhaar
-                            ? 12
-                            : isPincode
-                            ? 6
-                            : null,
-                        // keyboardType:
-                        // isMobile || isAadhaar || isPincode
-                        //     ? TextInputType.number
-                        //     : isDOB
-                        //     ? TextInputType.none
-                        //     : TextInputType.emailAddress,
-                        keyboardType: keyboardType,
-                        inputFormatters:
-                        isMobile || isAadhaar || isPincode
-                            ? [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(
-                            isMobile
-                                ? 10
-                                : isAadhaar
-                                ? 12
-                                : 6,
-                          ),
-                        ]
-                            : [],
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: 14,
-                          color: AppColor.black,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: '',
-                          counterText: '',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                          border: InputBorder.none,
-                          isDense: true,
-                          // errorText: errorText,
-                        ),
-                      ),
-                    ),
+          final pickedDate = await showDatePicker(
+            context: context!,
+            initialDate: initialDate,
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2025),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  dialogBackgroundColor: AppColor.white,
+                  colorScheme: const ColorScheme.light(
+                    primary: AppColor.blue,
+                    onPrimary: Colors.white,
+                    onSurface: AppColor.black,
+                  ),
+                  textButtonTheme: TextButtonThemeData(
+                    style: TextButton.styleFrom(foregroundColor: AppColor.blue),
                   ),
                 ),
+                child: child!,
+              );
+            },
+          );
 
-                if (verticalDivider)
-                  Container(
-                    width: 2,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.grey.shade200,
-                          Colors.grey.shade300,
-                          Colors.grey.shade200,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(1),
-                    ),
+          if (pickedDate != null) {
+            if (pickedDate.isBefore(startDate) || pickedDate.isAfter(endDate)) {
+              ScaffoldMessenger.of(context!).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Invalid Date of Birth!\nPlease select a date between 01-06-2021 and 31-05-2022.',
                   ),
-                SizedBox(width: 20),
+                  backgroundColor: Colors.red,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            } else {
+              controller?.text =
+                  "${pickedDate.day.toString().padLeft(2, '0')}-"
+                  "${pickedDate.month.toString().padLeft(2, '0')}-"
+                  "${pickedDate.year}";
+              // optionally move focus
+              // FocusScope.of(context!).nextFocus();
+              state.didChange(controller?.text ?? '');
+            }
+          }
+        }
 
-                // if (imagePath == null)
-                //   Expanded(
-                //     child: CustomTextField.textWithSmall(
-                //       text: text,
-                //       fontSize: 14,
-                //       color: AppColor.gray,
-                //     ),
-                //   ),
-                if (imagePath != null)
-                  InkWell(
-                    onTap: () {
-                      controller?.clear();
-                      if (onDetailsTap != null) {
-                        onDetailsTap();
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Image.asset(
-                        imagePath,
-                        height: imageSize,
-                        width: imageSize,
-                        color: imageColor,
+        final effectiveInputFormatters =
+            isMobile || isAadhaar || isPincode
+                ? <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(
+                    isMobile ? 10 : (isAadhaar ? 12 : 6),
+                  ),
+                ]
+                : (inputFormatters ?? const []);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: AppColor.lightWhite,
+                border: Border.all(
+                  color: hasError ? AppColor.red : Colors.transparent,
+                  width: 1.5,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 15,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: flex,
+                      child: GestureDetector(
+                        onTap: _handleDobTap,
+                        child: AbsorbPointer(
+                          absorbing: isDOB, // disable keyboard if DOB
+                          child: TextFormField(
+                            focusNode: focusNode,
+                            controller: controller,
+                            maxLines: maxLine,
+                            maxLength:
+                                isMobile
+                                    ? 10
+                                    : (isAadhaar ? 12 : (isPincode ? 6 : null)),
+                            keyboardType: keyboardType,
+                            inputFormatters: effectiveInputFormatters,
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              color: AppColor.black,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: '',
+                              counterText: '',
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              border: InputBorder.none,
+                              isDense: true,
+                              // we show our own error below; suppress TF default
+                              errorText: null,
+                            ),
+                            onChanged: (v) {
+                              state.didChange(v);
+                              onChanged?.call(v);
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-              ],
+
+                    if (verticalDivider)
+                      Container(
+                        width: 2,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.grey.shade200,
+                              Colors.grey.shade300,
+                              Colors.grey.shade200,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                    const SizedBox(width: 20),
+
+                    if (imagePath != null)
+                      InkWell(
+                        onTap: () {
+                          controller?.clear();
+                          state.didChange(''); // clear validation state
+                          onDetailsTap?.call();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 15),
+                          child: Image.asset(
+                            imagePath,
+                            height: imageSize,
+                            width: imageSize,
+                            color: imageColor,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-        if (errorText != null && errorText.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0, top: 4),
-            child: Text(
-              errorText,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
-      ],
+
+            if (hasError)
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0, top: 4),
+                child: Text(
+                  state.errorText!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
-
-
 
   static textWithSmall({
     required String text,
@@ -693,6 +663,7 @@ class CommonContainer {
     required String className,
     required String aText1,
     required String aText2,
+    required String CText1,
     required Color backRoundColor,
     Color? backRoundColors,
     Gradient? gradient,
@@ -769,34 +740,15 @@ class CommonContainer {
                       ),
                       child: Row(
                         children: [
-                          RichText(
-                            text: TextSpan(
-                              text: '7',
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.gray,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'th ',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'C',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            CText1,
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.gray,
                             ),
                           ),
+
                           SizedBox(width: 10),
                           Container(
                             width: 2,
@@ -828,27 +780,27 @@ class CommonContainer {
                   ),
                   view != null
                       ? InkWell(
-                    onTap: onTap,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: AppColor.borderGary),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 25,
-                          vertical: 10,
-                        ),
-                        child: Text(
-                          view ?? '',
-                          style: GoogleFont.inter(
-                            fontSize: 12,
-                            color: AppColor.black,
+                        onTap: onTap,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(color: AppColor.borderGary),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 10,
+                            ),
+                            child: Text(
+                              view ?? '',
+                              style: GoogleFont.inter(
+                                fontSize: 12,
+                                color: AppColor.black,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
                       : SizedBox.shrink(),
                   InkWell(
                     onTap: onIconTap,
@@ -864,9 +816,10 @@ class CommonContainer {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(14.0),
-                        child: Icon(
+                        child: Image.asset(
+                          AppImages.rightSideArrow,
                           color: AppColor.white,
-                          CupertinoIcons.right_chevron,
+                          height: 14,
                         ),
                       ),
                     ),
@@ -1115,6 +1068,7 @@ class CommonContainer {
     );
   }
 
+/*  // inside CommonContainer
   static Widget quizContainer({
     required String leftTextNumber,
     required String leftValue,
@@ -1123,32 +1077,39 @@ class CommonContainer {
     required bool leftSelected,
     required bool rightSelected,
     required bool isQuizCompleted,
+    Color? leftBorderColor,
+    Color? rightBorderColor,
     VoidCallback? leftOnTap,
     VoidCallback? rightOnTap,
   }) {
+    // If right side has no option, render a transparent placeholder
+    final bool rightIsPlaceholder =
+        rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
+
     return Row(
       children: [
+        // LEFT
         Expanded(
           child: GestureDetector(
             onTap: leftOnTap,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               decoration: BoxDecoration(
                 gradient:
-                leftSelected
-                    ? LinearGradient(
-                  colors: [Colors.white, AppColor.white],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-                    : null,
+                    leftSelected
+                        ? const LinearGradient(
+                          colors: [Colors.white, Colors.white],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )
+                        : null,
                 color: leftSelected ? null : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color:
-                  leftSelected
-                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                      : AppColor.lowLightgray,
+                      leftSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
                   width: leftSelected ? 3 : 1,
                 ),
               ),
@@ -1161,14 +1122,13 @@ class CommonContainer {
                     child: CustomTextField.textWithSmall(
                       text: leftValue,
                       fontWeight:
-                      leftSelected ? FontWeight.w800 : FontWeight.w500,
-
+                          leftSelected ? FontWeight.w800 : FontWeight.w500,
                       color:
-                      leftSelected
-                          ? (isQuizCompleted
-                          ? AppColor.green
-                          : AppColor.black)
-                          : AppColor.black,
+                          leftSelected
+                              ? (isQuizCompleted
+                                  ? AppColor.green
+                                  : AppColor.green)
+                              : AppColor.black,
                     ),
                   ),
                 ],
@@ -1177,55 +1137,78 @@ class CommonContainer {
           ),
         ),
 
-        SizedBox(width: 20),
+        const SizedBox(width: 20),
 
+        // RIGHT (real card or transparent placeholder)
         Expanded(
-          child: GestureDetector(
-            onTap: rightOnTap,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              decoration: BoxDecoration(
-                gradient:
-                rightSelected
-                    ? LinearGradient(
-                  colors: [Colors.white, AppColor.white],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-                    : null,
-                color: rightSelected ? null : AppColor.lowLightgray,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color:
-                  rightSelected
-                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                      : AppColor.lowLightgray,
-                  width: rightSelected ? 3 : 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField.textWithSmall(text: rightTextNumber),
-                  ),
-                  Expanded(
-                    child: CustomTextField.textWithSmall(
-                      text: rightValue,
-                      fontWeight:
-                      rightSelected ? FontWeight.w800 : FontWeight.w500,
-
-                      color:
-                      rightSelected
-                          ? (isQuizCompleted
-                          ? AppColor.green
-                          : AppColor.green)
-                          : AppColor.black,
+          child:
+              rightIsPlaceholder
+                  ? Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.transparent, width: 1),
+                    ),
+                    child: Row(
+                      children: const [
+                        Expanded(child: SizedBox()),
+                        Expanded(child: SizedBox()),
+                      ],
+                    ),
+                  )
+                  : GestureDetector(
+                    onTap: rightOnTap,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient:
+                            rightSelected
+                                ? const LinearGradient(
+                                  colors: [Colors.white, Colors.white],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                )
+                                : null,
+                        color: rightSelected ? null : AppColor.lowLightgray,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color:
+                              rightSelected
+                                  ? (isQuizCompleted
+                                      ? AppColor.green
+                                      : AppColor.green)
+                                  : AppColor.lowLightgray,
+                          width: rightSelected ? 3 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField.textWithSmall(
+                              text: rightTextNumber,
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomTextField.textWithSmall(
+                              text: rightValue,
+                              fontWeight:
+                                  rightSelected
+                                      ? FontWeight.w800
+                                      : FontWeight.w500,
+                              color: AppColor.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
         ),
       ],
     );
@@ -1235,6 +1218,8 @@ class CommonContainer {
     required String leftTextNumber,
     required String leftValue,
     required bool isSelected,
+
+    Color? borderColor,
     VoidCallback? onTap,
     required bool isQuizCompleted,
   }) {
@@ -1248,11 +1233,12 @@ class CommonContainer {
               decoration: BoxDecoration(
                 color: isSelected ? AppColor.white : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
+
                 border: Border.all(
                   color:
-                  isSelected
-                      ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                      : AppColor.lowLightgray,
+                      isSelected
+                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                          : AppColor.lowLightgray,
                   width: isSelected ? 3 : 1,
                 ),
               ),
@@ -1273,12 +1259,174 @@ class CommonContainer {
                       child: CustomTextField.textWithSmall(
                         text: leftValue,
 
-                        color:
-                        isSelected
-                            ? (isQuizCompleted
-                            ? AppColor.green
-                            : AppColor.green)
-                            : AppColor.black,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }*/
+
+  // inside CommonContainer
+
+  static Widget quizContainer({
+    required String leftTextNumber,
+    required String leftValue,
+    required String rightTextNumber,
+    required String rightValue,
+    required bool leftSelected,      // kept for API compatibility (ignored)
+    required bool rightSelected,     // kept for API compatibility (ignored)
+    required bool isQuizCompleted,   // kept for API compatibility (ignored)
+    Color? leftBorderColor,
+    Color? rightBorderColor,
+    VoidCallback? leftOnTap,
+    VoidCallback? rightOnTap,
+  }) {
+    // If right side has no option, render a transparent placeholder
+    final bool rightIsPlaceholder =
+        rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
+
+    final Color lBorder = leftBorderColor ?? AppColor.lowLightgray;
+    final Color rBorder = rightIsPlaceholder
+        ? Colors.transparent
+        : (rightBorderColor ?? AppColor.lowLightgray);
+
+    return Row(
+      children: [
+        // LEFT
+        Expanded(
+          child: GestureDetector(
+            onTap: leftOnTap, // can be null to disable
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.transparent, // ✅ no fill
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: lBorder,          // ✅ border color from parent
+                  width: 2,                // thicker to show clearly
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(text: leftTextNumber),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: leftValue,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 20),
+
+        // RIGHT (real card or transparent placeholder)
+        Expanded(
+          child: rightIsPlaceholder
+              ? Container(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.transparent, width: 2),
+            ),
+            child: const Row(
+              children: [
+                Expanded(child: SizedBox()),
+                Expanded(child: SizedBox()),
+              ],
+            ),
+          )
+              : GestureDetector(
+            onTap: rightOnTap, // can be null to disable
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.transparent, // ✅ no fill
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: rBorder,          // ✅ border color from parent
+                  width: 2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightTextNumber,
+                    ),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightValue,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget quizContainer1({
+    required String leftTextNumber,
+    required String leftValue,
+    required bool isSelected,        // kept for API compatibility (ignored)
+    Color? borderColor,
+    VoidCallback? onTap,
+    required bool isQuizCompleted,   // kept for API compatibility (ignored)
+  }) {
+    final Color bColor = borderColor ?? AppColor.lowLightgray;
+
+    return GestureDetector(
+      onTap: onTap, // can be null to disable
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.transparent, // ✅ no fill
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: bColor,           // ✅ border color from parent
+                  width: 2,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: CustomTextField.textWithSmall(
+                        text: leftTextNumber,
+                        color: AppColor.borderGary,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 6,
+                      child: CustomTextField.textWithSmall(
+                        text: leftValue,
+                        color: AppColor.black,
                       ),
                     ),
                   ],
@@ -1290,6 +1438,7 @@ class CommonContainer {
       ),
     );
   }
+
 
   static Widget carouselSlider({
     required String mainText1,
@@ -1308,13 +1457,11 @@ class CommonContainer {
     EdgeInsets? textPadding,
   }) {
     final CrossAxisAlignment textCross =
-
         (textAlign == TextAlign.end)
             ? CrossAxisAlignment.end
             : (textAlign == TextAlign.center)
             ? CrossAxisAlignment.center
             : CrossAxisAlignment.start;
-
 
     return Material(
       color: Colors.transparent,
@@ -1327,7 +1474,6 @@ class CommonContainer {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-
             Positioned.fill(
               child: IgnorePointer(
                 child: Image.asset(bcImage, fit: BoxFit.cover),
@@ -1340,7 +1486,6 @@ class CommonContainer {
               top: 20,
               child: Padding(
                 padding:
-
                     textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
 
                 child: Column(
@@ -1354,7 +1499,6 @@ class CommonContainer {
                       style: GoogleFont.ibmPlexSans(
                         fontSize: isSelect ? 22 : 15,
                         fontWeight:
-
                             isSelect ? FontWeight.w800 : FontWeight.w500,
 
                         color: AppColor.white,
@@ -1368,7 +1512,6 @@ class CommonContainer {
                       style: GoogleFont.ibmPlexSans(
                         fontSize: isSelect ? 22 : 20,
                         fontWeight:
-
                             isSelect ? FontWeight.w500 : FontWeight.w800,
 
                         color: AppColor.white,
@@ -1378,7 +1521,6 @@ class CommonContainer {
                 ),
               ),
             ),
-
 
             Positioned.fill(
               child: Padding(
@@ -1444,8 +1586,8 @@ class CommonContainer {
     required String standardText2,
     required String standardText3,
     required List<String> sections,
-    Map<String, List<String>>? sectionSubjects,
-    String? expandedSection,
+    Map<String, List<String>>? sectionSubjects, // Map section -> subjects
+    String? expandedSection, // currently expanded section
     Function(String section)? onSectionTap,
     List<EdgeInsets>? paddings,
     EdgeInsetsGeometry? containerPadding,
@@ -1459,7 +1601,7 @@ class CommonContainer {
         borderRadius: BorderRadius.circular(16),
       ),
       padding:
-      containerPadding ??
+          containerPadding ??
           EdgeInsets.symmetric(horizontal: 30, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1494,24 +1636,25 @@ class CommonContainer {
           SizedBox(height: 15),
           Row(
             children:
-            sections.asMap().entries.map((entry) {
-              final index = entry.key;
-              final section = entry.value;
-              final padding =
-              paddings != null && paddings.length > index
-                  ? paddings[index]
-                  : EdgeInsets.only(right: 10);
+                sections.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final section = entry.value;
+                  final padding =
+                      paddings != null && paddings.length > index
+                          ? paddings[index]
+                          : EdgeInsets.only(right: 10);
 
-              bool isExpanded = section == expandedSection;
-              List<String> subjects = sectionSubjects?[section] ?? [];
-
+                  bool isExpanded = section == expandedSection;
+                  List<String> subjects = sectionSubjects?[section] ?? [];
 
                   return Padding(
                     padding: padding,
                     child: InkWell(
                       onTap: () {
                         if (onSectionTap != null) {
-                          onSectionTap(isExpanded ? '' : section);
+                          onSectionTap(
+                            isExpanded ? '' : section,
+                          ); // collapse if tapped again
                         }
                       },
                       child: Container(
@@ -1520,25 +1663,37 @@ class CommonContainer {
                               sectionBgColor ?? AppColor.white.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColor.white),
-
                         ),
-                        if (isExpanded && subjects.isNotEmpty) ...[
-                          SizedBox(width: 8),
-                          Text(
-                            '- ${subjects.join(", ")}',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.black,
+                        padding:
+                            sectionTextPadding ??
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Row(
+                          children: [
+                            Text(
+                              section,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.black,
+                              ),
                             ),
-                          ),
-                        ],
-                      ],
+                            if (isExpanded && subjects.isNotEmpty) ...[
+                              SizedBox(width: 8),
+                              Text(
+                                '- ${subjects.join(", ")}',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -1993,10 +2148,12 @@ class CommonContainer {
     required List<Map<String, dynamic>> tabs,
     required int selectedIndex,
     required ValueChanged<int> onSelect,
+    double horizontalPadding = 40,
   }) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(tabs.length, (index) {
           final isSelected = selectedIndex == index;
           return Padding(
@@ -2004,8 +2161,8 @@ class CommonContainer {
             child: GestureDetector(
               onTap: () => onSelect(index),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
                   vertical: 9,
                 ),
                 decoration: BoxDecoration(

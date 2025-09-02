@@ -53,4 +53,13 @@ class AppImages {
   static String clear = 'asset/Images/Clear.png';
   static String greenTick = 'asset/Images/Green Tick.png';
   static String downArrow = 'asset/Images/down_arrow.png';
+  static String announcement1 = 'asset/Images/Announcement1.png';
+  static String announcement2 = 'asset/Images/Announcement2.png';
+  static String announcement3 = 'asset/Images/Announcement3.png';
+  static String announcement4 = 'asset/Images/Announcement4.png';
+  static String announcement5 = 'asset/Images/Announcement5.png';
+  static String announcement6 = 'asset/Images/Announcement6.png';
+  static String announcement7 = 'asset/Images/Announcement7.png';
+  static String announcement8 = 'asset/Images/Announcement8.png';
+  static String examResultBCImage = 'asset/Images/ExamResultBCImage.png';
 }

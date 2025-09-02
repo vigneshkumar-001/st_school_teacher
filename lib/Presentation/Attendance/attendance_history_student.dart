@@ -31,6 +31,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
   DateTime today = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  CalendarFormat _format = CalendarFormat.month;
 
   AttendanceStudentData? attendanceData;
   DateTime selectedDay = DateTime.now();
@@ -172,7 +173,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                 SizedBox(height: 3),
                 Center(
                   child: Text(
-                    '${attendanceData?.studentName ?? "Loading..."} Attendance',
+                    '${attendanceData?.studentName ?? ''} Attendance',
                     style: GoogleFonts.ibmPlexSans(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
@@ -199,10 +200,35 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                             focusedDay: _focusedDay,
                             firstDay: DateTime.utc(2000),
                             lastDay: DateTime.utc(2050),
+
+                            // 🔒 Always Month
+                            calendarFormat: CalendarFormat.month,
+                            availableCalendarFormats: const {
+                              CalendarFormat.month: 'Month',
+                            },
+                            headerStyle: HeaderStyle(
+                              formatButtonVisible: false, // hide format toggle
+                              titleCentered: true, // 👈 center the month text
+                              titleTextStyle: GoogleFonts.ibmPlexSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.black,
+                              ),
+                              leftChevronIcon: Icon(
+                                Icons.chevron_left,
+                                color: AppColor.gray,
+                              ),
+                              rightChevronIcon: Icon(
+                                Icons.chevron_right,
+                                color: AppColor.gray,
+                              ),
+                            ),
+                            availableGestures:
+                                AvailableGestures
+                                    .horizontalSwipe, // allow only swipe months
+
                             onPageChanged: (focusedDay) {
-                              setState(() {
-                                _focusedDay = focusedDay;
-                              });
+                              setState(() => _focusedDay = focusedDay);
                               loadStudentAttendance(focusedDay);
                             },
                             selectedDayPredicate:
@@ -229,7 +255,9 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                                 ),
                               );
                             },
-                            calendarStyle: CalendarStyle(
+
+                            // keep your existing styles/builders
+                            calendarStyle: const CalendarStyle(
                               markersMaxCount: 1,
                               markerSize: 6,
                             ),
@@ -252,7 +280,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                                     ),
                                   );
                                 }
-                                return SizedBox.shrink();
+                                return const SizedBox.shrink();
                               },
                               defaultBuilder: (context, day, focusedDay) {
                                 return Center(
@@ -268,7 +296,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                             ),
                           ),
                         ),
-
+                        SizedBox(height: 35),
                         Container(
                           decoration: BoxDecoration(
                             color: AppColor.lowLightgray,
@@ -348,7 +376,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 40),
                         Row(
                           children: [
                             Text(
@@ -377,11 +405,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                           progress:
                               (attendanceData?.presentPercentage ?? 0) / 100,
                         ),
-
                         SizedBox(height: 15),
-
-                        SizedBox(height: 12),
-
                         Text(
                           "${attendanceData?.fullDayPresentCount ?? '0'} Out of ${attendanceData?.totalWorkingDays ?? '0'}",
                           style: GoogleFont.ibmPlexSans(
@@ -394,7 +418,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                     ),
                   ),
                 ),
-                SizedBox(height: 27),
+                /*SizedBox(height: 27),
                 Center(
                   child: OutlinedButton(
                     onPressed: () {
@@ -432,7 +456,7 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                       ],
                     ),
                   ),
-                ),
+                ),*/
               ],
             ),
           ),

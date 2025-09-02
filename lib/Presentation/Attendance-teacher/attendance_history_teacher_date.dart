@@ -180,9 +180,7 @@ class _AttendanceHistoryTeacherDateState
                               children: [
                                 CurvedAttendanceCard(
                                   imagePath: AppImages.morning,
-                                  isAbsent:
-                                      data?.morning ==
-                                      "present",
+                                  isAbsent: data?.morning == "present",
                                 ),
                                 SizedBox(width: 8),
                                 Text(
@@ -222,9 +220,7 @@ class _AttendanceHistoryTeacherDateState
                                 SizedBox(width: 22),
                                 CurvedAttendanceCard(
                                   imagePath: AppImages.afternoon,
-                                  isAbsent:
-                                      data?.afternoon ==
-                                      "present",
+                                  isAbsent: data?.afternoon == "present",
                                 ),
                                 SizedBox(width: 8),
                                 Text(
@@ -257,7 +253,7 @@ class _AttendanceHistoryTeacherDateState
                         Row(
                           children: [
                             Text(
-                              '${ data?.monthName ?? ''} Overall Attendance ',
+                              '${data?.monthName ?? ''} Overall Attendance ',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -276,19 +272,12 @@ class _AttendanceHistoryTeacherDateState
                             ),
                           ],
                         ),
-                        SizedBox(height: 15),
-
-
+                        SizedBox(height: 20),
                         GradientProgressBar(
                           progress:
-                              (data
-                                      ?.thisMonthPresentPercentage ??
-                                  0) /
-                              100,
+                              (data?.thisMonthPresentPercentage ?? 0) / 100,
                         ),
-
                         SizedBox(height: 15),
-
                         Text(
                           "${data?.fullDayPresentCount} Out of ${data?.totalWorkingDays}",
                           style: GoogleFont.ibmPlexSans(
@@ -301,7 +290,7 @@ class _AttendanceHistoryTeacherDateState
                     ),
                   ),
                 ),
-                SizedBox(height: 27),
+                SizedBox(height: 40),
                 Center(
                   child: OutlinedButton(
                     onPressed: () {
