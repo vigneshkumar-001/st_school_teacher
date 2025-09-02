@@ -35,7 +35,7 @@ class HomeworkCreatePreview extends StatefulWidget {
     this.subjectId,
     required this.images,
     required this.listPoints,
-    this.selectedClassId, File? permanentImage,
+    this.selectedClassId,
   });
 
   @override
