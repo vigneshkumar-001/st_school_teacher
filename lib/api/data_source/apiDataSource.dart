@@ -20,6 +20,7 @@ import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
 import '../../Presentation/Profile/model/teacher_data_response.dart';
 import '../../Presentation/Quiz Screen/Model/details_preview.dart';
+import '../../Presentation/Quiz Screen/Model/history_specific_student_response.dart';
 import '../../Presentation/Quiz Screen/Model/quiz_attend_response.dart';
 import '../../Presentation/Quiz Screen/Model/quizlist_response.dart';
 import '../repository/failure.dart';
@@ -621,7 +622,6 @@ class ApiDataSource extends BaseApiDataSource {
   }) async {
     try {
       final url = ApiUrl.teacherQuizAttend(classId: quizId);
-      AppLogger.log.i('→ POST $url');
 
       // 👇 Correct: use sendRequest with POST
       final resp = await Request.sendRequest(url, {}, 'POST', true);
@@ -634,11 +634,13 @@ class ApiDataSource extends BaseApiDataSource {
             final parsed = AttendSummaryResponse.fromAny(resp.data);
             if (parsed.status) return Right(parsed);
 
-            return Left(ServerFailure(
-              parsed.message.isNotEmpty ? parsed.message : 'Request failed',
-              code: parsed.code,
-              data: resp.data,
-            ));
+            return Left(
+              ServerFailure(
+                parsed.message.isNotEmpty ? parsed.message : 'Request failed',
+                code: parsed.code,
+                data: resp.data,
+              ),
+            );
           } catch (e) {
             return Left(ServerFailure('Failed to parse attend summary: $e'));
           }
@@ -672,4 +674,29 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
+  Future<Either<Failure, StudentQuizResult>> studentQuizResults({
+    required int quizId,
+    required int studentId,
+  }) async {
+    try {
+      final url = ApiUrl.studentQuizResult(
+        quizId: quizId,
+        studentId: studentId,
+      );
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(StudentQuizResult.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
 }

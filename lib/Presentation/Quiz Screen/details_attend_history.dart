@@ -506,6 +506,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Core/consents.dart';
 
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_details.dart';
 import '../../Core/Utility/app_color.dart';
@@ -514,17 +515,15 @@ import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'Model/quiz_attend_response.dart';
+import 'attend_history_specific_student.dart';
 import 'controller/quiz_controller.dart';
 
 class DetailsAttendHistory extends StatefulWidget {
-  final int quizId;            // this is actually the classId used by API
+  /// This is actually the classId used by your API
+  final int quizId;
   final String? dateLabel;
 
-  const DetailsAttendHistory({
-    super.key,
-    required this.quizId,
-    this.dateLabel,
-  });
+  const DetailsAttendHistory({super.key, required this.quizId, this.dateLabel});
 
   @override
   State<DetailsAttendHistory> createState() => _DetailsAttendHistoryState();
@@ -532,16 +531,17 @@ class DetailsAttendHistory extends StatefulWidget {
 
 class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
   final QuizController c =
-  Get.isRegistered<QuizController>() ? Get.find<QuizController>() : Get.put(QuizController());
+      Get.isRegistered<QuizController>()
+          ? Get.find<QuizController>()
+          : Get.put(QuizController());
 
   final TextEditingController searchController = TextEditingController();
   String _searchText = '';
-  int selectedIndex = 0; // 0 = Done, 1 = Pending
+  int selectedIndex = 0; // 0 = Done, 1 = Pending/Unfinished
 
   @override
   void initState() {
     super.initState();
-    // ✅ call with the correct param name
     WidgetsBinding.instance.addPostFrameCallback((_) {
       c.loadQuizAttendByClass(code: widget.quizId);
     });
@@ -553,16 +553,21 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
     super.dispose();
   }
 
-  // Include classId when navigating to QuizDetails
-  void _navigateToStudent({required String name, required int classId}) {
+  void _navigateToStudent({
+    required int studentId,
+    required String name,
+    required int quizId,
+  }) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => QuizDetails(
-          studentName: name,
-          classId: classId,       // ✅ pass it so details screen can fetch
-          revealOnOpen: true,
-        ),
+        builder:
+            (_) => AttendHistorySpecificStudent(
+              studentName: name,
+              studentId: studentId,
+              quizId: quizId,
+              revealOnOpen: true,
+            ),
       ),
     );
   }
@@ -573,7 +578,9 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
     final lower = label.toLowerCase().trim();
     if (lower == 'today') return DateFormat('MMM d, y').format(now);
     if (lower == 'yesterday') {
-      return DateFormat('MMM d, y').format(now.subtract(const Duration(days: 1)));
+      return DateFormat(
+        'MMM d, y',
+      ).format(now.subtract(const Duration(days: 1)));
     }
     final cleaned = label.replaceAll(',', '').trim();
     for (final loc in const ['en_US', 'en']) {
@@ -635,47 +642,72 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
             );
           }
 
-          // ✅ you called this `q` (not `quiz`)
+          // Data (null-safe)
           final QuizSummary q = data.quiz;
-          final List<StudentDone> done = data.studentsDone;
+          final List<StudentDone> done =
+              (data.studentsDone ?? const <StudentDone>[]);
+          final List<StudentUnfinished> unfinished =
+              (data.studentsUnfinished ?? const <StudentUnfinished>[]);
 
-          final List<StudentDone> doneFiltered = done.where((s) {
-            if (_searchText.isEmpty) return true;
-            return s.name.toLowerCase().contains(_searchText.toLowerCase());
-          }).toList();
+          // Search helper
+          bool _match(String s) =>
+              _searchText.isEmpty ||
+              s.toLowerCase().contains(_searchText.toLowerCase());
 
+          // Filtered views
+          final List<StudentDone> doneFiltered =
+              done.where((s) => _match(s.name)).toList();
+
+          final List<StudentUnfinished> unfinishedFiltered =
+              unfinished.where((u) => _match(u.name)).toList();
+
+          // Counts for tab pills (filtered counts feel natural when searching)
           final int doneCount = doneFiltered.length;
-          final int pendingCount = (q.totalStudents - done.length).clamp(0, 999999);
+          final int unfinishedCount = unfinishedFiltered.length;
+
+          // Optional date label
           final String? dateText = _formatDateLabel(widget.dateLabel);
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CommonContainer.NavigatArrow(
-                    image: AppImages.leftSideArrow,
-                    imageColor: AppColor.lightBlack,
-                    container: AppColor.lowLightgray,
-                    onIconTap: () => Navigator.pop(context),
-                    border: Border.all(color: AppColor.lightgray, width: 0.3),
-                  ),
-                  const SizedBox(height: 35),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonContainer.NavigatArrow(
+                  image: AppImages.leftSideArrow,
+                  imageColor: AppColor.lightBlack,
+                  container: AppColor.lowLightgray,
+                  onIconTap: () => Navigator.pop(context),
+                  border: Border.all(color: AppColor.lightgray, width: 0.3),
+                ),
+                const SizedBox(height: 35),
 
+                Center(
+                  child: Text(
+                    'Quiz Attend History',
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ),
+                if (dateText != null) ...[
+                  const SizedBox(height: 6),
                   Center(
                     child: Text(
-                      'Quiz Attend History',
+                      dateText,
                       style: GoogleFont.ibmPlexSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                        color: AppColor.black,
+                        fontSize: 12,
+                        color: AppColor.gray,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
+                ],
+                const SizedBox(height: 25),
 
-                  Container(
+                Expanded(
+                  child: Container(
                     decoration: BoxDecoration(
                       color: AppColor.white,
                       borderRadius: BorderRadius.circular(16),
@@ -685,14 +717,21 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // header card
                           Container(
                             decoration: BoxDecoration(
                               color: AppColor.lowLightBlue,
-                              border: Border.all(color: AppColor.lowLightgray, width: 1),
+                              border: Border.all(
+                                color: AppColor.lowLightgray,
+                                width: 1,
+                              ),
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 20,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -713,9 +752,11 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                       color: AppColor.black,
                                     ),
                                   ),
+                                  const SizedBox(height: 6),
                                   RichText(
                                     text: TextSpan(
-                                      text: '${q.doneStudentsCount} out ${q.totalStudents} ',
+                                      text:
+                                          '${q.doneStudentsCount} out ${q.totalStudents} ',
                                       style: GoogleFont.ibmPlexSans(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
@@ -736,16 +777,23 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                   const SizedBox(height: 20),
 
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      // Class & time pill
                                       Container(
                                         decoration: BoxDecoration(
-                                          color: AppColor.black.withOpacity(0.05),
-                                          borderRadius: BorderRadius.circular(50),
+                                          color: AppColor.black.withOpacity(
+                                            0.05,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            50,
+                                          ),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 25,
+                                            vertical: 10,
+                                          ),
                                           child: Row(
                                             children: [
                                               Text(
@@ -770,20 +818,22 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                                       Colors.grey.shade200,
                                                     ],
                                                   ),
-                                                  borderRadius: BorderRadius.circular(1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(1),
                                                 ),
                                               ),
                                               const SizedBox(width: 10),
                                               Text(
                                                 q.time,
-                                                style: GoogleFonts.inter(fontSize: 12, color: AppColor.gray),
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 12,
+                                                  color: AppColor.gray,
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
-
-                                      // ✅ Use `q`, not `quiz`. Also pass classId.
                                       Align(
                                         alignment: Alignment.centerRight,
                                         child: InkWell(
@@ -791,24 +841,35 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) => QuizDetails(
-                                                  classId: q.id,             // 👈 correct variable
-                                                  studentName: q.title,      // 👈 correct variable
-                                                  revealOnOpen: true,
-                                                ),
+                                                builder:
+                                                    (_) => QuizDetails(
+                                                      classId: q.id,
+                                                      studentName: q.title,
+                                                      revealOnOpen: true,
+                                                    ),
                                               ),
                                             );
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(50),
-                                              border: Border.all(color: AppColor.borderGary),
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              border: Border.all(
+                                                color: AppColor.borderGary,
+                                              ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 25,
+                                                    vertical: 10,
+                                                  ),
                                               child: Text(
                                                 'View',
-                                                style: GoogleFont.inter(fontSize: 12, color: AppColor.black),
+                                                style: GoogleFont.inter(
+                                                  fontSize: 12,
+                                                  color: AppColor.black,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -836,117 +897,239 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
 
                           TextField(
                             controller: searchController,
-                            onChanged: (value) => setState(() => _searchText = value),
+                            onChanged:
+                                (value) => setState(() => _searchText = value),
                             decoration: InputDecoration(
-                              suffixIcon: _searchText.isNotEmpty
-                                  ? GestureDetector(
-                                onTap: () => setState(() {
-                                  searchController.clear();
-                                  _searchText = '';
-                                }),
-                                child: Icon(Icons.clear, size: 20, color: AppColor.gray),
-                              )
-                                  : null,
+                              suffixIcon:
+                                  _searchText.isNotEmpty
+                                      ? GestureDetector(
+                                        onTap:
+                                            () => setState(() {
+                                              searchController.clear();
+                                              _searchText = '';
+                                            }),
+                                        child: Icon(
+                                          Icons.clear,
+                                          size: 20,
+                                          color: AppColor.gray,
+                                        ),
+                                      )
+                                      : null,
                               hintText: 'Search',
-                              hintStyle: GoogleFont.ibmPlexSans(fontSize: 14, color: AppColor.gray),
+                              hintStyle: GoogleFont.ibmPlexSans(
+                                fontSize: 14,
+                                color: AppColor.gray,
+                              ),
                               prefixIcon: Padding(
-                                padding: const EdgeInsets.only(left: 25.0, right: 6),
-                                child: Icon(Icons.search_rounded, size: 20, color: AppColor.gray),
+                                padding: const EdgeInsets.only(
+                                  left: 25.0,
+                                  right: 6,
+                                ),
+                                child: Icon(
+                                  Icons.search_rounded,
+                                  size: 20,
+                                  color: AppColor.gray,
+                                ),
                               ),
                               filled: true,
                               fillColor: AppColor.lowLightgray,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                              ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide(color: AppColor.lowLightgray),
+                                borderSide: BorderSide(
+                                  color: AppColor.lowLightgray,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide(color: AppColor.lowLightgray),
+                                borderSide: BorderSide(
+                                  color: AppColor.lowLightgray,
+                                ),
                               ),
                             ),
                           ),
 
                           const SizedBox(height: 15),
 
-                          DefaultTabController(
-                            length: 2,
-                            initialIndex: selectedIndex,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TabBar(
-                                  onTap: (i) => setState(() => selectedIndex = i),
-                                  isScrollable: true,
-                                  dividerColor: Colors.transparent,
-                                  dividerHeight: 0,
-                                  indicator: const BoxDecoration(),
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  labelPadding: EdgeInsets.zero,
-                                  tabs: [
-                                    _pillTab(label: "$doneCount Done", selected: selectedIndex == 0),
-                                    _pillTab(label: "$pendingCount Unfinished", selected: selectedIndex == 1),
-                                  ],
-                                ),
+                          // Tabs + content
+                          Expanded(
+                            child: DefaultTabController(
+                              length: 2,
+                              initialIndex: selectedIndex,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TabBar(
+                                    onTap:
+                                        (i) =>
+                                            setState(() => selectedIndex = i),
+                                    isScrollable: true,
+                                    dividerColor: Colors.transparent,
+                                    dividerHeight: 0,
+                                    indicator: const BoxDecoration(),
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    labelPadding: EdgeInsets.zero,
+                                    tabs: [
+                                      _pillTab(
+                                        label: "$doneCount Done",
+                                        selected: selectedIndex == 0,
+                                      ),
+                                      _pillTab(
+                                        label: "$unfinishedCount Unfinished",
+                                        selected: selectedIndex == 1,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 15),
 
-                                const SizedBox(height: 15),
+                                  Expanded(
+                                    child: TabBarView(
+                                      children: [
+                                        // DONE tab
+                                        ListView.separated(
+                                          padding: EdgeInsets.zero,
+                                          itemCount: doneFiltered.length,
+                                          separatorBuilder:
+                                              (_, __) => Divider(
+                                                color: AppColor.lowLightgray,
+                                                height: 1,
+                                              ),
+                                          itemBuilder: (_, i) {
+                                            final s = doneFiltered[i];
+                                            return ListTile(
+                                              dense: true,
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 2,
+                                                  ),
+                                              onTap: () {
+                                                AppLogger.log.i(
+                                                  '${s.id}${s.name}${q.id}',
+                                                );
+                                                  _navigateToStudent(
+                                                    studentId: s.id,
+                                                    name: s.name,
+                                                    quizId: q.id, // ← was classId
+                                                  );
+                                              },
+                                              title: Text(
+                                                s.name,
+                                                style: GoogleFont.ibmPlexSans(
+                                                  fontSize: 14,
+                                                  color: AppColor.lightBlack,
+                                                ),
+                                              ),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  CommonContainer.totalsPill(
+                                                    score: s.score,
+                                                    total: s.total,
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Image.asset(
+                                                    AppImages.rightSideArrow,
+                                                    color: AppColor.lightgray,
+                                                    height: 12,
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
 
-                                if (selectedIndex == 0)
-                                  ListView.separated(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: doneFiltered.length,
-                                    separatorBuilder: (_, __) =>
-                                        Divider(color: AppColor.lowLightgray, height: 1),
-                                    itemBuilder: (_, i) {
-                                      final s = doneFiltered[i];
-                                      return ListTile(
-                                        dense: true,
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                        onTap: () => _navigateToStudent(name: s.name, classId: q.id),
-                                        title: Text(
-                                          s.name,
-                                          style: GoogleFont.ibmPlexSans(fontSize: 14, color: AppColor.lightBlack),
+                                        // UNFINISHED tab
+                                        ListView.separated(
+                                          padding: EdgeInsets.zero,
+                                          itemCount: unfinishedFiltered.length,
+                                          separatorBuilder:
+                                              (_, __) => Divider(
+                                                color: AppColor.lowLightgray,
+                                                height: 1,
+                                              ),
+                                          itemBuilder: (_, i) {
+                                            final u =
+                                                unfinishedFiltered[i]; // StudentUnfinished
+                                            final String name = u.name;
+
+                                            return ListTile(
+                                              dense: true,
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 2,
+                                                  ),
+                                              onTap: () {
+                                                AppLogger.log.i(
+                                                  '${u.id} =  ${u.name} = ${q.id}',
+                                                );
+                                                 _navigateToStudent(
+                                                   studentId: u.id,
+                                                   name: name,
+                                                   quizId: q.id,
+                                                 );
+                                              },
+                                              title: Text(
+                                                name,
+                                                style: GoogleFont.ibmPlexSans(
+                                                  fontSize: 14,
+                                                  color: AppColor.lightBlack,
+                                                ),
+                                              ),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 4,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColor.lowLightgray,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                    ),
+                                                    child: Text(
+                                                      'Not attempted',
+                                                      style:
+                                                          GoogleFont.ibmPlexSans(
+                                                            fontSize: 11,
+                                                            color:
+                                                                AppColor.gray,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Image.asset(
+                                                    AppImages.rightSideArrow,
+                                                    color: AppColor.lightgray,
+                                                    height: 12,
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
                                         ),
-                                        trailing: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            CommonContainer.totalsPill(score: s.score, total: s.total),
-                                            const SizedBox(width: 10),
-                                            Image.asset(
-                                              AppImages.rightSideArrow,
-                                              color: AppColor.lightgray,
-                                              height: 12,
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  )
-                                else
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                                    decoration: BoxDecoration(
-                                      color: AppColor.lowLightgray,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      pendingCount > 0
-                                          ? '$pendingCount students have not attempted yet.'
-                                          : 'All students have completed.',
-                                      style: GoogleFont.ibmPlexSans(fontSize: 13, color: AppColor.gray),
+                                      ],
                                     ),
                                   ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }),
@@ -963,7 +1146,10 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
         decoration: BoxDecoration(
           color: selected ? AppColor.white : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: selected ? AppColor.blue : AppColor.borderGary, width: 1),
+          border: Border.all(
+            color: selected ? AppColor.blue : AppColor.borderGary,
+            width: 1,
+          ),
         ),
         child: Text(
           label,
@@ -977,4 +1163,3 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
     );
   }
 }
-
