@@ -8,6 +8,7 @@ import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
 import '../../../api/repository/failure.dart';
 import '../Model/details_preview.dart'; // QuizDetailsPreview, QuizDetailsData, Question
+import '../Model/history_specific_student_response.dart' hide Question;
 import '../Model/quiz_attend_response.dart';
 import '../Model/quizlist_response.dart'; // QuizListResponse, QuizData, QuizItem
 
@@ -29,6 +30,7 @@ class QuizController extends GetxController {
   // Flat cache for filters etc. (MUTABLE list, not a getter)
   final RxList<QuizItem> _allItems = <QuizItem>[].obs;
   final Rxn<AttendSummaryData> attendSummary = Rxn<AttendSummaryData>();
+  final Rxn<StudentQuizData> studentQuiz = Rxn<StudentQuizData>();
 
   // ---------- Nice UI getters (avoid null bangs) ----------
 
@@ -268,7 +270,6 @@ class QuizController extends GetxController {
     }
   }
 
-  // Name it by what it really takes: classId
   Future<String?> loadQuizAttendByClass({required int code}) async {
     isLoading.value = true;
     try {
@@ -301,6 +302,45 @@ class QuizController extends GetxController {
       AppLogger.log.e('AttendSummary exception: $msg');
       AppLogger.log.e(st.toString());
       return msg;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<String?> loadStudentQuizResult({
+    required int quizId,
+    required int studentId,
+  }) async {
+    if (isLoading.value) return null;
+    try {
+      isLoading.value = true;
+      lastError.value = '';
+
+      final result = await apiDataSource.studentQuizResults(
+        quizId: quizId,
+        studentId: studentId,
+      );
+
+      return result.fold(
+        (failure) {
+          lastError.value = failure.message;
+          // 🔐 Prevent stale UI from showing old data on error:
+          studentQuiz.value = null;
+          quizDetails.value = null; // keep alias in sync
+          AppLogger.log.e(failure.message);
+          return failure.message;
+        },
+        (resp) {
+          studentQuiz.value = resp.data;
+          AppLogger.log.i('Details fetched: ${resp.data}');
+        },
+      );
+    } catch (e) {
+      lastError.value = e.toString();
+      studentQuiz.value = null;
+      quizDetails.value = null;
+      AppLogger.log.e(e);
+      return e.toString();
     } finally {
       isLoading.value = false;
     }

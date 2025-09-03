@@ -225,7 +225,6 @@ bool _toBool(dynamic v) {
 }
 */
 
-// attend_summary_models.dart
 import 'dart:convert';
 
 class AttendSummaryResponse {
@@ -243,8 +242,7 @@ class AttendSummaryResponse {
 
   factory AttendSummaryResponse.fromAny(dynamic any) {
     if (any is String) return AttendSummaryResponse.fromJson(jsonDecode(any));
-    if (any is Map)
-      return AttendSummaryResponse.fromJson(any.cast<String, dynamic>());
+    if (any is Map) return AttendSummaryResponse.fromJson(any.cast<String, dynamic>());
     throw ArgumentError('Unsupported input to AttendSummaryResponse.fromAny');
   }
 
@@ -270,26 +268,37 @@ class AttendSummaryResponse {
 class AttendSummaryData {
   final QuizSummary quiz;
   final List<StudentDone> studentsDone;
+  final List<StudentUnfinished> studentsUnfinished; // 👈 NEW
 
-  AttendSummaryData({required this.quiz, required this.studentsDone});
+  AttendSummaryData({
+    required this.quiz,
+    required this.studentsDone,
+    required this.studentsUnfinished,
+  });
 
   factory AttendSummaryData.fromJson(Map<String, dynamic> json) {
-    final list = (json['studentsDone'] as List? ?? []);
+    final doneList = (json['studentsDone'] as List? ?? const []);
+    final unfinishedList = (json['studentsUnfinished'] as List? ?? const []);
+
     return AttendSummaryData(
       quiz: QuizSummary.fromJson(
         (json['quiz'] as Map?)?.cast<String, dynamic>() ?? const {},
       ),
-      studentsDone:
-          list
-              .whereType<Map>()
-              .map((e) => StudentDone.fromJson(e.cast<String, dynamic>()))
-              .toList(),
+      studentsDone: doneList
+          .whereType<Map>()
+          .map((e) => StudentDone.fromJson(e.cast<String, dynamic>()))
+          .toList(),
+      studentsUnfinished: unfinishedList
+          .whereType<Map>()
+          .map((e) => StudentUnfinished.fromJson(e.cast<String, dynamic>()))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
     'quiz': quiz.toJson(),
     'studentsDone': studentsDone.map((e) => e.toJson()).toList(),
+    'studentsUnfinished': studentsUnfinished.map((e) => e.toJson()).toList(),
   };
 }
 
@@ -369,6 +378,29 @@ class StudentDone {
   };
 }
 
+// 👇 NEW: unfinished row is just id + name
+class StudentUnfinished {
+  final int id;
+  final String name;
+
+  StudentUnfinished({
+    required this.id,
+    required this.name,
+  });
+
+  factory StudentUnfinished.fromJson(Map<String, dynamic> json) {
+    return StudentUnfinished(
+      id: _i(json['id']),
+      name: _s(json['name']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+  };
+}
+
 /// ---- tiny safe-cast helpers ----
 bool _b(dynamic v) {
   if (v is bool) return v;
@@ -385,3 +417,4 @@ int _i(dynamic v) {
 }
 
 String _s(dynamic v) => (v ?? '').toString();
+
