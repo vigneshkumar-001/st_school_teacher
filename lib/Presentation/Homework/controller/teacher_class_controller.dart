@@ -1,4 +1,4 @@
- import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/teacher_class_response.dart';
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
@@ -26,11 +26,11 @@ class TeacherClassController extends GetxController {
 
       final results = await apiDataSource.getTeacherClass();
       results.fold(
-            (failure) {
+        (failure) {
           isLoading.value = false;
           AppLogger.log.e(failure.message);
         },
-            (response) {
+        (response) {
           classList.value = response.data.classes;
           subjectList.value = response.data.subjects;
           isLoading.value = false;
@@ -41,7 +41,7 @@ class TeacherClassController extends GetxController {
 
             if (className != null && section != null) {
               selected = classList.firstWhereOrNull(
-                    (c) => c.name == className && c.section == section,
+                (c) => c.name == className && c.section == section,
               );
             }
 
@@ -61,7 +61,6 @@ class TeacherClassController extends GetxController {
     }
   }
 }
-
 
 // import 'package:get/get.dart';
 // import 'package:st_teacher_app/Presentation/Attendance/model/attendence_response.dart';

@@ -11,6 +11,7 @@ import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
 import '../../../api/repository/failure.dart';
 import '../Model/details_preview.dart'; // QuizDetailsPreview, QuizDetailsData, Question
+import '../Model/history_specific_student_response.dart' hide Question;
 import '../Model/quiz_attend_response.dart';
 import '../Model/quizlist_response.dart'; // QuizListResponse, QuizData, QuizItem
 
@@ -32,6 +33,7 @@ class QuizController extends GetxController {
   // Flat cache for filters etc. (MUTABLE list, not a getter)
   final RxList<QuizItem> _allItems = <QuizItem>[].obs;
   final Rxn<AttendSummaryData> attendSummary = Rxn<AttendSummaryData>();
+  final Rxn<StudentQuizData> studentQuiz = Rxn<StudentQuizData>();
 
   // ---------- Nice UI getters (avoid null bangs) ----------
 
@@ -103,17 +105,17 @@ class QuizController extends GetxController {
     final out = <String, List<QuizItem>>{};
     void addLabel(String label, List<QuizItem> items) {
       final filtered =
-          items.where(_matchesSelectedClass).toList()..sort(
+      items.where(_matchesSelectedClass).toList()..sort(
             (a, b) =>
-                _parseTimeOfDay(b.time).compareTo(_parseTimeOfDay(a.time)),
-          );
+            _parseTimeOfDay(b.time).compareTo(_parseTimeOfDay(a.time)),
+      );
       if (filtered.isNotEmpty) out[label] = filtered;
     }
 
     // Today/Yesterday first
     for (final s in const ['Today', 'Yesterday']) {
       final hit = data.byLabel.entries.firstWhere(
-        (e) => e.key.toLowerCase() == s.toLowerCase(),
+            (e) => e.key.toLowerCase() == s.toLowerCase(),
         orElse: () => const MapEntry('', <QuizItem>[]),
       );
       if (hit.key.isNotEmpty) addLabel(s, hit.value);
@@ -135,8 +137,8 @@ class QuizController extends GetxController {
       // If it's already only the inner data block
       final hasTopKeys =
           raw.containsKey('status') ||
-          raw.containsKey('code') ||
-          raw.containsKey('message');
+              raw.containsKey('code') ||
+              raw.containsKey('message');
       if (hasTopKeys && raw['data'] is Map<String, dynamic>) {
         return QuizData.fromJson((raw['data'] as Map).cast<String, dynamic>());
       }
@@ -155,14 +157,14 @@ class QuizController extends GetxController {
       isLoading.value = true;
 
       final results =
-          await apiDataSource.quizList(); // <-- use your data source
+      await apiDataSource.quizList(); // <-- use your data source
       return results.fold(
-        (Failure failure) {
+            (Failure failure) {
           lastError.value = failure.message;
           AppLogger.log.e(failure.message);
           return failure.message;
         },
-        (QuizListResponse resp) {
+            (QuizListResponse resp) {
           try {
             final parsed = _parseQuizPayload(resp);
             _quizData.value = parsed;
@@ -185,8 +187,8 @@ class QuizController extends GetxController {
               if (c.isNotEmpty) classes.add(c);
             }
             final sorted =
-                classes.toList()
-                  ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+            classes.toList()
+              ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
             classNames.assignAll(['All', ...sorted]);
 
             AppLogger.log.i(
@@ -212,89 +214,23 @@ class QuizController extends GetxController {
     }
   }
 
-  Future<String?> quizDetailsPreviews({required int classId}) async {
-    try {
-      isLoading.value = true;
-
-      final result = await apiDataSource.quizDetailsPreviews(code: classId);
-      return result.fold(
-        (failure) {
-          isLoading.value = false;
-          lastError.value = failure.message;
-          AppLogger.log.e(failure.message);
-          return failure.message;
-        },
-        (preview) {
-          // ✅ preview is QuizDetailsPreview
-          final data = preview.data; // QuizDetailsData
-          quizDetails.value = data;
-          isLoading.value = false;
-          lastError.value = '';
-          AppLogger.log.i('Details fetched: ${data?.title}');
-          return null;
-        },
-      );
-    } catch (e) {
-      isLoading.value = false;
-      lastError.value = e.toString();
-      AppLogger.log.e(e);
-      return e.toString();
-    }
-  }
-
-  // Name it by what it really takes: classId
-  Future<String?> loadQuizAttendByClass({required int code}) async {
-    isLoading.value = true;
-    try {
-      final result = await apiDataSource.loadQuizAttendByClass(quizId: code);
-      return result.fold(
-        (failure) {
-          final msg =
-              failure.message.isNotEmpty
-                  ? failure.message
-                  : 'Something went wrong';
-          lastError.value = msg;
-          AppLogger.log.e(
-            'AttendSummary FAILED: msg=${failure.message} code=${failure.code} data=${failure.data}',
-          );
-          return msg;
-        },
-        (resp) {
-          final data = resp.data; // AttendSummaryData
-          attendSummary.value = data;
-          lastError.value = '';
-          AppLogger.log.i(
-            'History fetched: ${data.quiz.title} / done=${data.studentsDone.length}',
-          );
-          return null;
-        },
-      );
-    } catch (e, st) {
-      final msg = e.toString();
-      lastError.value = msg;
-      AppLogger.log.e('AttendSummary exception: $msg');
-      AppLogger.log.e(st.toString());
-      return msg;
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  // ---------- API: CREATE (placeholder wiring) ----------
 
   Future<String?> quizCreate(
-    Map<String, dynamic> payload, {
-    bool showLoader = true,
-  }) async {
+      Map<String, dynamic> payload, {
+        bool showLoader = true,
+      }) async {
     try {
       if (showLoader) showPopupLoader();
       final results = await apiDataSource.quizCreate(payload);
       return results.fold(
-        (failure) {
+            (failure) {
           if (showLoader) hidePopupLoader();
           lastError.value = failure.message;
           AppLogger.log.e(failure.message);
           return failure.message;
         },
-        (response) async {
+            (response) async {
           if (showLoader) hidePopupLoader();
           isLoading.value = false;
           Get.offAll(QuizHistory());
@@ -339,6 +275,113 @@ class QuizController extends GetxController {
   void hidePopupLoader() {
     if (Get.isDialogOpen ?? false) {
       Get.back();
+    }
+  }
+
+  /// Loads quiz details by classId and sets [quizDetails]; returns `null` on success or an error message.
+  Future<String?> quizDetailsPreviews({required int classId}) async {
+    try {
+      isLoading.value = true;
+
+      final result = await apiDataSource.quizDetailsPreviews(code: classId);
+      return result.fold(
+            (failure) {
+          isLoading.value = false;
+          lastError.value = failure.message;
+          AppLogger.log.e(failure.message);
+          return failure.message;
+        },
+            (preview) {
+          // ✅ preview is QuizDetailsPreview
+          final data = preview.data; // QuizDetailsData
+          quizDetails.value = data;
+          isLoading.value = false;
+          lastError.value = '';
+          AppLogger.log.i('Details fetched: ${data?.title}');
+          return null;
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      lastError.value = e.toString();
+      AppLogger.log.e(e);
+      return e.toString();
+    }
+  }
+
+  Future<String?> loadQuizAttendByClass({required int code}) async {
+    isLoading.value = true;
+    try {
+      final result = await apiDataSource.loadQuizAttendByClass(quizId: code);
+      return result.fold(
+            (failure) {
+          final msg =
+          failure.message.isNotEmpty
+              ? failure.message
+              : 'Something went wrong';
+          lastError.value = msg;
+          AppLogger.log.e(
+            'AttendSummary FAILED: msg=${failure.message} code=${failure.code} data=${failure.data}',
+          );
+          return msg;
+        },
+            (resp) {
+          final data = resp.data; // AttendSummaryData
+          attendSummary.value = data;
+          lastError.value = '';
+          AppLogger.log.i(
+            'History fetched: ${data.quiz.title} / done=${data.studentsDone.length}',
+          );
+          return null;
+        },
+      );
+    } catch (e, st) {
+      final msg = e.toString();
+      lastError.value = msg;
+      AppLogger.log.e('AttendSummary exception: $msg');
+      AppLogger.log.e(st.toString());
+      return msg;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<String?> loadStudentQuizResult({
+    required int quizId,
+    required int studentId,
+  }) async {
+    if (isLoading.value) return null;
+    try {
+      isLoading.value = true;
+      lastError.value = '';
+
+      final result = await apiDataSource.studentQuizResults(
+        quizId: quizId,
+        studentId: studentId,
+      );
+
+      return result.fold(
+            (failure) {
+          lastError.value = failure.message;
+          // 🔐 Prevent stale UI from showing old data on error:
+          studentQuiz.value = null;
+          quizDetails.value = null; // keep alias in sync
+          AppLogger.log.e(failure.message);
+          return failure.message;
+        },
+            (resp) {
+          studentQuiz.value = resp.data;
+          AppLogger.log.i('Details fetched: ${resp.data}');
+        },
+      );
+    } catch (e) {
+      lastError.value = e.toString();
+      studentQuiz.value = null;
+      quizDetails.value = null;
+      AppLogger.log.e(e);
+      return e.toString();
+    } finally {
+      isLoading.value = false;
     }
   }
 }

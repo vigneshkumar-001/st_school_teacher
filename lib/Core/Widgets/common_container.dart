@@ -239,70 +239,70 @@ class CommonContainer {
   }
 
   /*
-  static StudentsList({
-    required String mainText,
-    VoidCallback? onIconTap,
+    static StudentsList({
+      required String mainText,
+      VoidCallback? onIconTap,
 
 
-  static StudentsList({
-    required String mainText,
-    VoidCallback? onIconTap,
+    static StudentsList({
+      required String mainText,
+      VoidCallback? onIconTap,
 
-    bool blueContainer = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: InkWell(
-        onTap: onIconTap,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text(
-                  mainText,
-                  style: GoogleFont.ibmPlexSans(
-                    fontSize: 14,
-                    color: AppColor.black,
-                  ),
-                ),
-                Spacer(),
-                if (blueContainer)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColor.blueStdContainer,
-                      borderRadius: BorderRadius.circular(50),
+      bool blueContainer = false,
+    }) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        child: InkWell(
+          onTap: onIconTap,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    mainText,
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 14,
+                      color: AppColor.black,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 5,
-                        horizontal: 20,
+                  ),
+                  Spacer(),
+                  if (blueContainer)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColor.blueStdContainer,
+                        borderRadius: BorderRadius.circular(50),
                       ),
-                      child: Text(
-                        '7 out of 10',
-                        style: GoogleFont.ibmPlexSans(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                          color: AppColor.blue,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 20,
+                        ),
+                        child: Text(
+                          '7 out of 10',
+                          style: GoogleFont.ibmPlexSans(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: AppColor.blue,
+                          ),
                         ),
                       ),
                     ),
+                  SizedBox(width: 10),
+                  Image.asset(
+                    AppImages.rightSideArrow,
+                    height: 10,
+                    color: AppColor.lightgray,
                   ),
-                SizedBox(width: 10),
-                Image.asset(
-                  AppImages.rightSideArrow,
-                  height: 10,
-                  color: AppColor.lightgray,
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Divider(color: AppColor.lowLightgray),
-          ],
+                ],
+              ),
+              SizedBox(height: 10),
+              Divider(color: AppColor.lowLightgray),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-*/
+      );
+    }
+  */
 
   static announcementsScreen({
     required String mainText,
@@ -1069,197 +1069,66 @@ class CommonContainer {
   }
 
   /*  // inside CommonContainer
-  static Widget quizContainer({
-    required String leftTextNumber,
-    required String leftValue,
-    required String rightTextNumber,
-    required String rightValue,
-    required bool leftSelected,
-    required bool rightSelected,
-    required bool isQuizCompleted,
-    Color? leftBorderColor,
-    Color? rightBorderColor,
-    VoidCallback? leftOnTap,
-    VoidCallback? rightOnTap,
-  }) {
-    // If right side has no option, render a transparent placeholder
-    final bool rightIsPlaceholder =
-        rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
+    static Widget quizContainer({
+      required String leftTextNumber,
+      required String leftValue,
+      required String rightTextNumber,
+      required String rightValue,
+      required bool leftSelected,
+      required bool rightSelected,
+      required bool isQuizCompleted,
+      Color? leftBorderColor,
+      Color? rightBorderColor,
+      VoidCallback? leftOnTap,
+      VoidCallback? rightOnTap,
+    }) {
+      // If right side has no option, render a transparent placeholder
+      final bool rightIsPlaceholder =
+          rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
 
-    return Row(
-      children: [
-        // LEFT
-        Expanded(
-          child: GestureDetector(
-            onTap: leftOnTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: BoxDecoration(
-                gradient:
-                    leftSelected
-                        ? const LinearGradient(
-                          colors: [Colors.white, Colors.white],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        )
-                        : null,
-                color: leftSelected ? null : AppColor.lowLightgray,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color:
-                      leftSelected
-                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                          : AppColor.lowLightgray,
-                  width: leftSelected ? 3 : 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField.textWithSmall(text: leftTextNumber),
-                  ),
-                  Expanded(
-                    child: CustomTextField.textWithSmall(
-                      text: leftValue,
-                      fontWeight:
-                          leftSelected ? FontWeight.w800 : FontWeight.w500,
-                      color:
-                          leftSelected
-                              ? (isQuizCompleted
-                                  ? AppColor.green
-                                  : AppColor.green)
-                              : AppColor.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(width: 20),
-
-        // RIGHT (real card or transparent placeholder)
-        Expanded(
-          child:
-              rightIsPlaceholder
-                  ? Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.transparent, width: 1),
-                    ),
-                    child: Row(
-                      children: const [
-                        Expanded(child: SizedBox()),
-                        Expanded(child: SizedBox()),
-                      ],
-                    ),
-                  )
-                  : GestureDetector(
-                    onTap: rightOnTap,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient:
-                            rightSelected
-                                ? const LinearGradient(
-                                  colors: [Colors.white, Colors.white],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                )
-                                : null,
-                        color: rightSelected ? null : AppColor.lowLightgray,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color:
-                              rightSelected
-                                  ? (isQuizCompleted
-                                      ? AppColor.green
-                                      : AppColor.green)
-                                  : AppColor.lowLightgray,
-                          width: rightSelected ? 3 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: CustomTextField.textWithSmall(
-                              text: rightTextNumber,
-                            ),
-                          ),
-                          Expanded(
-                            child: CustomTextField.textWithSmall(
-                              text: rightValue,
-                              fontWeight:
-                                  rightSelected
-                                      ? FontWeight.w800
-                                      : FontWeight.w500,
-                              color: AppColor.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-        ),
-      ],
-    );
-  }
-
-  static quizContainer1({
-    required String leftTextNumber,
-    required String leftValue,
-    required bool isSelected,
-
-    Color? borderColor,
-    VoidCallback? onTap,
-    required bool isQuizCompleted,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
+      return Row(
         children: [
+          // LEFT
           Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColor.white : AppColor.lowLightgray,
-                borderRadius: BorderRadius.circular(16),
-
-                border: Border.all(
-                  color:
-                      isSelected
-                          ? (isQuizCompleted ? AppColor.green : AppColor.green)
-                          : AppColor.lowLightgray,
-                  width: isSelected ? 3 : 1,
+            child: GestureDetector(
+              onTap: leftOnTap,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                decoration: BoxDecoration(
+                  gradient:
+                      leftSelected
+                          ? const LinearGradient(
+                            colors: [Colors.white, Colors.white],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          )
+                          : null,
+                  color: leftSelected ? null : AppColor.lowLightgray,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color:
+                        leftSelected
+                            ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                            : AppColor.lowLightgray,
+                    width: leftSelected ? 3 : 1,
+                  ),
                 ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 1,
-                      child: CustomTextField.textWithSmall(
-                        text: leftTextNumber,
-
-                        color: AppColor.borderGary,
-                      ),
+                      child: CustomTextField.textWithSmall(text: leftTextNumber),
                     ),
                     Expanded(
-                      flex: 6,
                       child: CustomTextField.textWithSmall(
                         text: leftValue,
-
-                        color: AppColor.black,
+                        fontWeight:
+                            leftSelected ? FontWeight.w800 : FontWeight.w500,
+                        color:
+                            leftSelected
+                                ? (isQuizCompleted
+                                    ? AppColor.green
+                                    : AppColor.green)
+                                : AppColor.black,
                       ),
                     ),
                   ],
@@ -1267,10 +1136,141 @@ class CommonContainer {
               ),
             ),
           ),
+
+          const SizedBox(width: 20),
+
+          // RIGHT (real card or transparent placeholder)
+          Expanded(
+            child:
+                rightIsPlaceholder
+                    ? Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.transparent, width: 1),
+                      ),
+                      child: Row(
+                        children: const [
+                          Expanded(child: SizedBox()),
+                          Expanded(child: SizedBox()),
+                        ],
+                      ),
+                    )
+                    : GestureDetector(
+                      onTap: rightOnTap,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient:
+                              rightSelected
+                                  ? const LinearGradient(
+                                    colors: [Colors.white, Colors.white],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  )
+                                  : null,
+                          color: rightSelected ? null : AppColor.lowLightgray,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color:
+                                rightSelected
+                                    ? (isQuizCompleted
+                                        ? AppColor.green
+                                        : AppColor.green)
+                                    : AppColor.lowLightgray,
+                            width: rightSelected ? 3 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextField.textWithSmall(
+                                text: rightTextNumber,
+                              ),
+                            ),
+                            Expanded(
+                              child: CustomTextField.textWithSmall(
+                                text: rightValue,
+                                fontWeight:
+                                    rightSelected
+                                        ? FontWeight.w800
+                                        : FontWeight.w500,
+                                color: AppColor.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+          ),
         ],
-      ),
-    );
-  }*/
+      );
+    }
+
+    static quizContainer1({
+      required String leftTextNumber,
+      required String leftValue,
+      required bool isSelected,
+
+      Color? borderColor,
+      VoidCallback? onTap,
+      required bool isQuizCompleted,
+    }) {
+      return GestureDetector(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColor.white : AppColor.lowLightgray,
+                  borderRadius: BorderRadius.circular(16),
+
+                  border: Border.all(
+                    color:
+                        isSelected
+                            ? (isQuizCompleted ? AppColor.green : AppColor.green)
+                            : AppColor.lowLightgray,
+                    width: isSelected ? 3 : 1,
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: CustomTextField.textWithSmall(
+                          text: leftTextNumber,
+
+                          color: AppColor.borderGary,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: CustomTextField.textWithSmall(
+                          text: leftValue,
+
+                          color: AppColor.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }*/
 
   // inside CommonContainer
 

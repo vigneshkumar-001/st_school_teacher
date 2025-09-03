@@ -20,6 +20,7 @@ import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
 import '../../Presentation/Profile/model/teacher_data_response.dart';
 import '../../Presentation/Quiz Screen/Model/details_preview.dart';
+import '../../Presentation/Quiz Screen/Model/history_specific_student_response.dart';
 import '../../Presentation/Quiz Screen/Model/quiz_attend_response.dart';
 import '../../Presentation/Quiz Screen/Model/quizlist_response.dart';
 import '../repository/failure.dart';
@@ -141,8 +142,8 @@ class ApiDataSource extends BaseApiDataSource {
   }
 
   Future<Either<Failure, AttendanceResponse>> getTodayStatus(
-    int classId,
-  ) async {
+      int classId,
+      ) async {
     try {
       String url = ApiUrl.studentAttendance(classId: classId);
 
@@ -193,9 +194,9 @@ class ApiDataSource extends BaseApiDataSource {
   }
 
   Future<Either<Failure, AttendanceHistoryResponse>> fetchAttendanceHistory(
-    int classId,
-    DateTime date,
-  ) async {
+      int classId,
+      DateTime date,
+      ) async {
     final formattedDate = DateFormat('yyyy-MM-dd').format(date);
     try {
       String url = ApiUrl.attendanceByDate(
@@ -482,7 +483,7 @@ class ApiDataSource extends BaseApiDataSource {
 
       final response = await Request.formData(url, formData, 'POST', true);
       Map<String, dynamic> responseData =
-          jsonDecode(response.data) as Map<String, dynamic>;
+      jsonDecode(response.data) as Map<String, dynamic>;
       if (response.statusCode == 200) {
         if (responseData['status'] == true) {
           return Right(UserImageModels.fromJson(responseData));
@@ -502,6 +503,7 @@ class ApiDataSource extends BaseApiDataSource {
       return Left(ServerFailure('Something went wrong'));
     }
   }
+
 
   // Future<Either<Failure, QuizListResponse>> quizList() async {
   //   try {
@@ -558,9 +560,9 @@ class ApiDataSource extends BaseApiDataSource {
         }
       } else {
         String errorMessage =
-            (response is DioException)
-                ? response.message ?? "Network error"
-                : "Request failed with status: ${response.statusCode}";
+        (response is DioException)
+            ? response.message ?? "Network error"
+            : "Request failed with status: ${response.statusCode}";
         return Left(ServerFailure(errorMessage));
       }
     } catch (e) {
@@ -597,7 +599,6 @@ class ApiDataSource extends BaseApiDataSource {
   }) async {
     try {
       final url = ApiUrl.teacherQuizAttend(classId: quizId);
-      AppLogger.log.i('→ POST $url');
 
       // 👇 Correct: use sendRequest with POST
       final resp = await Request.sendRequest(url, {}, 'POST', true);
@@ -650,6 +651,31 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
+  Future<Either<Failure, StudentQuizResult>> studentQuizResults({
+    required int quizId,
+    required int studentId,
+  }) async {
+    try {
+      final url = ApiUrl.studentQuizResult(
+        quizId: quizId,
+        studentId: studentId,
+      );
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(StudentQuizResult.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
   Future<Either<Failure, QuizDetailsPreview>> quizCreate(
       Map<String, dynamic> body,
       ) async {
