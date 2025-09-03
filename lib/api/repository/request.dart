@@ -33,7 +33,7 @@ class Request {
           ResponseInterceptorHandler handler,
         ) {
           AppLogger.log.i(
-            "sendPostRequest \n API: $url \n RESPONSE: ${response.toString()}",
+            "sendPostRequest \n API: $url \n Token: $token \n RESPONSE: ${response.toString()}",
           );
           return handler.next(response);
         },
