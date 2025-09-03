@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
+import 'package:get/get.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import 'package:get/get.dart';
+import 'controller/create_homework_controller.dart';
 
 class HomeworkHistoryDetails extends StatefulWidget {
   final int homeworkId;
@@ -29,6 +29,58 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
     });
   }
 
+  // ---------- Image helpers (network) ----------
+  void _openFullScreenNetwork(String url) {
+    if (url.isEmpty) return;
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.9),
+      builder:
+          (_) => GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 5,
+                child: Image.network(
+                  url,
+                  errorBuilder:
+                      (_, __, ___) =>
+                          Image.asset(AppImages.homeworkPreviewImage2),
+                ),
+              ),
+            ),
+          ),
+    );
+  }
+
+  /// Full-width network image with large height, keeps aspect (no crop).
+  Widget _fullWidthNetImage(String url) {
+    final h = MediaQuery.of(context).size.height;
+    return GestureDetector(
+      onTap: () => _openFullScreenNetwork(url),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: h * 0.6), // big but safe
+          child: Image.network(
+            url,
+            width: double.infinity,
+            fit:
+                BoxFit
+                    .contain, // change to cover if you prefer edge-to-edge crop
+            errorBuilder:
+                (_, __, ___) => Image.asset(
+                  AppImages.homeworkPreviewImage2,
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,29 +93,34 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Pick first image from tasks (cover)
-          final tasks = details.tasks ?? [];
-
-          // Get first image task
+          final List<dynamic> tasks = (details.tasks ?? []);
           Map<String, dynamic>? firstImageTask;
-          for (var t in tasks) {
-            if (t['type'] == 'image') {
-              firstImageTask = t;
+          for (final t in tasks) {
+            if (t is Map &&
+                t['type'] == 'image' &&
+                (t['content'] ?? '').toString().isNotEmpty) {
+              firstImageTask = t.cast<String, dynamic>();
               break;
             }
           }
 
-          // Remaining tasks, excluding the first image
           final remainingTasks =
               tasks.where((t) => t != firstImageTask).toList();
-
-          // Separate remaining images and paragraphs
           final remainingImages =
-              remainingTasks.where((t) => t['type'] == 'image').toList();
+              remainingTasks
+                  .where((t) => t is Map && t['type'] == 'image')
+                  .cast<Map>()
+                  .toList();
           final remainingParagraphs =
-              remainingTasks.where((t) => t['type'] == 'paragraph').toList();
+              remainingTasks
+                  .where((t) => t is Map && t['type'] == 'paragraph')
+                  .cast<Map>()
+                  .toList();
           final remainingLists =
-              remainingTasks.where((t) => t['type'] == 'list').toList();
+              remainingTasks
+                  .where((t) => t is Map && t['type'] == 'list')
+                  .cast<Map>()
+                  .toList();
 
           return SingleChildScrollView(
             child: Padding(
@@ -90,207 +147,201 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Card
                   Container(
                     decoration: BoxDecoration(
                       color: AppColor.white,
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 30,
-                        horizontal: 20,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // --- First image ---
-                          if (firstImageTask != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                firstImageTask['content'] ?? '',
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (context, error, stackTrace) => Image.asset(
-                                      AppImages.homeworkPreviewImage2,
-                                    ),
-                              ),
-                            )
-                          else
-                            Image.asset(
-                              AppImages.homeworkPreviewImage2,
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-
-                          const SizedBox(height: 20),
-
-                          // --- Title & main description ---
-                          Text(
-                            details.title ?? '',
-                            style: GoogleFont.inter(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 24,
-                              color: AppColor.lightBlack,
-                            ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            right: 30,
+                            left: 30,
+                            top: 30,
                           ),
-                          if (details.description != null)
-                            Text(
-                              details.description,
-                              style: GoogleFont.inter(
-                                fontSize: 12,
-                                color: AppColor.gray,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ---- First image (full width) ----
+                              // if (firstImageTask != null)
+                              //   _fullWidthNetImage((firstImageTask!['content'] ?? '').toString())
+                              // else
+                              //   ClipRRect(
+                              //     borderRadius: BorderRadius.circular(16),
+                              //     child: Image.asset(
+                              //       AppImages.homeworkPreviewImage2,
+                              //       width: double.infinity,
+                              //       fit: BoxFit.contain,
+                              //     ),
+                              //   ),
+
+                              // ---- Title & main description ----
+                              Text(
+                                (details.title ?? ''),
+                                style: GoogleFont.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 24,
+                                  color: AppColor.lightBlack,
+                                ),
                               ),
-                            ),
-                          if (remainingLists.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            Text(
-                              "List Points:",
-                              style: GoogleFont.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.black,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(remainingLists.length, (
-                                  index,
+                              if ((details.description ?? '')
+                                  .toString()
+                                  .trim()
+                                  .isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  (details.description ?? '').toString(),
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    color: AppColor.gray,
+                                  ),
+                                ),
+                              ],
+
+                              // ---- List points (if any) ----
+                              if (remainingLists.isNotEmpty) ...[
+                                const SizedBox(height: 16),
+                                Text(
+                                  "List Points:",
+                                  style: GoogleFont.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: List.generate(remainingLists.length, (
+                                    index,
                                   ) {
-                                final task = remainingLists[index];
+                                    final task = remainingLists[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 4),
+                                      child: Text(
+                                        "${index + 1}. ${(task['content'] ?? '').toString()}",
+                                        style: GoogleFont.inter(
+                                          fontSize: 13,
+                                          color: AppColor.gray,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ],
+
+                              const SizedBox(height: 16),
+
+                              // ---- Remaining images (each full width) ----
+                              ...remainingImages.map<Widget>((task) {
+                                final url = (task['content'] ?? '').toString();
                                 return Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _fullWidthNetImage(url),
+                                );
+                              }),
+
+                              const SizedBox(height: 12),
+
+                              // ---- Paragraphs ----
+                              ...remainingParagraphs.map<Widget>((task) {
+                                final txt = (task['content'] ?? '').toString();
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
                                   child: Text(
-                                    "${index + 1}. ${task['content'] ?? ''}",
+                                    txt,
                                     style: GoogleFont.inter(
-                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14,
                                       color: AppColor.gray,
                                     ),
                                   ),
                                 );
                               }),
-                            ),
-                          ],
-                          const SizedBox(height: 16),
-
-                          // --- Remaining images ---
-                          ...remainingImages.map<Widget>(
-                            (task) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  task['content'] ?? '',
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                          Image.asset(
-                                            AppImages.homeworkPreviewImage2,
-                                          ),
-                                ),
-                              ),
-                            ),
+                            ],
                           ),
+                        ),
 
-                          const SizedBox(height: 16),
-
-                          // --- Paragraphs ---
-                          ...remainingParagraphs.map<Widget>(
-                            (task) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                task['content'] ?? '',
-                                style: GoogleFont.inter(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                  color: AppColor.gray,
-                                ),
-                              ),
+                        // ---- Subject / Time chips ----
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 30,
                             ),
-                          ),
-                          // --- List Points ---
-
-
-                          const SizedBox(height: 16),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColor.black.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            child: Image.asset(
-                                              AppImages.avatar1,
-                                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColor.black.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          child: Image.asset(AppImages.avatar1),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          (details.subject?.name ?? '')
+                                              .toString(),
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.lightBlack,
                                           ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            '${details?.subject.name}',
-                                            style: GoogleFont.inter(
-                                              fontSize: 12,
-                                              color: AppColor.lightBlack,
-                                            ),
-                                          ),
-                                          SizedBox(width: 20),
-                                        ],
-                                      ),
+                                        ),
+                                        const SizedBox(width: 20),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(width: 20),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColor.black.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            CupertinoIcons.clock_fill,
-                                            size: 35,
-                                            color: AppColor.lightBlack
-                                                .withOpacity(0.3),
+                                ),
+                                const SizedBox(width: 20),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColor.black.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          CupertinoIcons.clock_fill,
+                                          size: 35,
+                                          color: AppColor.lightBlack
+                                              .withOpacity(0.3),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          (details.time ?? '').toString(),
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.lightBlack,
                                           ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            details?.time ?? '',
-                                            style: GoogleFont.inter(
-                                              fontSize: 12,
-                                              color: AppColor.lightBlack,
-                                            ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          (details.date ?? '').toString(),
+                                          style: GoogleFont.inter(
+                                            fontSize: 12,
+                                            color: AppColor.gray,
                                           ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            details?.date ?? '',
-                                            style: GoogleFont.inter(
-                                              fontSize: 12,
-                                              color: AppColor.gray,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

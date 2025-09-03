@@ -1012,23 +1012,16 @@ import 'package:flutter/material.dart';
 import 'package:st_teacher_app/Core/consents.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:get_it/get_it.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-
 import 'package:st_teacher_app/Core/Utility/app_color.dart';
 import 'package:st_teacher_app/Core/Utility/app_images.dart';
 import 'package:st_teacher_app/Presentation/Homework/controller/teacher_class_controller.dart';
 import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import '../Attendance/attendance_history_student.dart';
 import '../Attendance/attendance_start.dart';
 import '../Homework/homework_create.dart';
 import '../Menu/menu_screen.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-
 import 'dart:ui' show lerpDouble;
-
 import '../Profile/controller/teacher_data_controller.dart';
 import '../Quiz Screen/quiz_screen_create.dart'; // so we can call lerpDouble(...)
 
@@ -1408,8 +1401,8 @@ class _HomeState extends State<Home> {
 
                                           const cardIconSizes = [
                                             {
-                                              "selectedH": 200,
-                                              "selectedW": 220,
+                                              "selectedH": 290,
+                                              "selectedW": 260,
                                               "sideH": 160,
                                               "sideW": 170,
                                             }, // card 0
@@ -1420,10 +1413,10 @@ class _HomeState extends State<Home> {
                                               "sideW": 156,
                                             }, // card 1 (bigger)
                                             {
-                                              "selectedH": 410,
-                                              "selectedW": 450,
+                                              "selectedH": 220,
+                                              "selectedW": 250,
                                               "sideH": 190,
-                                              "sideW": 200,
+                                              "sideW": 180,
                                             }, // card 2
                                           ];
 

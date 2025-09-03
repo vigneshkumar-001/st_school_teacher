@@ -95,7 +95,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                   SizedBox(height: 35),
                   Center(
                     child: Text(
-                      'Homework Preview',
+                      'Homework History',
                       style: GoogleFont.inter(
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
@@ -189,7 +189,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                           Center(
                                             child: Text(
                                               dateLabel,
-                                              style: TextStyle(
+                                              style: GoogleFont.ibmPlexSans(
                                                 fontSize: 12,
                                                 color: AppColor.gray,
                                               ),
@@ -217,6 +217,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                                 bottom: 10,
                                               ),
                                               child: CommonContainer.homeworkhistory(
+                                                CText1: hw.classNames,
                                                 onIconTap: () {
                                                   Get.to(
                                                     () =>

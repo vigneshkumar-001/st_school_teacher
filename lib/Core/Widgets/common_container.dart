@@ -21,10 +21,11 @@ class CommonContainer {
     bool addButton = false,
     VoidCallback? onIconTap,
     VoidCallback? Start,
+    Color? color =AppColor.white,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColor.white,
+        color: color,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
@@ -166,10 +167,83 @@ class CommonContainer {
       ),
     );
   }
+  static StudentsList({
+    required String mainText,
+    String? subText,   // 👈 added
+    VoidCallback? onIconTap,
+    bool blueContainer = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      child: InkWell(
+        onTap: onIconTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  mainText,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 14,
+                    color: AppColor.black,
+                  ),
+                ),
+                Spacer(),
+                if (blueContainer)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.blueStdContainer,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      child: Text(
+                        '7 out of 10',
+                        style: GoogleFont.ibmPlexSans(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: AppColor.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                SizedBox(width: 10),
+                Image.asset(
+                  AppImages.rightSideArrow,
+                  height: 10,
+                  color: AppColor.lightgray,
+                ),
+              ],
+            ),
+            if (subText != null) ...[
+              SizedBox(height: 4),
+              Text(
+                subText,
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 12,
+                  color: AppColor.lightgray,
+                ),
+              ),
+            ],
+            SizedBox(height: 10),
+            Divider(color: AppColor.lowLightgray),
+          ],
+        ),
+      ),
+    );
+  }
+
+/*
+  static StudentsList({
+    required String mainText,
+    VoidCallback? onIconTap,
+
 
   static StudentsList({
     required String mainText,
     VoidCallback? onIconTap,
+
     bool blueContainer = false,
   }) {
     return Padding(
@@ -224,6 +298,7 @@ class CommonContainer {
       ),
     );
   }
+*/
 
   static announcementsScreen({
     required String mainText,
@@ -553,6 +628,8 @@ class CommonContainer {
       ],
     );
   }
+
+
 
   static textWithSmall({
     required String text,
@@ -1226,15 +1303,18 @@ class CommonContainer {
     Alignment iconAlignment = Alignment.center,
     double iconYOffset = 0,
     EdgeInsets? iconPadding,
+
     TextAlign textAlign = TextAlign.start,
     EdgeInsets? textPadding,
   }) {
     final CrossAxisAlignment textCross =
-    (textAlign == TextAlign.end)
-        ? CrossAxisAlignment.end
-        : (textAlign == TextAlign.center)
-        ? CrossAxisAlignment.center
-        : CrossAxisAlignment.start;
+
+        (textAlign == TextAlign.end)
+            ? CrossAxisAlignment.end
+            : (textAlign == TextAlign.center)
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start;
+
 
     return Material(
       color: Colors.transparent,
@@ -1247,6 +1327,7 @@ class CommonContainer {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
+
             Positioned.fill(
               child: IgnorePointer(
                 child: Image.asset(bcImage, fit: BoxFit.cover),
@@ -1259,7 +1340,9 @@ class CommonContainer {
               top: 20,
               child: Padding(
                 padding:
-                textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
+
+                    textPadding ?? const EdgeInsets.symmetric(horizontal: 25),
+
                 child: Column(
                   crossAxisAlignment: textCross,
                   children: [
@@ -1271,7 +1354,9 @@ class CommonContainer {
                       style: GoogleFont.ibmPlexSans(
                         fontSize: isSelect ? 22 : 15,
                         fontWeight:
-                        isSelect ? FontWeight.w800 : FontWeight.w500,
+
+                            isSelect ? FontWeight.w800 : FontWeight.w500,
+
                         color: AppColor.white,
                       ),
                     ),
@@ -1283,7 +1368,9 @@ class CommonContainer {
                       style: GoogleFont.ibmPlexSans(
                         fontSize: isSelect ? 22 : 20,
                         fontWeight:
-                        isSelect ? FontWeight.w500 : FontWeight.w800,
+
+                            isSelect ? FontWeight.w500 : FontWeight.w800,
+
                         color: AppColor.white,
                       ),
                     ),
@@ -1292,12 +1379,14 @@ class CommonContainer {
               ),
             ),
 
+
             Positioned.fill(
               child: Padding(
                 padding:
-                isSelect
-                    ? const EdgeInsets.symmetric(horizontal: 0)
-                    : const EdgeInsets.symmetric(horizontal: 25),
+                    isSelect
+                        ? const EdgeInsets.symmetric(horizontal: 0)
+                        : const EdgeInsets.symmetric(horizontal: 25),
+
                 child: Align(
                   alignment: iconAlignment,
                   child: Transform.translate(
@@ -1416,33 +1505,22 @@ class CommonContainer {
               bool isExpanded = section == expandedSection;
               List<String> subjects = sectionSubjects?[section] ?? [];
 
-              return Padding(
-                padding: padding,
-                child: InkWell(
-                  onTap: () {
-                    if (onSectionTap != null) {
-                      onSectionTap(isExpanded ? '' : section);
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color:
-                      sectionBgColor ?? AppColor.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColor.white),
-                    ),
-                    padding:
-                    sectionTextPadding ??
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          section,
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.black,
-                          ),
+
+                  return Padding(
+                    padding: padding,
+                    child: InkWell(
+                      onTap: () {
+                        if (onSectionTap != null) {
+                          onSectionTap(isExpanded ? '' : section);
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              sectionBgColor ?? AppColor.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColor.white),
+
                         ),
                         if (isExpanded && subjects.isNotEmpty) ...[
                           SizedBox(width: 8),
@@ -1520,189 +1598,189 @@ class CommonContainer {
                   flex: flex,
                   child: GestureDetector(
                     onTap:
-                    (datePickMode != DatePickMode.none && context != null)
-                        ? () async {
-                      String dd(int v) => v.toString().padLeft(2, '0');
-                      String fmt(DateTime d) =>
-                          '${dd(d.day)}-${dd(d.month)}-${d.year}';
+                        (datePickMode != DatePickMode.none && context != null)
+                            ? () async {
+                              String dd(int v) => v.toString().padLeft(2, '0');
+                              String fmt(DateTime d) =>
+                                  '${dd(d.day)}-${dd(d.month)}-${d.year}';
 
-                      if (datePickMode == DatePickMode.single) {
-                        final picked = await showDatePicker(
-                          context: context!,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime(2100),
-                          builder:
-                              (ctx, child) => Theme(
-                            data: Theme.of(ctx).copyWith(
-                              dialogBackgroundColor: AppColor.white,
-                              colorScheme: ColorScheme.light(
-                                primary: AppColor.blue,
-                                onPrimary: Colors.white,
-                                onSurface: AppColor.black,
-                              ),
-                              textButtonTheme: TextButtonThemeData(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColor.blue,
-                                ),
-                              ),
-                            ),
-                            child: child!,
-                          ),
-                        );
-                        if (picked != null) {
-                          controller.text = fmt(picked);
-                        }
-                      } else if (datePickMode == DatePickMode.range) {
-                        final picked = await showDateRangePicker(
-                          context: context!,
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                          initialDateRange: DateTimeRange(
-                            start: DateTime.now(),
-                            end: DateTime.now().add(
-                              const Duration(days: 7),
-                            ),
-                          ),
-                          builder:
-                              (ctx, child) => Theme(
-                            data: Theme.of(ctx).copyWith(
-                              dialogBackgroundColor: AppColor.white,
-                              colorScheme: ColorScheme.light(
-                                primary: AppColor.blue,
-                                onPrimary: Colors.white,
-                                onSurface: AppColor.black,
-                              ),
-                              textButtonTheme: TextButtonThemeData(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColor.blue,
-                                ),
-                              ),
-                            ),
-                            child: child!,
-                          ),
-                        );
-                        if (picked != null) {
-                          controller.text =
-                          '${fmt(picked.start)}  to  ${fmt(picked.end)}';
-                        }
-                      }
-                    }
-                        : null,
+                              if (datePickMode == DatePickMode.single) {
+                                final picked = await showDatePicker(
+                                  context: context!,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime(2100),
+                                  builder:
+                                      (ctx, child) => Theme(
+                                        data: Theme.of(ctx).copyWith(
+                                          dialogBackgroundColor: AppColor.white,
+                                          colorScheme: ColorScheme.light(
+                                            primary: AppColor.blue,
+                                            onPrimary: Colors.white,
+                                            onSurface: AppColor.black,
+                                          ),
+                                          textButtonTheme: TextButtonThemeData(
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: AppColor.blue,
+                                            ),
+                                          ),
+                                        ),
+                                        child: child!,
+                                      ),
+                                );
+                                if (picked != null) {
+                                  controller.text = fmt(picked);
+                                }
+                              } else if (datePickMode == DatePickMode.range) {
+                                final picked = await showDateRangePicker(
+                                  context: context!,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                  initialDateRange: DateTimeRange(
+                                    start: DateTime.now(),
+                                    end: DateTime.now().add(
+                                      const Duration(days: 7),
+                                    ),
+                                  ),
+                                  builder:
+                                      (ctx, child) => Theme(
+                                        data: Theme.of(ctx).copyWith(
+                                          dialogBackgroundColor: AppColor.white,
+                                          colorScheme: ColorScheme.light(
+                                            primary: AppColor.blue,
+                                            onPrimary: Colors.white,
+                                            onSurface: AppColor.black,
+                                          ),
+                                          textButtonTheme: TextButtonThemeData(
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: AppColor.blue,
+                                            ),
+                                          ),
+                                        ),
+                                        child: child!,
+                                      ),
+                                );
+                                if (picked != null) {
+                                  controller.text =
+                                      '${fmt(picked.start)}  to  ${fmt(picked.end)}';
+                                }
+                              }
+                            }
+                            : null,
 
                     child: AbsorbPointer(
                       absorbing: datePickMode != DatePickMode.none,
                       child:
-                      styledRangeText
-                          ? Stack(
-                        alignment: Alignment.centerLeft,
-                        children: [
-                          Opacity(
-                            opacity: 0,
-                            child: TextFormField(
-                              controller: controller,
-                              validator: validator,
-                              readOnly: true,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 10,
+                          styledRangeText
+                              ? Stack(
+                                alignment: Alignment.centerLeft,
+                                children: [
+                                  Opacity(
+                                    opacity: 0,
+                                    child: TextFormField(
+                                      controller: controller,
+                                      validator: validator,
+                                      readOnly: true,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        isDense: true,
+                                        contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  ValueListenableBuilder<TextEditingValue>(
+                                    valueListenable: controller,
+                                    builder: (context, value, _) {
+                                      final raw = value.text.trim();
+                                      if (raw.isEmpty) {
+                                        return Text(
+                                          text,
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            color: AppColor.gray,
+                                          ),
+                                        );
+                                      }
+
+                                      final parts = raw.split(
+                                        RegExp(
+                                          r'\s+to\s+',
+                                          caseSensitive: false,
+                                        ),
+                                      );
+                                      if (parts.length == 1) {
+                                        // single date style
+                                        return Text(
+                                          parts[0],
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColor.black,
+                                          ),
+                                        );
+                                      }
+
+                                      final startTxt = parts[0];
+                                      final endTxt = parts[1];
+
+                                      return RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: startTxt,
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.black,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: '   to   ',
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.gray,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: endTxt,
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )
+                              : TextFormField(
+                                controller: controller,
+                                validator: validator,
+                                readOnly: datePickMode != DatePickMode.none,
+                                onChanged: onChanged,
+                                maxLines: maxLine,
+                                keyboardType: keyboardType,
+                                inputFormatters: inputFormatters,
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.black,
+                                ),
+                                decoration: const InputDecoration(
+                                  hintText: '',
+                                  counterText: '',
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  border: InputBorder.none,
+                                  isDense: true,
                                 ),
                               ),
-                            ),
-                          ),
-                          ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: controller,
-                            builder: (context, value, _) {
-                              final raw = value.text.trim();
-                              if (raw.isEmpty) {
-                                return Text(
-                                  text,
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    color: AppColor.gray,
-                                  ),
-                                );
-                              }
-
-                              final parts = raw.split(
-                                RegExp(
-                                  r'\s+to\s+',
-                                  caseSensitive: false,
-                                ),
-                              );
-                              if (parts.length == 1) {
-                                // single date style
-                                return Text(
-                                  parts[0],
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColor.black,
-                                  ),
-                                );
-                              }
-
-                              final startTxt = parts[0];
-                              final endTxt = parts[1];
-
-                              return RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: startTxt,
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColor.black,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: '   to   ',
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColor.gray,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: endTxt,
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColor.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      )
-                          : TextFormField(
-                        controller: controller,
-                        validator: validator,
-                        readOnly: datePickMode != DatePickMode.none,
-                        onChanged: onChanged,
-                        maxLines: maxLine,
-                        keyboardType: keyboardType,
-                        inputFormatters: inputFormatters,
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: 14,
-                          color: AppColor.black,
-                        ),
-                        decoration: const InputDecoration(
-                          hintText: '',
-                          counterText: '',
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                          ),
-                          border: InputBorder.none,
-                          isDense: true,
-                        ),
-                      ),
                     ),
                   ),
                 ),
@@ -1863,7 +1941,7 @@ class CommonContainer {
         color: Colors.white,
         borderRadius: BorderRadius.circular(radius),
         boxShadow:
-        shadows ??
+            shadows ??
             [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -1887,12 +1965,12 @@ class CommonContainer {
       onChanged: onChanged,
       decoration: InputDecoration(
         suffixIcon:
-        searchText.isNotEmpty
-            ? GestureDetector(
-          onTap: onClear,
-          child: Icon(Icons.clear, size: 20, color: AppColor.gray),
-        )
-            : null,
+            searchText.isNotEmpty
+                ? GestureDetector(
+                  onTap: onClear,
+                  child: Icon(Icons.clear, size: 20, color: AppColor.gray),
+                )
+                : null,
         hintText: 'Search',
         hintStyle: GoogleFont.ibmPlexSans(fontSize: 14, color: AppColor.gray),
         prefixIcon: Padding(

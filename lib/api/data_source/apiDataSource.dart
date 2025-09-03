@@ -11,6 +11,7 @@ import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_
 import 'package:st_teacher_app/Presentation/Attendance/model/class_list_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/get_homework_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/teacher_class_response.dart';
+import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
 import 'package:st_teacher_app/api/repository/api_url.dart';
 
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
@@ -18,6 +19,9 @@ import '../../Presentation/Homework/model/homework_details_response.dart';
 import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
 import '../../Presentation/Profile/model/teacher_data_response.dart';
+import '../../Presentation/Quiz Screen/Model/details_preview.dart';
+import '../../Presentation/Quiz Screen/Model/quiz_attend_response.dart';
+import '../../Presentation/Quiz Screen/Model/quizlist_response.dart';
 import '../repository/failure.dart';
 import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
@@ -498,4 +502,174 @@ class ApiDataSource extends BaseApiDataSource {
       return Left(ServerFailure('Something went wrong'));
     }
   }
+
+  Future<Either<Failure, LoginResponse>> quizCreate({
+    required int month,
+    required int year,
+  }) async {
+    try {
+      String url = ApiUrl.teacherQuizCreate;
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(LoginResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  // Future<Either<Failure, QuizListResponse>> quizList() async {
+  //   try {
+  //     String url = ApiUrl.teacherQuizList;
+  //
+  //     dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+  //     AppLogger.log.i(response);
+  //     if (response is! DioException &&
+  //         (response.statusCode == 200 || response.statusCode == 201)) {
+  //       if (response.data['status'] == true) {
+  //         return Right(QuizListResponse.fromJson(response.data));
+  //       } else {
+  //         return Left(ServerFailure(response.data['message']));
+  //       }
+  //     } else {
+  //       return Left(ServerFailure((response as DioException).message ?? ""));
+  //     }
+  //   } catch (e) {
+  //     return Left(ServerFailure(''));
+  //   }
+  // }
+
+  Future<Either<Failure, QuizListResponse>> quizList() async {
+    try {
+      String url = ApiUrl.teacherQuizList;
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+
+      // DEBUG: Log the raw response string
+      AppLogger.log.i('RAW RESPONSE: ${response.toString()}');
+      AppLogger.log.i('Response length: ${response.toString().length}');
+
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data != null && response.data is Map<String, dynamic>) {
+          // Check if data is complete
+          String jsonString = json.encode(response.data);
+          AppLogger.log.i('JSON string length: ${jsonString.length}');
+
+          if (response.data['status'] == true) {
+            try {
+              return Right(QuizListResponse.fromJson(response.data));
+            } catch (e) {
+              AppLogger.log.e('JSON parsing error: $e');
+              return Left(ServerFailure('Failed to parse quiz data'));
+            }
+          } else {
+            return Left(
+              ServerFailure(response.data['message'] ?? 'Unknown error'),
+            );
+          }
+        } else {
+          return Left(ServerFailure('Invalid response format'));
+        }
+      } else {
+        String errorMessage =
+            (response is DioException)
+                ? response.message ?? "Network error"
+                : "Request failed with status: ${response.statusCode}";
+        return Left(ServerFailure(errorMessage));
+      }
+    } catch (e) {
+      AppLogger.log.e('Quiz list error: $e');
+      return Left(ServerFailure('Failed to fetch quiz list'));
+    }
+  }
+
+  Future<Either<Failure, QuizDetailsPreview>> quizDetailsPreviews({
+    required int code,
+  }) async {
+    try {
+      String url = ApiUrl.quizDetailsPreview(classId: code);
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(QuizDetailsPreview.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, AttendSummaryResponse>> loadQuizAttendByClass({
+    required int quizId,
+  }) async {
+    try {
+      final url = ApiUrl.teacherQuizAttend(classId: quizId);
+      AppLogger.log.i('→ POST $url');
+
+      // 👇 Correct: use sendRequest with POST
+      final resp = await Request.sendRequest(url, {}, 'POST', true);
+
+      if (resp is Response) {
+        final status = resp.statusCode ?? 0;
+
+        if (status >= 200 && status < 300) {
+          try {
+            final parsed = AttendSummaryResponse.fromAny(resp.data);
+            if (parsed.status) return Right(parsed);
+
+            return Left(ServerFailure(
+              parsed.message.isNotEmpty ? parsed.message : 'Request failed',
+              code: parsed.code,
+              data: resp.data,
+            ));
+          } catch (e) {
+            return Left(ServerFailure('Failed to parse attend summary: $e'));
+          }
+        }
+
+        // Non-2xx: surface a meaningful server message if present
+        final data = resp.data;
+        String serverMsg = 'HTTP $status';
+        if (data is Map && data['message'] != null) {
+          serverMsg = data['message'].toString();
+        }
+        return Left(ServerFailure(serverMsg, code: status, data: data));
+      }
+
+      if (resp is DioException) {
+        final code = resp.response?.statusCode;
+        final data = resp.response?.data;
+        String msg = resp.message ?? 'Network error';
+        if (data is Map && data['message'] != null) {
+          msg = data['message'].toString();
+        }
+        return Left(ServerFailure(msg, code: code, data: data));
+      }
+
+      AppLogger.log.e('Unexpected response type: ${resp.runtimeType}');
+      return Left(
+        ServerFailure('Unexpected response type: ${resp.runtimeType}'),
+      );
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
 }
