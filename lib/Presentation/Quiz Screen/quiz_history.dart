@@ -152,7 +152,7 @@ class _QuizHistoryState extends State<QuizHistory> {
                           ),
                         ),
 
-                        SizedBox(height: 16),
+
 
                         // Grouped sections
                         Column(

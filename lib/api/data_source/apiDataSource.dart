@@ -503,30 +503,6 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-  Future<Either<Failure, LoginResponse>> quizCreate({
-    required int month,
-    required int year,
-  }) async {
-    try {
-      String url = ApiUrl.teacherQuizCreate;
-
-      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
-      AppLogger.log.i(response);
-      if (response is! DioException &&
-          (response.statusCode == 200 || response.statusCode == 201)) {
-        if (response.data['status'] == true) {
-          return Right(LoginResponse.fromJson(response.data));
-        } else {
-          return Left(ServerFailure(response.data['message']));
-        }
-      } else {
-        return Left(ServerFailure((response as DioException).message ?? ""));
-      }
-    } catch (e) {
-      return Left(ServerFailure(''));
-    }
-  }
-
   // Future<Either<Failure, QuizListResponse>> quizList() async {
   //   try {
   //     String url = ApiUrl.teacherQuizList;
@@ -634,11 +610,13 @@ class ApiDataSource extends BaseApiDataSource {
             final parsed = AttendSummaryResponse.fromAny(resp.data);
             if (parsed.status) return Right(parsed);
 
-            return Left(ServerFailure(
-              parsed.message.isNotEmpty ? parsed.message : 'Request failed',
-              code: parsed.code,
-              data: resp.data,
-            ));
+            return Left(
+              ServerFailure(
+                parsed.message.isNotEmpty ? parsed.message : 'Request failed',
+                code: parsed.code,
+                data: resp.data,
+              ),
+            );
           } catch (e) {
             return Left(ServerFailure('Failed to parse attend summary: $e'));
           }
@@ -668,6 +646,41 @@ class ApiDataSource extends BaseApiDataSource {
         ServerFailure('Unexpected response type: ${resp.runtimeType}'),
       );
     } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, QuizDetailsPreview>> quizCreate(
+      Map<String, dynamic> body,
+      ) async {
+    try {
+      String url = ApiUrl.teacherQuizCreate;
+
+      final response = await Request.sendRequest(url, body, 'post', true);
+
+      // If response is Dio Response
+      if (response is Response) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (response.data['status'] == true) {
+            return Right(QuizDetailsPreview.fromJson(response.data));
+          }
+          else {
+            return Left(ServerFailure(response.data['message'] ?? "Unknown error"));
+          }
+        } else {
+          return Left(ServerFailure("Unexpected status: ${response.statusCode}"));
+        }
+      }
+
+      // If response is DioException
+      if (response is DioException) {
+        return Left(ServerFailure(response.message ?? "Request failed"));
+      }
+
+      // If neither
+      return Left(ServerFailure("Unexpected response type: ${response.runtimeType}"));
+    } catch (e, stack) {
+      AppLogger.log.e("quizCreate error: $e\n$stack");
       return Left(ServerFailure(e.toString()));
     }
   }

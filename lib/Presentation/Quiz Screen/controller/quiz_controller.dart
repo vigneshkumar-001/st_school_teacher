@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Core/Utility/app_color.dart';
 
 import 'package:st_teacher_app/Core/consents.dart'; // AppLogger? (adjust if needed)
+import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
 import '../../../api/repository/failure.dart';
@@ -209,35 +212,6 @@ class QuizController extends GetxController {
     }
   }
 
-  // ---------- API: CREATE (placeholder wiring) ----------
-
-  Future<String?> quizCreate() async {
-    try {
-      isLoading.value = true;
-      final results = await apiDataSource.getTeacherClassData();
-      return results.fold(
-        (failure) {
-          isLoading.value = false;
-          lastError.value = failure.message;
-          AppLogger.log.e(failure.message);
-          return failure.message;
-        },
-        (response) async {
-          isLoading.value = false;
-          lastError.value = '';
-          AppLogger.log.i(response.data ?? 'Data fetched');
-          return null;
-        },
-      );
-    } catch (e) {
-      isLoading.value = false;
-      lastError.value = e.toString();
-      AppLogger.log.e(e);
-      return e.toString();
-    }
-  }
-
-  /// Loads quiz details by classId and sets [quizDetails]; returns `null` on success or an error message.
   Future<String?> quizDetailsPreviews({required int classId}) async {
     try {
       isLoading.value = true;
@@ -256,7 +230,7 @@ class QuizController extends GetxController {
           quizDetails.value = data;
           isLoading.value = false;
           lastError.value = '';
-          AppLogger.log.i('Details fetched: ${data.title}');
+          AppLogger.log.i('Details fetched: ${data?.title}');
           return null;
         },
       );
@@ -303,6 +277,68 @@ class QuizController extends GetxController {
       return msg;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<String?> quizCreate(
+    Map<String, dynamic> payload, {
+    bool showLoader = true,
+  }) async {
+    try {
+      if (showLoader) showPopupLoader();
+      final results = await apiDataSource.quizCreate(payload);
+      return results.fold(
+        (failure) {
+          if (showLoader) hidePopupLoader();
+          lastError.value = failure.message;
+          AppLogger.log.e(failure.message);
+          return failure.message;
+        },
+        (response) async {
+          if (showLoader) hidePopupLoader();
+          isLoading.value = false;
+          Get.offAll(QuizHistory());
+
+          lastError.value = '';
+          AppLogger.log.i(response.data ?? 'Data fetched');
+          return null;
+        },
+      );
+    } catch (e) {
+      if (showLoader) hidePopupLoader();
+      isLoading.value = false;
+      lastError.value = e.toString();
+      AppLogger.log.e(e);
+      return e.toString();
+    }
+  }
+
+  void showPopupLoader() {
+    Get.dialog(
+      Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(
+              color: AppColor.black,
+              strokeAlign: 1,
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false, // user can't dismiss by tapping outside
+      barrierColor: Colors.black.withOpacity(0.3), // transparent background
+    );
+  }
+
+  void hidePopupLoader() {
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
     }
   }
 }

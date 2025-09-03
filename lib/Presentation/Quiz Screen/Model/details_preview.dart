@@ -1,4 +1,4 @@
-class QuizDetailsPreview {
+/*class QuizDetailsPreview {
   final bool status;
   final int code;
   final String message;
@@ -19,7 +19,30 @@ class QuizDetailsPreview {
       data: QuizDetailsData.fromJson(json['data']),
     );
   }
+}*/
+class QuizDetailsPreview {
+  final bool status;
+  final int code;
+  final String message;
+  final QuizDetailsData? data; // <-- nullable
+
+  QuizDetailsPreview({
+    required this.status,
+    required this.code,
+    required this.message,
+    this.data,
+  });
+
+  factory QuizDetailsPreview.fromJson(Map<String, dynamic> json) {
+    return QuizDetailsPreview(
+      status: json['status'],
+      code: json['code'],
+      message: json['message'],
+      data: json['data'] != null ? QuizDetailsData.fromJson(json['data']) : null,
+    );
+  }
 }
+
 
 class QuizDetailsData {
   final int id;

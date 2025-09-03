@@ -18,6 +18,7 @@ class ApiUrl {
   static String attendance =
       '$baseUrl/teacher-student-attendance/mark-attendance';
 
+
   static String studentAttendance({required int classId}) {
     return '$baseUrl/teacher-student-attendance/today-status/?class_id=$classId';
   }

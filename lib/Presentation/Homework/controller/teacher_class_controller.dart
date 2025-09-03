@@ -19,7 +19,7 @@ class TeacherClassController extends GetxController {
     getTeacherClass();
   }
 
-  /// Fetch classes from API and optionally select a class/section if provided
+
   Future<void> getTeacherClass({String? className, String? section}) async {
     try {
       isLoading.value = true;
