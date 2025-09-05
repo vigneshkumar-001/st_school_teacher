@@ -651,10 +651,7 @@ class _AttendHistorySpecificStudentState
     super.initState();
     AppLogger.log.i('${widget.quizId},${widget.studentId}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      c.loadStudentQuizResult(
-        quizId: widget.quizId,
-        studentId: widget.studentId,
-      );
+      c.loadStudentQuizResult(quizId: 11, studentId: 2450);
 
       setState(() {});
     });
