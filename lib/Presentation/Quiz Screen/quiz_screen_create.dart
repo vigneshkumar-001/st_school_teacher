@@ -1,4 +1,4 @@
-import 'package:dotted_border/dotted_border.dart';
+/*import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -1019,6 +1019,1068 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}*/
+
+import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:st_teacher_app/Core/consents.dart';
+import 'package:st_teacher_app/Presentation/Homework/controller/teacher_class_controller.dart';
+import 'package:st_teacher_app/Presentation/Quiz%20Screen/controller/quiz_controller.dart';
+
+import '../../Core/Utility/app_color.dart';
+import '../../Core/Utility/app_images.dart';
+import '../../Core/Utility/custom_app_button.dart';
+import '../../Core/Utility/google_fonts.dart';
+import '../../Core/Widgets/common_container.dart';
+import '../Quiz Screen/quiz_history.dart';
+
+class AnswerModel {
+  String text;
+  bool isCorrect;
+
+  AnswerModel({this.text = '', this.isCorrect = false});
+
+  Map<String, dynamic> toJson() => {"text": text, "isCorrect": isCorrect};
+}
+
+class QuestionModel {
+  String question;
+  List<AnswerModel> answers;
+
+  QuestionModel({this.question = '', List<AnswerModel>? answers})
+      : answers = answers ?? List.generate(4, (_) => AnswerModel());
+  Map<String, dynamic> toJson() => {
+    "question": question,
+    "answers": answers.map((a) => a.toJson()).toList(),
+  };
+}
+
+class QuizScreenCreate extends StatefulWidget {
+  const QuizScreenCreate({super.key});
+
+  @override
+  State<QuizScreenCreate> createState() => _QuizScreenCreateState();
+}
+
+class _QuizScreenCreateState extends State<QuizScreenCreate> {
+  final TeacherClassController teacherClassController =
+  Get.put(TeacherClassController());
+  final QuizController controller = Get.put(QuizController());
+
+  // Data
+  final List<QuestionModel> questionList = [];
+
+  // Subject tabs (coming from controller in real app)
+  final List<Map<String, dynamic>> tabs = const [
+    {"label": "Social Science"},
+    {"label": "English"},
+  ];
+
+  // --- UI State ---
+  int selectedIndex = 0; // class index in horizontal list
+  int subjectIndex = 0; // index in subject chips
+  int? selectedClassId;
+  int? selectedSubjectId;
+
+  bool showClearIcon = false;
+  final TextEditingController headingController = TextEditingController();
+  final TextEditingController timeLimitController = TextEditingController();
+
+  // Validation state
+  final Set<int> _invalidQuestions = <int>{};
+  final Map<int, Set<int>> _invalidAnswers = <int, Set<int>>{};
+  bool _headingInvalid = false;
+  bool _timeLimitInvalid = false;
+  bool _classInvalid = false;
+  bool _subjectInvalid = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initialize subject/class from controllers if available
+      if (teacherClassController.subjectList.isNotEmpty) {
+        subjectIndex = 0;
+        selectedSubjectId = teacherClassController.subjectList[0].id;
+      }
+      if (teacherClassController.classList.isNotEmpty) {
+        selectedIndex = 0;
+        selectedClassId = teacherClassController.classList[0].id;
+        teacherClassController.selectedClass.value =
+        teacherClassController.classList[0];
+      }
+      setState(() {});
+    });
+
+    // Heading listener: show clear icon + clear error on typing
+    headingController.addListener(() {
+      setState(() {
+        showClearIcon = headingController.text.isNotEmpty;
+        if (_headingInvalid && headingController.text.trim().isNotEmpty) {
+          _headingInvalid = false;
+        }
+      });
+    });
+
+    // Time limit listener: clear error when valid (>0) number
+    timeLimitController.addListener(() {
+      final v = timeLimitController.text.trim();
+      final n = int.tryParse(v);
+      setState(() {
+        if (_timeLimitInvalid && n != null && n > 0) {
+          _timeLimitInvalid = false;
+        }
+      });
+    });
+
+    // Always have at least one question to start
+    if (questionList.isEmpty) questionList.add(QuestionModel());
+  }
+
+  @override
+  void dispose() {
+    headingController.dispose();
+    timeLimitController.dispose();
+    super.dispose();
+  }
+
+  void _addMoreQuestion() {
+    setState(() {
+      questionList.add(QuestionModel());
+    });
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  // -------------------- VALIDATION & PAYLOAD --------------------
+  Map<String, dynamic>? _validateAndBuildPayload() {
+    bool hasError = false;
+
+    // reset flags
+    setState(() {
+      _classInvalid = false;
+      _subjectInvalid = false;
+      _headingInvalid = false;
+      _timeLimitInvalid = false;
+      _invalidQuestions.clear();
+      _invalidAnswers.clear();
+    });
+
+    // Class required
+    if (selectedClassId == null) {
+      _classInvalid = true;
+      hasError = true;
+    }
+
+    // Subject required (subjectIndex is non-nullable int; check ID instead)
+    if (selectedSubjectId == null) {
+      _subjectInvalid = true;
+      hasError = true;
+    }
+
+    // Heading required
+    if (headingController.text.trim().isEmpty) {
+      _headingInvalid = true;
+      hasError = true;
+    }
+
+    // Time limit required + must be > 0
+    final timeStr = timeLimitController.text.trim();
+    final timeNum = int.tryParse(timeStr);
+    if (timeStr.isEmpty || timeNum == null || timeNum <= 0) {
+      _timeLimitInvalid = true;
+      hasError = true;
+    }
+
+    // Questions & Answers required
+    for (int qIndex = 0; qIndex < questionList.length; qIndex++) {
+      final q = questionList[qIndex];
+
+      if (q.question.trim().isEmpty) {
+        _invalidQuestions.add(qIndex);
+        hasError = true;
+      }
+
+      for (int aIndex = 0; aIndex < q.answers.length; aIndex++) {
+        if (q.answers[aIndex].text.trim().isEmpty) {
+          (_invalidAnswers[qIndex] ??= <int>{}).add(aIndex);
+          hasError = true;
+        }
+      }
+
+      // At least 1 correct answer
+      if (!q.answers.any((a) => a.isCorrect)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Question ${qIndex + 1}: mark at least one correct answer",
+            ),
+          ),
+        );
+        hasError = true;
+      }
+    }
+
+    if (hasError) {
+      setState(() {}); // update UI with errors
+      return null;
+    }
+
+    return {
+      "classId": selectedClassId,
+      "subjectId": selectedSubjectId,
+      "heading": headingController.text.trim(),
+      "timeLimit": timeNum,
+      "publish": true,
+      "questions": questionList.map((q) {
+        return {
+          "text": q.question.trim(),
+          "options": q.answers
+              .map((a) => {"text": a.text.trim(), "isCorrect": a.isCorrect})
+              .toList(),
+        };
+      }).toList(),
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColor.lowLightgray,
+      body: SafeArea(
+        child: Obx(() {
+          final classes = teacherClassController.classList;
+          final subjects = teacherClassController.subjectList;
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header row
+                  Row(
+                    children: [
+                      CommonContainer.NavigatArrow(
+                        image: AppImages.leftSideArrow,
+                        imageColor: AppColor.lightBlack,
+                        container: AppColor.lowLightgray,
+                        onIconTap: () => Navigator.pop(context),
+                        border:
+                        Border.all(color: AppColor.lightgray, width: 0.3),
+                      ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const QuizHistory(),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Text(
+                              'History',
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.gray,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Image.asset(AppImages.historyImage, height: 24),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 35),
+                  Center(
+                    child: Text(
+                      'Create Quiz',
+                      style: GoogleFont.ibmPlexSans(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 22,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ------------------ Class ------------------
+                          Text(
+                            'Class',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              color: AppColor.black,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          SizedBox(
+                            height: 100,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Positioned.fill(
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColor.white.withOpacity(0.3),
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.white.withOpacity(0.3),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.topRight,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: -20,
+                                  bottom: -20,
+                                  left: 0,
+                                  right: 0,
+                                  child: ListView.builder(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 2,
+                                    ),
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: classes.length,
+                                    itemBuilder: (context, index) {
+                                      final item = classes[index];
+                                      final isSelected = index == selectedIndex;
+
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            selectedIndex = index;
+                                            selectedClassId = item.id;
+                                            teacherClassController
+                                                .selectedClass
+                                                .value = item;
+                                            _classInvalid = false;
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                          const Duration(milliseconds: 120),
+                                          curve: Curves.easeInOut,
+                                          width: 90,
+                                          height: isSelected ? 120 : 80,
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? AppColor.white
+                                                : Colors.transparent,
+                                            borderRadius:
+                                            BorderRadius.circular(24),
+                                            border: isSelected
+                                                ? Border.all(
+                                              color: AppColor.blueG1,
+                                              width: 1.5,
+                                            )
+                                                : null,
+                                            boxShadow: isSelected
+                                                ? [
+                                              BoxShadow(
+                                                color: AppColor.white
+                                                    .withOpacity(0.5),
+                                                blurRadius: 10,
+                                                offset:
+                                                const Offset(0, 4),
+                                              ),
+                                            ]
+                                                : [],
+                                          ),
+                                          child: isSelected
+                                              ? Column(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment
+                                                .spaceBetween,
+                                            children: [
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .center,
+                                                children: [
+                                                  ShaderMask(
+                                                    shaderCallback:
+                                                        (bounds) =>
+                                                        const LinearGradient(
+                                                          colors: [
+                                                            AppColor.blueG1,
+                                                            AppColor.blue,
+                                                          ],
+                                                          begin: Alignment
+                                                              .topLeft,
+                                                          end: Alignment
+                                                              .bottomRight,
+                                                        ).createShader(Rect
+                                                            .fromLTWH(
+                                                            0,
+                                                            0,
+                                                            bounds.width,
+                                                            bounds
+                                                                .height)),
+                                                    blendMode:
+                                                    BlendMode.srcIn,
+                                                    child: Text(
+                                                      item.name,
+                                                      style: GoogleFont
+                                                          .ibmPlexSans(
+                                                        fontSize: 28,
+                                                        color:
+                                                        Colors.white,
+                                                        fontWeight:
+                                                        FontWeight
+                                                            .bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    const EdgeInsets
+                                                        .only(
+                                                        top: 8.0),
+                                                    child: ShaderMask(
+                                                      shaderCallback:
+                                                          (bounds) =>
+                                                          const LinearGradient(
+                                                            colors: [
+                                                              AppColor
+                                                                  .blueG1,
+                                                              AppColor.blue,
+                                                            ],
+                                                            begin: Alignment
+                                                                .topLeft,
+                                                            end: Alignment
+                                                                .bottomRight,
+                                                          ).createShader(Rect
+                                                              .fromLTWH(
+                                                              0,
+                                                              0,
+                                                              bounds
+                                                                  .width,
+                                                              bounds
+                                                                  .height)),
+                                                      blendMode:
+                                                      BlendMode.srcIn,
+                                                      child: Text(
+                                                        'th',
+                                                        style: GoogleFont
+                                                            .ibmPlexSans(
+                                                          fontSize: 14,
+                                                          color: Colors
+                                                              .white,
+                                                          fontWeight:
+                                                          FontWeight
+                                                              .bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Container(
+                                                height: 55,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  gradient:
+                                                  const LinearGradient(
+                                                    colors: [
+                                                      AppColor.blueG1,
+                                                      AppColor.blue,
+                                                    ],
+                                                    begin: Alignment
+                                                        .topLeft,
+                                                    end: Alignment
+                                                        .topRight,
+                                                  ),
+                                                  borderRadius:
+                                                  const BorderRadius
+                                                      .vertical(
+                                                    bottom:
+                                                    Radius.circular(
+                                                        22),
+                                                  ),
+                                                ),
+                                                alignment:
+                                                Alignment.center,
+                                                child: Text(
+                                                  item.section,
+                                                  style: GoogleFont
+                                                      .ibmPlexSans(
+                                                    fontSize: 20,
+                                                    color:
+                                                    AppColor.white,
+                                                    fontWeight:
+                                                    FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                              : Center(
+                                            child: Column(
+                                              mainAxisSize:
+                                              MainAxisSize.min,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 20,
+                                                    vertical: 3,
+                                                  ),
+                                                  decoration:
+                                                  BoxDecoration(
+                                                    color:
+                                                    AppColor.white,
+                                                    borderRadius:
+                                                    BorderRadius
+                                                        .circular(20),
+                                                  ),
+                                                  child: Text(
+                                                    item.name,
+                                                    style: GoogleFont
+                                                        .ibmPlexSans(
+                                                      fontSize: 14,
+                                                      color:
+                                                      AppColor.gray,
+                                                      fontWeight:
+                                                      FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  item.section,
+                                                  style: GoogleFont
+                                                      .ibmPlexSans(
+                                                    fontSize: 20,
+                                                    color: AppColor
+                                                        .lightgray,
+                                                    fontWeight:
+                                                    FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (_classInvalid)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8, left: 4),
+                              child: Text('Class is required',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12)),
+                            ),
+
+                          const SizedBox(height: 40),
+
+                          // ------------------ Subject ------------------
+                          Text(
+                            'Subject',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              color: AppColor.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 10,
+                            children:
+                            List.generate(subjects.length, (index) {
+                              final sub = subjects[index];
+                              final isSelected = subjectIndex == index;
+                              return GestureDetector(
+                                onTap: () => setState(() {
+                                  subjectIndex = index;
+                                  selectedSubjectId = sub.id;
+                                  _subjectInvalid = false;
+                                }),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 25,
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColor.white,
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? AppColor.blue
+                                          : AppColor.borderGary,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (isSelected) ...[
+                                        Icon(Icons.check,
+                                            size: 16, color: AppColor.blue),
+                                        const SizedBox(width: 6),
+                                      ],
+                                      Text(
+                                        sub.name,
+                                        style: GoogleFont.ibmPlexSans(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: isSelected
+                                              ? AppColor.blue
+                                              : AppColor.gray,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                          if (_subjectInvalid)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8, left: 4),
+                              child: Text('Subject is required',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12)),
+                            ),
+
+                          const SizedBox(height: 25),
+
+                          // ------------------ Heading ------------------
+                          Text(
+                            'Heading',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              color: AppColor.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: _headingInvalid
+                                    ? Colors.red
+                                    : Colors.transparent,
+                                width: 1.2,
+                              ),
+                            ),
+                            child: CommonContainer.fillingContainer(
+                              onDetailsTap: () {
+                                headingController.clear();
+                                setState(() {
+                                  showClearIcon = false;
+                                  _headingInvalid = true; // empty -> invalid
+                                });
+                              },
+                              // If your component supports onChanged, this helps clear red faster:
+                              onChanged: (v) {
+                                setState(() {
+                                  if (_headingInvalid &&
+                                      v.trim().isNotEmpty) {
+                                    _headingInvalid = false;
+                                  }
+                                  showClearIcon = v.isNotEmpty;
+                                });
+                              },
+                              imagePath:
+                              showClearIcon ? AppImages.close : null,
+                              imageColor: AppColor.gray,
+                              text: '',
+                              controller: headingController,
+                              verticalDivider: false,
+                            ),
+                          ),
+                          if (_headingInvalid)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 6, left: 4),
+                              child: Text('Heading is required',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12)),
+                            ),
+
+                          const SizedBox(height: 25),
+
+                          // ------------------ Time Limit ------------------
+                          Text(
+                            'Time Limit',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              color: AppColor.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: _timeLimitInvalid
+                                    ? Colors.red
+                                    : Colors.transparent,
+                                width: 1.2,
+                              ),
+                            ),
+                            child: CommonContainer.fillingContainer(
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              onChanged: (v) {
+                                final n = int.tryParse(v.trim());
+                                setState(() {
+                                  _timeLimitInvalid =
+                                  !(n != null && n > 0);
+                                });
+                              },
+                              imagePath: AppImages.clock,
+                              imageColor: AppColor.lightgray,
+                              text: '',
+                              controller: timeLimitController,
+                              verticalDivider: false,
+                            ),
+                          ),
+                          if (_timeLimitInvalid)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 6, left: 4),
+                              child: Text('Time Limit is required',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12)),
+                            ),
+
+                          const SizedBox(height: 25),
+
+                          // ------------------ Questions & Answers ------------------
+                          Column(
+                            children:
+                            List.generate(questionList.length, (qIndex) {
+                              final q = questionList[qIndex];
+                              return Padding(
+                                padding:
+                                const EdgeInsets.only(bottom: 24),
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Q${qIndex + 1}",
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColor.borderGary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    // Question field
+                                    TextFormField(
+                                      initialValue: q.question,
+                                      maxLines: 3,
+                                      decoration: InputDecoration(
+                                        hintText: "Enter question",
+                                        filled: true,
+                                        fillColor: AppColor.lightWhite,
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(16),
+                                          borderSide: BorderSide(
+                                            color: _invalidQuestions
+                                                .contains(qIndex)
+                                                ? Colors.red
+                                                : Colors.transparent,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(16),
+                                          borderSide: BorderSide(
+                                            color: AppColor.blue,
+                                          ),
+                                        ),
+                                      ),
+                                      onChanged: (val) {
+                                        q.question = val;
+                                        if (val.trim().isNotEmpty) {
+                                          setState(() => _invalidQuestions
+                                              .remove(qIndex));
+                                        }
+                                      },
+                                    ),
+                                    if (_invalidQuestions.contains(qIndex))
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 6, left: 4),
+                                        child: Text('Question is required',
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 12)),
+                                      ),
+
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'Answer',
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+
+                                    Column(
+                                      children: List.generate(
+                                          q.answers.length, (aIndex) {
+                                        final a = q.answers[aIndex];
+                                        final isInvalid =
+                                            _invalidAnswers[qIndex]
+                                                ?.contains(aIndex) ??
+                                                false;
+
+                                        return Padding(
+                                          padding:
+                                          const EdgeInsets.only(
+                                              bottom: 8),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                padding:
+                                                const EdgeInsets
+                                                    .symmetric(
+                                                  horizontal: 20,
+                                                  vertical: 12,
+                                                ),
+                                                decoration:
+                                                BoxDecoration(
+                                                  color:
+                                                  AppColor.lightWhite,
+                                                  borderRadius:
+                                                  BorderRadius.circular(
+                                                      18),
+                                                  border: Border.all(
+                                                    color: isInvalid
+                                                        ? Colors.red
+                                                        : Colors
+                                                        .transparent,
+                                                    width: 1.2,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child:
+                                                      TextFormField(
+                                                        initialValue:
+                                                        a.text,
+                                                        decoration:
+                                                        InputDecoration(
+                                                          hintText:
+                                                          'List ${aIndex + 1}',
+                                                          hintStyle:
+                                                          GoogleFont
+                                                              .ibmPlexSans(
+                                                            fontSize: 14,
+                                                            color: AppColor
+                                                                .gray,
+                                                          ),
+                                                          border:
+                                                          InputBorder
+                                                              .none,
+                                                        ),
+                                                        onChanged:
+                                                            (val) {
+                                                          a.text = val;
+
+                                                          // Your rule: first option auto-correct
+                                                          a.isCorrect =
+                                                          (aIndex ==
+                                                              0);
+
+                                                          if (val
+                                                              .trim()
+                                                              .isNotEmpty) {
+                                                            setState(() {
+                                                              _invalidAnswers[qIndex]?.remove(aIndex);
+                                                              if ((_invalidAnswers[qIndex]?.isEmpty ?? true)) {
+                                                                _invalidAnswers.remove(qIndex);
+                                                              }
+                                                            });
+                                                          }
+                                                        },
+                                                      ),
+                                                    ),
+                                                    if (aIndex == 0)
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets
+                                                            .only(
+                                                            left: 8),
+                                                        child: Container(
+                                                          decoration:
+                                                          BoxDecoration(
+                                                            color:
+                                                            AppColor
+                                                                .white,
+                                                            borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                14),
+                                                          ),
+                                                          child: const Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                              vertical: 6,
+                                                              horizontal: 14,
+                                                            ),
+                                                            child: Text(
+                                                              "Answer",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .blue,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              if (isInvalid)
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .only(
+                                                      top: 6,
+                                                      left: 4),
+                                                  child: Text(
+                                                    'Answer ${aIndex + 1} is required',
+                                                    style: const TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize: 12),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ),
+
+                          const SizedBox(height: 25),
+
+                          // ------------------ Add Question ------------------
+                          GestureDetector(
+                            onTap: _addMoreQuestion,
+                            child: DottedBorder(
+                              color: AppColor.blue,
+                              strokeWidth: 1.5,
+                              dashPattern: const [8, 4],
+                              borderType: BorderType.RRect,
+                              radius: const Radius.circular(20),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Add Question',
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    color: AppColor.blue,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 40),
+
+                          // ------------------ Publish ------------------
+                          AppButton.button(
+                            onTap: () async {
+                              HapticFeedback.heavyImpact();
+
+                              final payload = _validateAndBuildPayload();
+                              if (payload == null) return;
+
+                              AppLogger.log.i(payload);
+                              await controller.quizCreate(payload);
+
+                              // After success, you can navigate:
+                              // if (mounted) {
+                              //   Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //       builder: (_) => const QuizHistory(),
+                              //     ),
+                              //   );
+                              // }
+                            },
+                            width: 145,
+                            height: 60,
+                            text: 'Publish',
+                            image: AppImages.buttonArrow,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
       ),
     );
   }

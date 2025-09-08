@@ -46,6 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width * 0.7;
     return Scaffold(
+      backgroundColor: AppColor.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
