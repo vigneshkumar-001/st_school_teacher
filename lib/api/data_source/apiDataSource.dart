@@ -14,6 +14,7 @@ import 'package:st_teacher_app/Presentation/Homework/model/teacher_class_respons
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
 import 'package:st_teacher_app/api/repository/api_url.dart';
 
+import '../../Presentation/Announcement Screen/Model/announcement_create_response.dart';
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
 import '../../Presentation/Homework/model/homework_details_response.dart';
 import '../../Presentation/Homework/model/user_image_response.dart';
@@ -505,8 +506,8 @@ class ApiDataSource extends BaseApiDataSource {
   }
 
   Future<Either<Failure, QuizDetailsPreview>> quizCreate(
-      Map<String, dynamic> body,
-      ) async {
+    Map<String, dynamic> body,
+  ) async {
     try {
       String url = ApiUrl.teacherQuizCreate;
 
@@ -517,12 +518,15 @@ class ApiDataSource extends BaseApiDataSource {
         if (response.statusCode == 200 || response.statusCode == 201) {
           if (response.data['status'] == true) {
             return Right(QuizDetailsPreview.fromJson(response.data));
-          }
-          else {
-            return Left(ServerFailure(response.data['message'] ?? "Unknown error"));
+          } else {
+            return Left(
+              ServerFailure(response.data['message'] ?? "Unknown error"),
+            );
           }
         } else {
-          return Left(ServerFailure("Unexpected status: ${response.statusCode}"));
+          return Left(
+            ServerFailure("Unexpected status: ${response.statusCode}"),
+          );
         }
       }
 
@@ -532,7 +536,9 @@ class ApiDataSource extends BaseApiDataSource {
       }
 
       // If neither
-      return Left(ServerFailure("Unexpected response type: ${response.runtimeType}"));
+      return Left(
+        ServerFailure("Unexpected response type: ${response.runtimeType}"),
+      );
     } catch (e, stack) {
       AppLogger.log.e("quizCreate error: $e\n$stack");
       return Left(ServerFailure(e.toString()));
@@ -710,4 +716,63 @@ class ApiDataSource extends BaseApiDataSource {
       return Left(ServerFailure(''));
     }
   }
+
+  Future<Either<Failure, AnnouncementCreateResponse>> createAnnouncement({
+    required int classId,
+    required int subjectId,
+    required String heading,
+    required String description,
+    required bool publish,
+    required List<Map<String, dynamic>> contents,
+  }) async {
+    try {
+      String url = ApiUrl.createAnnouncement;
+
+      final body = {
+        "classId": classId,
+        "subjectId": subjectId,
+        "heading": heading,
+        "description": description,
+        "publish": publish,
+        "contents": contents, // pass directly
+      };
+
+      dynamic response = await Request.sendRequest(url, body, 'Post', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(AnnouncementCreateResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+
+  // Future<Either<Failure, AnnouncementCreateResponse>> getAnnouncement() async {
+  //   try {
+  //     String url = ApiUrl.getAnnouncement;
+  //
+  //     dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+  //     AppLogger.log.i(response);
+  //     if (response is! DioException &&
+  //         (response.statusCode == 200 || response.statusCode == 201)) {
+  //       if (response.data['status'] == true) {
+  //         return Right(AnnouncementCreateResponse.fromJson(response.data));
+  //       } else {
+  //         return Left(ServerFailure(response.data['message']));
+  //       }
+  //     } else {
+  //       return Left(ServerFailure((response as DioException).message ?? ""));
+  //     }
+  //   } catch (e) {
+  //     return Left(ServerFailure(''));
+  //   }
+  // }
 }

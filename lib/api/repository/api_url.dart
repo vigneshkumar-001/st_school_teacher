@@ -11,6 +11,7 @@ class ApiUrl {
   static String profile = '$baseUrl/teacher-home/profile';
   static String teacherQuizCreate = '$baseUrl/teacher-quiz/create';
   static String teacherQuizList = '$baseUrl/teacher-quiz/list';
+  static String createAnnouncement = '$baseUrl/teacher-announcement/create';
 
   static String studentQuizResult({
     required int quizId,

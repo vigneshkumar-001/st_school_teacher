@@ -5,6 +5,8 @@ import 'package:st_teacher_app/Core/Utility/app_images.dart';
 import 'package:st_teacher_app/Core/Utility/google_fonts.dart';
 import 'package:st_teacher_app/Core/Widgets/common_container.dart';
 import 'package:st_teacher_app/Presentation/Homework/homework_history.dart';
+import '../Announcement Screen/announcement_create.dart';
+import '../Announcement Screen/list_general.dart';
 import '../Attendance-teacher/attendance_history_teacher.dart';
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
@@ -161,30 +163,27 @@ class _MenuScreenState extends State<MenuScreen> {
                 //   addButton: true,
                 // ),
                 // SizedBox(height: 20),
-                //
-                // CommonContainer.Menu_Students(
-                //   Start: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => AnnouncementCreate(),
-                //       ),
-                //     );
-                //   },
-                //
-                //   onIconTap: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => ListGeneral(),
-                //       ),
-                //     );
-                //   },
-                //   mainText: 'Announcement',
-                //   subText: 'Create',
-                //   image: AppImages.Announcement,
-                //   addButton: true,
-                // ),*/
+                CommonContainer.Menu_Students(
+                  Start: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AnnouncementCreate(),
+                      ),
+                    );
+                  },
+
+                  onIconTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ListGeneral()),
+                    );
+                  },
+                  mainText: 'Announcement',
+                  subText: 'Create',
+                  image: AppImages.Announcement,
+                  addButton: true,
+                ),
                 // SizedBox(height: 20),
                 // CommonContainer.Menu_Students(
                 //   onIconTap: () {},
