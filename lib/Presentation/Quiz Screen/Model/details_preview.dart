@@ -2,13 +2,13 @@ class QuizDetailsPreview {
   final bool status;
   final int code;
   final String message;
-  final QuizDetailsData data;
+  final QuizDetailsData? data; // <-- nullable
 
   QuizDetailsPreview({
     required this.status,
     required this.code,
     required this.message,
-    required this.data,
+    this.data,
   });
 
   factory QuizDetailsPreview.fromJson(Map<String, dynamic> json) {
@@ -16,10 +16,11 @@ class QuizDetailsPreview {
       status: json['status'],
       code: json['code'],
       message: json['message'],
-      data: QuizDetailsData.fromJson(json['data']),
+      data: json['data'] != null ? QuizDetailsData.fromJson(json['data']) : null,
     );
   }
 }
+
 
 class QuizDetailsData {
   final int id;
@@ -52,7 +53,7 @@ class QuizDetailsData {
       quizClass: QuizClass.fromJson(json['class']),
       subject: Subject.fromJson(json['subject']),
       questions:
-          (json['questions'] as List).map((q) => Question.fromJson(q)).toList(),
+      (json['questions'] as List).map((q) => Question.fromJson(q)).toList(),
     );
   }
 }
@@ -96,7 +97,7 @@ class Question {
       id: json['id'],
       text: json['text'],
       options:
-          (json['options'] as List).map((o) => Option.fromJson(o)).toList(),
+      (json['options'] as List).map((o) => Option.fromJson(o)).toList(),
     );
   }
 }
