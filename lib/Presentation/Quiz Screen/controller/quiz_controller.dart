@@ -349,7 +349,9 @@ class QuizController extends GetxController {
   Future<String?> loadStudentQuizResult({
     required int quizId,
     required int studentId,
+
     bool openScreen = true,
+
   }) async {
     if (isLoading.value) return null;
     try {
