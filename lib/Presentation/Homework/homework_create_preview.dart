@@ -4,37 +4,38 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:get/get.dart';
+import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
-import 'controller/create_homework_controller.dart';
 import 'homework_history.dart';
+import 'package:get/get.dart';
 
 class HomeworkCreatePreview extends StatefulWidget {
   final String subjects;
-  final List<String> description; // paragraphs (first item used as main)
-  final List<File> images; // additional images from Create screen
-  final List<String> listPoints; // list items
-  final File? permanentImage; // header image from Create screen (optional)
+  final List<String> description; // paragraphs
+  final List<File> images;
+
+  final List<String> listPoints;
+  final File? permanentImage;
+
   final String heading;
 
   final int? subjectId;
   final int? selectedClassId;
-
   const HomeworkCreatePreview({
     super.key,
     required this.subjects,
     required this.description,
+    this.permanentImage, // 👈 optional
+    required this.heading,
+    this.subjectId,
     required this.images,
     required this.listPoints,
-    required this.heading,
-    this.permanentImage,
-    this.subjectId,
-    this.selectedClassId,
+    this.selectedClassId, File? permanentImage,
   });
 
   @override
@@ -42,22 +43,21 @@ class HomeworkCreatePreview extends StatefulWidget {
 }
 
 class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
-  final CreateHomeworkController homeworkController = Get.put(
-    CreateHomeworkController(),
-  );
-
   late DateTime now;
   late String formattedTime;
   late String formattedDate;
   Timer? timer;
-  bool _isPublishing = false;
+
   @override
   void initState() {
     super.initState();
     now = DateTime.now();
     _updateTime();
-    // Update every minute
-    timer = Timer.periodic(const Duration(minutes: 1), (_) => _updateTime());
+
+    // Optional: Update time every minute (or every second if you want)
+    timer = Timer.periodic(Duration(seconds: 60), (_) {
+      _updateTime();
+    });
   }
 
   void _updateTime() {
@@ -74,62 +74,12 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
     super.dispose();
   }
 
-  // ---------- Image helpers ----------
-
-  void _openFullScreen(File file) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.9),
-      builder:
-          (_) => GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Center(
-              child: InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 5,
-                child: Image.file(file),
-              ),
-            ),
-          ),
-    );
-  }
-
-  /// Full-width image with rounded corners; keeps aspect ratio without stretching.
-  /// Tap to open zoomable fullscreen.
-  Widget _previewImage(File file) {
-    final screenH = MediaQuery.of(context).size.height;
-    return GestureDetector(
-      onTap: () => _openFullScreen(file),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            // Limit height to avoid overly tall images; tweak as you like
-            maxHeight: screenH * 0.55,
-          ),
-          child: Image.file(
-            file,
-            width: double.infinity,
-            fit:
-                BoxFit
-                    .contain, // change to BoxFit.cover if you prefer edge-to-edge crop
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ---------- UI ----------
-
+  final CreateHomeworkController homeworkController = Get.put(
+    CreateHomeworkController(),
+  );
+  List<Map<String, dynamic>> contents = [];
   @override
   Widget build(BuildContext context) {
-    final mainDescription =
-        widget.description.isNotEmpty ? widget.description.first : '';
-    final extraParagraphs =
-        widget.description.length > 1
-            ? widget.description.sublist(1)
-            : const <String>[];
-
     return Scaffold(
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
@@ -146,7 +96,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                   onIconTap: () => Navigator.pop(context),
                   border: Border.all(color: AppColor.lightgray, width: 0.3),
                 ),
-                const SizedBox(height: 35),
+                SizedBox(height: 35),
                 Center(
                   child: Text(
                     'Homework Preview',
@@ -157,12 +107,23 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-
-                // Card
+                SizedBox(height: 20),
                 Container(
                   decoration: BoxDecoration(
                     color: AppColor.white,
+                    // gradient: LinearGradient(
+                    //   colors: [
+                    //     AppColor.lowLightYellow,
+                    //     AppColor.lowLightYellow,
+                    //     AppColor.lowLightYellow,
+                    //     AppColor.lowLightYellow,
+                    //     AppColor.lowLightYellow,
+                    //     AppColor.lowLightYellow,
+                    //     AppColor.lowLightYellow.withOpacity(0.2),
+                    //   ], // gradient top to bottom
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Padding(
@@ -170,74 +131,81 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // -------- Images (full width, adjustable) --------
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (widget.permanentImage != null) ...[
-                                _previewImage(widget.permanentImage!),
-                                const SizedBox(height: 12),
-                              ],
-                              for (final img in widget.images) ...[
-                                _previewImage(img),
-                                const SizedBox(height: 12),
-                              ],
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        // -------- Texts --------
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 10),
+                              Column(
+                                children: [
+                                  if (widget.permanentImage != null)
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.file(
+                                        widget.permanentImage!,
+                                        fit: BoxFit.cover,
+                                        height: 200,
+                                        width: double.infinity,
+                                      ),
+                                    ),
+                                  widget.images != null &&
+                                          widget.images.isNotEmpty
+                                      ? Column(
+                                        children:
+                                            widget.images.map((img) {
+                                              return Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: Image.file(
+                                                  img, // ✅ Directly pass File
+                                                  fit: BoxFit.cover,
+                                                  height: 200,
+                                                  width: double.infinity,
+                                                ),
+                                              );
+                                            }).toList(),
+                                      )
+                                      : const SizedBox.shrink(),
+                                ],
+                              ),
+
+                              SizedBox(height: 20),
+                              // Image.asset(AppImages.homeworkPreviewImage2),
+                              // SizedBox(height: 20),
                               Text(
-                                widget.heading,
+                                widget.heading ?? '',
                                 style: GoogleFont.inter(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 24,
                                   color: AppColor.lightBlack,
                                 ),
                               ),
-                              const SizedBox(height: 12),
-                              if (mainDescription.trim().isNotEmpty) ...[
-                                Text(
-                                  mainDescription,
-                                  style: GoogleFont.inter(
-                                    fontSize: 12,
-                                    color: AppColor.gray,
-                                  ),
+                              SizedBox(height: 15),
+                              Text(
+                                widget.description.join(
+                                  ",\n",
+                                ), // new line separated
+                                style: GoogleFont.inter(
+                                  fontSize: 12,
+                                  color: AppColor.gray,
                                 ),
-                                const SizedBox(height: 10),
-                              ],
-                              if (extraParagraphs.isNotEmpty)
-                                Text(
-                                  extraParagraphs.join("\n\n"),
-                                  style: GoogleFont.inter(
-                                    fontSize: 12,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                              const SizedBox(height: 12),
+                              ),
+                              SizedBox(height: 15),
 
-                              if (widget.listPoints.isNotEmpty)
+                              if (widget.listPoints != null &&
+                                  widget.listPoints.isNotEmpty)
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: List.generate(
                                     widget.listPoints.length,
-                                    (i) {
+                                    (index) {
                                       return Padding(
                                         padding: const EdgeInsets.only(
                                           bottom: 4.0,
                                         ),
                                         child: Text(
-                                          '${i + 1}. ${widget.listPoints[i]}',
+                                          '${index + 1}. ${widget.listPoints[index]}',
                                           style: GoogleFont.inter(
                                             fontSize: 12,
                                             color: AppColor.gray,
@@ -250,10 +218,8 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                             ],
                           ),
                         ),
+                        SizedBox(height: 20),
 
-                        const SizedBox(height: 16),
-
-                        // -------- Chips --------
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Padding(
@@ -277,7 +243,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                         ),
                                         SizedBox(width: 10),
                                         Text(
-                                          widget.subjects,
+                                          widget.subjects ?? '',
                                           style: GoogleFont.inter(
                                             fontSize: 12,
                                             color: AppColor.lightBlack,
@@ -304,7 +270,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                           color: AppColor.lightBlack
                                               .withOpacity(0.3),
                                         ),
-                                        const SizedBox(width: 10),
+                                        SizedBox(width: 10),
                                         Text(
                                           formattedTime,
                                           style: GoogleFont.inter(
@@ -312,7 +278,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                             color: AppColor.lightBlack,
                                           ),
                                         ),
-                                        const SizedBox(width: 10),
+                                        SizedBox(width: 10),
                                         Text(
                                           formattedDate,
                                           style: GoogleFont.inter(
@@ -328,15 +294,11 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                             ),
                           ),
                         ),
-
-                        SizedBox(height: 10),
-
-                        // -------- Actions --------
+                        SizedBox(height: 20),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 22.5),
                           child: Row(
                             children: [
-                              // Back to Edit
                               Container(
                                 decoration: BoxDecoration(
                                   color: AppColor.lowLightgray,
@@ -358,11 +320,11 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                         child: Row(
                                           children: [
                                             Icon(
+                                              color: AppColor.gray,
                                               CupertinoIcons.left_chevron,
                                               size: 20,
-                                              color: AppColor.gray,
                                             ),
-                                            const SizedBox(width: 11),
+                                            SizedBox(width: 11),
                                             Text(
                                               'Back to Edit',
                                               style: GoogleFont.ibmPlexSans(
@@ -379,87 +341,129 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                 ),
                               ),
                               SizedBox(width: 10),
+                              /*    AppButton.button(
+                                onTap: () async {
+                                  List<Map<String, dynamic>> contents = [];
 
-                              // Publish
+                                  // Add lists to contents
+                                  for (var listItem in widget.listPoints) {
+                                    if (listItem is List<String>) {
+                                      contents.add({
+                                        "type": "list",
+                                        "content": listItem,
+                                      });
+                                    } else if (listItem is String) {
+                                      contents.add({
+                                        "type": "list",
+                                        "content": listItem,
+                                      });
+                                    }
+                                  }
+
+                                  if (widget.description.length > 1) {
+                                    for (
+                                      var i = 1;
+                                      i < widget.description.length;
+                                      i++
+                                    ) {
+                                      var para = widget.description[i];
+                                      if (para.trim().isNotEmpty) {
+                                        contents.add({
+                                          "type": "paragraph",
+                                          "content": para,
+                                        });
+                                      }
+                                    }
+                                  }
+
+                                  String mainDescription =
+                                      widget.description.isNotEmpty
+                                          ? widget.description[0]
+                                          : '';
+                                  for (var image
+                                      in widget.images.whereType<File>()) {
+                                    contents.add({
+                                      "type": "image",
+                                      "content":
+                                          image
+                                              .path, // or just include the file for backend upload
+                                    });
+                                  }
+                                  await homeworkController.createHomeWork(
+                                    showLoader: true,
+                                    classId: widget.selectedClassId,
+                                    subjectId: widget.subjectId,
+                                    heading: widget.heading ?? '',
+                                    description: mainDescription,
+                                    publish: true,
+                                    contents: contents,
+                                    imageFiles:
+                                        widget.images
+                                            .whereType<File>()
+                                            .toList(),
+                                  );
+                                },
+
+                                width: 145,
+                                height: 60,
+                                text: 'Publish',
+                                image: AppImages.buttonArrow,
+                              ),*/
                               AppButton.button(
                                 onTap: () async {
-                                  if (_isPublishing)
-                                    return; // prevent double taps
-                                  setState(() => _isPublishing = true);
+                                  List<Map<String, dynamic>> contents = [];
 
-                                  try {
-                                    // Build payload
-                                    final contents = <Map<String, dynamic>>[
-                                      ...extraParagraphs
-                                          .where((p) => p.trim().isNotEmpty)
-                                          .map(
-                                            (p) => {
-                                              "type": "paragraph",
-                                              "content": p,
-                                            },
-                                          ),
-                                      ...widget.listPoints
-                                          .where((l) => l.trim().isNotEmpty)
-                                          .map(
-                                            (l) => {
-                                              "type": "list",
-                                              "content": l,
-                                            },
-                                          ),
-                                    ];
-
-                                    await homeworkController.createHomeWork(
-                                      context: context,
-                                      showLoader: true,
-                                      classId: widget.selectedClassId,
-                                      subjectId: widget.subjectId,
-                                      heading: widget.heading,
-                                      description: mainDescription,
-                                      publish: true,
-                                      contents: contents,
-                                      imageFiles: [
-                                        if (widget.permanentImage != null)
-                                          widget.permanentImage!,
-                                        ...widget.images,
-                                      ],
-                                    );
-
-                                    // ✅ Optionally show "Published!" for a moment
-                                    setState(() => _isPublishing = false);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: AppColor.green,
-                                        content: Text(
-                                          "Homework published successfully!",
-                                          style: GoogleFont.ibmPlexSans(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColor.white,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    setState(() => _isPublishing = false);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: AppColor.red,
-                                        content: Text(
-                                          "Failed to publish: $e",
-                                          style: GoogleFont.ibmPlexSans(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColor.white,
-                                          ),
-                                        ),
-                                      ),
-                                    );
+                                  // Add list items
+                                  for (var listItem in widget.listPoints) {
+                                    contents.add({
+                                      "type": "list",
+                                      "content": listItem,
+                                    });
                                   }
+
+                                  // Add paragraph contents
+                                  if (widget.description.length > 1) {
+                                    for (
+                                      var i = 1;
+                                      i < widget.description.length;
+                                      i++
+                                    ) {
+                                      var para = widget.description[i];
+                                      if (para.trim().isNotEmpty) {
+                                        contents.add({
+                                          "type": "paragraph",
+                                          "content": para,
+                                        });
+                                      }
+                                    }
+                                  }
+
+                                  // First description goes to 'description' field
+                                  String mainDescription =
+                                      widget.description.isNotEmpty
+                                          ? widget.description[0]
+                                          : '';
+
+                                  // Only pass files for upload, do NOT add their paths manually
+                                  await homeworkController.createHomeWork(
+                                    context: context,
+                                    showLoader: true,
+                                    classId: widget.selectedClassId,
+                                    subjectId: widget.subjectId,
+                                    heading: widget.heading ?? '',
+                                    description: mainDescription,
+                                    publish: true,
+                                    contents: contents,
+                                    imageFiles: [
+                                      if (widget.permanentImage != null)
+                                        widget.permanentImage!,
+                                      ...widget.images.whereType<File>(),
+                                    ],
+                                  );
                                 },
                                 width: 145,
                                 height: 60,
-                                text:
-                                    _isPublishing ? 'Publishing...' : 'Publish',
+                                text: 'Publish',
                                 image: AppImages.buttonArrow,
                               ),
                             ],
