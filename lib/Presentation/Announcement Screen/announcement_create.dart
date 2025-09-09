@@ -13,7 +13,7 @@
 // import '../../Core/Utility/google_fonts.dart';
 // import '../../Core/Widgets/common_container.dart';
 // import '../Homework/controller/teacher_class_controller.dart';
-// import 'list_general.dart';
+// import 'announcement_screen.dart';
 //
 // enum SectionType { image, paragraph, list }
 //
@@ -1613,7 +1613,7 @@ import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../Homework/controller/teacher_class_controller.dart';
 import 'controller/announcement_contorller.dart';
-import 'list_general.dart';
+import 'announcement_screen.dart';
 
 enum SectionType { image, paragraph, list }
 

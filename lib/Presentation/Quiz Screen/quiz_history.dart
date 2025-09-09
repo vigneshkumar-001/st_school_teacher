@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:st_teacher_app/Core/Utility/date_and_time_convert.dart';
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/Model/quizlist_response.dart';
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_details.dart';
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_screen_create.dart';
@@ -35,7 +36,7 @@ class _QuizHistoryState extends State<QuizHistory> {
       body: SafeArea(
         child: Obx(() {
           if (quizController.isLoading.value) {
-            return Center(child: AppLoader.circularLoader(AppColor.black));
+            return Center(child: AppLoader.circularLoader( ));
           }
 
           final groups = quizController.groupedQuizzes;
@@ -226,7 +227,12 @@ class _QuizHistoryState extends State<QuizHistory> {
                                           avatarImage: '',
                                           mainText: qi.title,
                                           smaleText: '',
-                                          time: qi.time,
+                                          time:
+                                              DateAndTimeConvert.formatDateTime(
+                                                showTime: true,
+                                                showDate: false,
+                                                qi.time.toString(),
+                                              ),
                                           aText1: ' ',
                                           aText2: '',
                                           backRoundColor: bgColor,

@@ -4,6 +4,7 @@ import 'package:st_teacher_app/Presentation/Attendance/controller/student_attend
 import 'package:st_teacher_app/Presentation/Homework/controller/teacher_class_controller.dart';
 import 'package:st_teacher_app/Presentation/Login%20Screen/controller/login_controller.dart';
 
+import 'Presentation/Announcement Screen/controller/announcement_contorller.dart';
 import 'Presentation/Attendance-teacher/controller/teacher_attendance_controller.dart';
 import 'Presentation/Attendance/controller/attendance_controller.dart';
 import 'Presentation/Quiz Screen/controller/quiz_controller.dart';
@@ -16,4 +17,5 @@ Future<void>  initController() async {
   Get.lazyPut(() => TeacherClassController());
   Get.lazyPut(() => TeacherAttendanceController());
   Get.lazyPut(() => QuizController());
+  Get.lazyPut(() => AnnouncementContorller());
 }

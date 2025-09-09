@@ -26,7 +26,7 @@ class _MyProfileState extends State<MyProfile> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return Center(child: AppLoader.circularLoader(AppColor.black));
+            return Center(child: AppLoader.circularLoader( ));
           }
 
           final teacherDataResponse = controller.teacherDataResponse.value;

@@ -1757,7 +1757,7 @@ class _HomeState extends State<Home> {
                                             .value) {
                                           return Center(
                                             child: AppLoader.circularLoader(
-                                              AppColor.black,
+
                                             ),
                                           );
                                         }

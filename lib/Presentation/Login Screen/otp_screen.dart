@@ -38,7 +38,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
       body: Obx(() {
         if (otpController.isOtpLoading.value) {
-          return AppLoader.circularLoader(AppColor.black);
+          return AppLoader.circularLoader( );
         }
         return SafeArea(
           child: Padding(

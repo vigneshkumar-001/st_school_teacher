@@ -759,10 +759,10 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-  Future<Either<Failure, AnnouncementListResponse>> listAnnouncement({
+  Future<Either<Failure, AnnouncementResponse>> getAnnouncementList({
     int? page,
     int? limit,
-}) async {
+  }) async {
     try {
       String url = ApiUrl.listAnnouncement;
 
@@ -771,7 +771,7 @@ class ApiDataSource extends BaseApiDataSource {
       if (response is! DioException &&
           (response.statusCode == 200 || response.statusCode == 201)) {
         if (response.data['status'] == true) {
-          return Right(AnnouncementListResponse.fromJson(response.data));
+          return Right(AnnouncementResponse.fromJson(response.data));
         } else {
           return Left(ServerFailure(response.data['message']));
         }
@@ -783,8 +783,9 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-
-  Future<Either<Failure, AnnouncementDetailResponse>> announcementDetail(int id) async {
+  Future<Either<Failure, AnnouncementDetailsResponse>> announcementDetail(
+    int id,
+  ) async {
     try {
       String url = ApiUrl.announcementDetail;
 
@@ -793,7 +794,7 @@ class ApiDataSource extends BaseApiDataSource {
       if (response is! DioException &&
           (response.statusCode == 200 || response.statusCode == 201)) {
         if (response.data['status'] == true) {
-          return Right(AnnouncementDetailResponse.fromJson(response.data));
+          return Right(AnnouncementDetailsResponse.fromJson(response.data));
         } else {
           return Left(ServerFailure(response.data['message']));
         }
@@ -804,5 +805,4 @@ class ApiDataSource extends BaseApiDataSource {
       return Left(ServerFailure(''));
     }
   }
-
 }

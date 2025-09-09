@@ -685,7 +685,7 @@ class _AttendHistorySpecificStudentState
           final data = c.studentQuiz.value; // StudentQuizData?
 
           if (c.isLoading.value && data == null) {
-            return Center(child: AppLoader.circularLoader(AppColor.black));
+            return Center(child: AppLoader.circularLoader( ));
           }
 
           if (data == null) {

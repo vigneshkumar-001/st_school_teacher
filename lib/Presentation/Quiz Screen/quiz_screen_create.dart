@@ -1225,12 +1225,25 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
     return '${m} min';
   }
 
+  int _digitsOrZero(String s) {
+    final m = RegExp(r'\d+').firstMatch(s);
+    return m == null ? 0 : int.parse(m.group(0)!);
+  }
+
+  int _extractMinutes(String input) {
+    final m = RegExp(r'(\d+)').firstMatch(input);
+    if (m == null) return 0;
+    return int.parse(m.group(1)!);
+  }
+
+
   Future<void> _pickMinutes(BuildContext context) async {
-    // range you want (change 300 if needed)
     const minValue = 1;
     const maxValue = 300;
-    int temp = (_minutes.clamp(minValue, maxValue));
-    if (temp == 0) temp = 1;
+
+    int temp = _minutes;
+    if (temp < minValue) temp = minValue;
+    if (temp > maxValue) temp = maxValue;
 
     await showModalBottomSheet(
       context: context,
@@ -1248,18 +1261,14 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 40,
-                  height: 4,
+                  width: 40, height: 4,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Select Minutes',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+                const SizedBox(height: 20),
+                const Text('Select Minutes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
 
                 SizedBox(
@@ -1269,10 +1278,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                     scrollController: FixedExtentScrollController(
                       initialItem: temp - minValue,
                     ),
-                    onSelectedItemChanged: (i) {
-                      temp = i + minValue;
-                    },
-                    children: List.generate((maxValue - minValue + 1), (i) {
+                    onSelectedItemChanged: (i) => temp = i + minValue,
+                    children: List.generate(maxValue - minValue + 1, (i) {
                       final v = i + minValue;
                       return Center(child: Text('$v min'));
                     }),
@@ -1289,17 +1296,18 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                       ),
                     ),
                     Expanded(
-                      child: ElevatedButton(
+                      child:ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            _minutes = temp;
-                            timeLimitController.text = _formatMinutes(_minutes);
-                            _timeLimitInvalid = _minutes <= 0;
+                            _minutes = temp;                         // save picked minutes
+                            timeLimitController.text = '$_minutes min'; // show in the field
+                            _timeLimitInvalid = _minutes <= 0 ? true : false; // clear error
                           });
-                          Navigator.pop(ctx);
+                          Navigator.pop(ctx); // close the sheet
                         },
-                        child: const Text('Done'),
+                        child: Text('Done'),
                       ),
+
                     ),
                   ],
                 ),
@@ -1310,6 +1318,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       },
     );
   }
+
 
   void _showError(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
@@ -1335,7 +1344,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       hasError = true;
     }
 
-    // Subject required (subjectIndex is non-nullable int; check ID instead)
+    // Subject required
     if (selectedSubjectId == null) {
       _subjectInvalid = true;
       hasError = true;
@@ -1347,10 +1356,10 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       hasError = true;
     }
 
-    // Time limit required + must be > 0
-    final timeStr = timeLimitController.text.trim();
-    final timeNum = int.tryParse(timeStr);
-    if (timeStr.isEmpty || timeNum == null || timeNum <= 0) {
+    // ----- Time limit (> 0). Prefer picker value; fallback to digits in text -----
+    final typed = timeLimitController.text.trim();
+    int timeNum = _minutes > 0 ? _minutes : _extractMinutes(typed);
+    if (timeNum <= 0) {
       _timeLimitInvalid = true;
       hasError = true;
     }
@@ -1374,11 +1383,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       // At least 1 correct answer
       if (!q.answers.any((a) => a.isCorrect)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Question ${qIndex + 1}: mark at least one correct answer",
-            ),
-          ),
+          SnackBar(content: Text("Question ${qIndex + 1}: mark at least one correct answer")),
         );
         hasError = true;
       }
@@ -1393,25 +1398,20 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       "classId": selectedClassId,
       "subjectId": selectedSubjectId,
       "heading": headingController.text.trim(),
-      "timeLimit": timeNum,
+      "timeLimit": timeNum, // <- clean numeric minutes
       "publish": true,
-      "questions":
-          questionList.map((q) {
-            return {
-              "text": q.question.trim(),
-              "options":
-                  q.answers
-                      .map(
-                        (a) => {
-                          "text": a.text.trim(),
-                          "isCorrect": a.isCorrect,
-                        },
-                      )
-                      .toList(),
-            };
+      "questions": questionList.map((q) {
+        return {
+          "text": q.question.trim(),
+          "options": q.answers.map((a) => {
+            "text": a.text.trim(),
+            "isCorrect": a.isCorrect,
           }).toList(),
+        };
+      }).toList(),
     };
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1982,16 +1982,13 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                   text: '',
                                   controller: timeLimitController,
                                   verticalDivider: false,
-                                  onChanged: (_) {
-                                    // (Optional) if someone pastes text, still validate
-                                    final txt = timeLimitController.text.trim();
-                                    // very light validation: any non-empty -> ok; you can parse back if needed
-                                    setState(
-                                      () =>
-                                          _timeLimitInvalid =
-                                              _timeLimit.inMinutes <= 0,
-                                    );
+                                  onChanged: (v) {
+                                    setState(() {
+                                      _minutes = _digitsOrZero(v);
+                                      _timeLimitInvalid = _minutes <= 0;
+                                    });
                                   },
+
                                 ),
                               ),
                             ),

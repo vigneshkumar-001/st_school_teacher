@@ -40,7 +40,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return Center(child: AppLoader.circularLoader(AppColor.black));
+            return Center(child: AppLoader.circularLoader( ));
           }
           if (controller.homeworkList.isEmpty) {
             return Center(child: Text("No Homework Found"));

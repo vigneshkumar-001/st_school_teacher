@@ -12,11 +12,12 @@ import '../../../Core/Utility/snack_bar.dart';
 import '../Model/announcement_create_response.dart';
 import '../Model/announcement_details_response.dart';
 import '../Model/announcement_list_general.dart';
-import '../list_general.dart';
+import '../announcement_screen.dart';
 
 class AnnouncementContorller extends GetxController {
   ApiDataSource apiDataSource = ApiDataSource();
   RxList<Announcement> classList = <Announcement>[].obs;
+  Rx<AnnouncementDetails?> announcementDetails = Rx<AnnouncementDetails?>(null);
 
   RxBool isLoading = false.obs;
   final RxList<String> categoryOptions = <String>[].obs;
@@ -24,7 +25,8 @@ class AnnouncementContorller extends GetxController {
   final RxString categoryError = ''.obs;
   String accessToken = '';
   RxString frontImageUrl = ''.obs;
-  var AnnouncementList = <Announcement>[].obs;
+
+  Rx<AnnouncementData?> announcementData = Rx<AnnouncementData?>(null);
 
   var selectedClassName = 'All'.obs;
   RxList<Announcement> subjectList = <Announcement>[].obs;
@@ -33,7 +35,7 @@ class AnnouncementContorller extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    listAnnouncements();
+    getAnnouncement();
   }
 
   final RxString error = ''.obs;
@@ -50,8 +52,36 @@ class AnnouncementContorller extends GetxController {
     return ['All', ...cls];
   }
 
-  final detail = Rxn<AnnouncementDetail>();
+  final detail = Rxn<AnnouncementDetails>();
 
+  Future<AnnouncementDetails?> getAnnouncementDetails({
+    bool showLoader = true,
+    required int id,
+  }) async {
+    try {
+      if (showLoader) showPopupLoader();
+
+      final results = await apiDataSource.announcementDetail(id);
+
+      return results.fold(
+            (failure) {
+          if (showLoader) hidePopupLoader();
+          AppLogger.log.e(failure.message);
+          return null;
+        },
+            (response) {
+          if (showLoader) hidePopupLoader();
+          AppLogger.log.i('Announcement Details Fetched ✅');
+          announcementDetails.value = response.data; // store in observable
+          return response.data; // return data for UI
+        },
+      );
+    } catch (e) {
+      if (showLoader) hidePopupLoader();
+      AppLogger.log.e(e);
+      return null;
+    }
+  }
   Future<void> createAnnouncement({
     int? classId,
     int? subjectId,
@@ -106,7 +136,7 @@ class AnnouncementContorller extends GetxController {
         (response) async {
           if (showLoader) hidePopupLoader();
           Navigator.pop(context!);
-          Get.off(ListGeneral());
+          Get.off(AnnouncementScreen());
         },
       );
     } catch (e) {
@@ -115,54 +145,27 @@ class AnnouncementContorller extends GetxController {
     }
   }
 
-  Future<void> listAnnouncements({bool force = false}) async {
-    if (isLoading.value) return;
-    if (!force && items.isNotEmpty) return;
-
-    error.value = '';
-    isLoading.value = true;
-    page.value = 1;
-
+  Future<String?> getAnnouncement({bool showLoader = true}) async {
     try {
-      final result = await apiDataSource.listAnnouncement(
-        page: page.value,
-        limit: limit,
-      );
-
-      result.fold(
-        (failure) {
-          items.clear();
-          error.value = failure.message;
+      isLoading.value = true;
+      final results = await apiDataSource.getAnnouncementList();
+      return results.fold(
+            (failure) {
+          isLoading.value = false;
+          AppLogger.log.e(failure.message);
         },
-        (response) {
-          // response can be a typed object or Map; normalize to Map
-          final map = _asMap(response);
-
-          final data = (map['data'] as Map?) ?? {};
-          final list = (data['items'] as List?) ?? const [];
-          final meta = (data['meta'] as Map?) ?? const {};
-
-          final parsed =
-              list
-                  .map(
-                    (e) => AnnouncementItem.fromJson(
-                      Map<String, dynamic>.from(e as Map),
-                    ),
-                  )
-                  .toList();
-
-          items.assignAll(parsed);
-
-          // pagination info (if present)
-          totalPages.value = (meta['pages'] as num?)?.toInt() ?? 1;
+            (response) async {
+          isLoading.value = false;
+          AppLogger.log.i('announcementData List ');
+          announcementData.value = response.data;
+          AppLogger.log.i(response.toString());
         },
       );
     } catch (e) {
-      items.clear();
-      error.value = e.toString();
-    } finally {
       isLoading.value = false;
+      AppLogger.log.e(e);
     }
+    return null;
   }
 
   Future<void> fetch(int id) async {
@@ -206,7 +209,7 @@ class AnnouncementContorller extends GetxController {
     selectedClassName.value = className;
   }
 
-  List<Announcement> get filteredAnnouncement {
+  /*  List<Announcement> get filteredAnnouncement {
     if (selectedClassName.value == 'All') {
       return AnnouncementList;
     }
@@ -259,7 +262,7 @@ class AnnouncementContorller extends GetxController {
     } catch (_) {
       throw StateError('Unsupported response type: ${response.runtimeType}');
     }
-  }
+  }*/
 }
 
 void showPopupLoader() {
