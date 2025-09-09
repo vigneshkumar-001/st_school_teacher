@@ -280,7 +280,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     );
   }
 
-  // ===== UI =====
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -333,14 +332,14 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                   color: AppColor.gray,
                                 ),
                               ),
-                                SizedBox(width: 8),
+                              SizedBox(width: 8),
                               Image.asset(AppImages.historyImage, height: 24),
                             ],
                           ),
                         ),
                       ],
                     ),
-                      SizedBox(height: 35),
+                    SizedBox(height: 35),
                     Center(
                       child: Text(
                         'Create Homework',
@@ -351,7 +350,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                         ),
                       ),
                     ),
-                      SizedBox(height: 20),
+                    SizedBox(height: 20),
 
                     // Card
                     Container(
@@ -375,7 +374,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                 color: AppColor.black,
                               ),
                             ),
-                              SizedBox(height: 35),
+                            SizedBox(height: 35),
                             SizedBox(
                               height: 100,
                               child: Stack(

@@ -1706,8 +1706,10 @@ class _HomeState extends State<Home> {
                                             context,
                                             MaterialPageRoute(
                                               builder:
-                                                  (context) =>
-                                                      QuizScreenCreate(),
+                                                  (context) => QuizScreenCreate(
+                                                    className: selected.name,
+                                                    section: selected.section,
+                                                  ),
                                             ),
                                           );
                                         }

@@ -1053,7 +1053,7 @@ class QuestionModel {
   List<AnswerModel> answers;
 
   QuestionModel({this.question = '', List<AnswerModel>? answers})
-      : answers = answers ?? List.generate(4, (_) => AnswerModel());
+    : answers = answers ?? List.generate(4, (_) => AnswerModel());
   Map<String, dynamic> toJson() => {
     "question": question,
     "answers": answers.map((a) => a.toJson()).toList(),
@@ -1061,15 +1061,18 @@ class QuestionModel {
 }
 
 class QuizScreenCreate extends StatefulWidget {
-  const QuizScreenCreate({super.key});
+  final String? className;
+  final String? section;
+  const QuizScreenCreate({super.key, this.className, this.section});
 
   @override
   State<QuizScreenCreate> createState() => _QuizScreenCreateState();
 }
 
 class _QuizScreenCreateState extends State<QuizScreenCreate> {
-  final TeacherClassController teacherClassController =
-  Get.put(TeacherClassController());
+  final TeacherClassController teacherClassController = Get.put(
+    TeacherClassController(),
+  );
   final QuizController controller = Get.put(QuizController());
 
   // Data
@@ -1086,11 +1089,11 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   int subjectIndex = 0; // index in subject chips
   int? selectedClassId;
   int? selectedSubjectId;
-
+  String? selectedSubject;
   bool showClearIcon = false;
   final TextEditingController headingController = TextEditingController();
   final TextEditingController timeLimitController = TextEditingController();
-
+  final List<TextEditingController> descriptionControllers = [];
   // Validation state
   final Set<int> _invalidQuestions = <int>{};
   final Map<int, Set<int>> _invalidAnswers = <int, Set<int>>{};
@@ -1099,7 +1102,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   bool _classInvalid = false;
   bool _subjectInvalid = false;
 
-  @override
+
+  /* @override
   void initState() {
     super.initState();
 
@@ -1113,7 +1117,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
         selectedIndex = 0;
         selectedClassId = teacherClassController.classList[0].id;
         teacherClassController.selectedClass.value =
-        teacherClassController.classList[0];
+            teacherClassController.classList[0];
       }
       setState(() {});
     });
@@ -1141,8 +1145,41 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
 
     // Always have at least one question to start
     if (questionList.isEmpty) questionList.add(QuestionModel());
-  }
+  }*/
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Always show at least 1 description field
+    descriptionControllers.add(TextEditingController());
+
+    headingController.addListener(() {
+      setState(() => showClearIcon = headingController.text.isNotEmpty);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (teacherClassController.classList.isNotEmpty) {
+        final defaultClass = teacherClassController.classList.firstWhere(
+              (c) =>
+          c.name == (widget.className ?? c.name) &&
+              c.section == (widget.section ?? c.section),
+          orElse: () => teacherClassController.classList.first,
+        );
+        teacherClassController.selectedClass.value = defaultClass;
+        selectedIndex = teacherClassController.classList.indexOf(defaultClass);
+        selectedClassId = defaultClass.id;
+      }
+
+      if (teacherClassController.subjectList.isNotEmpty) {
+        subjectIndex = 0;
+        selectedSubject = teacherClassController.subjectList[0].name;
+        selectedSubjectId = teacherClassController.subjectList[0].id;
+      }
+
+      setState(() {});
+    });
+  }
   @override
   void dispose() {
     headingController.dispose();
@@ -1240,14 +1277,21 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       "heading": headingController.text.trim(),
       "timeLimit": timeNum,
       "publish": true,
-      "questions": questionList.map((q) {
-        return {
-          "text": q.question.trim(),
-          "options": q.answers
-              .map((a) => {"text": a.text.trim(), "isCorrect": a.isCorrect})
-              .toList(),
-        };
-      }).toList(),
+      "questions":
+          questionList.map((q) {
+            return {
+              "text": q.question.trim(),
+              "options":
+                  q.answers
+                      .map(
+                        (a) => {
+                          "text": a.text.trim(),
+                          "isCorrect": a.isCorrect,
+                        },
+                      )
+                      .toList(),
+            };
+          }).toList(),
     };
   }
 
@@ -1266,7 +1310,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header row
+
                   Row(
                     children: [
                       CommonContainer.NavigatArrow(
@@ -1274,8 +1318,10 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                         imageColor: AppColor.lightBlack,
                         container: AppColor.lowLightgray,
                         onIconTap: () => Navigator.pop(context),
-                        border:
-                        Border.all(color: AppColor.lightgray, width: 0.3),
+                        border: Border.all(
+                          color: AppColor.lightgray,
+                          width: 0.3,
+                        ),
                       ),
                       const Spacer(),
                       InkWell(
@@ -1371,14 +1417,15 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                   left: 0,
                                   right: 0,
                                   child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: classes.length,
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 2,
                                     ),
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: classes.length,
                                     itemBuilder: (context, index) {
                                       final item = classes[index];
-                                      final isSelected = index == selectedIndex;
+                                      final isSelected =
+                                          index == selectedIndex;
 
                                       return GestureDetector(
                                         onTap: () {
@@ -1388,12 +1435,12 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                             teacherClassController
                                                 .selectedClass
                                                 .value = item;
-                                            _classInvalid = false;
                                           });
                                         },
                                         child: AnimatedContainer(
-                                          duration:
-                                          const Duration(milliseconds: 120),
+                                          duration: const Duration(
+                                            milliseconds: 120,
+                                          ),
                                           curve: Curves.easeInOut,
                                           width: 90,
                                           height: isSelected ? 120 : 80,
@@ -1401,36 +1448,44 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                             horizontal: 0,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: isSelected
+                                            color:
+                                            isSelected
                                                 ? AppColor.white
                                                 : Colors.transparent,
                                             borderRadius:
                                             BorderRadius.circular(24),
-                                            border: isSelected
+                                            border:
+                                            isSelected
                                                 ? Border.all(
                                               color: AppColor.blueG1,
                                               width: 1.5,
                                             )
                                                 : null,
-                                            boxShadow: isSelected
+                                            boxShadow:
+                                            isSelected
                                                 ? [
                                               BoxShadow(
                                                 color: AppColor.white
                                                     .withOpacity(0.5),
                                                 blurRadius: 10,
-                                                offset:
-                                                const Offset(0, 4),
+                                                offset: const Offset(
+                                                  0,
+                                                  4,
+                                                ),
                                               ),
                                             ]
                                                 : [],
                                           ),
-                                          child: isSelected
+                                          child:
+                                          isSelected
                                               ? Column(
                                             mainAxisAlignment:
                                             MainAxisAlignment
                                                 .spaceBetween,
                                             children: [
-                                              const SizedBox(height: 8),
+                                              const SizedBox(
+                                                height: 8,
+                                              ),
                                               Row(
                                                 mainAxisAlignment:
                                                 MainAxisAlignment
@@ -1438,32 +1493,41 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                 children: [
                                                   ShaderMask(
                                                     shaderCallback:
-                                                        (bounds) =>
-                                                        const LinearGradient(
-                                                          colors: [
-                                                            AppColor.blueG1,
-                                                            AppColor.blue,
-                                                          ],
-                                                          begin: Alignment
-                                                              .topLeft,
-                                                          end: Alignment
-                                                              .bottomRight,
-                                                        ).createShader(Rect
-                                                            .fromLTWH(
-                                                            0,
-                                                            0,
-                                                            bounds.width,
-                                                            bounds
-                                                                .height)),
+                                                        (
+                                                        bounds,
+                                                        ) => const LinearGradient(
+                                                      colors: [
+                                                        AppColor
+                                                            .blueG1,
+                                                        AppColor
+                                                            .blue,
+                                                      ],
+                                                      begin:
+                                                      Alignment
+                                                          .topLeft,
+                                                      end:
+                                                      Alignment
+                                                          .bottomRight,
+                                                    ).createShader(
+                                                      Rect.fromLTWH(
+                                                        0,
+                                                        0,
+                                                        bounds
+                                                            .width,
+                                                        bounds
+                                                            .height,
+                                                      ),
+                                                    ),
                                                     blendMode:
-                                                    BlendMode.srcIn,
+                                                    BlendMode
+                                                        .srcIn,
                                                     child: Text(
                                                       item.name,
-                                                      style: GoogleFont
-                                                          .ibmPlexSans(
+                                                      style: GoogleFont.ibmPlexSans(
                                                         fontSize: 28,
                                                         color:
-                                                        Colors.white,
+                                                        Colors
+                                                            .white,
                                                         fontWeight:
                                                         FontWeight
                                                             .bold,
@@ -1472,38 +1536,46 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                   ),
                                                   Padding(
                                                     padding:
-                                                    const EdgeInsets
-                                                        .only(
-                                                        top: 8.0),
+                                                    const EdgeInsets.only(
+                                                      top: 8.0,
+                                                    ),
                                                     child: ShaderMask(
                                                       shaderCallback:
-                                                          (bounds) =>
-                                                          const LinearGradient(
-                                                            colors: [
-                                                              AppColor
-                                                                  .blueG1,
-                                                              AppColor.blue,
-                                                            ],
-                                                            begin: Alignment
-                                                                .topLeft,
-                                                            end: Alignment
-                                                                .bottomRight,
-                                                          ).createShader(Rect
-                                                              .fromLTWH(
-                                                              0,
-                                                              0,
-                                                              bounds
-                                                                  .width,
-                                                              bounds
-                                                                  .height)),
+                                                          (
+                                                          bounds,
+                                                          ) => const LinearGradient(
+                                                        colors: [
+                                                          AppColor
+                                                              .blueG1,
+                                                          AppColor
+                                                              .blue,
+                                                        ],
+                                                        begin:
+                                                        Alignment
+                                                            .topLeft,
+                                                        end:
+                                                        Alignment
+                                                            .bottomRight,
+                                                      ).createShader(
+                                                        Rect.fromLTWH(
+                                                          0,
+                                                          0,
+                                                          bounds
+                                                              .width,
+                                                          bounds
+                                                              .height,
+                                                        ),
+                                                      ),
                                                       blendMode:
-                                                      BlendMode.srcIn,
+                                                      BlendMode
+                                                          .srcIn,
                                                       child: Text(
                                                         'th',
-                                                        style: GoogleFont
-                                                            .ibmPlexSans(
-                                                          fontSize: 14,
-                                                          color: Colors
+                                                        style: GoogleFont.ibmPlexSans(
+                                                          fontSize:
+                                                          14,
+                                                          color:
+                                                          Colors
                                                               .white,
                                                           fontWeight:
                                                           FontWeight
@@ -1516,38 +1588,42 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                               ),
                                               Container(
                                                 height: 55,
-                                                width: double.infinity,
+                                                width:
+                                                double.infinity,
                                                 decoration: BoxDecoration(
-                                                  gradient:
-                                                  const LinearGradient(
+                                                  gradient: const LinearGradient(
                                                     colors: [
                                                       AppColor.blueG1,
                                                       AppColor.blue,
                                                     ],
-                                                    begin: Alignment
+                                                    begin:
+                                                    Alignment
                                                         .topLeft,
-                                                    end: Alignment
+                                                    end:
+                                                    Alignment
                                                         .topRight,
                                                   ),
                                                   borderRadius:
-                                                  const BorderRadius
-                                                      .vertical(
+                                                  const BorderRadius.vertical(
                                                     bottom:
                                                     Radius.circular(
-                                                        22),
+                                                      22,
+                                                    ),
                                                   ),
                                                 ),
                                                 alignment:
                                                 Alignment.center,
                                                 child: Text(
                                                   item.section,
-                                                  style: GoogleFont
-                                                      .ibmPlexSans(
+                                                  style:
+                                                  GoogleFont.ibmPlexSans(
                                                     fontSize: 20,
                                                     color:
-                                                    AppColor.white,
+                                                    AppColor
+                                                        .white,
                                                     fontWeight:
-                                                    FontWeight.bold,
+                                                    FontWeight
+                                                        .bold,
                                                   ),
                                                 ),
                                               ),
@@ -1560,28 +1636,31 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                               children: [
                                                 Container(
                                                   padding:
-                                                  const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 20,
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal:
+                                                    20,
                                                     vertical: 3,
                                                   ),
                                                   decoration:
                                                   BoxDecoration(
                                                     color:
-                                                    AppColor.white,
+                                                    AppColor
+                                                        .white,
                                                     borderRadius:
-                                                    BorderRadius
-                                                        .circular(20),
+                                                    BorderRadius.circular(
+                                                      20,
+                                                    ),
                                                   ),
                                                   child: Text(
                                                     item.name,
-                                                    style: GoogleFont
-                                                        .ibmPlexSans(
+                                                    style: GoogleFont.ibmPlexSans(
                                                       fontSize: 14,
                                                       color:
-                                                      AppColor.gray,
+                                                      AppColor
+                                                          .gray,
                                                       fontWeight:
-                                                      FontWeight.w600,
+                                                      FontWeight
+                                                          .w600,
                                                     ),
                                                   ),
                                                 ),
@@ -1590,13 +1669,14 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                 ),
                                                 Text(
                                                   item.section,
-                                                  style: GoogleFont
-                                                      .ibmPlexSans(
+                                                  style: GoogleFont.ibmPlexSans(
                                                     fontSize: 20,
-                                                    color: AppColor
+                                                    color:
+                                                    AppColor
                                                         .lightgray,
                                                     fontWeight:
-                                                    FontWeight.bold,
+                                                    FontWeight
+                                                        .bold,
                                                   ),
                                                 ),
                                               ],
@@ -1613,9 +1693,13 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                           if (_classInvalid)
                             const Padding(
                               padding: EdgeInsets.only(top: 8, left: 4),
-                              child: Text('Class is required',
-                                  style: TextStyle(
-                                      color: Colors.red, fontSize: 12)),
+                              child: Text(
+                                'Class is required',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
 
                           const SizedBox(height: 40),
@@ -1631,16 +1715,16 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                           const SizedBox(height: 10),
                           Wrap(
                             spacing: 10,
-                            children:
-                            List.generate(subjects.length, (index) {
+                            children: List.generate(subjects.length, (index) {
                               final sub = subjects[index];
                               final isSelected = subjectIndex == index;
                               return GestureDetector(
-                                onTap: () => setState(() {
-                                  subjectIndex = index;
-                                  selectedSubjectId = sub.id;
-                                  _subjectInvalid = false;
-                                }),
+                                onTap:
+                                    () => setState(() {
+                                      subjectIndex = index;
+                                      selectedSubjectId = sub.id;
+                                      _subjectInvalid = false;
+                                    }),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 25,
@@ -1650,9 +1734,10 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                     color: AppColor.white,
                                     borderRadius: BorderRadius.circular(30),
                                     border: Border.all(
-                                      color: isSelected
-                                          ? AppColor.blue
-                                          : AppColor.borderGary,
+                                      color:
+                                          isSelected
+                                              ? AppColor.blue
+                                              : AppColor.borderGary,
                                       width: 1.5,
                                     ),
                                   ),
@@ -1660,8 +1745,11 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       if (isSelected) ...[
-                                        Icon(Icons.check,
-                                            size: 16, color: AppColor.blue),
+                                        Icon(
+                                          Icons.check,
+                                          size: 16,
+                                          color: AppColor.blue,
+                                        ),
                                         const SizedBox(width: 6),
                                       ],
                                       Text(
@@ -1669,9 +1757,10 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                         style: GoogleFont.ibmPlexSans(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          color: isSelected
-                                              ? AppColor.blue
-                                              : AppColor.gray,
+                                          color:
+                                              isSelected
+                                                  ? AppColor.blue
+                                                  : AppColor.gray,
                                         ),
                                       ),
                                     ],
@@ -1683,9 +1772,13 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                           if (_subjectInvalid)
                             const Padding(
                               padding: EdgeInsets.only(top: 8, left: 4),
-                              child: Text('Subject is required',
-                                  style: TextStyle(
-                                      color: Colors.red, fontSize: 12)),
+                              child: Text(
+                                'Subject is required',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
 
                           const SizedBox(height: 25),
@@ -1703,9 +1796,10 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: _headingInvalid
-                                    ? Colors.red
-                                    : Colors.transparent,
+                                color:
+                                    _headingInvalid
+                                        ? Colors.red
+                                        : Colors.transparent,
                                 width: 1.2,
                               ),
                             ),
@@ -1720,15 +1814,13 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                               // If your component supports onChanged, this helps clear red faster:
                               onChanged: (v) {
                                 setState(() {
-                                  if (_headingInvalid &&
-                                      v.trim().isNotEmpty) {
+                                  if (_headingInvalid && v.trim().isNotEmpty) {
                                     _headingInvalid = false;
                                   }
                                   showClearIcon = v.isNotEmpty;
                                 });
                               },
-                              imagePath:
-                              showClearIcon ? AppImages.close : null,
+                              imagePath: showClearIcon ? AppImages.close : null,
                               imageColor: AppColor.gray,
                               text: '',
                               controller: headingController,
@@ -1738,9 +1830,13 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                           if (_headingInvalid)
                             const Padding(
                               padding: EdgeInsets.only(top: 6, left: 4),
-                              child: Text('Heading is required',
-                                  style: TextStyle(
-                                      color: Colors.red, fontSize: 12)),
+                              child: Text(
+                                'Heading is required',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
 
                           const SizedBox(height: 25),
@@ -1758,9 +1854,10 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: _timeLimitInvalid
-                                    ? Colors.red
-                                    : Colors.transparent,
+                                color:
+                                    _timeLimitInvalid
+                                        ? Colors.red
+                                        : Colors.transparent,
                                 width: 1.2,
                               ),
                             ),
@@ -1772,8 +1869,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                               onChanged: (v) {
                                 final n = int.tryParse(v.trim());
                                 setState(() {
-                                  _timeLimitInvalid =
-                                  !(n != null && n > 0);
+                                  _timeLimitInvalid = !(n != null && n > 0);
                                 });
                               },
                               imagePath: AppImages.clock,
@@ -1786,24 +1882,27 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                           if (_timeLimitInvalid)
                             const Padding(
                               padding: EdgeInsets.only(top: 6, left: 4),
-                              child: Text('Time Limit is required',
-                                  style: TextStyle(
-                                      color: Colors.red, fontSize: 12)),
+                              child: Text(
+                                'Time Limit is required',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
 
                           const SizedBox(height: 25),
 
                           // ------------------ Questions & Answers ------------------
                           Column(
-                            children:
-                            List.generate(questionList.length, (qIndex) {
+                            children: List.generate(questionList.length, (
+                              qIndex,
+                            ) {
                               final q = questionList[qIndex];
                               return Padding(
-                                padding:
-                                const EdgeInsets.only(bottom: 24),
+                                padding: const EdgeInsets.only(bottom: 24),
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       "Q${qIndex + 1}",
@@ -1824,18 +1923,22 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                         filled: true,
                                         fillColor: AppColor.lightWhite,
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(16),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
                                           borderSide: BorderSide(
-                                            color: _invalidQuestions
-                                                .contains(qIndex)
-                                                ? Colors.red
-                                                : Colors.transparent,
+                                            color:
+                                                _invalidQuestions.contains(
+                                                      qIndex,
+                                                    )
+                                                    ? Colors.red
+                                                    : Colors.transparent,
                                           ),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(16),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
                                           borderSide: BorderSide(
                                             color: AppColor.blue,
                                           ),
@@ -1844,19 +1947,27 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                       onChanged: (val) {
                                         q.question = val;
                                         if (val.trim().isNotEmpty) {
-                                          setState(() => _invalidQuestions
-                                              .remove(qIndex));
+                                          setState(
+                                            () => _invalidQuestions.remove(
+                                              qIndex,
+                                            ),
+                                          );
                                         }
                                       },
                                     ),
                                     if (_invalidQuestions.contains(qIndex))
                                       const Padding(
                                         padding: EdgeInsets.only(
-                                            top: 6, left: 4),
-                                        child: Text('Question is required',
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 12)),
+                                          top: 6,
+                                          left: 4,
+                                        ),
+                                        child: Text(
+                                          'Question is required',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                          ),
+                                        ),
                                       ),
 
                                     const SizedBox(height: 12),
@@ -1870,82 +1981,83 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                     const SizedBox(height: 12),
 
                                     Column(
-                                      children: List.generate(
-                                          q.answers.length, (aIndex) {
+                                      children: List.generate(q.answers.length, (
+                                        aIndex,
+                                      ) {
                                         final a = q.answers[aIndex];
                                         final isInvalid =
-                                            _invalidAnswers[qIndex]
-                                                ?.contains(aIndex) ??
-                                                false;
+                                            _invalidAnswers[qIndex]?.contains(
+                                              aIndex,
+                                            ) ??
+                                            false;
 
                                         return Padding(
-                                          padding:
-                                          const EdgeInsets.only(
-                                              bottom: 8),
+                                          padding: const EdgeInsets.only(
+                                            bottom: 8,
+                                          ),
                                           child: Column(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 padding:
-                                                const EdgeInsets
-                                                    .symmetric(
-                                                  horizontal: 20,
-                                                  vertical: 12,
-                                                ),
-                                                decoration:
-                                                BoxDecoration(
-                                                  color:
-                                                  AppColor.lightWhite,
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 12,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: AppColor.lightWhite,
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                      18),
+                                                      BorderRadius.circular(18),
                                                   border: Border.all(
-                                                    color: isInvalid
-                                                        ? Colors.red
-                                                        : Colors
-                                                        .transparent,
+                                                    color:
+                                                        isInvalid
+                                                            ? Colors.red
+                                                            : Colors
+                                                                .transparent,
                                                     width: 1.2,
                                                   ),
                                                 ),
                                                 child: Row(
                                                   children: [
                                                     Expanded(
-                                                      child:
-                                                      TextFormField(
-                                                        initialValue:
-                                                        a.text,
-                                                        decoration:
-                                                        InputDecoration(
+                                                      child: TextFormField(
+                                                        initialValue: a.text,
+                                                        decoration: InputDecoration(
                                                           hintText:
-                                                          'List ${aIndex + 1}',
+                                                              'List ${aIndex + 1}',
                                                           hintStyle:
-                                                          GoogleFont
-                                                              .ibmPlexSans(
-                                                            fontSize: 14,
-                                                            color: AppColor
-                                                                .gray,
-                                                          ),
+                                                              GoogleFont.ibmPlexSans(
+                                                                fontSize: 14,
+                                                                color:
+                                                                    AppColor
+                                                                        .gray,
+                                                              ),
                                                           border:
-                                                          InputBorder
-                                                              .none,
+                                                              InputBorder.none,
                                                         ),
-                                                        onChanged:
-                                                            (val) {
+                                                        onChanged: (val) {
                                                           a.text = val;
 
                                                           // Your rule: first option auto-correct
                                                           a.isCorrect =
-                                                          (aIndex ==
-                                                              0);
+                                                              (aIndex == 0);
 
                                                           if (val
                                                               .trim()
                                                               .isNotEmpty) {
                                                             setState(() {
-                                                              _invalidAnswers[qIndex]?.remove(aIndex);
-                                                              if ((_invalidAnswers[qIndex]?.isEmpty ?? true)) {
-                                                                _invalidAnswers.remove(qIndex);
+                                                              _invalidAnswers[qIndex]
+                                                                  ?.remove(
+                                                                    aIndex,
+                                                                  );
+                                                              if ((_invalidAnswers[qIndex]
+                                                                      ?.isEmpty ??
+                                                                  true)) {
+                                                                _invalidAnswers
+                                                                    .remove(
+                                                                      qIndex,
+                                                                    );
                                                               }
                                                             });
                                                           }
@@ -1955,34 +2067,33 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                     if (aIndex == 0)
                                                       Padding(
                                                         padding:
-                                                        const EdgeInsets
-                                                            .only(
-                                                            left: 8),
+                                                            const EdgeInsets.only(
+                                                              left: 8,
+                                                            ),
                                                         child: Container(
-                                                          decoration:
-                                                          BoxDecoration(
+                                                          decoration: BoxDecoration(
                                                             color:
-                                                            AppColor
-                                                                .white,
+                                                                AppColor.white,
                                                             borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                14),
+                                                                BorderRadius.circular(
+                                                                  14,
+                                                                ),
                                                           ),
                                                           child: const Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                              vertical: 6,
-                                                              horizontal: 14,
-                                                            ),
+                                                            padding:
+                                                                EdgeInsets.symmetric(
+                                                                  vertical: 6,
+                                                                  horizontal:
+                                                                      14,
+                                                                ),
                                                             child: Text(
                                                               "Answer",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                    .blue,
+                                                                color:
+                                                                    Colors.blue,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                           ),
@@ -1994,15 +2105,16 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                               if (isInvalid)
                                                 Padding(
                                                   padding:
-                                                  const EdgeInsets
-                                                      .only(
-                                                      top: 6,
-                                                      left: 4),
+                                                      const EdgeInsets.only(
+                                                        top: 6,
+                                                        left: 4,
+                                                      ),
                                                   child: Text(
                                                     'Answer ${aIndex + 1} is required',
                                                     style: const TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 12),
+                                                      color: Colors.red,
+                                                      fontSize: 12,
+                                                    ),
                                                   ),
                                                 ),
                                             ],
@@ -2057,15 +2169,14 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                               AppLogger.log.i(payload);
                               await controller.quizCreate(payload);
 
-                              // After success, you can navigate:
-                              // if (mounted) {
-                              //   Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //       builder: (_) => const QuizHistory(),
-                              //     ),
-                              //   );
-                              // }
+                              if (mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const QuizHistory(),
+                                  ),
+                                );
+                              }
                             },
                             width: 145,
                             height: 60,
