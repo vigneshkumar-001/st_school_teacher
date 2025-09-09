@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:st_teacher_app/Core/consents.dart';
 import '../../../Core/Utility/snack_bar.dart';
 import '../Model/announcement_create_response.dart';
+import '../Model/announcement_details_response.dart';
 import '../Model/announcement_list_general.dart';
 import '../list_general.dart';
 
@@ -48,6 +49,8 @@ class AnnouncementContorller extends GetxController {
     final cls = items.map((e) => e.classId.toString()).toSet().toList()..sort();
     return ['All', ...cls];
   }
+
+  final detail = Rxn<AnnouncementDetail>();
 
   Future<void> createAnnouncement({
     int? classId,
@@ -160,6 +163,43 @@ class AnnouncementContorller extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> fetch(int id) async {
+    try {
+      isLoading.value = true;
+      error.value = '';
+
+      // Adjust the API call name/signature to your project.
+      final result = await apiDataSource.announcementDetail(id);
+
+      result.fold(
+        (failure) {
+          error.value = failure.message ?? 'Something went wrong';
+          AppLogger.log.e(error.value);
+        },
+        (resp) {
+          final data = resp.data;
+          detail.value = data;
+          contents.assignAll(
+            (data?.contents ?? const []) as Iterable<Map<String, dynamic>>,
+          );
+          AppLogger.log.i('Loaded announcement detail: ${detail.value?.id}');
+        },
+      );
+    } catch (e) {
+      error.value = e.toString();
+      AppLogger.log.e(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void clear() {
+    isLoading.value = false;
+    error.value = '';
+    detail.value = null;
+    contents.clear();
   }
 
   void selectClass(String className) {

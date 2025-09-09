@@ -13,6 +13,7 @@ class ApiUrl {
   static String teacherQuizList = '$baseUrl/teacher-quiz/list';
   static String createAnnouncement = '$baseUrl/teacher-announcement/create';
   static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
+  static String announcementDetail = '$baseUrl/teacher-announcement/details/18';
 
   static String studentQuizResult({
     required int quizId,

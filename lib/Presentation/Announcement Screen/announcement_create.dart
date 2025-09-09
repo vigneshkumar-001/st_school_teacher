@@ -2112,12 +2112,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                         const Spacer(),
                         InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ListGeneral(),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => ListGeneral(),
+                            //   ),
+                            // );
                           },
                           child: Row(
                             children: [

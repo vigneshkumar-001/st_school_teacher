@@ -15,6 +15,7 @@ import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
 import 'package:st_teacher_app/api/repository/api_url.dart';
 
 import '../../Presentation/Announcement Screen/Model/announcement_create_response.dart';
+import '../../Presentation/Announcement Screen/Model/announcement_details_response.dart';
 import '../../Presentation/Announcement Screen/Model/announcement_list_general.dart';
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
 import '../../Presentation/Homework/model/homework_details_response.dart';
@@ -781,4 +782,27 @@ class ApiDataSource extends BaseApiDataSource {
       return Left(ServerFailure(''));
     }
   }
+
+
+  Future<Either<Failure, AnnouncementDetailResponse>> announcementDetail(int id) async {
+    try {
+      String url = ApiUrl.announcementDetail;
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(AnnouncementDetailResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
 }

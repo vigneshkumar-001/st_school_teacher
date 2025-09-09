@@ -1025,6 +1025,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
 }*/
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -1133,50 +1134,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   bool _classInvalid = false;
   bool _subjectInvalid = false;
 
-  /* @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Initialize subject/class from controllers if available
-      if (teacherClassController.subjectList.isNotEmpty) {
-        subjectIndex = 0;
-        selectedSubjectId = teacherClassController.subjectList[0].id;
-      }
-      if (teacherClassController.classList.isNotEmpty) {
-        selectedIndex = 0;
-        selectedClassId = teacherClassController.classList[0].id;
-        teacherClassController.selectedClass.value =
-            teacherClassController.classList[0];
-      }
-      setState(() {});
-    });
-
-    // Heading listener: show clear icon + clear error on typing
-    headingController.addListener(() {
-      setState(() {
-        showClearIcon = headingController.text.isNotEmpty;
-        if (_headingInvalid && headingController.text.trim().isNotEmpty) {
-          _headingInvalid = false;
-        }
-      });
-    });
-
-    // Time limit listener: clear error when valid (>0) number
-    timeLimitController.addListener(() {
-      final v = timeLimitController.text.trim();
-      final n = int.tryParse(v);
-      setState(() {
-        if (_timeLimitInvalid && n != null && n > 0) {
-          _timeLimitInvalid = false;
-        }
-      });
-    });
-
-    // Always have at least one question to start
-    if (questionList.isEmpty) questionList.add(QuestionModel());
-  }*/
-
   @override
   void initState() {
     super.initState();
@@ -1209,6 +1166,29 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
 
       setState(() {});
     });
+
+    headingController.addListener(() {
+      setState(() {
+        showClearIcon = headingController.text.isNotEmpty;
+        if (_headingInvalid && headingController.text.trim().isNotEmpty) {
+          _headingInvalid = false;
+        }
+      });
+    });
+
+    // Time limit listener: clear error when valid (>0) number
+    timeLimitController.addListener(() {
+      final v = timeLimitController.text.trim();
+      final n = int.tryParse(v);
+      setState(() {
+        if (_timeLimitInvalid && n != null && n > 0) {
+          _timeLimitInvalid = false;
+        }
+      });
+    });
+
+    // Always have at least one question to start
+    if (questionList.isEmpty) questionList.add(QuestionModel() as QuestionItem);
   }
 
   @override
@@ -1233,6 +1213,102 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       _invalidQuestions.removeWhere((i) => i >= qIndex);
       _invalidAnswers.removeWhere((i, _) => i >= qIndex);
     });
+  }
+
+  String _formatMinutes(int m) => m > 0 ? '$m min' : '';
+  Duration _timeLimit = const Duration(minutes: 0);
+  int _minutes = 0;
+  // Format like "1h 30m" or "25 min"
+  String _formatDuration(Duration d) {
+    final m = d.inMinutes % 60;
+    if (m > 0) return ' ${m}m';
+    return '${m} min';
+  }
+
+  Future<void> _pickMinutes(BuildContext context) async {
+    // range you want (change 300 if needed)
+    const minValue = 1;
+    const maxValue = 300;
+    int temp = (_minutes.clamp(minValue, maxValue));
+    if (temp == 0) temp = 1;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Select Minutes',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+
+                SizedBox(
+                  height: 180,
+                  child: CupertinoPicker(
+                    itemExtent: 36,
+                    scrollController: FixedExtentScrollController(
+                      initialItem: temp - minValue,
+                    ),
+                    onSelectedItemChanged: (i) {
+                      temp = i + minValue;
+                    },
+                    children: List.generate((maxValue - minValue + 1), (i) {
+                      final v = i + minValue;
+                      return Center(child: Text('$v min'));
+                    }),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _minutes = temp;
+                            timeLimitController.text = _formatMinutes(_minutes);
+                            _timeLimitInvalid = _minutes <= 0;
+                          });
+                          Navigator.pop(ctx);
+                        },
+                        child: const Text('Done'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showError(String msg) {
@@ -1896,24 +1972,31 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                 width: 1.2,
                               ),
                             ),
-                            child: CommonContainer.fillingContainer(
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              onChanged: (v) {
-                                final n = int.tryParse(v.trim());
-                                setState(() {
-                                  _timeLimitInvalid = !(n != null && n > 0);
-                                });
-                              },
-                              imagePath: AppImages.clock,
-                              imageColor: AppColor.lightgray,
-                              text: '',
-                              controller: timeLimitController,
-                              verticalDivider: false,
+                            child: GestureDetector(
+                              onTap: () => _pickMinutes(context),
+                              child: AbsorbPointer(
+                                // Prevents keyboard; value only set via picker
+                                child: CommonContainer.fillingContainer(
+                                  imagePath: AppImages.clock,
+                                  imageColor: AppColor.lightgray,
+                                  text: '',
+                                  controller: timeLimitController,
+                                  verticalDivider: false,
+                                  onChanged: (_) {
+                                    // (Optional) if someone pastes text, still validate
+                                    final txt = timeLimitController.text.trim();
+                                    // very light validation: any non-empty -> ok; you can parse back if needed
+                                    setState(
+                                      () =>
+                                          _timeLimitInvalid =
+                                              _timeLimit.inMinutes <= 0,
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
                           ),
+
                           if (_timeLimitInvalid)
                             const Padding(
                               padding: EdgeInsets.only(top: 6, left: 4),
@@ -2222,8 +2305,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
 
                               AppLogger.log.i(payload);
                               await controller.quizCreate(payload);
-
-
                             },
                             width: 145,
                             height: 60,
