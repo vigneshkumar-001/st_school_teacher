@@ -1,6 +1,6 @@
 class ApiUrl {
-  static String baseUrl1 = 'https://school-back-end-594f59bea6cb.herokuapp.com';
-  static String baseUrl = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
+  static String baseUrl = 'https://school-back-end-594f59bea6cb.herokuapp.com';
+  static String baseUrl1 = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
 
   static String login = '$baseUrl/teacher-auth/login';
   static String verifyOtp = '$baseUrl/teacher-auth/verify-otp';
@@ -12,9 +12,7 @@ class ApiUrl {
   static String teacherQuizCreate = '$baseUrl/teacher-quiz/create';
   static String teacherQuizList = '$baseUrl/teacher-quiz/list';
   static String createAnnouncement = '$baseUrl/teacher-announcement/create';
-
-
-
+  static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
 
   static String studentQuizResult({
     required int quizId,

@@ -15,6 +15,7 @@ import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
 import 'package:st_teacher_app/api/repository/api_url.dart';
 
 import '../../Presentation/Announcement Screen/Model/announcement_create_response.dart';
+import '../../Presentation/Announcement Screen/Model/announcement_list_general.dart';
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
 import '../../Presentation/Homework/model/homework_details_response.dart';
 import '../../Presentation/Homework/model/user_image_response.dart';
@@ -719,10 +720,12 @@ class ApiDataSource extends BaseApiDataSource {
 
   Future<Either<Failure, AnnouncementCreateResponse>> createAnnouncement({
     required int classId,
-    required int subjectId,
+
     required String heading,
+    required String category,
+    required String announcementCategory,
     required String description,
-    required bool publish,
+
     required List<Map<String, dynamic>> contents,
   }) async {
     try {
@@ -730,10 +733,11 @@ class ApiDataSource extends BaseApiDataSource {
 
       final body = {
         "classId": classId,
-        "subjectId": subjectId,
-        "heading": heading,
-        "description": description,
-        "publish": publish,
+        "category": category,
+        "announcementCategory": announcementCategory,
+        "title": heading,
+        "content": description,
+
         "contents": contents, // pass directly
       };
 
@@ -754,25 +758,24 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
+  Future<Either<Failure, AnnouncementListResponse>> listAnnouncement() async {
+    try {
+      String url = ApiUrl.listAnnouncement;
 
-  // Future<Either<Failure, AnnouncementCreateResponse>> getAnnouncement() async {
-  //   try {
-  //     String url = ApiUrl.getAnnouncement;
-  //
-  //     dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
-  //     AppLogger.log.i(response);
-  //     if (response is! DioException &&
-  //         (response.statusCode == 200 || response.statusCode == 201)) {
-  //       if (response.data['status'] == true) {
-  //         return Right(AnnouncementCreateResponse.fromJson(response.data));
-  //       } else {
-  //         return Left(ServerFailure(response.data['message']));
-  //       }
-  //     } else {
-  //       return Left(ServerFailure((response as DioException).message ?? ""));
-  //     }
-  //   } catch (e) {
-  //     return Left(ServerFailure(''));
-  //   }
-  // }
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(AnnouncementListResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
 }
