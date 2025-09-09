@@ -758,7 +758,10 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-  Future<Either<Failure, AnnouncementListResponse>> listAnnouncement() async {
+  Future<Either<Failure, AnnouncementListResponse>> listAnnouncement({
+    int? page,
+    int? limit,
+}) async {
     try {
       String url = ApiUrl.listAnnouncement;
 

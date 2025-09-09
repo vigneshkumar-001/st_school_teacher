@@ -1708,6 +1708,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   Future<void> _openCategorySheet() async {
     final selected = await showModalBottomSheet<String>(
       context: context,
+      backgroundColor: AppColor.white,
       isScrollControlled: false,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
