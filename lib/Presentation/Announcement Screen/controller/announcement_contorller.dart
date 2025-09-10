@@ -1,3 +1,4 @@
+import 'package:dartz/dartz_unsafe.dart' as data;
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -9,11 +10,14 @@ import 'dart:io';
 import 'package:st_teacher_app/Core/consents.dart';
 import '../../../Core/Utility/snack_bar.dart';
 import '../Model/announcement_create_response.dart';
-import '../list_general.dart';
+import '../Model/announcement_details_response.dart';
+import '../Model/announcement_list_general.dart';
+import '../announcement_screen.dart';
 
 class AnnouncementContorller extends GetxController {
   ApiDataSource apiDataSource = ApiDataSource();
   RxList<Announcement> classList = <Announcement>[].obs;
+  Rx<AnnouncementDetails?> announcementDetails = Rx<AnnouncementDetails?>(null);
 
   RxBool isLoading = false.obs;
   final RxList<String> categoryOptions = <String>[].obs;
@@ -21,79 +25,63 @@ class AnnouncementContorller extends GetxController {
   final RxString categoryError = ''.obs;
   String accessToken = '';
   RxString frontImageUrl = ''.obs;
-  var AnnouncementList = <Announcement>[].obs;
+
+  Rx<AnnouncementData?> announcementData = Rx<AnnouncementData?>(null);
 
   var selectedClassName = 'All'.obs;
   RxList<Announcement> subjectList = <Announcement>[].obs;
   List<Map<String, dynamic>> contents = [];
-  var classNames = <String>[].obs;
+  // var classNames = <String>[].obs;
   @override
   void onInit() {
     super.onInit();
-    listAnnouncement();
+    getAnnouncement();
   }
 
-  /*  Future<void> createAnnouncement({
-    int? classId,
-    int? subjectId,
-    String category = '',
-    String heading = '',
-    String description = '',
-    bool publish = false,
+  final RxString error = ''.obs;
+  final RxList<AnnouncementItem> items = <AnnouncementItem>[].obs;
+
+  // pagination (optional)
+  final RxInt page = 1.obs;
+  final int limit = 20;
+  final RxInt totalPages = 1.obs;
+
+  /// Build class names like: ['All', '38', '39', ...]
+  List<String> get classNames {
+    final cls = items.map((e) => e.classId.toString()).toSet().toList()..sort();
+    return ['All', ...cls];
+  }
+
+  final detail = Rxn<AnnouncementDetails>();
+
+  Future<AnnouncementDetails?> getAnnouncementDetails({
     bool showLoader = true,
-    List<File>? imageFiles,
-    BuildContext? context,
-    required List<Map<String, dynamic>> contents,
+    required int id,
   }) async {
     try {
       if (showLoader) showPopupLoader();
 
-      if (imageFiles != null && imageFiles.isNotEmpty) {
-        for (var file in imageFiles) {
-          final uploadResult = await apiDataSource.userProfileUpload(
-            imageFile: file,
-          );
+      final results = await apiDataSource.announcementDetail(id);
 
-          String? imageUrl = uploadResult.fold((failure) {
-            CustomSnackBar.showError("Image Upload Failed: ${failure.message}");
-            return null;
-          }, (success) => success.message);
-
-          if (imageUrl != null) {
-            contents.add({"type": "image", "content": imageUrl});
-          }
-        }
-      }
-
-      final results = await apiDataSource.createAnnouncement(
-        classId: classId ?? 0,
-        subjectId: subjectId ?? 0,
-        heading: heading,
-        category: category,
-        description: description,
-        publish: publish,
-        contents: contents,
-      );
-
-      results.fold(
-        (failure) {
+      return results.fold(
+            (failure) {
           if (showLoader) hidePopupLoader();
           AppLogger.log.e(failure.message);
+          return null;
         },
-        (response) async {
-          // fetchAnnouncement();
+            (response) {
           if (showLoader) hidePopupLoader();
-          Navigator.pop(context!);
-          Navigator.pop(context!);
-          // Get.to(HomeworkHistory());
+          AppLogger.log.i('Announcement Details Fetched ✅');
+          announcementDetails.value = response.data; // store in observable
+          return response.data; // return data for UI
         },
       );
     } catch (e) {
       if (showLoader) hidePopupLoader();
       AppLogger.log.e(e);
+      return null;
     }
-  }*/
-
+  }
   Future<void> createAnnouncement({
     int? classId,
     int? subjectId,
@@ -148,7 +136,7 @@ class AnnouncementContorller extends GetxController {
         (response) async {
           if (showLoader) hidePopupLoader();
           Navigator.pop(context!);
-          Get.off(ListGeneral());
+          Get.off(AnnouncementScreen());
         },
       );
     } catch (e) {
@@ -157,52 +145,71 @@ class AnnouncementContorller extends GetxController {
     }
   }
 
-  Future<void> listAnnouncement() async {
+  Future<String?> getAnnouncement({bool showLoader = true}) async {
     try {
       isLoading.value = true;
-
-      final result = await apiDataSource.listAnnouncement();
-
-      result.fold(
-        (failure) {
+      final results = await apiDataSource.getAnnouncementList();
+      return results.fold(
+            (failure) {
           isLoading.value = false;
-          Get.snackbar('Error', failure.message);
+          AppLogger.log.e(failure.message);
         },
-        (response) {
-          // Here, response is your GetHomeworkResponse object
-          final data =
-              response.data; // Correct: access 'data' from response object
-
-          final List<Announcement> loadedHomework = [];
-
-          // data.forEach((key, value) {
-          //   loadedHomework.addAll(value);
-          //   // value is already List<Homework>, no need to map again
-          // });
-          AnnouncementList.value = loadedHomework;
-          classList.value = loadedHomework;
-
-          // Build classNames dynamically from homeworkList
-          final classes =
-              loadedHomework.map((ac) => ac.classId.toString()).toSet().toList()
-                ..sort();
-
-          classNames.value = ['All', ...classes];
-
+            (response) async {
           isLoading.value = false;
+          AppLogger.log.i('announcementData List ');
+          announcementData.value = response.data;
+          AppLogger.log.i(response.toString());
         },
       );
     } catch (e) {
       isLoading.value = false;
-      Get.snackbar('Error', e.toString());
+      AppLogger.log.e(e);
     }
+    return null;
+  }
+
+  Future<void> fetch(int id) async {
+    try {
+      isLoading.value = true;
+      error.value = '';
+
+      // Adjust the API call name/signature to your project.
+      final result = await apiDataSource.announcementDetail(id);
+
+      result.fold(
+        (failure) {
+          error.value = failure.message ?? 'Something went wrong';
+          AppLogger.log.e(error.value);
+        },
+        (resp) {
+          final data = resp.data;
+          detail.value = data;
+          contents.assignAll(
+            (data?.contents ?? const []) as Iterable<Map<String, dynamic>>,
+          );
+          AppLogger.log.i('Loaded announcement detail: ${detail.value?.id}');
+        },
+      );
+    } catch (e) {
+      error.value = e.toString();
+      AppLogger.log.e(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void clear() {
+    isLoading.value = false;
+    error.value = '';
+    detail.value = null;
+    contents.clear();
   }
 
   void selectClass(String className) {
     selectedClassName.value = className;
   }
 
-  List<Announcement> get filteredAnnouncement {
+  /*  List<Announcement> get filteredAnnouncement {
     if (selectedClassName.value == 'All') {
       return AnnouncementList;
     }
@@ -245,32 +252,44 @@ class AnnouncementContorller extends GetxController {
     return grouped;
   }
 
-  void showPopupLoader() {
-    Get.dialog(
-      Center(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(
-              color: AppColor.black,
-              strokeAlign: 1,
-            ),
+  Map<String, dynamic> _asMap(dynamic response) {
+    if (response is Map<String, dynamic>) return response;
+    try {
+      // If your response has toJson()
+      // ignore: avoid_dynamic_calls
+      final m = response.toJson() as Map<String, dynamic>;
+      return m;
+    } catch (_) {
+      throw StateError('Unsupported response type: ${response.runtimeType}');
+    }
+  }*/
+}
+
+void showPopupLoader() {
+  Get.dialog(
+    Center(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircularProgressIndicator(
+            color: AppColor.black,
+            strokeAlign: 1,
           ),
         ),
       ),
-      barrierDismissible: false, // user can't dismiss by tapping outside
-      barrierColor: Colors.black.withOpacity(0.3), // transparent background
-    );
-  }
+    ),
+    barrierDismissible: false, // user can't dismiss by tapping outside
+    barrierColor: Colors.black.withOpacity(0.3), // transparent background
+  );
+}
 
-  void hidePopupLoader() {
-    if (Get.isDialogOpen ?? false) {
-      Get.back();
-    }
+void hidePopupLoader() {
+  if (Get.isDialogOpen ?? false) {
+    Get.back();
   }
 }

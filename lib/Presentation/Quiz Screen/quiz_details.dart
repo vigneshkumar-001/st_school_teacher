@@ -872,7 +872,7 @@ class _QuizDetailsState extends State<QuizDetails> {
         child: Obx(() {
           if (quizController.isLoading.value &&
               quizController.quizDetails.value == null) {
-            return Center(child: AppLoader.circularLoader(AppColor.black));
+            return Center(child: AppLoader.circularLoader( ));
           }
 
           final details = quizController.quizDetails.value;

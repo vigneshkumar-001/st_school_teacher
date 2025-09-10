@@ -124,12 +124,11 @@ class _AttendanceHistoryTeacherState extends State<AttendanceHistoryTeacher> {
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
         child: Obx(() {
-          final isLoading = teacherAttendanceController.isLoading.value;
           final data =
               teacherAttendanceController.teacherAttendanceData.value?.data;
 
-          if (isLoading) {
-            return const Center(child: CircularProgressIndicator());
+          if (teacherAttendanceController.isLoading.value) {
+            return Center(child: AppLoader.circularLoader());
           }
 
           if (data == null) {

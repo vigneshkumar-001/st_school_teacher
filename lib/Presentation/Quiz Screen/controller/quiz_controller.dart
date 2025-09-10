@@ -232,9 +232,8 @@ class QuizController extends GetxController {
           return failure.message;
         },
         (response) async {
+          Get.off(() => const QuizHistory());
           if (showLoader) hidePopupLoader();
-          isLoading.value = false;
-          Get.offAll(QuizHistory());
 
           lastError.value = '';
           AppLogger.log.i(response.data ?? 'Data fetched');
@@ -243,7 +242,7 @@ class QuizController extends GetxController {
       );
     } catch (e) {
       if (showLoader) hidePopupLoader();
-      isLoading.value = false;
+
       lastError.value = e.toString();
       AppLogger.log.e(e);
       return e.toString();
@@ -352,7 +351,6 @@ class QuizController extends GetxController {
     required int studentId,
 
     bool openScreen = true,
-
   }) async {
     if (isLoading.value) return null;
     try {

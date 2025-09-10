@@ -13,7 +13,7 @@
 // import '../../Core/Utility/google_fonts.dart';
 // import '../../Core/Widgets/common_container.dart';
 // import '../Homework/controller/teacher_class_controller.dart';
-// import 'list_general.dart';
+// import 'announcement_screen.dart';
 //
 // enum SectionType { image, paragraph, list }
 //
@@ -1613,7 +1613,7 @@ import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../Homework/controller/teacher_class_controller.dart';
 import 'controller/announcement_contorller.dart';
-import 'list_general.dart';
+import 'announcement_screen.dart';
 
 enum SectionType { image, paragraph, list }
 
@@ -1708,6 +1708,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   Future<void> _openCategorySheet() async {
     final selected = await showModalBottomSheet<String>(
       context: context,
+      backgroundColor: AppColor.white,
       isScrollControlled: false,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
@@ -2111,12 +2112,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                         const Spacer(),
                         InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ListGeneral(),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => ListGeneral(),
+                            //   ),
+                            // );
                           },
                           child: Row(
                             children: [

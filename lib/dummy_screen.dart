@@ -461,7 +461,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
         child: Obx(
           () =>
               attendanceController.isLoading.value
-                  ? Center(child: AppLoader.circularLoader(Colors.black))
+                  ? Center(child: AppLoader.circularLoader( ))
                   : SingleChildScrollView(
                     child: Column(
                       children: [
@@ -725,8 +725,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                                 width: 24,
                                                                 child:
                                                                     AppLoader.circularLoader(
-                                                                      Colors
-                                                                          .white,
+
                                                                     ),
                                                               )
                                                             else ...[
@@ -804,8 +803,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                                 width: 24,
                                                                 child:
                                                                     AppLoader.circularLoader(
-                                                                      Colors
-                                                                          .white,
+
                                                                     ),
                                                               )
                                                             else ...[

@@ -599,7 +599,7 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
       body: SafeArea(
         child: Obx(() {
           if (c.isLoading.value) {
-            return Center(child: AppLoader.circularLoader(AppColor.black));
+            return Center(child: AppLoader.circularLoader( ));
           }
 
           final AttendSummaryData? data = c.attendSummary.value;

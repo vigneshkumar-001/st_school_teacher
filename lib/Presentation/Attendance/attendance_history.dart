@@ -572,7 +572,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                               if (attendanceHistoryController.isLoading.value) {
                                 return Center(
                                   child: AppLoader.circularLoader(
-                                    AppColor.black,
+
                                   ),
                                 );
                               }
