@@ -18,4 +18,5 @@ Future<void>  initController() async {
   Get.lazyPut(() => TeacherAttendanceController());
   Get.lazyPut(() => QuizController());
   Get.lazyPut(() => AnnouncementContorller());
+
 }

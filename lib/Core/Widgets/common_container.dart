@@ -319,7 +319,7 @@ class CommonContainer {
       onTap: onDetailsTap,
       child: Stack(
         children: [
-          Image.asset(backRoundImage),
+          Image.network(backRoundImage),
           Positioned(
             bottom: 0,
             right: 0,
@@ -391,6 +391,39 @@ class CommonContainer {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  static checkMark({required VoidCallback onTap, String? imagePath}) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ),
+          elevation: MaterialStateProperty.all(0),
+          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColor.blueG1, AppColor.blueG2],
+                begin: Alignment.topRight,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(17.0),
+              child: Image.asset(imagePath ?? '', height: 20, width: 20),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1554,7 +1587,7 @@ class CommonContainer {
     );
   }
 
-  static checkMark({required VoidCallback onTap, String? imagePath}) {
+/*  static checkMark({required VoidCallback onTap, String? imagePath}) {
     return Center(
       child: ElevatedButton(
         onPressed: () {},
@@ -1585,7 +1618,7 @@ class CommonContainer {
         ),
       ),
     );
-  }
+  }*/
 
   static Widget myProfileContainer({
     required String standardText1,

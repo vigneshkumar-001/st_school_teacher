@@ -22,6 +22,7 @@ import '../../Presentation/Attendance/model/student_attendance_response.dart';
 import '../../Presentation/Homework/model/homework_details_response.dart';
 import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
+import '../../Presentation/Login Screen/model/student_Profile_response.dart';
 import '../../Presentation/Profile/model/teacher_data_response.dart';
 import '../../Presentation/Quiz Screen/Model/details_preview.dart';
 import '../../Presentation/Quiz Screen/Model/history_specific_student_response.dart';
@@ -964,6 +965,38 @@ class ApiDataSource extends BaseApiDataSource {
       }
     } catch (e) {
       return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, StudentProfileImageData>> studentProfileInsert({
+    String? image,
+  }) async {
+    try {
+      String url = ApiUrl.profileImageUrl;
+
+      dynamic response = await Request.sendRequest(
+        url,
+        {"url": image},
+        'post',
+        true,
+      );
+      AppLogger.log.i(response);
+
+      // Accept both 200 and 201 as success
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(StudentProfileImageData.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else if (response is DioException) {
+        return Left(ServerFailure(response.message ?? "Dio Error"));
+      } else {
+        return Left(ServerFailure("Unknown error"));
+      }
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

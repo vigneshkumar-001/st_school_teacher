@@ -12,6 +12,8 @@ import 'Presentation/Homework/controller/teacher_class_controller.dart';
 import 'Presentation/Login Screen/change_mobile_number.dart';
 import 'package:get/get.dart';
 
+import 'Presentation/Profile/controller/teacher_data_controller.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -22,6 +24,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   double _progress = 0.0;
   final TeacherClassController controller = Get.put(TeacherClassController());
+  final TeacherDataController imgData = Get.put(TeacherDataController());
   final AnnouncementContorller announcementContorller = Get.put(
     AnnouncementContorller(),
   );
@@ -50,6 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
       controller.getTeacherClass();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         announcementContorller.getCategoryList(showLoader: false);
+        imgData.getTeacherClassData( );
       });
       _startLoading();
     }

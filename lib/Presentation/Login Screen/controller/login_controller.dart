@@ -1,11 +1,13 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:st_teacher_app/Core/consents.dart';
+import 'package:st_teacher_app/Presentation/Announcement%20Screen/controller/announcement_contorller.dart';
 import 'package:st_teacher_app/Presentation/Home/home.dart';
 import 'package:st_teacher_app/Presentation/Login%20Screen/change_mobile_number.dart';
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
 import '../../../Core/Utility/snack_bar.dart';
+import '../../Attendance-teacher/controller/teacher_attendance_controller.dart';
 import '../../Menu/menu_screen.dart';
 
 import '../../Profile/controller/teacher_data_controller.dart';
@@ -18,6 +20,12 @@ class LoginController extends GetxController {
   RxBool isOtpLoading = false.obs;
   ApiDataSource apiDataSource = ApiDataSource();
   final TeacherDataController controller = Get.put(TeacherDataController());
+  final AnnouncementContorller announcementContorller = Get.put(
+    AnnouncementContorller(),
+  );
+  final TeacherAttendanceController teacherAttendanceController = Get.put(
+    TeacherAttendanceController(),
+  );
 
   @override
   void onInit() {
@@ -89,18 +97,25 @@ class LoginController extends GetxController {
           AppLogger.log.e(failure.message);
         },
         (response) async {
-          Get.offAll(Home(page: 'homeScreen'));
+
           // Home(pages: 'homeScreen', page: ''),
 
           // Get.offAll(Home(pages: 'homeScreen'));
 
-          isOtpLoading.value = false;
+
 
           AppLogger.log.i(response.message);
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', response.token);
           String? token = prefs.getString('token');
           await controller.getTeacherClassData();
+          final now = DateTime.now();
+          await teacherAttendanceController.getTeacherAttendanceMonth(
+            month: now.month,
+            year: now.year,
+          );
+          Get.offAll(Home(page: 'homeScreen'));
+          isOtpLoading.value = false;
           AppLogger.log.i('token = $token');
         },
       );
@@ -118,7 +133,10 @@ class LoginController extends GetxController {
   }) async {
     try {
       isOtpLoading.value = true;
-      final results = await apiDataSource.changeNumberOtp(otp: otp, phone: phone);
+      final results = await apiDataSource.changeNumberOtp(
+        otp: otp,
+        phone: phone,
+      );
       results.fold(
         (failure) {
           isOtpLoading.value = false;
@@ -154,7 +172,8 @@ class LoginController extends GetxController {
     String? token = prefs.getString('token');
     if (token != null && token.isNotEmpty) {
       accessToken = token;
-      await controller.getTeacherClassData(); // fetch teacher data
+      await controller.getTeacherClassData();
+      await announcementContorller.getCategoryList();
       return true;
     }
     return false;

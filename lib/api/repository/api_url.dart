@@ -10,19 +10,20 @@ class ApiUrl {
   static String teacherClassFetch = '$baseUrl/teacher-homework/meta';
   static String getHomeWork = '$baseUrl/teacher-homework/list';
   static String createHomework = '$baseUrl/teacher-homework/create';
+  static String profileImageUrl = '$baseUrl/teacher-home/profiles/profile-image-url';
   static String profile = '$baseUrl/teacher-home/profile';
   static String teacherQuizCreate = '$baseUrl/teacher-quiz/create';
   static String teacherQuizList = '$baseUrl/teacher-quiz/list';
   static String createAnnouncement = '$baseUrl/teacher-announcement/create';
   static String teacherExamsCreate = '$baseUrl/teacher-exams/create';
   // static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
-    static String categoriesList = '$baseUrl/announcement-categories';
+  static String categoriesList = '$baseUrl/announcement-categories';
 
-  static String announcementDetail({required int  Id}) {
+  static String announcementDetail({required int Id}) {
     return '$baseUrl/teacher-announcement/details/$Id';
   }
 
-  static String listAnnouncement({required String  type}) {
+  static String listAnnouncement({required String type}) {
     return '$baseUrl/teacher-announcement/list?tab=$type';
   }
 

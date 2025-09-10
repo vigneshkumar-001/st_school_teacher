@@ -7,6 +7,7 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../Login Screen/change_mobile_number.dart';
+import '../Menu/profile_screen.dart';
 import 'controller/teacher_data_controller.dart';
 import 'package:get/get.dart';
 
@@ -22,6 +23,166 @@ class _MyProfileState extends State<MyProfile> {
 
   final TeacherDataController controller = Get.put(TeacherDataController());
   final LoginController loginController = Get.put(LoginController());
+
+  void _OTPonMobileNoEdit(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.30,
+          minChildSize: 0.20,
+          maxChildSize: 0.50,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppColor.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Obx(() {
+                final data = controller.teacherDataResponse.value?.data;
+                return ListView(
+                  controller: scrollController,
+                  padding: EdgeInsets.all(16),
+                  children: [
+                    Center(
+                      child: Container(
+                        height: 4,
+                        width: 30,
+                        decoration: BoxDecoration(color: AppColor.gray),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ListTile(
+                      leading: Container(
+                        padding: EdgeInsets.all(17),
+                        decoration: BoxDecoration(
+                          color: AppColor.lowLightgray,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Icon(Icons.call),
+                      ),
+                      title: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChangeMobileNumber(),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Change Mobile Number',
+                              style: GoogleFont.ibmPlexSans(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: AppColor.gray,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              data?.profile.mobile.toString() ?? "",
+                              style: GoogleFont.ibmPlexSans(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: AppColor.lightBlack,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      trailing: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChangeMobileNumber(),
+                            ),
+                          );
+                        },
+                        child: Image.asset(
+                          AppImages.rightSideArrow,
+                          height: 16,
+                          width: 16,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+
+                    GestureDetector(
+                      onTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(builder: (_) => ProfileScreen()),
+                        // );
+                      },
+                      child: ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            data?.profile.profileImg.toString() ?? '',
+                            height: 55,
+                            fit: BoxFit.cover,
+                            width: 55,
+                          ),
+                        ),
+
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Change',
+                              style: GoogleFont.ibmPlexSans(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: AppColor.gray,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Profile Picture',
+                              style: GoogleFont.ibmPlexSans(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: AppColor.lightBlack,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProfileScreen(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            AppImages.rightSideArrow,
+                            height: 16,
+                            width: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -210,13 +371,7 @@ class _MyProfileState extends State<MyProfile> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => ChangeMobileNumber(),
-                                      ),
-                                    );
+                                    _OTPonMobileNoEdit(context);
                                   },
                                   child: Row(
                                     children: [
@@ -336,15 +491,20 @@ class _MyProfileState extends State<MyProfile> {
                       ),
                     ),
                   ),
+
                   Positioned(
                     right: 35,
-                    bottom: 20,
+                    bottom: 30,
                     child: InkWell(
                       onTap: () {},
-                      child: Image.asset(
-                        AppImages.schoolGirl,
-                        height: 100,
-                        width: 100,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.network(
+                          profile.profileImg.toString() ?? '',
+                          height: 80,
+                          fit: BoxFit.cover,
+                          width: 80,
+                        ),
                       ),
                     ),
                   ),
