@@ -240,7 +240,7 @@ class _AttendanceHistoryStudentDateState
                       ),
                       SizedBox(height: 38),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: AppColor.lowLightgray),
@@ -253,7 +253,7 @@ class _AttendanceHistoryStudentDateState
                                 imagePath: AppImages.morning,
                                 isAbsent: attendanceData?.morning == "present",
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 5),
                               Text(
                                 'Morning',
                                 style: GoogleFont.ibmPlexSans(
