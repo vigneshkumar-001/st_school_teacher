@@ -244,14 +244,11 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                         alignment: Alignment.topRight,
                         child: Text(
                           errorText,
-                          style:  TextStyle(
-                            color: Colors.red,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: Colors.red, fontSize: 12),
                         ),
                       ),
                     ),
-                     SizedBox(height: 25),
+                    SizedBox(height: 25),
                     Obx(() {
                       return AppButton.button(
                         text: 'Get OTP',
@@ -331,7 +328,6 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                                       );
                                     }).toList(),
                                 options: CarouselOptions(
-
                                   height: 120,
                                   autoPlay: true,
                                   autoPlayInterval: Duration(seconds: 3),

@@ -352,24 +352,34 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
+
   Future<Either<Failure, GetHomeworkResponse>> getHomeWork() async {
     try {
-      String url = ApiUrl.getHomeWork;
+      final String url = ApiUrl.getHomeWork;
 
-      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      final response = await Request.sendGetRequest(url, {}, 'get', true);
       AppLogger.log.i(response);
+
       if (response is! DioException &&
-          (response.statusCode == 200 || response.statusCode == 201)) {
-        if (response.data['status'] == true) {
-          return Right(GetHomeworkResponse.fromJson(response.data));
+          (response?.statusCode == 200 || response?.statusCode == 201)) {
+        final body = response?.data;
+        if (body is Map<String, dynamic>) {
+          if (body['status'] == true) {
+            // ✅ parse with our robust models
+            return Right(GetHomeworkResponse.fromJson(body));
+          } else {
+            return Left(ServerFailure(body['message']?.toString() ?? 'Unknown error'));
+          }
         } else {
-          return Left(ServerFailure(response.data['message']));
+          return Left(ServerFailure('Unexpected response format'));
         }
       } else {
-        return Left(ServerFailure((response as DioException).message ?? ""));
+        return Left(ServerFailure((response as DioException).message ?? 'Network error'));
       }
-    } catch (e) {
-      return Left(ServerFailure(''));
+    } catch (e, st) {
+      AppLogger.log.e(e);
+      AppLogger.log.e(st);
+      return Left(ServerFailure('Something went wrong'));
     }
   }
 

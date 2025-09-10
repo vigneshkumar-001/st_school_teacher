@@ -30,21 +30,21 @@ class TeacherAttendanceController extends GetxController {
     bool showLoader = false,
   }) async {
     try {
-      // isLoading.value = true;
-      if (showLoader) showPopupLoader(); // show popup loader
+      isLoading.value = true;
+      // if (showLoader) showPopupLoader();
       final results = await apiDataSource.getTeacherAttendanceMonth(
         month: month,
         year: year,
       );
       results.fold(
         (failure) {
-          //isLoading.value = false;
-          if (showLoader) hidePopupLoader(); // hide popup loader
+          isLoading.value = false;
+          // if (showLoader) hidePopupLoader(); // hide popup loader
           AppLogger.log.e(failure.message);
         },
         (response) async {
-          //isLoading.value = false;
-          if (showLoader) hidePopupLoader(); // hide popup loader
+          isLoading.value = false;
+          // if (showLoader) hidePopupLoader();
           teacherAttendanceData.value = response; // ✅ store full response
           AppLogger.log.i(response.message);
         },

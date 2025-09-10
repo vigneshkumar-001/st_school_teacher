@@ -40,7 +40,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return Center(child: AppLoader.circularLoader( ));
+            return Center(child: AppLoader.circularLoader());
           }
           if (controller.homeworkList.isEmpty) {
             return Center(child: Text("No Homework Found"));
@@ -200,7 +200,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                             entry,
                                           ) {
                                             final int index = entry.key;
-                                            final Homework hw = entry.value;
+                                            final HomeworkItem  hw = entry.value;
 
                                             const List<Color> colors = [
                                               AppColor.lightBlueC1,

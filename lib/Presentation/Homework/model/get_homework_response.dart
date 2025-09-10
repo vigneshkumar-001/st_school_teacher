@@ -1,8 +1,11 @@
+// lib/features/homework/models/homework_models.dart
+import 'package:intl/intl.dart';
+
 class GetHomeworkResponse {
   final bool status;
   final int code;
   final String message;
-  final Map<String, List<Homework>> data;
+  final HomeworkData data;
 
   GetHomeworkResponse({
     required this.status,
@@ -12,51 +15,96 @@ class GetHomeworkResponse {
   });
 
   factory GetHomeworkResponse.fromJson(Map<String, dynamic> json) {
-    // The "data" field is a map with keys like "Today", "Aug 8"
-    // Each key maps to a list of Homework objects.
-    final Map<String, List<Homework>> parsedData = {};
-    (json['data'] as Map<String, dynamic>).forEach((key, value) {
-      parsedData[key] =
-          (value as List).map((item) => Homework.fromJson(item)).toList();
-    });
-
+    final data = json['data'];
+    if (data is! Map) {
+      throw const FormatException("Expected 'data' to be an object");
+    }
     return GetHomeworkResponse(
-      status: json['status'] as bool,
-      code: json['code'] as int,
-      message: json['message'] as String,
-      data: parsedData,
+      status: json['status'] == true,
+      code: (json['code'] ?? 0) as int,
+      message: (json['message'] ?? '') as String,
+      data: HomeworkData.fromJson(data.cast<String, dynamic>()),
     );
   }
 }
 
-class Homework {
+class HomeworkData {
+  final int page;
+  final int pageSize;
+  final int total;
+  /// e.g. { "Today": [ ... ], "Yesterday": [ ... ] }
+  final Map<String, List<HomeworkItem>> groups;
+
+  HomeworkData({
+    required this.page,
+    required this.pageSize,
+    required this.total,
+    required this.groups,
+  });
+
+  factory HomeworkData.fromJson(Map<String, dynamic> json) {
+    final rawGroups = (json['groups'] ?? {}) as Map<String, dynamic>;
+
+    final parsedGroups = <String, List<HomeworkItem>>{};
+    rawGroups.forEach((section, value) {
+      final list = (value is List) ? value : const [];
+      parsedGroups[section] = list
+          .whereType<Map<String, dynamic>>()
+          .map(HomeworkItem.fromJson)
+          .toList();
+    });
+
+    return HomeworkData(
+      page: (json['page'] ?? 1) as int,
+      pageSize: (json['pageSize'] ?? 20) as int,
+      total: (json['total'] ?? 0) as int,
+      groups: parsedGroups,
+    );
+  }
+}
+
+class HomeworkItem {
   final int id;
   final String subject;
   final String title;
-  final String classNames;
+  final String theClass;
   final String time;
   final DateTime date;
   final String type;
 
-  Homework({
+  HomeworkItem({
     required this.id,
     required this.subject,
     required this.title,
-    required this.classNames,
+    required this.theClass,
     required this.time,
     required this.date,
     required this.type,
   });
 
-  factory Homework.fromJson(Map<String, dynamic> json) {
-    return Homework(
-      id: json['id'] as int,
-      subject: json['subject'] as String,
-      title: json['title'] as String,
-      classNames: json['class'] ?? '',
-      time: json['time'] as String,
-      date: DateTime.parse(json['date'] as String),
-      type: json['type'] as String,
+  factory HomeworkItem.fromJson(Map<String, dynamic> json) {
+    final rawDate = (json['date'] ?? '') as String;
+    DateTime parsedDate;
+    try {
+      parsedDate = DateTime.parse(rawDate).toLocal();
+    } catch (_) {
+      parsedDate = DateTime.fromMillisecondsSinceEpoch(0);
+    }
+    return HomeworkItem(
+      id: (json['id'] ?? 0) as int,
+      subject: (json['subject'] ?? '') as String,
+      title: (json['title'] ?? '') as String,
+      theClass: (json['class'] ?? '') as String,
+      time: (json['time'] ?? '') as String,
+      date: parsedDate,
+      type: (json['type'] ?? '') as String,
     );
   }
+
+  String formatDate({String pattern = 'dd-MMM-yyyy, hh:mm a'}) {
+    return DateFormat(pattern).format(date);
+  }
+
+  /// UI convenience to match your widget usage
+  String get classNames => theClass;
 }
