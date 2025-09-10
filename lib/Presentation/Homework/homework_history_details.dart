@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
+import '../../Core/Utility/date_and_time_convert.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'controller/create_homework_controller.dart';
@@ -319,15 +320,24 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                         ),
                                         const SizedBox(width: 10),
                                         Text(
-                                          (details.time ?? '').toString(),
+                                          DateAndTimeConvert.formatDateTime(
+                                            showTime: true,
+                                            showDate: false,
+                                            details.time.toString(),
+                                          ),
                                           style: GoogleFont.inter(
                                             fontSize: 12,
-                                            color: AppColor.lightBlack,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColor.black,
                                           ),
                                         ),
                                         const SizedBox(width: 10),
                                         Text(
-                                          (details.date ?? '').toString(),
+                                          DateAndTimeConvert.formatDateTime(
+                                            showTime: false,
+                                            showDate: true,
+                                            details.date.toString(),
+                                          ),
                                           style: GoogleFont.inter(
                                             fontSize: 12,
                                             color: AppColor.gray,
