@@ -811,13 +811,15 @@ import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/custom_textfield.dart';
+import '../../Core/Utility/date_and_time_convert.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'Model/details_preview.dart';
 import 'controller/quiz_controller.dart';
+
 class QuizDetails extends StatefulWidget {
   final String studentName;
-  final int? classId; // optional: auto-load if provided
+  final int? classId;
   final bool revealOnOpen;
 
   const QuizDetails({
@@ -837,8 +839,12 @@ class _QuizDetailsState extends State<QuizDetails> {
   @override
   void initState() {
     super.initState();
-    // No selection / reveal logic. We only highlight by isCorrect.
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      quizController.quizDetailsPreviews(classId: widget.classId ?? 0);
+    });
   }
+
 
   // ---------- small helpers ----------
   bool _isShort(String s) {
@@ -864,15 +870,15 @@ class _QuizDetailsState extends State<QuizDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final titlePrefix = widget.studentName.isEmpty ? '' : '${widget.studentName} ';
+    final titlePrefix =
+        widget.studentName.isEmpty ? '' : '${widget.studentName} ';
 
     return Scaffold(
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
         child: Obx(() {
-          if (quizController.isLoading.value &&
-              quizController.quizDetails.value == null) {
-            return Center(child: AppLoader.circularLoader( ));
+          if (quizController.quizDetailsPreview.value) {
+            return Center(child: AppLoader.circularLoader());
           }
 
           final details = quizController.quizDetails.value;
@@ -880,8 +886,8 @@ class _QuizDetailsState extends State<QuizDetails> {
             return const Center(child: Text('No quiz details found'));
           }
 
-          final postedTime = details.time; // e.g. "12:04 PM"
-          final postedDate = _formatApiDate(details.date); // e.g. "01.Sep.2025"
+          // final postedTime = details.time; // e.g. "12:04 PM"
+          // final postedDate = _formatApiDate(details.date); // e.g. "01.Sep.2025"
 
           return SingleChildScrollView(
             child: Padding(
@@ -898,28 +904,6 @@ class _QuizDetailsState extends State<QuizDetails> {
                   ),
                   const SizedBox(height: 35),
 
-                  // Header line: "<Student> Quiz Details"
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        titlePrefix,
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.blue,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Quiz Details',
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: 16,
-                          color: AppColor.gray,
-                        ),
-                      ),
-                    ],
-                  ),
 
                   // Title from API
                   Center(
@@ -953,15 +937,20 @@ class _QuizDetailsState extends State<QuizDetails> {
                             // ✅ Strongly type options
                             final List<Option> options = q.options;
 
-                            final allNumeric = options.isNotEmpty &&
+                            final allNumeric =
+                                options.isNotEmpty &&
                                 options.every((o) => _isNumeric(o.text));
-                            final anyParagraph =
-                            options.any((o) => !_isShort(o.text));
+                            final anyParagraph = options.any(
+                              (o) => !_isShort(o.text),
+                            );
                             final useTwoUp = allNumeric && !anyParagraph;
 
                             return Padding(
                               padding: EdgeInsets.only(
-                                bottom: qIdx == details.questions.length - 1 ? 0 : 28,
+                                bottom:
+                                    qIdx == details.questions.length - 1
+                                        ? 0
+                                        : 28,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -973,64 +962,92 @@ class _QuizDetailsState extends State<QuizDetails> {
                                   const SizedBox(height: 15),
 
                                   if (useTwoUp)
-                                  // numeric/compact -> 2 per row
-                                    ...List.generate((options.length / 2).ceil(), (row) {
-                                      final leftIdx = row * 2;
-                                      final rightIdx = leftIdx + 1;
+                                    // numeric/compact -> 2 per row
+                                    ...List.generate(
+                                      (options.length / 2).ceil(),
+                                      (row) {
+                                        final leftIdx = row * 2;
+                                        final rightIdx = leftIdx + 1;
 
-                                      final Option left = options[leftIdx];
-                                      final bool hasRight = rightIdx < options.length;
-                                      final Option? right = hasRight ? options[rightIdx] : null;
+                                        final Option left = options[leftIdx];
+                                        final bool hasRight =
+                                            rightIdx < options.length;
+                                        final Option? right =
+                                            hasRight ? options[rightIdx] : null;
 
-                                      final leftLetter  = String.fromCharCode(65 + leftIdx);
-                                      final rightLetter = hasRight ? String.fromCharCode(65 + rightIdx) : '';
+                                        final leftLetter = String.fromCharCode(
+                                          65 + leftIdx,
+                                        );
+                                        final rightLetter =
+                                            hasRight
+                                                ? String.fromCharCode(
+                                                  65 + rightIdx,
+                                                )
+                                                : '';
 
-                                      // ✅ borders: green for correct; gray otherwise
-                                      final leftBorderColor = (left.isCorrect == true)
-                                          ? AppColor.green
-                                          : AppColor.lowLightgray;
+                                        // ✅ borders: green for correct; gray otherwise
+                                        final leftBorderColor =
+                                            (left.isCorrect == true)
+                                                ? AppColor.green
+                                                : AppColor.lowLightgray;
 
-                                      final rightBorderColor = hasRight
-                                          ? ((right!.isCorrect == true)
-                                          ? AppColor.green
-                                          : AppColor.lowLightgray)
-                                          : Colors.transparent;
+                                        final rightBorderColor =
+                                            hasRight
+                                                ? ((right!.isCorrect == true)
+                                                    ? AppColor.green
+                                                    : AppColor.lowLightgray)
+                                                : Colors.transparent;
 
-                                      return Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: row == ((options.length / 2).ceil() - 1) ? 0 : 14,
-                                        ),
-                                        child: CommonContainer.quizContainer(
-                                          leftTextNumber: leftLetter,
-                                          leftValue: left.text,
-                                          rightTextNumber: hasRight ? rightLetter : '',
-                                          rightValue: hasRight ? right!.text : '',
-                                          // 🚫 selection OFF
-                                          leftSelected: false,
-                                          rightSelected: false,
-                                          isQuizCompleted: false,
-                                          // ✅ borders by correctness
-                                          leftBorderColor: leftBorderColor,
-                                          rightBorderColor: rightBorderColor,
-                                          // 🚫 taps OFF
-                                          leftOnTap: null,
-                                          rightOnTap: null,
-                                        ),
-                                      );
-                                    })
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom:
+                                                row ==
+                                                        ((options.length / 2)
+                                                                .ceil() -
+                                                            1)
+                                                    ? 0
+                                                    : 14,
+                                          ),
+                                          child: CommonContainer.quizContainer(
+                                            leftTextNumber: leftLetter,
+                                            leftValue: left.text,
+                                            rightTextNumber:
+                                                hasRight ? rightLetter : '',
+                                            rightValue:
+                                                hasRight ? right!.text : '',
+                                            // 🚫 selection OFF
+                                            leftSelected: false,
+                                            rightSelected: false,
+                                            isQuizCompleted: false,
+                                            // ✅ borders by correctness
+                                            leftBorderColor: leftBorderColor,
+                                            rightBorderColor: rightBorderColor,
+                                            // 🚫 taps OFF
+                                            leftOnTap: null,
+                                            rightOnTap: null,
+                                          ),
+                                        );
+                                      },
+                                    )
                                   else
-                                  // text/paragraph/mixed -> full width items
+                                    // text/paragraph/mixed -> full width items
                                     ...List.generate(options.length, (oIdx) {
                                       final Option opt = options[oIdx];
-                                      final letter = String.fromCharCode(65 + oIdx);
+                                      final letter = String.fromCharCode(
+                                        65 + oIdx,
+                                      );
 
-                                      final borderColor = (opt.isCorrect == true)
-                                          ? AppColor.green
-                                          : AppColor.lowLightgray;
+                                      final borderColor =
+                                          (opt.isCorrect == true)
+                                              ? AppColor.green
+                                              : AppColor.lowLightgray;
 
                                       return Padding(
                                         padding: EdgeInsets.only(
-                                          bottom: oIdx == options.length - 1 ? 0 : 14,
+                                          bottom:
+                                              oIdx == options.length - 1
+                                                  ? 0
+                                                  : 14,
                                         ),
                                         child: CommonContainer.quizContainer1(
                                           // 🚫 selection OFF
@@ -1056,7 +1073,10 @@ class _QuizDetailsState extends State<QuizDetails> {
 
                   // Posted on (time + date from API)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 25),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 64,
+                      vertical: 25,
+                    ),
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColor.black.withOpacity(0.08),
@@ -1078,7 +1098,11 @@ class _QuizDetailsState extends State<QuizDetails> {
                             Row(
                               children: [
                                 Text(
-                                  postedTime,
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: true,
+                                    showDate: false,
+                                    details.time.toString(),
+                                  ),
                                   style: GoogleFont.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -1087,7 +1111,11 @@ class _QuizDetailsState extends State<QuizDetails> {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  postedDate,
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: false,
+                                    showDate: true,
+                                    details.date.toString(),
+                                  ),
                                   style: GoogleFont.inter(
                                     fontSize: 12,
                                     color: AppColor.gray,
@@ -1109,4 +1137,3 @@ class _QuizDetailsState extends State<QuizDetails> {
     );
   }
 }
-

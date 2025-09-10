@@ -1051,11 +1051,12 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    controller.getTeacherClassData();
     _pageController = PageController(
       viewportFraction: 0.70, // shows side peeks; adjust 0.66–0.75
       initialPage: 1, // middle card selected on start
     );
-    controller.getTeacherClassData();
+
     currentPage = 1;
   }
 
@@ -1756,9 +1757,7 @@ class _HomeState extends State<Home> {
                                             .isLoading
                                             .value) {
                                           return Center(
-                                            child: AppLoader.circularLoader(
-
-                                            ),
+                                            child: AppLoader.circularLoader(),
                                           );
                                         }
 

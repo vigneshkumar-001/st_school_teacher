@@ -5,7 +5,9 @@ import '../Core/Utility/app_color.dart';
 import 'Core/Utility/app_images.dart';
 import 'Core/Utility/google_fonts.dart';
 import 'Presentation/Home/home.dart';
+import 'Presentation/Homework/controller/teacher_class_controller.dart';
 import 'Presentation/Login Screen/change_mobile_number.dart';
+import 'package:get/get.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,10 +18,11 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   double _progress = 0.0;
-
+  final TeacherClassController controller = Get.put(TeacherClassController());
   @override
   void initState() {
     super.initState();
+    controller.getTeacherClass();
     _startLoading();
   }
 

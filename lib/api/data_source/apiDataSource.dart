@@ -352,7 +352,6 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-
   Future<Either<Failure, GetHomeworkResponse>> getHomeWork() async {
     try {
       final String url = ApiUrl.getHomeWork;
@@ -368,13 +367,17 @@ class ApiDataSource extends BaseApiDataSource {
             // ✅ parse with our robust models
             return Right(GetHomeworkResponse.fromJson(body));
           } else {
-            return Left(ServerFailure(body['message']?.toString() ?? 'Unknown error'));
+            return Left(
+              ServerFailure(body['message']?.toString() ?? 'Unknown error'),
+            );
           }
         } else {
           return Left(ServerFailure('Unexpected response format'));
         }
       } else {
-        return Left(ServerFailure((response as DioException).message ?? 'Network error'));
+        return Left(
+          ServerFailure((response as DioException).message ?? 'Network error'),
+        );
       }
     } catch (e, st) {
       AppLogger.log.e(e);
@@ -815,4 +818,48 @@ class ApiDataSource extends BaseApiDataSource {
       return Left(ServerFailure(''));
     }
   }
+
+  Future<Either<Failure, AnnouncementCreateResponse>> createExam({
+    required int classId,
+    required String heading,
+    required String startDate,
+    required String endDate,
+    required String announcementDate,
+    String? timetableUrl,
+  }) async {
+    try {
+      String url = ApiUrl.teacherExamsCreate;
+
+      final body = {
+        "classId": classId,
+        "heading": heading,
+        "startDate": startDate,
+        "endDate": endDate,
+        "announcementDate": announcementDate,
+
+        "timetableUrl": timetableUrl,
+        "timetableType": 'image',
+        "isPublished": true,
+      };
+
+      dynamic response = await Request.sendRequest(url, body, 'Post', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(AnnouncementCreateResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+
+
+
 }

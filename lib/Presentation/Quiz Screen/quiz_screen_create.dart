@@ -2301,7 +2301,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                               if (payload == null) return;
 
                               AppLogger.log.i(payload);
-                              await controller.quizCreate(payload);
+                              await controller.quizCreate(context,payload);
                             },
                             width: 145,
                             height: 60,

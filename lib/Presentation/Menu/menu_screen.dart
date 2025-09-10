@@ -10,6 +10,8 @@ import '../Announcement Screen/announcement_screen.dart';
 import '../Attendance-teacher/attendance_history_teacher.dart';
 import '../Attendance/attendance_history.dart';
 import '../Attendance/attendance_start.dart';
+import '../Exam Screen/screens/exam_create.dart';
+import '../Exam Screen/screens/exam_history.dart';
 import '../Homework/homework_create.dart';
 import '../Profile/my_profile.dart';
 import '../Quiz Screen/quiz_history.dart';
@@ -143,26 +145,26 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 SizedBox(height: 20),
 
-                // CommonContainer.Menu_Students(
-                //   Start: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(builder: (context) => ExamCreate()),
-                //     );
-                //   },
-                //   onIconTap: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(builder: (context) => ExamHistory()),
-                //     );
-                //   },
-                //
-                //   mainText: 'Exam',
-                //   subText: 'Create',
-                //   image: AppImages.Exam,
-                //   addButton: true,
-                // ),
-                // SizedBox(height: 20),
+                CommonContainer.Menu_Students(
+                  Start: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ExamCreate()),
+                    );
+                  },
+                  onIconTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ExamHistory()),
+                    );
+                  },
+
+                  mainText: 'Exam',
+                  subText: 'Create',
+                  image: AppImages.Exam,
+                  addButton: true,
+                ),
+                SizedBox(height: 20),
                 CommonContainer.Menu_Students(
                   Start: () {
                     Navigator.push(

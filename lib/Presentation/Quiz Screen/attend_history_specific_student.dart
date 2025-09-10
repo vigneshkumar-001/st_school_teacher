@@ -651,7 +651,10 @@ class _AttendHistorySpecificStudentState
     super.initState();
     AppLogger.log.i('${widget.quizId},${widget.studentId}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      c.loadStudentQuizResult(quizId: 11, studentId: 2450);
+      c.loadStudentQuizResult(
+        quizId: widget.quizId,
+        studentId: widget.studentId,
+      );
 
       setState(() {});
     });
@@ -684,34 +687,19 @@ class _AttendHistorySpecificStudentState
         child: Obx(() {
           final data = c.studentQuiz.value; // StudentQuizData?
 
-          if (c.isLoading.value && data == null) {
-            return Center(child: AppLoader.circularLoader( ));
+          if (c.loadStudent.value && data == null) {
+            return Center(child: AppLoader.circularLoader());
           }
 
           if (data == null) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  CommonContainer.NavigatArrow(
-                    image: AppImages.leftSideArrow,
-                    imageColor: AppColor.lightBlack,
-                    container: AppColor.lowLightgray,
-                    onIconTap: () => Navigator.pop(context),
-                    border: Border.all(color: AppColor.lightgray, width: 0.3),
-                  ),
-                  const SizedBox(height: 40),
-                  Text(
-                    'No quiz data found',
-                    style: GoogleFont.ibmPlexSans(fontSize: 16),
-                  ),
-                ],
+            return Center(
+              child: Text(
+                'No quiz data found',
+                style: GoogleFont.ibmPlexSans(fontSize: 16),
               ),
             );
           }
 
-          // ✅ Now `data` is non-null StudentQuizData
           final displayName =
               widget.studentName.isNotEmpty
                   ? widget.studentName

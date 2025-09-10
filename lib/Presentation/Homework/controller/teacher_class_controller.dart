@@ -20,7 +20,7 @@ class TeacherClassController extends GetxController {
   }
 
   /// Fetch classes from API and optionally select a class/section if provided
-  Future<void> getTeacherClass({String? className, String? section}) async {
+  /*Future<void> getTeacherClass({String? className, String? section}) async {
     try {
       isLoading.value = true;
 
@@ -59,7 +59,49 @@ class TeacherClassController extends GetxController {
       isLoading.value = false;
       AppLogger.log.e(e);
     }
+  }*/
+  Future<void> getTeacherClass({String? className, String? section}) async {
+    try {
+      isLoading.value = true;
+
+      final results = await apiDataSource.getTeacherClass();
+      results.fold(
+            (failure) {
+          isLoading.value = false;
+          AppLogger.log.e(failure.message);
+        },
+            (response) {
+          // 🔑 assignAll instead of value =
+          classList.assignAll(response.data.classes);
+          subjectList.assignAll(response.data.subjects);
+          isLoading.value = false;
+
+          // Set selected class based on passed className/section or default to first
+          if (classList.isNotEmpty) {
+            TeacherClass? selected;
+
+            if (className != null && section != null) {
+              selected = classList.firstWhereOrNull(
+                    (c) => c.name == className && c.section == section,
+              );
+            }
+
+            selectedClass.value = selected ?? classList.first;
+
+            AppLogger.log.i(
+              "Selected class: ${selectedClass.value?.name} - ${selectedClass.value?.section}",
+            );
+          }
+
+          AppLogger.log.i("Fetched ${classList.length} classes");
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      AppLogger.log.e(e);
+    }
   }
+
 }
 
 // import 'package:get/get.dart';
