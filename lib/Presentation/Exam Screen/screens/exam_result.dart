@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:st_teacher_app/Presentation/Exam%20Screen/result_list.dart';
+import 'package:st_teacher_app/Presentation/Exam%20Screen/screens/result_list.dart';
 
-import '../../Core/Utility/app_color.dart';
-import '../../Core/Utility/app_images.dart';
-import '../../Core/Utility/google_fonts.dart';
-import '../../Core/Widgets/common_container.dart';
+import '../../../Core/Utility/app_color.dart';
+import '../../../Core/Utility/app_images.dart';
+import '../../../Core/Utility/google_fonts.dart';
+import '../../../Core/Widgets/common_container.dart';
 import 'exam_result_done.dart';
 
 class ExamResult extends StatefulWidget {

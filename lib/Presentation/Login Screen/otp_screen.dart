@@ -185,13 +185,13 @@ class _OtpScreenState extends State<OtpScreen> {
                       String mobileNumber =
                           widget.mobileNumber.toString() ?? '';
                       otpController.otpLogin(phone: mobileNumber, otp: Otp);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => Home(pages: 'homeScreen', page: ''),
-                        ),
-                      );
+                      // Navigator.pushReplacement(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder:
+                      //         (context) => Home(pages: 'homeScreen', page: ''),
+                      //   ),
+                      // );
                     } else {
                       // Navigator.push(
                       //   context,

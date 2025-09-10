@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Core/Utility/snack_bar.dart';
 
 import 'package:st_teacher_app/Core/consents.dart'; // AppLogger? (adjust if needed)
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
@@ -18,6 +19,8 @@ import '../quiz_history.dart'; // QuizListResponse, QuizData, QuizItem
 
 class QuizController extends GetxController {
   final isLoading = false.obs;
+  final loadStudent = false.obs;
+  final quizDetailsPreview = false.obs;
   final apiDataSource = ApiDataSource();
 
   // Details page data (set by quizDetailsPreviews)
@@ -217,6 +220,7 @@ class QuizController extends GetxController {
 
   // ---------- API: CREATE (placeholder wiring) ----------
   Future<String?> quizCreate(
+    BuildContext context,
     Map<String, dynamic> payload, {
 
     bool showLoader = true,
@@ -232,11 +236,13 @@ class QuizController extends GetxController {
           return failure.message;
         },
         (response) async {
+          Navigator.pop(context);
           Get.off(() => const QuizHistory());
           if (showLoader) hidePopupLoader();
-
+          CustomSnackBar.showSuccess(response.message);
           lastError.value = '';
           AppLogger.log.i(response.data ?? 'Data fetched');
+          AppLogger.log.i(response.message);
           return null;
         },
       );
@@ -281,12 +287,12 @@ class QuizController extends GetxController {
   /// Loads quiz details by classId and sets [quizDetails]; returns `null` on success or an error message.
   Future<String?> quizDetailsPreviews({required int classId}) async {
     try {
-      isLoading.value = true;
+      quizDetailsPreview.value = true;
 
       final result = await apiDataSource.quizDetailsPreviews(code: classId);
       return result.fold(
         (failure) {
-          isLoading.value = false;
+          quizDetailsPreview.value = false;
           lastError.value = failure.message;
           AppLogger.log.e(failure.message);
           return failure.message;
@@ -295,14 +301,14 @@ class QuizController extends GetxController {
           // ✅ preview is QuizDetailsPreview
           final data = preview.data; // QuizDetailsData
           quizDetails.value = data;
-          isLoading.value = false;
+          quizDetailsPreview.value = false;
           lastError.value = '';
           AppLogger.log.i('Details fetched: ${data?.title}');
           return null;
         },
       );
     } catch (e) {
-      isLoading.value = false;
+      quizDetailsPreview.value = false;
       lastError.value = e.toString();
       AppLogger.log.e(e);
       return e.toString();
@@ -354,7 +360,7 @@ class QuizController extends GetxController {
   }) async {
     if (isLoading.value) return null;
     try {
-      isLoading.value = true;
+      loadStudent.value = true;
       lastError.value = '';
 
       final result = await apiDataSource.studentQuizResults(
@@ -364,6 +370,7 @@ class QuizController extends GetxController {
 
       return result.fold(
         (failure) {
+          loadStudent.value = false;
           lastError.value = failure.message;
           // 🔐 Prevent stale UI from showing old data on error:
           studentQuiz.value = null;
@@ -372,18 +379,20 @@ class QuizController extends GetxController {
           return failure.message;
         },
         (resp) {
+          loadStudent.value = false;
           studentQuiz.value = resp.data;
           AppLogger.log.i('Details fetched: ${resp.data}');
         },
       );
     } catch (e) {
+      loadStudent.value = false;
       lastError.value = e.toString();
       studentQuiz.value = null;
       quizDetails.value = null;
       AppLogger.log.e(e);
       return e.toString();
     } finally {
-      isLoading.value = false;
+      loadStudent.value = false;
     }
   }
 }

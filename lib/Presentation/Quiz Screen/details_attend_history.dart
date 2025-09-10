@@ -512,6 +512,7 @@ import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_details.dart';
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/app_loader.dart';
+import '../../Core/Utility/date_and_time_convert.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'Model/quiz_attend_response.dart';
@@ -599,7 +600,7 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
       body: SafeArea(
         child: Obx(() {
           if (c.isLoading.value) {
-            return Center(child: AppLoader.circularLoader( ));
+            return Center(child: AppLoader.circularLoader());
           }
 
           final AttendSummaryData? data = c.attendSummary.value;
@@ -824,7 +825,12 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                               ),
                                               const SizedBox(width: 10),
                                               Text(
-                                                q.time,
+                                                DateAndTimeConvert.formatDateTime(
+                                                  showTime: true,
+                                                  showDate: false,
+                                                  q.time.toString(),
+                                                ),
+
                                                 style: GoogleFonts.inter(
                                                   fontSize: 12,
                                                   color: AppColor.gray,
@@ -838,6 +844,9 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                         alignment: Alignment.centerRight,
                                         child: InkWell(
                                           onTap: () {
+                                            AppLogger.log.i(
+                                              "${q.id},${q.title}",
+                                            );
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -1009,11 +1018,11 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                                 AppLogger.log.i(
                                                   '${s.id}${s.name}${q.id}',
                                                 );
-                                                  _navigateToStudent(
-                                                    studentId: s.id,
-                                                    name: s.name,
-                                                    quizId: q.id, // ← was classId
-                                                  );
+                                                _navigateToStudent(
+                                                  studentId: s.id,
+                                                  name: s.name,
+                                                  quizId: q.id, // ← was classId
+                                                );
                                               },
                                               title: Text(
                                                 s.name,
@@ -1066,11 +1075,11 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                                 AppLogger.log.i(
                                                   '${u.id} =  ${u.name} = ${q.id}',
                                                 );
-                                                 _navigateToStudent(
-                                                   studentId: u.id,
-                                                   name: name,
-                                                   quizId: q.id,
-                                                 );
+                                                  _navigateToStudent(
+                                                    studentId: u.id,
+                                                    name: name,
+                                                    quizId: q.id,
+                                                  );
                                               },
                                               title: Text(
                                                 name,
