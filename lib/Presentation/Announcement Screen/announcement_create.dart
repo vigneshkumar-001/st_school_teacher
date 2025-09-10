@@ -1612,6 +1612,7 @@ import '../../Core/Utility/custom_app_button.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../Homework/controller/teacher_class_controller.dart';
+import 'Model/category_list_response.dart';
 import 'controller/announcement_contorller.dart';
 import 'announcement_screen.dart';
 
@@ -1675,6 +1676,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   // ---------- selection state ----------
   int selectedIndex = 0;
   int subjectIndex = 0;
+  int selectedCategoryId = 0;
   String? selectedSubject;
   int? selectedSubjectId;
   int? selectedClassId;
@@ -1693,44 +1695,133 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
     TeacherClassController(),
   );
   bool showCategoryClear = false;
-  static const List<String> _categoryOptions = <String>[
-    'today_special',
-    'term_fee',
-    'exam_result',
-    'holiday',
-    'sports_day',
-    'parents_meeting',
-    'exam_date',
-    'teacher_meeting',
-    'prepare_exam',
-  ];
 
   Future<void> _openCategorySheet() async {
-    final selected = await showModalBottomSheet<String>(
+    final selected = await showModalBottomSheet<CategoryData>(
       context: context,
-      backgroundColor: AppColor.white,
-      isScrollControlled: false,
+      backgroundColor: Colors.transparent, // so rounded corners show
+      isScrollControlled: true,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return ListView.separated(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          itemCount: _categoryOptions.length,
-          separatorBuilder: (_, __) => const Divider(height: 0),
-          itemBuilder: (context, i) {
-            final value = _categoryOptions[i];
-            final isSelected = value == Category.text.trim();
-            return ListTile(
-              dense: true,
-              title: Text(
-                value.replaceAll('_', ' '), // nicer label
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.85,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 12,
+                    color: Colors.black12,
+                    offset: Offset(0, -2),
+                  ),
+                ],
               ),
-              trailing: isSelected ? const Icon(Icons.check) : null,
-              onTap: () => Navigator.of(context).pop(value),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- header ---
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Select Category",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.grey),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+
+                  // --- list of categories ---
+                  Expanded(
+                    child: Obx(() {
+                      final categories = announcementContorller.categoryData;
+                      if (categories.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "No categories found",
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        );
+                      }
+
+                      return ListView.separated(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 10,
+                        ),
+                        itemCount: categories.length,
+                        separatorBuilder:
+                            (_, __) => const Divider(
+                              height: 1,
+                              indent: 16,
+                              endIndent: 16,
+                            ),
+                        itemBuilder: (context, i) {
+                          final category = categories[i];
+                          final isSelected =
+                              category.name == Category.text.trim();
+
+                          return ListTile(
+                            // leading: category.image != null
+                            //     ? CircleAvatar(
+                            //   radius: 20,
+                            //   backgroundImage: NetworkImage(category.image!),
+                            // )
+                            //     : CircleAvatar(
+                            //   radius: 20,
+                            //   backgroundColor: Colors.grey.shade200,
+                            //   child: const Icon(Icons.category, color: Colors.grey),
+                            // ),
+                            title: Text(
+                              category.name.replaceAll('_', ' ').toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight:
+                                    isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                color:
+                                    isSelected ? Colors.blue : Colors.black87,
+                              ),
+                            ),
+                            trailing:
+                                isSelected
+                                    ? const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.blue,
+                                    )
+                                    : null,
+                            onTap: () => Navigator.of(context).pop(category),
+                          );
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
             );
           },
         );
@@ -1739,11 +1830,13 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
 
     if (selected != null) {
       setState(() {
-        Category.text = selected;
+        Category.text = selected.name;
+        selectedCategoryId = selected.id; // 👈 id for insert
         showCategoryClear = true;
       });
     }
   }
+
   // GetX controller for API
 
   // Category UI helpers
@@ -1918,8 +2011,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
 
       // Extra fields to match your JSON contract
       category: 'Student', // "category": "Student"
-      announcementCategory:
-          Category.text.trim(), // "announcementCategory": "exam_result"
+      announcementCategoryId: selectedCategoryId,
 
       publish: true,
       contents: contents,
@@ -2112,12 +2204,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                         const Spacer(),
                         InkWell(
                           onTap: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => ListGeneral(),
-                            //   ),
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AnnouncementScreen(),
+                              ),
+                            );
                           },
                           child: Row(
                             children: [

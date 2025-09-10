@@ -26,7 +26,9 @@ class _QuizHistoryState extends State<QuizHistory> {
   @override
   void initState() {
     super.initState();
-    quizController.quizList();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await quizController.quizList();
+    });
   }
 
   @override
@@ -36,7 +38,7 @@ class _QuizHistoryState extends State<QuizHistory> {
       body: SafeArea(
         child: Obx(() {
           if (quizController.isLoading.value) {
-            return Center(child: AppLoader.circularLoader( ));
+            return Center(child: AppLoader.circularLoader());
           }
 
           final groups = quizController.groupedQuizzes;

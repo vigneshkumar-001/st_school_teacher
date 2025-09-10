@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Core/Utility/app_loader.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_history.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -129,296 +130,305 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
     return Scaffold(
       backgroundColor: AppColor.lowLightgray,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CommonContainer.NavigatArrow(
-                  image: AppImages.leftSideArrow,
-                  onIconTap: () => Navigator.pop(context),
-                  container: AppColor.white,
-                  border: Border.all(color: AppColor.lightgray, width: 0.3),
-                ),
-                SizedBox(height: 18),
-                Center(
-                  child: RichText(
-                    text: TextSpan(
-                      text: selectedClass?.className ?? '',
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 14,
-                        color: AppColor.gray,
-                        fontWeight: FontWeight.w800,
+        child: Obx(() {
+          final classes = attendanceController.classList;
+          if (attendanceController.isLoading.value) {
+            return Center(child: AppLoader.circularLoader());
+          }
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CommonContainer.NavigatArrow(
+                    image: AppImages.leftSideArrow,
+                    onIconTap: () => Navigator.pop(context),
+                    container: AppColor.white,
+                    border: Border.all(color: AppColor.lightgray, width: 0.3),
+                  ),
+                  SizedBox(height: 18),
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        text: selectedClass?.className ?? '',
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: 14,
+                          color: AppColor.gray,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: ' ${selectedClass?.section ?? ''}',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              color: AppColor.gray,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' Section',
+                            style: GoogleFont.ibmPlexSans(
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
                       ),
-                      children: [
-                        TextSpan(
-                          text: ' ${selectedClass?.section ?? ''}',
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 14,
-                            color: AppColor.gray,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        TextSpan(
-                          text: ' Section',
-                          style: GoogleFont.ibmPlexSans(
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
-                ),
-                SizedBox(height: 3),
-                Center(
-                  child: Text(
-                    '${attendanceData?.studentName ?? ''} Attendance',
-                    style: GoogleFonts.ibmPlexSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.black,
+                  SizedBox(height: 3),
+                  Center(
+                    child: Text(
+                      '${attendanceData?.studentName ?? ''} Attendance',
+                      style: GoogleFonts.ibmPlexSans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                        color: AppColor.black,
+                      ),
                     ),
                   ),
-                ),
 
-                SizedBox(height: 21),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColor.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 30,
+                  SizedBox(height: 21),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          child: TableCalendar(
-                            focusedDay: _focusedDay,
-                            firstDay: DateTime.utc(2000),
-                            lastDay: DateTime.utc(2050),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 30,
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            child: TableCalendar(
+                              focusedDay: _focusedDay,
+                              firstDay: DateTime.utc(2000),
+                              lastDay: DateTime.utc(2050),
 
-                            // 🔒 Always Month
-                            calendarFormat: CalendarFormat.month,
-                            availableCalendarFormats: const {
-                              CalendarFormat.month: 'Month',
-                            },
-                            headerStyle: HeaderStyle(
-                              formatButtonVisible: false, // hide format toggle
-                              titleCentered: true, // 👈 center the month text
-                              titleTextStyle: GoogleFonts.ibmPlexSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.black,
-                              ),
-                              leftChevronIcon: Icon(
-                                Icons.chevron_left,
-                                color: AppColor.gray,
-                              ),
-                              rightChevronIcon: Icon(
-                                Icons.chevron_right,
-                                color: AppColor.gray,
-                              ),
-                            ),
-                            availableGestures:
-                                AvailableGestures
-                                    .horizontalSwipe, // allow only swipe months
-
-                            onPageChanged: (focusedDay) {
-                              setState(() => _focusedDay = focusedDay);
-                              loadStudentAttendance(focusedDay);
-                            },
-                            selectedDayPredicate:
-                                (day) => isSameDay(day, _selectedDay),
-                            onDaySelected: (selectedDay, focusedDay) {
-                              setState(() {
-                                _selectedDay = selectedDay;
-                                _focusedDay = focusedDay;
-                              });
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => AttendanceHistoryStudentDate(
-                                        selectedDate: _selectedDay!,
-                                        studentId: widget.studentId ?? 0,
-                                        classId: selectedClass.id,
-                                        studentName:
-                                            attendanceData?.studentName,
-                                        className:
-                                            selectedClass?.className ?? '',
-                                        section: selectedClass?.section ?? '',
-                                      ),
+                              // 🔒 Always Month
+                              calendarFormat: CalendarFormat.month,
+                              availableCalendarFormats: const {
+                                CalendarFormat.month: 'Month',
+                              },
+                              headerStyle: HeaderStyle(
+                                formatButtonVisible:
+                                    false, // hide format toggle
+                                titleCentered: true, // 👈 center the month text
+                                titleTextStyle: GoogleFonts.ibmPlexSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColor.black,
                                 ),
-                              );
-                            },
+                                leftChevronIcon: Icon(
+                                  Icons.chevron_left,
+                                  color: AppColor.gray,
+                                ),
+                                rightChevronIcon: Icon(
+                                  Icons.chevron_right,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+                              availableGestures:
+                                  AvailableGestures
+                                      .horizontalSwipe, // allow only swipe months
 
-                            // keep your existing styles/builders
-                            calendarStyle: const CalendarStyle(
-                              markersMaxCount: 1,
-                              markerSize: 6,
-                            ),
-                            calendarBuilders: CalendarBuilders(
-                              markerBuilder: (context, day, events) {
-                                final color = getAttendanceColor(
-                                  day,
-                                  attendanceData?.attendanceByDate ?? {},
+                              onPageChanged: (focusedDay) {
+                                setState(() => _focusedDay = focusedDay);
+                                loadStudentAttendance(focusedDay);
+                              },
+                              selectedDayPredicate:
+                                  (day) => isSameDay(day, _selectedDay),
+                              onDaySelected: (selectedDay, focusedDay) {
+                                setState(() {
+                                  _selectedDay = selectedDay;
+                                  _focusedDay = focusedDay;
+                                });
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (
+                                          context,
+                                        ) => AttendanceHistoryStudentDate(
+                                          selectedDate: _selectedDay!,
+                                          studentId: widget.studentId ?? 0,
+                                          classId: selectedClass.id,
+                                          studentName:
+                                              attendanceData?.studentName,
+                                          className:
+                                              selectedClass?.className ?? '',
+                                          section: selectedClass?.section ?? '',
+                                        ),
+                                  ),
                                 );
-                                if (color != null) {
-                                  return Positioned(
-                                    bottom: 4,
-                                    child: Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: color,
-                                        shape: BoxShape.circle,
+                              },
+
+                              // keep your existing styles/builders
+                              calendarStyle: const CalendarStyle(
+                                markersMaxCount: 1,
+                                markerSize: 6,
+                              ),
+                              calendarBuilders: CalendarBuilders(
+                                markerBuilder: (context, day, events) {
+                                  final color = getAttendanceColor(
+                                    day,
+                                    attendanceData?.attendanceByDate ?? {},
+                                  );
+                                  if (color != null) {
+                                    return Positioned(
+                                      bottom: 4,
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          color: color,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                                defaultBuilder: (context, day, focusedDay) {
+                                  return Center(
+                                    child: Text(
+                                      '${day.day}',
+                                      style: GoogleFonts.ibmPlexSans(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                              defaultBuilder: (context, day, focusedDay) {
-                                return Center(
-                                  child: Text(
-                                    '${day.day}',
-                                    style: GoogleFonts.ibmPlexSans(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 35),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColor.lowLightgray,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 25,
+                                vertical: 12,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 15,
+                                          color: AppColor.yellow,
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'Event',
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColor.gray,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 35),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppColor.lowLightgray,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 25,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        size: 15,
-                                        color: AppColor.yellow,
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        'Event',
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColor.gray,
+                                  Spacer(),
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 15,
+                                          color: AppColor.green,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Spacer(),
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        size: 15,
-                                        color: AppColor.green,
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        'Holidays',
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColor.gray,
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'Holidays',
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColor.gray,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Spacer(),
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        size: 15,
-                                        color: AppColor.red,
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        'Absent',
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColor.gray,
+                                  Spacer(),
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 15,
+                                          color: AppColor.red,
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'Absent',
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColor.gray,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 40),
-                        Row(
-                          children: [
-                            Text(
-                              '${attendanceData?.monthName} Overall Attendance ',
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.black,
+                                ],
                               ),
                             ),
-
-                            Spacer(),
-                            Text(
-                              'Average',
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.orange,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(height: 20),
-                        GradientProgressBar(
-                          progress:
-                              (attendanceData?.presentPercentage ?? 0) / 100,
-                        ),
-                        SizedBox(height: 15),
-                        Text(
-                          "${attendanceData?.fullDayPresentCount ?? '0'} Out of ${attendanceData?.totalWorkingDays ?? '0'}",
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: AppColor.gray,
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 40),
+                          Row(
+                            children: [
+                              Text(
+                                '${attendanceData?.monthName} Overall Attendance ',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColor.black,
+                                ),
+                              ),
+
+                              Spacer(),
+                              Text(
+                                'Average',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.orange,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 20),
+                          GradientProgressBar(
+                            progress:
+                                (attendanceData?.presentPercentage ?? 0) / 100,
+                          ),
+                          SizedBox(height: 15),
+                          Text(
+                            "${attendanceData?.fullDayPresentCount ?? '0'} Out of ${attendanceData?.totalWorkingDays ?? '0'}",
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColor.gray,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                /*SizedBox(height: 27),
+                  /*SizedBox(height: 27),
                 Center(
                   child: OutlinedButton(
                     onPressed: () {
@@ -457,10 +467,11 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
                     ),
                   ),
                 ),*/
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }

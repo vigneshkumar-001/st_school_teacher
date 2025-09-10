@@ -2213,7 +2213,9 @@ class AnnouncementScreen extends StatefulWidget {
 
 class _AnnouncementScreenState extends State<AnnouncementScreen> {
   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
-  int selectedIndex = 0;
+ 
+  int selectedIndex = 0; // 0 = General, 1 = Teacher
+ 
   final List<Map<String, String>> subjects = [
     {'subject': 'Tamil', 'mark': '70'},
     {'subject': 'English', 'mark': '70'},
@@ -2595,21 +2597,21 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                   const SizedBox(height: 16),
 
                   // Image (if exists)
-                  if (details!.contents.isNotEmpty &&
-                      details.contents.first.type == "image")
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        details.contents.first.content ?? "",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  // if (details!.contents.isNotEmpty &&
+                  //     details.contents.first.type == "image")
+                  //   ClipRRect(
+                  //     borderRadius: BorderRadius.circular(16),
+                  //     child: Image.network(
+                  //       details.contents.first.content ?? "",
+                  //       fit: BoxFit.cover,
+                  //     ),
+                  //   ),
 
                   const SizedBox(height: 20),
 
                   // Title
                   Text(
-                    details.title,
+                    details?.title.toString() ?? '',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -2630,7 +2632,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       Text(
                         DateFormat(
                           'dd-MMM-yyyy',
-                        ).format(DateTime.parse(details.notifyDate)),
+                        ).format(DateTime.parse(details?.notifyDate.toString() ?? '')),
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -2640,14 +2642,14 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
 
                   // Content
                   Text(
-                    details.content,
+                    details?.content.toString()?? '',
                     style: const TextStyle(fontSize: 16, height: 1.5),
                   ),
 
                   const SizedBox(height: 20),
 
                   // Extra dynamic contents
-                  if (details.contents.isNotEmpty)
+                  if (details!.contents.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:
@@ -2707,7 +2709,11 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   @override
   void initState() {
     super.initState();
-    controller.getAnnouncement();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.announcementData.value == null) {
+        controller.getAnnouncement(type: "general");
+      }
+    });
   }
 
   // Widget _buildGeneralTab(List<AnnouncementItem> items) {
@@ -2751,7 +2757,6 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.white,
       body: SafeArea(
         child: Obx(() {
           final data = controller.announcementData.value;
@@ -2760,25 +2765,29 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
             return Center(child: AppLoader.circularLoader());
           }
 
-          // Empty State
           if (data == null || data.items.isEmpty) {
             return const Center(child: Text("No announcements available"));
           }
 
           return RefreshIndicator(
             onRefresh: () async {
-              await controller.getAnnouncement();
+              await controller.getAnnouncement(
+                type: selectedIndex == 0 ? "general" : "teacher",
+              );
             },
-            child: SingleChildScrollView(
+            child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
+              padding: const EdgeInsets.all(15),
+              itemCount: data.items.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Center(
                       child: Text(
-                        'Announcements',
+                        selectedIndex == 0
+                            ? 'General Announcements'
+                            : 'Teacher Announcements',
                         style: GoogleFont.ibmPlexSans(
                           fontWeight: FontWeight.w600,
                           fontSize: 26,
@@ -2786,64 +2795,83 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                  );
+                }
 
-                    Column(
-                      children:
-                          data.items.map((item) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: CommonContainer.announcementsScreen(
-                                mainText: item.announcementCategory,
-                                backRoundImage: AppImages.announcement2,
-                                iconData: CupertinoIcons.clock_fill,
-                                additionalText1: "Date",
-                                additionalText2: '18-Jun-25',
-                                verticalPadding: 12,
-                                gradientStartColor: AppColor.black.withOpacity(
-                                  0.01,
-                                ),
-                                gradientEndColor: AppColor.black,
-                                onDetailsTap: () async {
-                                  if (item.type == "exammark") {
-                                    _examResult(context);
-                                  } else if (item.type == "announcement" ||
-                                      item.type == "holiday") {
-                                    _showAnnouncementDetails(context, item.id);
-
-                                    // Navigate to details screen
-                                  }
-
-                                  // Example: show details bottomsheet
-                                  // _showAnnouncementDetails(context, item);
-                                },
-                              ),
-                            );
-                          }).toList(),
-                    ),
-                  ],
-                ),
-              ),
+                final item = data.items[index - 1];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: CommonContainer.announcementsScreen(
+                    mainText: item.announcementCategory,
+                    backRoundImage: AppImages.announcement1,
+                    iconData: CupertinoIcons.clock_fill,
+                    additionalText1: "Date",
+                    additionalText2: DateFormat(
+                      "dd-MMM-yy",
+                    ).format(DateTime.parse(item.notifyDate.toString())),
+                    verticalPadding: 12,
+                    gradientStartColor: AppColor.black.withOpacity(0.01),
+                    gradientEndColor: AppColor.black,
+                    onDetailsTap: () async {
+                      if (item.type == "exammark") {
+                        _examResult(context);
+                      } else if (item.type == "announcement" ||
+                          item.type == "holiday") {
+                        _showAnnouncementDetails(context, item.id);
+                      }
+                    },
+                  ),
+                );
+              },
             ),
           );
         }),
       ),
       bottomNavigationBar: Container(
-                decoration: const BoxDecoration(color: AppColor.white),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                  child: CommonContainer.statusChips(
-                    horizontalPadding: 60,
-                    tabs: const [
-                      {"label": "General"},
-                      {"label": "Teacher"},
-                    ],
-                    selectedIndex: selectedIndex,
-                    onSelect: (i) => setState(() => selectedIndex = i),
-                  ),
-                ),
-              ),
-            );
+ 
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: const BoxDecoration(color: Colors.white),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildTabButton("General", 0),
+            _buildTabButton("Teacher", 1),
+          ],
+        ),
+      ),
+    );
+  }
 
+  Widget _buildTabButton(String label, int index) {
+    final isSelected = selectedIndex == index;
+    return GestureDetector(
+      onTap: () async {
+        setState(() => selectedIndex = index);
+        // Call API based on selected tab
+        await controller.getAnnouncement(
+          type: selectedIndex == 0 ? "general" : "teacher",
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 50),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.shade50 : Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: isSelected ? Colors.blue : Colors.grey.shade400,
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.blue : Colors.grey,
+          ),
+        ),
+      ),
+    );
+ 
   }
 }

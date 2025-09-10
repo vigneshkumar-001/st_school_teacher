@@ -13,8 +13,16 @@ class ApiUrl {
   static String teacherQuizList = '$baseUrl/teacher-quiz/list';
   static String createAnnouncement = '$baseUrl/teacher-announcement/create';
   static String teacherExamsCreate = '$baseUrl/teacher-exams/create';
-  static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
-  static String announcementDetail = '$baseUrl/teacher-announcement/details/18';
+  // static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
+    static String categoriesList = '$baseUrl/announcement-categories';
+
+  static String announcementDetail({required int  Id}) {
+    return '$baseUrl/teacher-announcement/details/$Id';
+  }
+
+  static String listAnnouncement({required String  type}) {
+    return '$baseUrl/teacher-announcement/list?tab=$type';
+  }
 
   static String studentQuizResult({
     required int quizId,

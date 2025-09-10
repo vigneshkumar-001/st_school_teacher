@@ -1051,7 +1051,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    controller.getTeacherClassData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await teacherClassController.getTeacherClass();
+    });
+
     _pageController = PageController(
       viewportFraction: 0.70, // shows side peeks; adjust 0.66–0.75
       initialPage: 1, // middle card selected on start
@@ -1750,7 +1753,7 @@ class _HomeState extends State<Home> {
                                     ),
                                     SizedBox(height: 35),
 
-                                    SizedBox(
+                                    /*  SizedBox(
                                       height: 70,
                                       child: Obx(() {
                                         if (teacherClassController
@@ -2001,6 +2004,264 @@ class _HomeState extends State<Home> {
                                                       ),
                                                     );
                                                   });
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                    ),*/
+                                    SizedBox(
+                                      height: 70,
+                                      child: Obx(() {
+                                        final classList =
+                                            teacherClassController.classList;
+                                        final selectedClass =
+                                            teacherClassController
+                                                .selectedClass
+                                                .value;
+
+                                        if (teacherClassController
+                                            .isLoading
+                                            .value) {
+                                          return Center(
+                                            child: AppLoader.circularLoader(),
+                                          );
+                                        }
+
+                                        if (classList.isEmpty) {
+                                          return Center(
+                                            child: Text("No classes available"),
+                                          );
+                                        }
+
+                                        return Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Positioned.fill(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      AppColor.white
+                                                          .withOpacity(0.3),
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.lowLightgray,
+                                                      AppColor.white
+                                                          .withOpacity(0.3),
+                                                    ],
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.topRight,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: -20,
+                                              bottom: -20,
+                                              left: 0,
+                                              right: 0,
+                                              child: ListView.builder(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount: classList.length,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 5,
+                                                    ),
+                                                itemBuilder: (context, index) {
+                                                  final item = classList[index];
+                                                  final grade = item.name;
+                                                  final section = item.section;
+                                                  final isSelected =
+                                                      item == selectedClass;
+
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      teacherClassController
+                                                          .selectedClass
+                                                          .value = item;
+                                                      AppLogger.log.i(
+                                                        "Selected class: ${item.name} - ${item.section}",
+                                                      );
+                                                    },
+                                                    child: AnimatedContainer(
+                                                      duration: Duration(
+                                                        milliseconds: 200,
+                                                      ),
+                                                      curve: Curves.easeInOut,
+                                                      width: 75,
+                                                      height: 50,
+                                                      margin:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 0,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            isSelected
+                                                                ? AppColor.white
+                                                                : Colors
+                                                                    .transparent,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              16,
+                                                            ),
+                                                        border:
+                                                            isSelected
+                                                                ? Border.all(
+                                                                  color:
+                                                                      AppColor
+                                                                          .black,
+                                                                  width: 1.5,
+                                                                )
+                                                                : null,
+                                                        boxShadow:
+                                                            isSelected
+                                                                ? [
+                                                                  BoxShadow(
+                                                                    color: AppColor
+                                                                        .white
+                                                                        .withOpacity(
+                                                                          0.5,
+                                                                        ),
+                                                                    blurRadius:
+                                                                        10,
+                                                                    offset:
+                                                                        Offset(
+                                                                          0,
+                                                                          4,
+                                                                        ),
+                                                                  ),
+                                                                ]
+                                                                : [],
+                                                      ),
+                                                      child:
+                                                          isSelected
+                                                              ? Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Center(
+                                                                    child: Text(
+                                                                      grade,
+                                                                      style: GoogleFont.ibmPlexSans(
+                                                                        fontSize:
+                                                                            28,
+                                                                        color:
+                                                                            AppColor.black,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    margin:
+                                                                        EdgeInsets.only(
+                                                                          bottom:
+                                                                              0,
+                                                                        ),
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          12,
+                                                                      vertical:
+                                                                          5,
+                                                                    ),
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          AppColor
+                                                                              .black,
+                                                                      borderRadius: BorderRadius.only(
+                                                                        topLeft:
+                                                                            Radius.circular(
+                                                                              40,
+                                                                            ),
+                                                                        topRight:
+                                                                            Radius.circular(
+                                                                              40,
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                    child: Text(
+                                                                      section,
+                                                                      style: GoogleFont.ibmPlexSans(
+                                                                        fontSize:
+                                                                            20,
+                                                                        color:
+                                                                            AppColor.white,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                              : Center(
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            12.0,
+                                                                      ),
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children: [
+                                                                      Container(
+                                                                        padding: const EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              25,
+                                                                          vertical:
+                                                                              3,
+                                                                        ),
+                                                                        decoration: BoxDecoration(
+                                                                          color:
+                                                                              AppColor.white,
+                                                                          borderRadius: BorderRadius.circular(
+                                                                            20,
+                                                                          ),
+                                                                        ),
+                                                                        child: Text(
+                                                                          grade,
+                                                                          style: GoogleFont.ibmPlexSans(
+                                                                            fontSize:
+                                                                                14,
+                                                                            color:
+                                                                                AppColor.gray,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Text(
+                                                                        section,
+                                                                        style: GoogleFont.ibmPlexSans(
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              AppColor.lightgray,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                    ),
+                                                  );
                                                 },
                                               ),
                                             ),
