@@ -283,7 +283,9 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                             /*7904005315*/
                             /*8870210295*/
                             AppLogger.log.i(mbl);
-                            loginController.mobileNumberLogin(mbl);
+                            widget.page == 'splash'
+                                ? loginController.mobileNumberLogin(mbl)
+                                : loginController.changeMobileNumberLogin(mbl);
                           }
                         },
                       );

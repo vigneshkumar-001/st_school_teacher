@@ -193,6 +193,10 @@ class _OtpScreenState extends State<OtpScreen> {
                       //   ),
                       // );
                     } else {
+                      String Otp = otp.text.toString();
+                      String mobileNumber =
+                          widget.mobileNumber.toString() ?? '';
+                      otpController.changeNumberOtp(phone: mobileNumber, otp: Otp);
                       // Navigator.push(
                       //   context,
                       //   MaterialPageRoute(builder: (context) => QuizScreen()),
