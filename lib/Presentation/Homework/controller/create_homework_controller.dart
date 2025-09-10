@@ -257,8 +257,6 @@ import 'package:st_teacher_app/Presentation/Homework/homework_history.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/homework_details_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/teacher_class_response.dart';
 
-
-
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
 import '../model/get_homework_response.dart';
@@ -310,7 +308,9 @@ class CreateHomeworkController extends GetxController {
       // Upload images first and push to contents
       if (imageFiles != null && imageFiles.isNotEmpty) {
         for (final file in imageFiles) {
-          final uploadResult = await apiDataSource.userProfileUpload(imageFile: file);
+          final uploadResult = await apiDataSource.userProfileUpload(
+            imageFile: file,
+          );
 
           final String? imageUrl = uploadResult.fold((failure) {
             CustomSnackBar.showError("Image Upload Failed: ${failure.message}");
@@ -333,11 +333,11 @@ class CreateHomeworkController extends GetxController {
       );
 
       results.fold(
-            (failure) {
+        (failure) {
           if (showLoader) hidePopupLoader();
           AppLogger.log.e(failure.message);
         },
-            (response) async {
+        (response) async {
           await fetchHomeworks();
           if (showLoader) hidePopupLoader();
           if (context != null) {
@@ -360,11 +360,11 @@ class CreateHomeworkController extends GetxController {
       final result = await apiDataSource.getHomeWork();
 
       result.fold(
-            (failure) {
+        (failure) {
           isLoading.value = false;
           Get.snackbar('Error', failure.message);
         },
-            (response) {
+        (response) {
           // ✅ response is GetHomeworkResponse
           final Map<String, List<HomeworkItem>> groups = response.data.groups;
 
@@ -379,12 +379,13 @@ class CreateHomeworkController extends GetxController {
           homeworkList.assignAll(flat);
 
           // build class chips
-          final classes = flat
-              .map((hw) => hw.classNames.trim())
-              .where((s) => s.isNotEmpty)
-              .toSet()
-              .toList()
-            ..sort();
+          final classes =
+              flat
+                  .map((hw) => hw.classNames.trim())
+                  .where((s) => s.isNotEmpty)
+                  .toSet()
+                  .toList()
+                ..sort();
           classNames.assignAll(['All', ...classes]);
 
           isLoading.value = false;
@@ -472,8 +473,7 @@ class CreateHomeworkController extends GetxController {
   Future<String?> getHomeWorkDetails({
     int? classId,
     bool showLoader = true,
-  }) async
-  {
+  }) async {
     try {
       homeworkDetails.value = null;
       if (showLoader) showPopupLoader();
@@ -483,10 +483,10 @@ class CreateHomeworkController extends GetxController {
       );
 
       results.fold(
-            (failure) {
+        (failure) {
           AppLogger.log.e(failure.message);
         },
-            (response) async {
+        (response) async {
           if (showLoader) hidePopupLoader();
           homeworkDetails.value = response;
         },

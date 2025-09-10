@@ -2,6 +2,7 @@ import 'package:dartz/dartz_unsafe.dart' as data;
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Presentation/Announcement%20Screen/Model/category_list_response.dart';
 import '../../../Core/Utility/app_color.dart';
 import '../../../api/data_source/apiDataSource.dart';
 import '../../Homework/model/teacher_class_response.dart';
@@ -18,6 +19,9 @@ class AnnouncementContorller extends GetxController {
   ApiDataSource apiDataSource = ApiDataSource();
   RxList<Announcement> classList = <Announcement>[].obs;
   Rx<AnnouncementDetails?> announcementDetails = Rx<AnnouncementDetails?>(null);
+  var categoryData = <CategoryData>[].obs;
+
+
 
   RxBool isLoading = false.obs;
   final RxList<String> categoryOptions = <String>[].obs;
@@ -64,12 +68,12 @@ class AnnouncementContorller extends GetxController {
       final results = await apiDataSource.announcementDetail(id);
 
       return results.fold(
-            (failure) {
+        (failure) {
           if (showLoader) hidePopupLoader();
           AppLogger.log.e(failure.message);
           return null;
         },
-            (response) {
+        (response) {
           if (showLoader) hidePopupLoader();
           AppLogger.log.i('Announcement Details Fetched ✅');
           announcementDetails.value = response.data; // store in observable
@@ -82,11 +86,12 @@ class AnnouncementContorller extends GetxController {
       return null;
     }
   }
+
   Future<void> createAnnouncement({
     int? classId,
     int? subjectId,
     String category = '',
-    String announcementCategory = '',
+    required int announcementCategoryId ,
     String heading = '',
     String description = '',
     bool publish = false,
@@ -122,7 +127,7 @@ class AnnouncementContorller extends GetxController {
 
         heading: heading,
         category: category,
-        announcementCategory: announcementCategory,
+        announcementCategoryId: announcementCategoryId,
         description: description,
 
         contents: contents,
@@ -145,10 +150,10 @@ class AnnouncementContorller extends GetxController {
     }
   }
 
-  Future<String?> getAnnouncement({bool showLoader = true}) async {
+  Future<String?> getAnnouncement({String type = "general", bool showLoader = true}) async {
     try {
       isLoading.value = true;
-      final results = await apiDataSource.getAnnouncementList();
+      final results = await apiDataSource.getAnnouncementList(type: type);
       return results.fold(
             (failure) {
           isLoading.value = false;
@@ -156,9 +161,8 @@ class AnnouncementContorller extends GetxController {
         },
             (response) async {
           isLoading.value = false;
-          AppLogger.log.i('announcementData List ');
           announcementData.value = response.data;
-          AppLogger.log.i(response.toString());
+          AppLogger.log.i("announcementData List for $type");
         },
       );
     } catch (e) {
@@ -167,6 +171,7 @@ class AnnouncementContorller extends GetxController {
     }
     return null;
   }
+
 
   Future<void> fetch(int id) async {
     try {
@@ -195,6 +200,32 @@ class AnnouncementContorller extends GetxController {
       AppLogger.log.e(e);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<List<CategoryData>?> getCategoryList({bool showLoader = true}) async {
+    try {
+      if (showLoader) showPopupLoader();
+
+      final results = await apiDataSource.getCategoryList();
+
+      return results.fold(
+        (failure) {
+          if (showLoader) hidePopupLoader();
+          AppLogger.log.e(failure.message);
+          return null;
+        },
+        (response) {
+          if (showLoader) hidePopupLoader();
+          AppLogger.log.i('Announcement Details Fetched ✅');
+          categoryData.value = response.data;
+          return response.data; // return data for UI
+        },
+      );
+    } catch (e) {
+      if (showLoader) hidePopupLoader();
+      AppLogger.log.e(e);
+      return null;
     }
   }
 

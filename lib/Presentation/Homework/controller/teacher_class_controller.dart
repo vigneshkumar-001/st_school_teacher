@@ -16,7 +16,7 @@ class TeacherClassController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getTeacherClass();
+
   }
 
   /// Fetch classes from API and optionally select a class/section if provided
@@ -66,11 +66,11 @@ class TeacherClassController extends GetxController {
 
       final results = await apiDataSource.getTeacherClass();
       results.fold(
-            (failure) {
+        (failure) {
           isLoading.value = false;
           AppLogger.log.e(failure.message);
         },
-            (response) {
+        (response) {
           // 🔑 assignAll instead of value =
           classList.assignAll(response.data.classes);
           subjectList.assignAll(response.data.subjects);
@@ -82,7 +82,7 @@ class TeacherClassController extends GetxController {
 
             if (className != null && section != null) {
               selected = classList.firstWhereOrNull(
-                    (c) => c.name == className && c.section == section,
+                (c) => c.name == className && c.section == section,
               );
             }
 
@@ -101,7 +101,6 @@ class TeacherClassController extends GetxController {
       AppLogger.log.e(e);
     }
   }
-
 }
 
 // import 'package:get/get.dart';

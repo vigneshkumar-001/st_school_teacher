@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Core/Utility/app_loader.dart';
 import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
+import '../../Core/Utility/date_and_time_convert.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'homework_create.dart';
@@ -235,7 +237,11 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                                 avatarImage: '',
                                                 mainText: hw.title,
                                                 smaleText: '',
-                                                time: hw.time,
+                                                time:  DateAndTimeConvert.formatDateTime(
+                                                  showTime: true,
+                                                  showDate: false,
+                                                  hw.time.toString(),
+                                                ),
                                                 aText1: ' ',
                                                 aText2: '',
                                                 backRoundColor: bgColor,

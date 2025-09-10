@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Home/home.dart';
+import 'package:st_teacher_app/Presentation/Login%20Screen/change_mobile_number.dart';
 import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
 import '../../../Core/Utility/snack_bar.dart';
@@ -72,7 +73,7 @@ class LoginController extends GetxController {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', response.token);
           String? token = prefs.getString('token');
-          controller.getTeacherClassData();
+          await controller.getTeacherClassData();
           AppLogger.log.i('token = $token');
         },
       );
@@ -82,5 +83,23 @@ class LoginController extends GetxController {
       return e.toString();
     }
     return null;
+  }
+
+  Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    if (token != null && token.isNotEmpty) {
+      accessToken = token;
+      await controller.getTeacherClassData(); // fetch teacher data
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    accessToken = '';
+    Get.offAll(() => ChangeMobileNumber(page: 'splash'));
   }
 }

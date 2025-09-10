@@ -59,11 +59,31 @@ class _AttendanceStartState extends State<AttendanceStart> {
 
   bool morningDone = false;
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //
+  //   attendanceController.getClassList().then((_) async {
+  //     if (attendanceController.classList.isNotEmpty) {
+  //       selectedClass = attendanceController.classList.first;
+  //
+  //       final attendanceData = await attendanceController.getTodayStatus(
+  //         selectedClass.id,
+  //       );
+  //       if (attendanceData != null) {
+  //         _prepareTabs(attendanceData);
+  //       }
+  //       setState(() {});
+  //     }
+  //   });
+  // }
   @override
   void initState() {
     super.initState();
 
-    attendanceController.getClassList().then((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await attendanceController.getClassList();
+
       if (attendanceController.classList.isNotEmpty) {
         selectedClass = attendanceController.classList.first;
 
@@ -73,6 +93,8 @@ class _AttendanceStartState extends State<AttendanceStart> {
         if (attendanceData != null) {
           _prepareTabs(attendanceData);
         }
+
+        // Safe to rebuild here
         setState(() {});
       }
     });
@@ -659,7 +681,23 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                             for (var student in presentStudents)
                                               CommonContainer.StudentsList(
                                                 mainText: student['name'],
-                                                onIconTap: () {},
+                                                onIconTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (
+                                                          context,
+                                                          ) => AttendanceHistoryStudent(
+                                                        studentId:
+                                                        student['id'],
+                                                        classId:
+                                                        selectedClass
+                                                            .id,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                           ] else if (selectedIndex == 1) ...[
                                             for (var student in absentStudents)

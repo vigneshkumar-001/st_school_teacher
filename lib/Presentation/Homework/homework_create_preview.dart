@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
@@ -446,6 +447,24 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                           : '';
 
                                   // Only pass files for upload, do NOT add their paths manually
+                                  // await homeworkController.createHomeWork(
+                                  //   context: context,
+                                  //   showLoader: true,
+                                  //   classId: widget.selectedClassId,
+                                  //   subjectId: widget.subjectId,
+                                  //   heading: widget.heading ?? '',
+                                  //   description: mainDescription,
+                                  //   publish: true,
+                                  //   contents: contents,
+                                  //   imageFiles: [
+                                  //     if (widget.permanentImage != null)
+                                  //       widget.permanentImage!,
+                                  //     ...widget.images.whereType<File>(),
+                                  //   ],
+                                  // );
+                                  // Create and start the stopwatch
+                                  final stopwatch = Stopwatch()..start();
+
                                   await homeworkController.createHomeWork(
                                     context: context,
                                     showLoader: true,
@@ -456,11 +475,17 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     publish: true,
                                     contents: contents,
                                     imageFiles: [
-                                      if (widget.permanentImage != null)
-                                        widget.permanentImage!,
+                                      if (widget.permanentImage != null) widget.permanentImage!,
                                       ...widget.images.whereType<File>(),
                                     ],
                                   );
+
+
+                                  stopwatch.stop();
+
+
+                                  AppLogger.log.i('createHomeWork executed in ${stopwatch.elapsedMilliseconds} ms');
+
                                 },
                                 width: 145,
                                 height: 60,

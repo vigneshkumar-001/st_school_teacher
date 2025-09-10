@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Core/consents.dart';
+import 'package:st_teacher_app/Presentation/Announcement%20Screen/Model/category_list_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance-teacher/model/teacher_attendance_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance-teacher/model/teacher_daily_attendance_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendance_history_response.dart';
@@ -737,7 +738,7 @@ class ApiDataSource extends BaseApiDataSource {
 
     required String heading,
     required String category,
-    required String announcementCategory,
+    required int announcementCategoryId,
     required String description,
 
     required List<Map<String, dynamic>> contents,
@@ -748,7 +749,7 @@ class ApiDataSource extends BaseApiDataSource {
       final body = {
         "classId": classId,
         "category": category,
-        "announcementCategory": announcementCategory,
+        "announcementCategoryId": announcementCategoryId,
         "title": heading,
         "content": description,
 
@@ -773,11 +774,10 @@ class ApiDataSource extends BaseApiDataSource {
   }
 
   Future<Either<Failure, AnnouncementResponse>> getAnnouncementList({
-    int? page,
-    int? limit,
+    required String type,
   }) async {
     try {
-      String url = ApiUrl.listAnnouncement;
+      String url = ApiUrl.listAnnouncement(type: type);
 
       dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
       AppLogger.log.i(response);
@@ -800,7 +800,7 @@ class ApiDataSource extends BaseApiDataSource {
     int id,
   ) async {
     try {
-      String url = ApiUrl.announcementDetail;
+      String url = ApiUrl.announcementDetail(Id: id);
 
       dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
       AppLogger.log.i(response);
@@ -859,7 +859,24 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
+  Future<Either<Failure, CategoryListResponse>> getCategoryList() async {
+    try {
+      String url = ApiUrl.categoriesList;
 
-
-
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(CategoryListResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
 }
