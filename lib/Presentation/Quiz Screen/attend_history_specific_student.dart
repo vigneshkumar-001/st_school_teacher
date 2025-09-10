@@ -608,6 +608,7 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
 }
 */
 
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -642,6 +643,13 @@ class AttendHistorySpecificStudent extends StatefulWidget {
       _AttendHistorySpecificStudentState();
 }
 
+class BorderStyleData {
+  final Color color;
+  final bool dotted;
+
+  BorderStyleData({required this.color, this.dotted = false});
+}
+
 class _AttendHistorySpecificStudentState
     extends State<AttendHistorySpecificStudent> {
   final QuizController c = Get.put(QuizController());
@@ -671,13 +679,44 @@ class _AttendHistorySpecificStudentState
     return numeric.hasMatch(t);
   }
 
-  Color _borderFor(SQOption o) {
-    if (o.isCorrect) return AppColor.green;
-    if (o.selected) return Colors.red;
-    return AppColor.lowLightgray;
+  BorderStyleData _borderFor(SQOption o) {
+    if (o.isCorrect) {
+      return BorderStyleData(color: AppColor.green, dotted: false);
+    }
+    if (o.selected) {
+      return BorderStyleData(
+        color: AppColor.red,
+        dotted: true,
+      ); // 🔴 always dotted
+    }
+    return BorderStyleData(color: AppColor.lowLightgray, dotted: false);
   }
 
   String _letter(int i) => String.fromCharCode(65 + i); // A, B, C...
+
+  Widget _wrapWithBorder({
+    required Widget child,
+    required BorderStyleData style,
+  }) {
+    if (style.dotted) {
+      return DottedBorder(
+        color: style.color,
+        strokeWidth: 1.5,
+        dashPattern: const [6, 3],
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(12),
+        child: child,
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: style.color, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: child,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -801,7 +840,7 @@ class _AttendHistorySpecificStudentState
                   // ),
                   const SizedBox(height: 25),
 
-                  Container(
+                  /* Container(
                     decoration: BoxDecoration(
                       color: AppColor.white,
                       borderRadius: BorderRadius.circular(16),
@@ -863,7 +902,8 @@ class _AttendHistorySpecificStudentState
                                                   ? 0
                                                   : 14,
                                         ),
-                                        child: CommonContainer.quizContainer(
+                                        child:
+                                        CommonContainer.quizContainer(
                                           leftTextNumber: leftLetter,
                                           leftValue: left.text,
                                           rightTextNumber:
@@ -901,6 +941,139 @@ class _AttendHistorySpecificStudentState
                                         leftTextNumber: letter,
                                         leftValue: opt.text,
                                         borderColor: _borderFor(opt),
+                                      ),
+                                    );
+                                  }),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ),*/
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        children: List.generate(data.questions.length, (qIdx) {
+                          final q = data.questions[qIdx];
+                          final number = '${qIdx + 1}.';
+
+                          final options = q.options;
+                          final allNumeric =
+                              options.isNotEmpty &&
+                              options.every((o) => _isNumeric(o.text));
+                          final anyLongText = options.any(
+                            (o) => !_isShort(o.text),
+                          );
+                          final useTwoUp = allNumeric && !anyLongText;
+
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom:
+                                  qIdx == data.questions.length - 1 ? 0 : 28,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomTextField.quizQuestion(
+                                  sno: number,
+                                  text: q.text,
+                                ),
+                                const SizedBox(height: 15),
+
+                                // Two-column numeric short answers
+                                if (useTwoUp)
+                                  ...List.generate((options.length / 2).ceil(), (
+                                    row,
+                                  ) {
+                                    final leftIdx = row * 2;
+                                    final rightIdx = leftIdx + 1;
+
+                                    final left = options[leftIdx];
+                                    final hasRight = rightIdx < options.length;
+                                    final right =
+                                        hasRight ? options[rightIdx] : null;
+
+                                    final leftLetter = _letter(leftIdx);
+                                    final rightLetter =
+                                        hasRight ? _letter(rightIdx) : '';
+
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                            row ==
+                                                    ((options.length / 2)
+                                                            .ceil() -
+                                                        1)
+                                                ? 0
+                                                : 14,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: _wrapWithBorder(
+                                              style: _borderFor(left),
+                                              child:
+                                                  CommonContainer.quizContainer1(
+                                                    isQuizCompleted: true,
+                                                    isSelected: left.selected,
+                                                    onTap: null,
+                                                    leftTextNumber: leftLetter,
+                                                    leftValue: left.text,
+                                                    borderColor:
+                                                        Colors.transparent,
+                                                  ),
+                                            ),
+                                          ),
+                                          if (hasRight)
+                                            const SizedBox(width: 12),
+                                          if (hasRight)
+                                            Expanded(
+                                              child: _wrapWithBorder(
+                                                style: _borderFor(right!),
+                                                child:
+                                                    CommonContainer.quizContainer1(
+                                                      isQuizCompleted: true,
+                                                      isSelected:
+                                                          right!.selected,
+                                                      onTap: null,
+                                                      leftTextNumber:
+                                                          rightLetter,
+                                                      leftValue: right!.text,
+                                                      borderColor:
+                                                          Colors.transparent,
+                                                    ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  })
+                                else
+                                  // Single-column answers
+                                  ...List.generate(options.length, (oIdx) {
+                                    final opt = options[oIdx];
+                                    final letter = _letter(oIdx);
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                            oIdx == options.length - 1 ? 0 : 14,
+                                      ),
+                                      child: _wrapWithBorder(
+                                        style: _borderFor(opt),
+                                        child: CommonContainer.quizContainer1(
+                                          isQuizCompleted: true,
+                                          isSelected: opt.selected,
+                                          onTap: null,
+                                          leftTextNumber: letter,
+                                          leftValue: opt.text,
+                                          borderColor: Colors.transparent,
+                                        ),
                                       ),
                                     );
                                   }),

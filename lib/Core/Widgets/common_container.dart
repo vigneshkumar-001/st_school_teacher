@@ -768,7 +768,7 @@ class CommonContainer {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 25,
+                        horizontal: 15,
                         vertical: 10,
                       ),
                       child: Row(
@@ -1461,6 +1461,7 @@ class CommonContainer {
                         color: AppColor.borderGary,
                       ),
                     ),
+                    SizedBox(width: 20),
                     Expanded(
                       flex: 6,
                       child: CustomTextField.textWithSmall(

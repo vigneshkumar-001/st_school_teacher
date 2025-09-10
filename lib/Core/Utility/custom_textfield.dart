@@ -28,7 +28,7 @@ class CustomTextField {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(sno, style: GoogleFont.ibmPlexSans(fontSize: 16,)),
-        SizedBox(width: 8),
+        SizedBox(width: 10),
         Expanded(
           child: Text(text, style: GoogleFont.ibmPlexSans(fontSize: 16)),
         ),

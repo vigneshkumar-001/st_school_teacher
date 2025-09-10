@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         Image.asset(AppImages.splashBackImage1),
                         Image.asset(AppImages.schoolLogo1),
                         Image.asset(AppImages.splashBackImage2),
-                        SizedBox(height: 35),
+                        SizedBox(height: 10),
                         Container(
                           width: width,
                           height: 12,
