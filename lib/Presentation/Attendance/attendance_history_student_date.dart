@@ -51,7 +51,7 @@ class _AttendanceHistoryStudentDateState
   late DateTime selectedDate;
   bool isLoading = true;
 
-  @override
+/*  @override
   void initState() {
     super.initState();
     selectedDate = widget.selectedDate;
@@ -61,6 +61,20 @@ class _AttendanceHistoryStudentDateState
       _fetchAttendance();
       if (attendanceController.classList.isNotEmpty) {
         selectedClass = attendanceController.classList.first;
+      }
+    });
+  }*/
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.selectedDate;
+
+    // Delay GetX updates until after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await attendanceController.getClassList();
+      if (attendanceController.classList.isNotEmpty) {
+        selectedClass = attendanceController.classList.first;
+        _fetchAttendance();
       }
     });
   }

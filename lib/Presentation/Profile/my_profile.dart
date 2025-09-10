@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:st_teacher_app/Core/Utility/app_loader.dart';
+import 'package:st_teacher_app/Presentation/Login%20Screen/controller/login_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
@@ -20,6 +21,7 @@ class _MyProfileState extends State<MyProfile> {
   Map<String, String?> expandedSections = {};
 
   final TeacherDataController controller = Get.put(TeacherDataController());
+  final LoginController loginController = Get.put(LoginController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -278,17 +280,18 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                Navigator.pushReplacement(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (context) =>
-                                                  ChangeMobileNumber(
-                                                              page: 'splash',
-                                                            ),
-
-                                                  ),
-                                                );
+                                                loginController.logout();
+                                                // Navigator.pushReplacement(
+                                                //   context,
+                                                //   MaterialPageRoute(
+                                                //     builder:
+                                                //         (context) =>
+                                                //   ChangeMobileNumber(
+                                                //               page: 'splash',
+                                                //             ),
+                                                //
+                                                //   ),
+                                                // );
                                               },
                                               child: Text(
                                                 'Log Out',

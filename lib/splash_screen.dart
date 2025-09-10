@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:st_teacher_app/Presentation/Announcement%20Screen/controller/announcement_contorller.dart';
+import 'package:st_teacher_app/Presentation/Login%20Screen/controller/login_controller.dart';
 
 import '../Core/Utility/app_color.dart';
 import 'Core/Utility/app_images.dart';
@@ -19,11 +22,37 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   double _progress = 0.0;
   final TeacherClassController controller = Get.put(TeacherClassController());
+  final AnnouncementContorller announcementContorller = Get.put(
+    AnnouncementContorller(),
+  );
+  final LoginController loginController = Get.put(LoginController());
   @override
   void initState() {
     super.initState();
-    controller.getTeacherClass();
-    _startLoading();
+    _checkLoginStatus();
+    // controller.getTeacherClass();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   announcementContorller.getCategoryList(showLoader: false);
+    // });
+    // _startLoading();
+  }
+
+  void _checkLoginStatus() async {
+    final isLoggedIn = await loginController.isLoggedIn();
+    if (isLoggedIn) {
+      // Skip splash and go to Home
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Home(page: 'homeScreen')),
+      );
+    } else {
+      // First time user → continue splash
+      controller.getTeacherClass();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        announcementContorller.getCategoryList(showLoader: false);
+      });
+      _startLoading();
+    }
   }
 
   void _startLoading() {
