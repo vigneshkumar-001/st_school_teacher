@@ -1071,7 +1071,8 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                     color: AppColor.black,
                                   ),
                                 ),
-                                const SizedBox(width: 25),
+                                 // SizedBox(width: 15),
+                                Spacer(),
                                 CommonContainer.addMore(
                                   onTap:
                                       () => setState(
@@ -1082,7 +1083,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                   mainText: 'Image',
                                   imagePath: AppImages.picherImageDark,
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 8),
                                 CommonContainer.addMore(
                                   onTap:
                                       () => setState(
@@ -1093,7 +1094,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                   mainText: 'Paragraph',
                                   imagePath: AppImages.paragraph,
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 8),
                                 CommonContainer.addMore(
                                   onTap:
                                       () => setState(

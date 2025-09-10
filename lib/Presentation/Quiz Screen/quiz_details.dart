@@ -845,7 +845,6 @@ class _QuizDetailsState extends State<QuizDetails> {
     });
   }
 
-
   // ---------- small helpers ----------
   bool _isShort(String s) {
     final t = s.trim();
@@ -903,7 +902,6 @@ class _QuizDetailsState extends State<QuizDetails> {
                     border: Border.all(color: AppColor.lightgray, width: 0.3),
                   ),
                   const SizedBox(height: 35),
-
 
                   // Title from API
                   Center(
@@ -1074,7 +1072,7 @@ class _QuizDetailsState extends State<QuizDetails> {
                   // Posted on (time + date from API)
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 64,
+                      horizontal: 45,
                       vertical: 25,
                     ),
                     child: Container(

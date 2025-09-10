@@ -105,7 +105,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                     const SizedBox(height: 10),
                     if (widget.page == 'splash') ...[
                       Image.asset(AppImages.schoolLogo1),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Text(
@@ -128,7 +128,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                           width: 0.3,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Text(
@@ -248,7 +248,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 25),
+                    SizedBox(height: 10),
                     Obx(() {
                       return AppButton.button(
                         text: 'Get OTP',
@@ -257,9 +257,11 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                                 ? SizedBox(
                                   height: 20,
                                   width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 )
                                 : null,

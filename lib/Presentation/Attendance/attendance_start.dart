@@ -348,7 +348,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
+                            horizontal: 25,
                             vertical: 13,
                           ),
                           child: SizedBox(
@@ -406,7 +406,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
+                            horizontal: 30,
                             vertical: 13,
                           ),
                           child: SizedBox(

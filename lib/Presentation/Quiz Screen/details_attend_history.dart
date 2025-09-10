@@ -1075,11 +1075,11 @@ class _DetailsAttendHistoryState extends State<DetailsAttendHistory> {
                                                 AppLogger.log.i(
                                                   '${u.id} =  ${u.name} = ${q.id}',
                                                 );
-                                                  _navigateToStudent(
-                                                    studentId: u.id,
-                                                    name: name,
-                                                    quizId: q.id,
-                                                  );
+                                                _navigateToStudent(
+                                                  studentId: u.id,
+                                                  name: name,
+                                                  quizId: q.id,
+                                                );
                                               },
                                               title: Text(
                                                 name,
