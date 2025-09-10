@@ -2185,6 +2185,7 @@
 //   }
 // }
 // */
+
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -2212,6 +2213,7 @@ class AnnouncementScreen extends StatefulWidget {
 
 class _AnnouncementScreenState extends State<AnnouncementScreen> {
   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
+  int selectedIndex = 0;
   final List<Map<String, String>> subjects = [
     {'subject': 'Tamil', 'mark': '70'},
     {'subject': 'English', 'mark': '70'},
@@ -2827,22 +2829,21 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         }),
       ),
       bottomNavigationBar: Container(
-        //         decoration: const BoxDecoration(color: AppColor.white),
-        //         child: Padding(
-        //           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-        //           child: CommonContainer.statusChips(
-        //             horizontalPadding: 60,
-        //             tabs: const [
-        //               {"label": "General"},
-        //               {"label": "Teacher"},
-        //             ],
-        //             selectedIndex: selectedIndex,
-        //             onSelect: (i) => setState(() => selectedIndex = i),
-        //           ),
-        //         ),
-        //       ),
-        //     );
-      ),
-    );
+                decoration: const BoxDecoration(color: AppColor.white),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  child: CommonContainer.statusChips(
+                    horizontalPadding: 60,
+                    tabs: const [
+                      {"label": "General"},
+                      {"label": "Teacher"},
+                    ],
+                    selectedIndex: selectedIndex,
+                    onSelect: (i) => setState(() => selectedIndex = i),
+                  ),
+                ),
+              ),
+            );
+
   }
 }

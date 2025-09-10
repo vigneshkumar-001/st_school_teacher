@@ -1236,7 +1236,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
     return int.parse(m.group(1)!);
   }
 
-
   Future<void> _pickMinutes(BuildContext context) async {
     const minValue = 1;
     const maxValue = 300;
@@ -1261,14 +1260,18 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 40, height: 4,
+                  width: 40,
+                  height: 4,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text('Select Minutes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                const Text(
+                  'Select Minutes',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 8),
 
                 SizedBox(
@@ -1286,17 +1289,56 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                 SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: TextButton(
                         onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Cancel'),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFont.ibmPlexSans(
+                            color: AppColor.blue,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     Expanded(
-                      child:ElevatedButton(
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _minutes = temp; // save picked minutes
+                            timeLimitController.text =
+                                '$_minutes min'; // show in the field
+                            _timeLimitInvalid =
+                                _minutes <= 0 ? true : false; // clear error
+                          });
+                          Navigator.pop(ctx); // close the sheet
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColor.blue,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            child: Center(
+                              child: Text(
+                                "Done",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColor.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /*  ElevatedButton(
                         onPressed: () {
                           setState(() {
                             _minutes = temp;                         // save picked minutes
@@ -1306,8 +1348,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                           Navigator.pop(ctx); // close the sheet
                         },
                         child: Text('Done'),
-                      ),
-
+                      ),*/
                     ),
                   ],
                 ),
@@ -1318,7 +1359,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       },
     );
   }
-
 
   void _showError(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
@@ -1383,7 +1423,11 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       // At least 1 correct answer
       if (!q.answers.any((a) => a.isCorrect)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Question ${qIndex + 1}: mark at least one correct answer")),
+          SnackBar(
+            content: Text(
+              "Question ${qIndex + 1}: mark at least one correct answer",
+            ),
+          ),
         );
         hasError = true;
       }
@@ -1400,18 +1444,23 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       "heading": headingController.text.trim(),
       "timeLimit": timeNum, // <- clean numeric minutes
       "publish": true,
-      "questions": questionList.map((q) {
-        return {
-          "text": q.question.trim(),
-          "options": q.answers.map((a) => {
-            "text": a.text.trim(),
-            "isCorrect": a.isCorrect,
+      "questions":
+          questionList.map((q) {
+            return {
+              "text": q.question.trim(),
+              "options":
+                  q.answers
+                      .map(
+                        (a) => {
+                          "text": a.text.trim(),
+                          "isCorrect": a.isCorrect,
+                        },
+                      )
+                      .toList(),
+            };
           }).toList(),
-        };
-      }).toList(),
     };
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -1988,7 +2037,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                       _timeLimitInvalid = _minutes <= 0;
                                     });
                                   },
-
                                 ),
                               ),
                             ),
@@ -2301,7 +2349,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                               if (payload == null) return;
 
                               AppLogger.log.i(payload);
-                              await controller.quizCreate(context,payload);
+                              await controller.quizCreate(context, payload);
                             },
                             width: 145,
                             height: 60,
