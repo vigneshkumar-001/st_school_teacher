@@ -1830,7 +1830,10 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
 
     if (selected != null) {
       setState(() {
-        Category.text = selected.name;
+        Category.text =
+            selected.name
+                .replaceAll('_', ' ')
+                .toUpperCase(); // <-- convert here
         selectedCategoryId = selected.id; // 👈 id for insert
         showCategoryClear = true;
       });
@@ -2579,11 +2582,9 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                               ),
                             ),
                             const SizedBox(height: 10),
-
                             GestureDetector(
                               onTap: _openCategorySheet, // open bottom sheet
                               child: AbsorbPointer(
-                                // prevent keyboard
                                 child: CommonContainer.fillingContainer(
                                   onDetailsTap: () {
                                     Category.clear();
@@ -2594,7 +2595,9 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                                           ? AppImages.close
                                           : AppImages.downArrow,
                                   imageColor: AppColor.gray,
-                                  text: '',
+                                  text:
+                                      Category.text
+                                          .toUpperCase(), // <-- display uppercase
                                   controller: Category,
                                   verticalDivider: false,
                                   imageSize: 11,
@@ -2602,6 +2605,27 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                               ),
                             ),
 
+                            // GestureDetector(
+                            //   onTap: _openCategorySheet, // open bottom sheet
+                            //   child: AbsorbPointer(
+                            //     // prevent keyboard
+                            //     child: CommonContainer.fillingContainer(
+                            //       onDetailsTap: () {
+                            //         Category.clear();
+                            //         setState(() => showCategoryClear = false);
+                            //       },
+                            //       imagePath:
+                            //           showCategoryClear
+                            //               ? AppImages.close
+                            //               : AppImages.downArrow,
+                            //       imageColor: AppColor.gray,
+                            //       text: '',
+                            //       controller: Category,
+                            //       verticalDivider: false,
+                            //       imageSize: 11,
+                            //     ),
+                            //   ),
+                            // ),
                             const SizedBox(height: 25),
 
                             // Heading
