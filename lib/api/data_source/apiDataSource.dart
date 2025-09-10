@@ -80,6 +80,49 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
+  Future<Either<Failure, LoginResponse>> changeMobileNumberLogin(
+    String phone,
+  ) async {
+    try {
+      String url = ApiUrl.changePhone;
+
+      dynamic response = await Request.sendRequest(
+        url,
+        {"newPhone": phone},
+        'Post',
+        false,
+      );
+      AppLogger.log.i(response);
+      if (response is! DioException) {
+        // If status code is success
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (response.data['status'] == true) {
+            return Right(LoginResponse.fromJson(response.data));
+          } else {
+            return Left(
+              ServerFailure(response.data['message'] ?? "Login failed"),
+            );
+          }
+        } else {
+          // ❗ API returned non-success code but has JSON error message
+          return Left(
+            ServerFailure(response.data['message'] ?? "Something went wrong"),
+          );
+        }
+      }
+      // Is DioException
+      else {
+        final errorData = response.response?.data;
+        if (errorData is Map && errorData.containsKey('message')) {
+          return Left(ServerFailure(errorData['message']));
+        }
+        return Left(ServerFailure(response.message ?? "Unknown Dio error"));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
   Future<Either<Failure, LoginResponse>> otpLogin({
     required String phone,
     required String otp,
@@ -90,6 +133,50 @@ class ApiDataSource extends BaseApiDataSource {
       dynamic response = await Request.sendRequest(
         url,
         {"otp": otp, "phone": phone},
+        'Post',
+        false,
+      );
+      AppLogger.log.i(response);
+      if (response is! DioException) {
+        // If status code is success
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (response.data['status'] == true) {
+            return Right(LoginResponse.fromJson(response.data));
+          } else {
+            return Left(
+              ServerFailure(response.data['message'] ?? "Login failed"),
+            );
+          }
+        } else {
+          // ❗ API returned non-success code but has JSON error message
+          return Left(
+            ServerFailure(response.data['message'] ?? "Something went wrong"),
+          );
+        }
+      }
+      // Is DioException
+      else {
+        final errorData = response.response?.data;
+        if (errorData is Map && errorData.containsKey('message')) {
+          return Left(ServerFailure(errorData['message']));
+        }
+        return Left(ServerFailure(response.message ?? "Unknown Dio error"));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, LoginResponse>> changeNumberOtp({
+    required String phone,
+    required String otp,
+  }) async {
+    try {
+      String url = ApiUrl.changePhoneVerify;
+
+      dynamic response = await Request.sendRequest(
+        url,
+        {"newPhone": phone, "otp": otp},
         'Post',
         false,
       );
