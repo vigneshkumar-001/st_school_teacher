@@ -38,12 +38,14 @@ class TeacherData {
 class Profile {
   final String staffName;
   final String mobile;
+  final String profileImg;
 
-  Profile({required this.staffName, required this.mobile});
+  Profile({required this.staffName, required this.mobile,required this.profileImg});
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
       staffName: json['staff_name'] ?? '',
+      profileImg: json['profile_img'] ?? '',
       mobile: json['mobile'] ?? '',
     );
   }

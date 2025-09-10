@@ -23,39 +23,79 @@ class TeacherAttendanceController extends GetxController {
   void onInit() {
     super.onInit();
   }
-
   Future<void> getTeacherAttendanceMonth({
-    required month,
-    required year,
-    bool showLoader = false,
+    required int month,
+    required int year,
+    bool showLoader = false, // true = use popup loader
   }) async {
+    // First-load = no cached data and not using popup loader
+    final bool isFirstLoad = teacherAttendanceData.value == null && !showLoader;
+
+    if (isFirstLoad) {
+      isLoading.value = true;        // show full-page spinner only on first load
+    } else if (showLoader) {
+      showPopupLoader();             // month-change → popup loader
+    }
+
     try {
-      isLoading.value = true;
-      // if (showLoader) showPopupLoader();
       final results = await apiDataSource.getTeacherAttendanceMonth(
         month: month,
         year: year,
       );
+
       results.fold(
-        (failure) {
-          isLoading.value = false;
-          // if (showLoader) hidePopupLoader(); // hide popup loader
+            (failure) {
           AppLogger.log.e(failure.message);
         },
-        (response) async {
-          isLoading.value = false;
-          // if (showLoader) hidePopupLoader();
-          teacherAttendanceData.value = response; // ✅ store full response
+            (response) async {
+          teacherAttendanceData.value = response;
           AppLogger.log.i(response.message);
         },
       );
     } catch (e) {
-      //isLoading.value = false;
-      if (showLoader) hidePopupLoader();
       AppLogger.log.e(e);
+    } finally {
+      if (isFirstLoad) {
+        isLoading.value = false;     // hide full-page spinner
+      }
+      if (showLoader) {
+        hidePopupLoader();           // hide popup loader
+      }
     }
-    return null;
   }
+
+  // Future<void> getTeacherAttendanceMonth({
+  //   required month,
+  //   required year,
+  //   bool showLoader = false,
+  // }) async {
+  //   try {
+  //     //isLoading.value = true;
+  //     if (showLoader) showPopupLoader();
+  //     final results = await apiDataSource.getTeacherAttendanceMonth(
+  //       month: month,
+  //       year: year,
+  //     );
+  //     results.fold(
+  //       (failure) {
+  //         //isLoading.value = false;
+  //         if (showLoader) hidePopupLoader(); // hide popup loader
+  //         AppLogger.log.e(failure.message);
+  //       },
+  //       (response) async {
+  //        // isLoading.value = false;
+  //        if (showLoader) hidePopupLoader();
+  //         teacherAttendanceData.value = response;
+  //         AppLogger.log.i(response.message);
+  //       },
+  //     );
+  //   } catch (e) {
+  //     isLoading.value = false;
+  //     // if (showLoader) hidePopupLoader();
+  //     AppLogger.log.e(e);
+  //   }
+  //   return null;
+  // }
 
   Future<TeacherDailyAttendanceData?> getTeacherDailyAttendance({
     required DateTime date,

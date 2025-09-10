@@ -145,26 +145,26 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 SizedBox(height: 20),
 
-                CommonContainer.Menu_Students(
-                  Start: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ExamCreate()),
-                    );
-                  },
-                  onIconTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ExamHistory()),
-                    );
-                  },
-
-                  mainText: 'Exam',
-                  subText: 'Create',
-                  image: AppImages.Exam,
-                  addButton: true,
-                ),
-                SizedBox(height: 20),
+                // CommonContainer.Menu_Students(
+                //   Start: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => ExamCreate()),
+                //     );
+                //   },
+                //   onIconTap: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => ExamHistory()),
+                //     );
+                //   },
+                //
+                //   mainText: 'Exam',
+                //   subText: 'Create',
+                //   image: AppImages.Exam,
+                //   addButton: true,
+                // ),
+                // SizedBox(height: 20),
                 CommonContainer.Menu_Students(
                   Start: () {
                     Navigator.push(

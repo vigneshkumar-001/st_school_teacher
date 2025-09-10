@@ -21,8 +21,6 @@ class AnnouncementContorller extends GetxController {
   Rx<AnnouncementDetails?> announcementDetails = Rx<AnnouncementDetails?>(null);
   var categoryData = <CategoryData>[].obs;
 
-
-
   RxBool isLoading = false.obs;
   final RxList<String> categoryOptions = <String>[].obs;
   final RxBool isCategoryLoading = false.obs;
@@ -91,7 +89,7 @@ class AnnouncementContorller extends GetxController {
     int? classId,
     int? subjectId,
     String category = '',
-    required int announcementCategoryId ,
+    required int announcementCategoryId,
     String heading = '',
     String description = '',
     bool publish = false,
@@ -139,8 +137,10 @@ class AnnouncementContorller extends GetxController {
           AppLogger.log.e(failure.message);
         },
         (response) async {
+          await getAnnouncement(type: 'general');
           if (showLoader) hidePopupLoader();
           Navigator.pop(context!);
+
           Get.off(AnnouncementScreen());
         },
       );
@@ -150,16 +150,19 @@ class AnnouncementContorller extends GetxController {
     }
   }
 
-  Future<String?> getAnnouncement({String type = "general", bool showLoader = true}) async {
+  Future<String?> getAnnouncement({
+    String type = "general",
+    bool showLoader = true,
+  }) async {
     try {
       isLoading.value = true;
       final results = await apiDataSource.getAnnouncementList(type: type);
       return results.fold(
-            (failure) {
+        (failure) {
           isLoading.value = false;
           AppLogger.log.e(failure.message);
         },
-            (response) async {
+        (response) async {
           isLoading.value = false;
           announcementData.value = response.data;
           AppLogger.log.i("announcementData List for $type");
@@ -171,7 +174,6 @@ class AnnouncementContorller extends GetxController {
     }
     return null;
   }
-
 
   Future<void> fetch(int id) async {
     try {

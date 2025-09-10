@@ -2213,9 +2213,9 @@ class AnnouncementScreen extends StatefulWidget {
 
 class _AnnouncementScreenState extends State<AnnouncementScreen> {
   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
- 
+
   int selectedIndex = 0; // 0 = General, 1 = Teacher
- 
+
   final List<Map<String, String>> subjects = [
     {'subject': 'Tamil', 'mark': '70'},
     {'subject': 'English', 'mark': '70'},
@@ -2606,7 +2606,6 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                   //       fit: BoxFit.cover,
                   //     ),
                   //   ),
-
                   const SizedBox(height: 20),
 
                   // Title
@@ -2630,9 +2629,9 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        DateFormat(
-                          'dd-MMM-yyyy',
-                        ).format(DateTime.parse(details?.notifyDate.toString() ?? '')),
+                        DateFormat('dd-MMM-yyyy').format(
+                          DateTime.parse(details?.notifyDate.toString() ?? ''),
+                        ),
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -2642,7 +2641,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
 
                   // Content
                   Text(
-                    details?.content.toString()?? '',
+                    details?.content.toString() ?? '',
                     style: const TextStyle(fontSize: 16, height: 1.5),
                   ),
 
@@ -2709,6 +2708,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   @override
   void initState() {
     super.initState();
+    controller.getCategoryList();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (controller.announcementData.value == null) {
         controller.getAnnouncement(type: "general");
@@ -2803,7 +2803,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: CommonContainer.announcementsScreen(
                     mainText: item.announcementCategory,
-                    backRoundImage: AppImages.announcement1,
+                    backRoundImage: item.image,
                     iconData: CupertinoIcons.clock_fill,
                     additionalText1: "Date",
                     additionalText2: DateFormat(
@@ -2828,7 +2828,6 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         }),
       ),
       bottomNavigationBar: Container(
- 
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: const BoxDecoration(color: Colors.white),
         child: Row(
@@ -2872,6 +2871,5 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         ),
       ),
     );
- 
   }
 }

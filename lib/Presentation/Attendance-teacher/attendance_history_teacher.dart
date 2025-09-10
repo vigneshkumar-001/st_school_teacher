@@ -127,7 +127,12 @@ class _AttendanceHistoryTeacherState extends State<AttendanceHistoryTeacher> {
           final data =
               teacherAttendanceController.teacherAttendanceData.value?.data;
 
-          if (teacherAttendanceController.isLoading.value) {
+          final isInitialLoading =
+              teacherAttendanceController.isLoading.value &&
+              teacherAttendanceController.teacherAttendanceData.value == null;
+
+          if (isInitialLoading) {
+            // full-page loader ONLY for very first fetch
             return Center(child: AppLoader.circularLoader());
           }
 
@@ -416,12 +421,14 @@ class _AttendanceHistoryTeacherState extends State<AttendanceHistoryTeacher> {
                               ),
 
                               SizedBox(height: 15),
-                              Text(
-                                "${data.fullDayPresentCount} Out of ${data.totalWorkingDays}",
-                                style: GoogleFont.ibmPlexSans(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColor.gray,
+                              Center(
+                                child: Text(
+                                  "${data.fullDayPresentCount} Out of ${data.totalWorkingDays}",
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColor.gray,
+                                  ),
                                 ),
                               ),
                             ],
