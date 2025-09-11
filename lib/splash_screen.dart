@@ -21,7 +21,9 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   double _progress = 0.0;
   final TeacherClassController controller = Get.put(TeacherClassController());
   final TeacherDataController imgData = Get.put(TeacherDataController());
@@ -32,50 +34,61 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
-    // controller.getTeacherClass();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   announcementContorller.getCategoryList(showLoader: false);
-    // });
-    // _startLoading();
+
+    // Animation controller for 12 seconds
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    );
+
+    _controller.addListener(() {
+      setState(() {
+        _progress = _controller.value; // 0.0 -> 1.0
+      });
+    });
+
+    _controller.forward(); // start animation
+
+    // Check login after 12 seconds
+    Future.delayed(const Duration(seconds: 12), () {
+      _checkLoginStatus();
+    });
   }
+
+  // void _checkLoginStatus() async {
+  //   final isLoggedIn = await loginController.isLoggedIn();
+  //   if (isLoggedIn) {
+  //     // Skip splash and go to Home
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => Home(page: 'homeScreen')),
+  //     );
+  //   } else {
+  //     // First time user → continue splash
+  //     controller.getTeacherClass();
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       announcementContorller.getCategoryList(showLoader: false);
+  //       imgData.getTeacherClassData();
+  //     });
+  //     _startLoading();
+  //   }
+  // }
 
   void _checkLoginStatus() async {
     final isLoggedIn = await loginController.isLoggedIn();
     if (isLoggedIn) {
-      // Skip splash and go to Home
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Home(page: 'homeScreen')),
       );
     } else {
-      // First time user → continue splash
-      controller.getTeacherClass();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        announcementContorller.getCategoryList(showLoader: false);
-        imgData.getTeacherClassData( );
-      });
-      _startLoading();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangeMobileNumber(page: 'splash'),
+        ),
+      );
     }
-  }
-
-  void _startLoading() {
-    Timer.periodic(const Duration(milliseconds: 400), (timer) {
-      setState(() {
-        _progress += 0.1;
-        if (_progress >= 1.0) {
-          _progress = 1.0;
-          timer.cancel();
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChangeMobileNumber(page: 'splash'),
-            ),
-          );
-        }
-      });
-    });
   }
 
   @override
@@ -103,41 +116,37 @@ class _SplashScreenState extends State<SplashScreen> {
                           height: 12,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColor.blue, width: 2),
+                            border: Border.all(
+                              color: AppColor.blueG2,
+                              width: 2,
+                            ),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(1.5),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
-                              child: TweenAnimationBuilder<double>(
-                                tween: Tween(begin: 0, end: _progress),
-                                duration: const Duration(milliseconds: 500),
-                                builder: (context, value, _) {
-                                  return Stack(
-                                    children: [
-                                      Container(color: AppColor.white),
-                                      FractionallySizedBox(
-                                        alignment: Alignment.centerLeft,
-                                        widthFactor: value,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                AppColor.blueG1,
-                                                AppColor.blue,
-                                              ],
-                                              begin: Alignment.centerLeft,
-                                              end: Alignment.centerRight,
-                                            ),
-                                          ),
+                              child: Stack(
+                                children: [
+                                  Container(color: AppColor.white),
+                                  FractionallySizedBox(
+                                    alignment: Alignment.centerLeft,
+                                    widthFactor:
+                                        _progress, // updated with controller
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            AppColor.blueG1,
+                                            AppColor.blueG2,
+                                          ],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
                                         ),
                                       ),
-                                    ],
-                                  );
-                                },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

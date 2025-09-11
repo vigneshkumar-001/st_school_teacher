@@ -1125,11 +1125,8 @@ class BorderStyleData {
 //   }
 // }
 
-
-
-
-
-class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStudent> {
+class _AttendHistorySpecificStudentState
+    extends State<AttendHistorySpecificStudent> {
   final QuizController c = Get.put(QuizController());
   final QuizController quizController = Get.put(QuizController());
   @override
@@ -1154,7 +1151,10 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
   String _letter(int i) => String.fromCharCode(65 + i);
 
   // Border wrapper for option containers
-  Widget _wrapWithBorder({required Widget child, required BorderStyleData style}) {
+  Widget _wrapWithBorder({
+    required Widget child,
+    required BorderStyleData style,
+  }) {
     if (style.dotted) {
       return DottedBorder(
         color: style.color,
@@ -1177,8 +1177,10 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
 
   // Determine border style for each option
   BorderStyleData _borderFor(SQOption option) {
-    if (option.isCorrect) return BorderStyleData(color: AppColor.green, dotted: false);
-    if (option.selected && !option.isCorrect) return BorderStyleData(color: AppColor.red, dotted: true);
+    if (option.isCorrect)
+      return BorderStyleData(color: AppColor.green, dotted: false);
+    if (option.selected && !option.isCorrect)
+      return BorderStyleData(color: AppColor.red, dotted: true);
     return BorderStyleData(color: Colors.transparent, dotted: false);
   }
 
@@ -1197,7 +1199,10 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
           ),
         ),
         const SizedBox(width: 6),
-        Text(label, style: GoogleFont.inter(fontSize: 11, color: AppColor.gray)),
+        Text(
+          label,
+          style: GoogleFont.inter(fontSize: 11, color: AppColor.gray),
+        ),
       ],
     );
   }
@@ -1225,9 +1230,10 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
             );
           }
 
-          final displayName = widget.studentName.isNotEmpty
-              ? widget.studentName
-              : data.student.name;
+          final displayName =
+              widget.studentName.isNotEmpty
+                  ? widget.studentName
+                  : data.student.name;
 
           return SingleChildScrollView(
             child: Padding(
@@ -1297,12 +1303,19 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
                           final number = '${qIdx + 1}.';
                           final options = q.options;
 
-                          final allNumeric = options.isNotEmpty && options.every((o) => _isNumeric(o.text));
-                          final anyLongText = options.any((o) => !_isShort(o.text));
+                          final allNumeric =
+                              options.isNotEmpty &&
+                              options.every((o) => _isNumeric(o.text));
+                          final anyLongText = options.any(
+                            (o) => !_isShort(o.text),
+                          );
                           final useTwoUp = allNumeric && !anyLongText;
 
                           return Padding(
-                            padding: EdgeInsets.only(bottom: qIdx == data.questions.length - 1 ? 0 : 28),
+                            padding: EdgeInsets.only(
+                              bottom:
+                                  qIdx == data.questions.length - 1 ? 0 : 28,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -1314,44 +1327,66 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
 
                                 // Two-column numeric options
                                 if (useTwoUp)
-                                  ...List.generate((options.length / 2).ceil(), (row) {
+                                  ...List.generate((options.length / 2).ceil(), (
+                                    row,
+                                  ) {
                                     final leftIdx = row * 2;
                                     final rightIdx = leftIdx + 1;
 
                                     final SQOption left = options[leftIdx];
-                                    final bool hasRight = rightIdx < options.length;
-                                    final SQOption? right = hasRight ? options[rightIdx] : null;
+                                    final bool hasRight =
+                                        rightIdx < options.length;
+                                    final SQOption? right =
+                                        hasRight ? options[rightIdx] : null;
 
                                     return Padding(
-                                      padding: EdgeInsets.only(bottom: row == ((options.length / 2).ceil() - 1) ? 0 : 14),
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                            row ==
+                                                    ((options.length / 2)
+                                                            .ceil() -
+                                                        1)
+                                                ? 0
+                                                : 14,
+                                      ),
                                       child: Row(
                                         children: [
                                           Expanded(
                                             child: _wrapWithBorder(
                                               style: _borderFor(left),
-                                              child: CommonContainer.quizContainer1(
-                                                leftTextNumber: _letter(leftIdx),
-                                                leftValue: left.text,
-                                                isSelected: left.isCorrect,
-                                                borderColor: Colors.transparent,
-                                                onTap: null,
-                                                isQuizCompleted: false,
-                                              ),
+                                              child:
+                                                  CommonContainer.quizContainer1(
+                                                    leftTextNumber: _letter(
+                                                      leftIdx,
+                                                    ),
+                                                    leftValue: left.text,
+                                                    isSelected: left.isCorrect,
+                                                    borderColor:
+                                                        Colors.transparent,
+                                                    onTap: null,
+                                                    isQuizCompleted: false,
+                                                  ),
                                             ),
                                           ),
-                                          if (hasRight) const SizedBox(width: 12),
+                                          if (hasRight)
+                                            const SizedBox(width: 12),
                                           if (hasRight)
                                             Expanded(
                                               child: _wrapWithBorder(
                                                 style: _borderFor(right!),
-                                                child: CommonContainer.quizContainer1(
-                                                  leftTextNumber: _letter(rightIdx),
-                                                  leftValue: right.text,
-                                                  isSelected: right.isCorrect,
-                                                  borderColor: Colors.transparent,
-                                                  onTap: null,
-                                                  isQuizCompleted: false,
-                                                ),
+                                                child:
+                                                    CommonContainer.quizContainer1(
+                                                      leftTextNumber: _letter(
+                                                        rightIdx,
+                                                      ),
+                                                      leftValue: right.text,
+                                                      isSelected:
+                                                          right.isCorrect,
+                                                      borderColor:
+                                                          Colors.transparent,
+                                                      onTap: null,
+                                                      isQuizCompleted: false,
+                                                    ),
                                               ),
                                             ),
                                         ],
@@ -1359,11 +1394,14 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
                                     );
                                   })
                                 else
-                                // Single-column options
+                                  // Single-column options
                                   ...List.generate(options.length, (oIdx) {
                                     final SQOption opt = options[oIdx];
                                     return Padding(
-                                      padding: EdgeInsets.only(bottom: oIdx == options.length - 1 ? 0 : 14),
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                            oIdx == options.length - 1 ? 0 : 14,
+                                      ),
                                       child: _wrapWithBorder(
                                         style: _borderFor(opt),
                                         child: CommonContainer.quizContainer1(
@@ -1384,20 +1422,6 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 20),
-
-                  // Legend for correct/incorrect
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _legendDot(border: AppColor.green, label: 'Correct'),
-                      const SizedBox(width: 16),
-                      _legendDot(border: AppColor.red, label: 'Incorrect'),
-                    ],
-                  ),
-
-                  const SizedBox(height: 30),
                 ],
               ),
             ),
@@ -1407,4 +1431,3 @@ class _AttendHistorySpecificStudentState extends State<AttendHistorySpecificStud
     );
   }
 }
-
