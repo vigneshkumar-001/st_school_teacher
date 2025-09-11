@@ -237,13 +237,13 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 25,vertical: 20),
                                     child: Row(
                                       children: [
-                                        CircleAvatar(
-                                          child: Image.asset(AppImages.avatar1),
-                                        ),
-                                        SizedBox(width: 10),
+                                        // CircleAvatar(
+                                        //   child: Image.asset(AppImages.avatar1),
+                                        // ),
+                                        // SizedBox(width: 10),
                                         Text(
                                           widget.subjects ?? '',
                                           style: GoogleFont.inter(
@@ -251,7 +251,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                             color: AppColor.lightBlack,
                                           ),
                                         ),
-                                        SizedBox(width: 20),
+
                                       ],
                                     ),
                                   ),
