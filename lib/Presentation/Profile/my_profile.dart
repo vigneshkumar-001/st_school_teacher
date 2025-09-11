@@ -417,7 +417,7 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                           ),
                                           title: Text(
-                                            'Log Out',
+                                            'Logout',
                                             style: GoogleFont.ibmPlexSans(
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -474,7 +474,7 @@ class _MyProfileState extends State<MyProfile> {
                                       Image.asset(AppImages.logOut, height: 20),
                                       SizedBox(width: 15),
                                       Text(
-                                        'LogOut',
+                                        'Logout',
                                         style: GoogleFont.ibmPlexSans(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w800,

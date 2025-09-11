@@ -689,7 +689,7 @@ class _AttendHistorySpecificStudentState
         dotted: true,
       ); // 🔴 always dotted
     }
-    return BorderStyleData(color: AppColor.lowLightgray, dotted: false);
+    return BorderStyleData(color: Colors.transparent, dotted: false);
   }
 
   String _letter(int i) => String.fromCharCode(65 + i); // A, B, C...
@@ -697,6 +697,7 @@ class _AttendHistorySpecificStudentState
   Widget _wrapWithBorder({
     required Widget child,
     required BorderStyleData style,
+    
   }) {
     if (style.dotted) {
       return DottedBorder(
@@ -1036,6 +1037,7 @@ class _AttendHistorySpecificStudentState
                                             Expanded(
                                               child: _wrapWithBorder(
                                                 style: _borderFor(right!),
+
                                                 child:
                                                     CommonContainer.quizContainer1(
                                                       isQuizCompleted: true,
@@ -1059,6 +1061,10 @@ class _AttendHistorySpecificStudentState
                                   ...List.generate(options.length, (oIdx) {
                                     final opt = options[oIdx];
                                     final letter = _letter(oIdx);
+                                    final borderColor =
+                                        (opt.isCorrect == true)
+                                            ? AppColor.green
+                                            : Colors.transparent;
                                     return Padding(
                                       padding: EdgeInsets.only(
                                         bottom:
@@ -1072,7 +1078,7 @@ class _AttendHistorySpecificStudentState
                                           onTap: null,
                                           leftTextNumber: letter,
                                           leftValue: opt.text,
-                                          borderColor: Colors.transparent,
+                                          borderColor: borderColor,
                                         ),
                                       ),
                                     );
