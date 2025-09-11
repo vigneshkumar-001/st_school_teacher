@@ -1031,8 +1031,65 @@ class _QuizDetailsState extends State<QuizDetails> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 25),
+
+                  // Posted on (time + date from API)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 45,
+                      vertical: 25,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColor.black.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: ListTile(
+                        leading: Image.asset(AppImages.clock, height: 33),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Posted on',
+                              style: GoogleFont.inter(
+                                fontSize: 10,
+                                color: AppColor.gray,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Text(
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: true,
+                                    showDate: false,
+                                    details?.time.toString() ?? '',
+                                  ),
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: false,
+                                    showDate: true,
+                                    details?.date.toString() ?? '',
+                                  ),
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    color: AppColor.gray,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

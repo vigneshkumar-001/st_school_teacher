@@ -712,6 +712,7 @@ class _AttendHistorySpecificStudentState
 
     return Container(
       decoration: BoxDecoration(
+        color: AppColor.white,
         border: Border.all(color: style.color, width: 1.5),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -741,9 +742,9 @@ class _AttendHistorySpecificStudentState
           }
 
           final displayName =
-          widget.studentName.isNotEmpty
-              ? widget.studentName
-              : data.student.name;
+              widget.studentName.isNotEmpty
+                  ? widget.studentName
+                  : data.student.name;
 
           return SingleChildScrollView(
             child: Padding(
@@ -967,16 +968,16 @@ class _AttendHistorySpecificStudentState
                           final options = q.options;
                           final allNumeric =
                               options.isNotEmpty &&
-                                  options.every((o) => _isNumeric(o.text));
+                              options.every((o) => _isNumeric(o.text));
                           final anyLongText = options.any(
-                                (o) => !_isShort(o.text),
+                            (o) => !_isShort(o.text),
                           );
                           final useTwoUp = allNumeric && !anyLongText;
 
                           return Padding(
                             padding: EdgeInsets.only(
                               bottom:
-                              qIdx == data.questions.length - 1 ? 0 : 28,
+                                  qIdx == data.questions.length - 1 ? 0 : 28,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -990,29 +991,29 @@ class _AttendHistorySpecificStudentState
                                 // Two-column numeric short answers
                                 if (useTwoUp)
                                   ...List.generate((options.length / 2).ceil(), (
-                                      row,
-                                      ) {
+                                    row,
+                                  ) {
                                     final leftIdx = row * 2;
                                     final rightIdx = leftIdx + 1;
 
                                     final left = options[leftIdx];
                                     final hasRight = rightIdx < options.length;
                                     final right =
-                                    hasRight ? options[rightIdx] : null;
+                                        hasRight ? options[rightIdx] : null;
 
                                     final leftLetter = _letter(leftIdx);
                                     final rightLetter =
-                                    hasRight ? _letter(rightIdx) : '';
+                                        hasRight ? _letter(rightIdx) : '';
 
                                     return Padding(
                                       padding: EdgeInsets.only(
                                         bottom:
-                                        row ==
-                                            ((options.length / 2)
-                                                .ceil() -
-                                                1)
-                                            ? 0
-                                            : 14,
+                                            row ==
+                                                    ((options.length / 2)
+                                                            .ceil() -
+                                                        1)
+                                                ? 0
+                                                : 14,
                                       ),
                                       child: Row(
                                         children: [
@@ -1020,15 +1021,15 @@ class _AttendHistorySpecificStudentState
                                             child: _wrapWithBorder(
                                               style: _borderFor(left),
                                               child:
-                                              CommonContainer.quizContainer1(
-                                                isQuizCompleted: true,
-                                                isSelected: left.selected,
-                                                onTap: null,
-                                                leftTextNumber: leftLetter,
-                                                leftValue: left.text,
-                                                borderColor:
-                                                Colors.transparent,
-                                              ),
+                                                  CommonContainer.quizContainer1(
+                                                    isQuizCompleted: true,
+                                                    isSelected: left.selected,
+                                                    onTap: null,
+                                                    leftTextNumber: leftLetter,
+                                                    leftValue: left.text,
+                                                    borderColor:
+                                                        Colors.transparent,
+                                                  ),
                                             ),
                                           ),
                                           if (hasRight)
@@ -1038,17 +1039,17 @@ class _AttendHistorySpecificStudentState
                                               child: _wrapWithBorder(
                                                 style: _borderFor(right!),
                                                 child:
-                                                CommonContainer.quizContainer1(
-                                                  isQuizCompleted: true,
-                                                  isSelected:
-                                                  right!.selected,
-                                                  onTap: null,
-                                                  leftTextNumber:
-                                                  rightLetter,
-                                                  leftValue: right!.text,
-                                                  borderColor:
-                                                  Colors.transparent,
-                                                ),
+                                                    CommonContainer.quizContainer1(
+                                                      isQuizCompleted: true,
+                                                      isSelected:
+                                                          right!.selected,
+                                                      onTap: null,
+                                                      leftTextNumber:
+                                                          rightLetter,
+                                                      leftValue: right!.text,
+                                                      borderColor:
+                                                          Colors.transparent,
+                                                    ),
                                               ),
                                             ),
                                         ],
@@ -1056,14 +1057,14 @@ class _AttendHistorySpecificStudentState
                                     );
                                   })
                                 else
-                                // Single-column answers
+                                  // Single-column answers
                                   ...List.generate(options.length, (oIdx) {
                                     final opt = options[oIdx];
                                     final letter = _letter(oIdx);
                                     return Padding(
                                       padding: EdgeInsets.only(
                                         bottom:
-                                        oIdx == options.length - 1 ? 0 : 14,
+                                            oIdx == options.length - 1 ? 0 : 14,
                                       ),
                                       child: _wrapWithBorder(
                                         style: _borderFor(opt),
