@@ -282,13 +282,13 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 25,vertical: 20),
                                     child: Row(
                                       children: [
-                                        CircleAvatar(
-                                          child: Image.asset(AppImages.avatar1),
-                                        ),
-                                        const SizedBox(width: 10),
+                                        // CircleAvatar(
+                                        //   child: Image.asset(AppImages.avatar1),
+                                        // ),
+                                        // const SizedBox(width: 10),
                                         Text(
                                           (details.subject?.name ?? '')
                                               .toString(),
