@@ -1488,6 +1488,7 @@ class CommonContainer {
     required bool rightSelected,
     required bool isQuizCompleted,
     Color? leftBorderColor,
+    required bool isSelect,
     Color? rightBorderColor,
     VoidCallback? leftOnTap,
     VoidCallback? rightOnTap,
@@ -1504,7 +1505,7 @@ class CommonContainer {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               decoration: BoxDecoration(
-                color: leftSelected ? Colors.white : AppColor.lowLightgray,
+                color: isSelect ? AppColor.white : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: leftBorderColor ?? AppColor.lowLightgray,
@@ -1533,13 +1534,15 @@ class CommonContainer {
 
         // RIGHT
         Expanded(
-          child: rightIsPlaceholder
+          child:
+          rightIsPlaceholder
               ? Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 20,
+            ),
             decoration: BoxDecoration(
-              // ❌ FIXED: changed leftSelected → rightSelected
-              color: rightSelected ? Colors.white : AppColor.lowLightgray,
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.transparent, width: 2),
             ),
@@ -1548,9 +1551,14 @@ class CommonContainer {
             onTap: rightOnTap,
             child: Container(
               padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 20),
+                horizontal: 20,
+                vertical: 20,
+              ),
               decoration: BoxDecoration(
-                color: rightSelected ? Colors.white : AppColor.lowLightgray,
+                color:
+                rightSelected
+                    ? Colors.white
+                    : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: rightBorderColor ?? AppColor.lowLightgray,
@@ -1596,7 +1604,7 @@ class CommonContainer {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               decoration: BoxDecoration(
-                // ✅ Always white if selected
+                // ✅ Force white if selected (even if correct = green)
                 color: isSelected ? Colors.white : AppColor.lowLightgray,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
