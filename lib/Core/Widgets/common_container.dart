@@ -1319,38 +1319,32 @@ class CommonContainer {
     Color? rightBorderColor,
     VoidCallback? leftOnTap,
     VoidCallback? rightOnTap,
+    Color? leftBackground, // ✅ comma, not semicolon
+    Color? rightBackground, // ✅ comma, not semicolon
   }) {
-    // If right side has no option, render a transparent placeholder
     final bool rightIsPlaceholder =
         rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
 
     final Color lBorder = leftBorderColor ?? AppColor.lowLightgray;
     final Color rBorder =
-        rightIsPlaceholder
-            ? Colors.transparent
-            : (rightBorderColor ?? AppColor.lowLightgray);
+    rightIsPlaceholder ? Colors.transparent : (rightBorderColor ?? AppColor.lowLightgray);
 
     return Row(
       children: [
         // LEFT
         Expanded(
           child: GestureDetector(
-            onTap: leftOnTap, // can be null to disable
+            onTap: leftOnTap,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               decoration: BoxDecoration(
-                color: Colors.transparent, // ✅ no fill
+                color: leftBackground ?? AppColor.lowLightgray, // ✅ use param
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: lBorder, // ✅ border color from parent
-                  width: 2, // thicker to show clearly
-                ),
+                border: Border.all(color: lBorder, width: 2),
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: CustomTextField.textWithSmall(text: leftTextNumber),
-                  ),
+                  Expanded(child: CustomTextField.textWithSmall(text: leftTextNumber)),
                   Expanded(
                     child: CustomTextField.textWithSmall(
                       text: leftValue,
@@ -1366,64 +1360,51 @@ class CommonContainer {
 
         const SizedBox(width: 20),
 
-        // RIGHT (real card or transparent placeholder)
+        // RIGHT
         Expanded(
-          child:
-              rightIsPlaceholder
-                  ? Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.transparent, width: 2),
-                    ),
-                    child: const Row(
-                      children: [
-                        Expanded(child: SizedBox()),
-                        Expanded(child: SizedBox()),
-                      ],
-                    ),
-                  )
-                  : GestureDetector(
-                    onTap: rightOnTap, // can be null to disable
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent, // ✅ no fill
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: rBorder, // ✅ border color from parent
-                          width: 2,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: CustomTextField.textWithSmall(
-                              text: rightTextNumber,
-                            ),
-                          ),
-                          Expanded(
-                            child: CustomTextField.textWithSmall(
-                              text: rightValue,
-                              fontWeight: FontWeight.w500,
-                              color: AppColor.black,
-                            ),
-                          ),
-                        ],
-                      ),
+          child: rightIsPlaceholder
+              ? Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.transparent, width: 2),
+            ),
+            child: const Row(
+              children: [
+                Expanded(child: SizedBox()),
+                Expanded(child: SizedBox()),
+              ],
+            ),
+          )
+              : GestureDetector(
+            onTap: rightOnTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                color: rightBackground ?? AppColor.lowLightgray, // ✅ use param
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: rBorder, width: 2),
+              ),
+              child: Row(
+                children: [
+                  Expanded(child: CustomTextField.textWithSmall(text: rightTextNumber)),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightValue,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
                     ),
                   ),
+                ],
+              ),
+            ),
+          ),
         ),
       ],
     );
   }
+
 
   static Widget quizContainer1({
     required String leftTextNumber,
