@@ -619,6 +619,7 @@ import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/custom_textfield.dart';
+import '../../Core/Utility/date_and_time_convert.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 
@@ -653,7 +654,7 @@ class BorderStyleData {
 class _AttendHistorySpecificStudentState
     extends State<AttendHistorySpecificStudent> {
   final QuizController c = Get.put(QuizController());
-
+  final QuizController quizController = Get.put(QuizController());
   @override
   void initState() {
     super.initState();
@@ -725,7 +726,7 @@ class _AttendHistorySpecificStudentState
       body: SafeArea(
         child: Obx(() {
           final data = c.studentQuiz.value; // StudentQuizData?
-
+          final details = quizController.quizDetails.value;
           if (c.loadStudent.value && data == null) {
             return Center(child: AppLoader.circularLoader());
           }
@@ -1084,8 +1085,65 @@ class _AttendHistorySpecificStudentState
                       ),
                     ),
                   ),
+                  const SizedBox(height: 25),
 
-                  const SizedBox(height: 30),
+                  // Posted on (time + date from API)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 45,
+                      vertical: 25,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColor.black.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: ListTile(
+                        leading: Image.asset(AppImages.clock, height: 33),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Posted on',
+                              style: GoogleFont.inter(
+                                fontSize: 10,
+                                color: AppColor.gray,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Text(
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: true,
+                                    showDate: false,
+                                    details?.time.toString() ?? '',
+                                  ),
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: false,
+                                    showDate: true,
+                                    details?.date.toString() ?? '',
+                                  ),
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    color: AppColor.gray,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
