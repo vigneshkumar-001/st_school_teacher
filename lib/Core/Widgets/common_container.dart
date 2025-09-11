@@ -1307,7 +1307,7 @@ class CommonContainer {
 
   // inside CommonContainer
 
-  static Widget quizContainer({
+  /*  static Widget quizContainer({
     required String leftTextNumber,
     required String leftValue,
     required String rightTextNumber,
@@ -1458,7 +1458,171 @@ class CommonContainer {
         ],
       ),
     );
+  }*/
+
+  static Widget quizContainer({
+    required String leftTextNumber,
+    required String leftValue,
+    required String rightTextNumber,
+    required String rightValue,
+    required bool leftSelected,
+    required bool rightSelected,
+    required bool isQuizCompleted,
+    Color? leftBorderColor,
+    required bool isSelect,
+    Color? rightBorderColor,
+    VoidCallback? leftOnTap,
+    VoidCallback? rightOnTap,
+  }) {
+    final bool rightIsPlaceholder =
+        rightOnTap == null && rightTextNumber.isEmpty && rightValue.isEmpty;
+
+    return Row(
+      children: [
+        // LEFT
+        Expanded(
+          child: GestureDetector(
+            onTap: leftOnTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                color: isSelect ? AppColor.white : AppColor.lowLightgray,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: leftBorderColor ?? AppColor.lowLightgray,
+                  width: 2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(text: leftTextNumber),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: leftValue,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 20),
+
+        // RIGHT
+        Expanded(
+          child:
+          rightIsPlaceholder
+              ? Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 20,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.transparent, width: 2),
+            ),
+          )
+              : GestureDetector(
+            onTap: rightOnTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 20,
+              ),
+              decoration: BoxDecoration(
+                color:
+                rightSelected
+                    ? Colors.white
+                    : AppColor.lowLightgray,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: rightBorderColor ?? AppColor.lowLightgray,
+                  width: 2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightTextNumber,
+                    ),
+                  ),
+                  Expanded(
+                    child: CustomTextField.textWithSmall(
+                      text: rightValue,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
+
+  static Widget quizContainer1({
+    required String leftTextNumber,
+    required String leftValue,
+    required bool isSelected,
+    Color? borderColor,
+    VoidCallback? onTap,
+    required bool isQuizCompleted,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              decoration: BoxDecoration(
+                // ✅ Force white if selected (even if correct = green)
+                color: isSelected ? Colors.white : AppColor.lowLightgray,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: borderColor ?? AppColor.lowLightgray,
+                  width: 2,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: CustomTextField.textWithSmall(
+                        text: leftTextNumber,
+                        color: AppColor.borderGary,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      flex: 6,
+                      child: CustomTextField.textWithSmall(
+                        text: leftValue,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 
   static Widget carouselSlider({
     required String mainText1,
@@ -1568,7 +1732,7 @@ class CommonContainer {
     );
   }
 
-/*  static checkMark({required VoidCallback onTap, String? imagePath}) {
+  /*  static checkMark({required VoidCallback onTap, String? imagePath}) {
     return Center(
       child: ElevatedButton(
         onPressed: () {},
