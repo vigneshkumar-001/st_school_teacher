@@ -660,6 +660,8 @@ class _AttendHistorySpecificStudentState
     super.initState();
     AppLogger.log.i('${widget.quizId},${widget.studentId}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+
       c.loadStudentQuizResult(
         quizId: widget.quizId,
         studentId: widget.studentId,
@@ -672,6 +674,15 @@ class _AttendHistorySpecificStudentState
   bool _isShort(String s) {
     final t = s.trim();
     return t.length <= 30 && !t.contains('\n');
+  }
+
+  String _formatApiDate(String yMd) {
+    try {
+      final d = DateTime.parse(yMd);
+      return DateFormat('dd.MMM.yyyy').format(d);
+    } catch (_) {
+      return yMd;
+    }
   }
 
   bool _isNumeric(String s) {
@@ -953,7 +964,7 @@ class _AttendHistorySpecificStudentState
                       ),
                     ),
                   ),*/
-                  Container(
+                  /*Container(
                     decoration: BoxDecoration(
                       color: AppColor.white,
                       borderRadius: BorderRadius.circular(16),
@@ -1085,7 +1096,123 @@ class _AttendHistorySpecificStudentState
                         }),
                       ),
                     ),
+                  ),*/
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        children: List.generate(data.questions.length, (qIdx) {
+                          final q = data.questions[qIdx];
+                          final number = '${qIdx + 1}.';
+
+                          final options = q.options;
+                          final allNumeric =
+                              options.isNotEmpty &&
+                              options.every((o) => _isNumeric(o.text));
+                          final anyLongText = options.any(
+                            (o) => !_isShort(o.text),
+                          );
+                          final useTwoUp = allNumeric && !anyLongText;
+
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom:
+                                  qIdx == data.questions.length - 1 ? 0 : 28,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomTextField.quizQuestion(
+                                  sno: number,
+                                  text: q.text,
+                                ),
+                                const SizedBox(height: 15),
+
+                                if (useTwoUp)
+                                  ...List.generate((options.length / 2).ceil(), (
+                                    row,
+                                  ) {
+                                    final leftIdx = row * 2;
+                                    final rightIdx = leftIdx + 1;
+
+                                    final left = options[leftIdx];
+                                    final hasRight = rightIdx < options.length;
+                                    final right =
+                                        hasRight ? options[rightIdx] : null;
+
+                                    final leftLetter = _letter(leftIdx);
+                                    final rightLetter =
+                                        hasRight ? _letter(rightIdx) : '';
+
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                            row ==
+                                                    ((options.length / 2)
+                                                            .ceil() -
+                                                        1)
+                                                ? 0
+                                                : 14,
+                                      ),
+                                      child: CommonContainer.quizContainer(
+                                        leftTextNumber: leftLetter,
+                                        leftValue: left.text,
+                                        rightTextNumber:
+                                            hasRight ? rightLetter : '',
+                                        rightValue: hasRight ? right!.text : '',
+                                        leftSelected: left.selected,
+                                        rightSelected: right?.selected ?? false,
+                                        isQuizCompleted: true,
+                                        isSelect:
+                                            true, // ✅ force white background for selection
+                                        leftBorderColor: _borderFor(left).color,
+                                        rightBorderColor:
+                                            hasRight
+                                                ? _borderFor(right!).color
+                                                : null,
+                                        leftOnTap: null,
+                                        rightOnTap: null,
+                                      ),
+                                    );
+                                  })
+                                else
+                                  ...List.generate(options.length, (oIdx) {
+                                    final opt = options[oIdx];
+                                    final letter = _letter(oIdx);
+
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                            oIdx == options.length - 1 ? 0 : 14,
+                                      ),
+                                      child: CommonContainer.quizContainer(
+                                        leftTextNumber: letter,
+                                        leftValue: opt.text,
+                                        rightTextNumber: '',
+                                        rightValue: '',
+                                        leftSelected: opt.selected,
+                                        rightSelected: false,
+                                        isQuizCompleted: true,
+                                        isSelect: true, // ✅ force white
+                                        leftBorderColor: _borderFor(opt).color,
+                                        rightBorderColor: null,
+                                        leftOnTap: null,
+                                        rightOnTap: null,
+                                      ),
+                                    );
+                                  }),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
                   ),
+
                   const SizedBox(height: 25),
 
                   // Posted on (time + date from API)

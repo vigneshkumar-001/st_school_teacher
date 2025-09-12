@@ -37,6 +37,7 @@ class StudentQuizData {
   final int total;
   final List<SQQuestion> questions;
 
+
   StudentQuizData({
     required this.student,
     required this.quiz,

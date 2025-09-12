@@ -1699,7 +1699,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   Future<void> _openCategorySheet() async {
     final selected = await showModalBottomSheet<CategoryData>(
       context: context,
-      backgroundColor: Colors.transparent, // so rounded corners show
+      backgroundColor: Colors.transparent,
       isScrollControlled: true,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
@@ -1727,7 +1727,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- header ---
+                  // Header
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -1741,7 +1741,6 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
                           ),
                         ),
                         IconButton(
@@ -1753,17 +1752,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                   ),
                   const Divider(height: 1),
 
-                  // --- list of categories ---
+                  // Category list
                   Expanded(
                     child: Obx(() {
-                      final categories = announcementContorller.categoryData;
+                      final categories = announcementController.categoryData;
                       if (categories.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            "No categories found",
-                            style: TextStyle(color: Colors.black54),
-                          ),
-                        );
+                        return const Center(child: Text("No categories found"));
                       }
 
                       return ListView.separated(
@@ -1785,20 +1779,9 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                               category.name == Category.text.trim();
 
                           return ListTile(
-                            // leading: category.image != null
-                            //     ? CircleAvatar(
-                            //   radius: 20,
-                            //   backgroundImage: NetworkImage(category.image!),
-                            // )
-                            //     : CircleAvatar(
-                            //   radius: 20,
-                            //   backgroundColor: Colors.grey.shade200,
-                            //   child: const Icon(Icons.category, color: Colors.grey),
-                            // ),
                             title: Text(
                               category.name.replaceAll('_', ' ').toUpperCase(),
                               style: TextStyle(
-                                fontSize: 16,
                                 fontWeight:
                                     isSelected
                                         ? FontWeight.w600
@@ -1830,11 +1813,8 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
 
     if (selected != null) {
       setState(() {
-        Category.text =
-            selected.name
-                .replaceAll('_', ' ')
-                .toUpperCase(); // <-- convert here
-        selectedCategoryId = selected.id; // 👈 id for insert
+        Category.text = selected.name.replaceAll('_', ' ').toUpperCase();
+        selectedCategoryId = selected.id;
         showCategoryClear = true;
       });
     }
@@ -2128,7 +2108,8 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await announcementController.getCategoryList();
       if (teacherClassController.classList.isNotEmpty) {
         final defaultClass = teacherClassController.classList.firstWhere(
           (c) =>
