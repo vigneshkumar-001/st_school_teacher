@@ -34,8 +34,8 @@ class CustomTextField {
         ),
       ],
     );
-  }
 
+  }
   static textWithSmall({
     required String text,
     Color? color = AppColor.lightgray,
