@@ -654,14 +654,12 @@ class BorderStyleData {
 class _AttendHistorySpecificStudentState
     extends State<AttendHistorySpecificStudent> {
   final QuizController c = Get.put(QuizController());
-  final QuizController quizController = Get.put(QuizController());
+  // final QuizController quizController = Get.put(QuizController());
   @override
   void initState() {
     super.initState();
     AppLogger.log.i('${widget.quizId},${widget.studentId}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-
       c.loadStudentQuizResult(
         quizId: widget.quizId,
         studentId: widget.studentId,
@@ -738,7 +736,6 @@ class _AttendHistorySpecificStudentState
       body: SafeArea(
         child: Obx(() {
           final data = c.studentQuiz.value; // StudentQuizData?
-          final details = quizController.quizDetails.value;
           if (c.loadStudent.value && data == null) {
             return Center(child: AppLoader.circularLoader());
           }
@@ -1105,6 +1102,143 @@ class _AttendHistorySpecificStudentState
                     child: Padding(
                       padding: const EdgeInsets.all(15),
                       child: Column(
+                        children: [
+                          ...List.generate(data.questions.length, (qIdx) {
+                            final q = data.questions[qIdx];
+                            final number = '${qIdx + 1}.';
+                            final List<SQOption> options = q.options;
+
+                            final allNumeric =
+                                options.isNotEmpty &&
+                                options.every((o) => _isNumeric(o.text));
+                            final anyParagraph = options.any(
+                              (o) => !_isShort(o.text),
+                            );
+                            final useTwoUp = allNumeric && !anyParagraph;
+
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom:
+                                    qIdx == data.questions.length - 1 ? 0 : 28,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomTextField.quizQuestion(
+                                    sno: number,
+                                    text: q.text,
+                                  ),
+                                  const SizedBox(height: 15),
+
+                                  if (useTwoUp)
+                                    ...List.generate((options.length / 2).ceil(), (
+                                      row,
+                                    ) {
+                                      final leftIdx = row * 2;
+                                      final rightIdx = leftIdx + 1;
+
+                                      final left = options[leftIdx];
+                                      final hasRight =
+                                          rightIdx < options.length;
+                                      final right =
+                                          hasRight ? options[rightIdx] : null;
+
+                                      final leftLetter = String.fromCharCode(
+                                        65 + leftIdx,
+                                      );
+                                      final rightLetter =
+                                          hasRight
+                                              ? String.fromCharCode(
+                                                65 + rightIdx,
+                                              )
+                                              : '';
+
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom:
+                                              row ==
+                                                      ((options.length / 2)
+                                                              .ceil() -
+                                                          1)
+                                                  ? 0
+                                                  : 14,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child:
+                                                  CommonContainer.quizContainer1(
+                                                    leftTextNumber: leftLetter,
+                                                    leftValue: left.text,
+                                                    isSelected: left.isCorrect,
+                                                    borderColor:
+                                                        left.isCorrect
+                                                            ? AppColor.green
+                                                            : AppColor
+                                                                .lowLightgray,
+                                                    onTap: null,
+                                                    isQuizCompleted: false,
+                                                  ),
+                                            ),
+                                            if (hasRight)
+                                              const SizedBox(width: 12),
+                                            if (hasRight)
+                                              Expanded(
+                                                child:
+                                                    CommonContainer.quizContainer1(
+                                                      leftTextNumber:
+                                                          rightLetter,
+                                                      leftValue: right!.text,
+                                                      isSelected:
+                                                          right.isCorrect,
+                                                      borderColor:
+                                                          right.isCorrect
+                                                              ? AppColor.green
+                                                              : AppColor
+                                                                  .lowLightgray,
+                                                      onTap: null,
+                                                      isQuizCompleted: false,
+                                                    ),
+                                              ),
+                                          ],
+                                        ),
+                                      );
+                                    })
+                                  else
+                                    ...List.generate(options.length, (oIdx) {
+                                      final opt = options[oIdx];
+                                      final letter = String.fromCharCode(
+                                        65 + oIdx,
+                                      );
+
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom:
+                                              oIdx == options.length - 1
+                                                  ? 0
+                                                  : 14,
+                                        ),
+                                        child: CommonContainer.quizContainer1(
+                                          leftTextNumber: letter,
+                                          leftValue: opt.text,
+                                          isSelected: opt.isCorrect,
+                                          borderColor:
+                                              opt.isCorrect
+                                                  ? AppColor.green
+                                                  : AppColor.lowLightgray,
+                                          onTap: null,
+                                          isQuizCompleted: false,
+                                        ),
+                                      );
+                                    }),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+
+                      /* Column(
                         children: List.generate(data.questions.length, (qIdx) {
                           final q = data.questions[qIdx];
                           final number = '${qIdx + 1}.';
@@ -1209,7 +1343,7 @@ class _AttendHistorySpecificStudentState
                             ),
                           );
                         }),
-                      ),
+                      ),*/
                     ),
                   ),
 

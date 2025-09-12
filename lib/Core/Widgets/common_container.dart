@@ -701,9 +701,11 @@ class CommonContainer {
     Color? backRoundColors,
     Gradient? gradient,
     VoidCallback? onIconTap,
+    VoidCallback? onIconTapLike,
     VoidCallback? onTap,
     String? homeWorkImage,
     String? view,
+    bool likeImage = false,
     required String section,
   }) {
     return Padding(
@@ -757,10 +759,13 @@ class CommonContainer {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+              likeImage?   Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+
                 children: [
+                  Image.asset(AppImages.likeImage, height: 50),
+                  SizedBox(width: 10),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColor.black.withOpacity(0.05),
@@ -811,54 +816,111 @@ class CommonContainer {
                       ),
                     ),
                   ),
-                  view != null
-                      ? InkWell(
-                        onTap: onTap,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border.all(color: AppColor.borderGary),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 10,
-                            ),
-                            child: Text(
-                              view ?? '',
-                              style: GoogleFont.inter(
-                                fontSize: 12,
-                                color: AppColor.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                      : SizedBox.shrink(),
-                  InkWell(
-                    onTap: onIconTap,
-                    child: Container(
+                ],
+              ):
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Container(
                       decoration: BoxDecoration(
-                        color: gradient == null ? backRoundColors : null,
-                        gradient: gradient,
-                        border: Border.all(
-                          color: AppColor.lowLightgray,
-                          width: 1,
-                        ),
-                        borderRadius: BorderRadius.circular(30),
+                        color: AppColor.black.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(50),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(14.0),
-                        child: Image.asset(
-                          AppImages.rightSideArrow,
-                          color: AppColor.white,
-                          height: 14,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 10,
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              CText1,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.gray,
+                              ),
+                            ),
+
+                            SizedBox(width: 10),
+                            Container(
+                              width: 2,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.grey.shade200,
+                                    Colors.grey.shade300,
+                                    Colors.grey.shade200,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(1),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              time,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: AppColor.gray,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                    view != null
+                        ? InkWell(
+                          onTap: onTap,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(color: AppColor.borderGary),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 10,
+                              ),
+                              child: Text(
+                                view ?? '',
+                                style: GoogleFont.inter(
+                                  fontSize: 12,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                        : SizedBox.shrink(),
+                    InkWell(
+                      onTap: onIconTap,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: gradient == null ? backRoundColors : null,
+                          gradient: gradient,
+                          border: Border.all(
+                            color: AppColor.lowLightgray,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Image.asset(
+                            AppImages.rightSideArrow,
+                            color: AppColor.white,
+                            height: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -1516,54 +1578,54 @@ class CommonContainer {
         // RIGHT
         Expanded(
           child:
-          rightIsPlaceholder
-              ? Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 20,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.transparent, width: 2),
-            ),
-          )
-              : GestureDetector(
-            onTap: rightOnTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 20,
-              ),
-              decoration: BoxDecoration(
-                color:
-                rightSelected
-                    ? Colors.white
-                    : AppColor.lowLightgray,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: rightBorderColor ?? AppColor.lowLightgray,
-                  width: 2,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField.textWithSmall(
-                      text: rightTextNumber,
+              rightIsPlaceholder
+                  ? Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.transparent, width: 2),
+                    ),
+                  )
+                  : GestureDetector(
+                    onTap: rightOnTap,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            rightSelected
+                                ? Colors.white
+                                : AppColor.lowLightgray,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: rightBorderColor ?? AppColor.lowLightgray,
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField.textWithSmall(
+                              text: rightTextNumber,
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomTextField.textWithSmall(
+                              text: rightValue,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Expanded(
-                    child: CustomTextField.textWithSmall(
-                      text: rightValue,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ],
     );
@@ -1621,8 +1683,6 @@ class CommonContainer {
       ),
     );
   }
-
-
 
   static Widget carouselSlider({
     required String mainText1,

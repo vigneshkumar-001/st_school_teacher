@@ -4,6 +4,7 @@ class AppImages {
   static String Events = 'asset/Images/Events.png';
   static String Exam = 'asset/Images/Exam.png';
   static String Homework = 'asset/Images/Homework.png';
+  static String likeImage = 'asset/Images/Like Image.png';
 
   static String Quiz = 'asset/Images/Quiz.png';
   static String rightArrow = 'assets/images/Right arrow.png';

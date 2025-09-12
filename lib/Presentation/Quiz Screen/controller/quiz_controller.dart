@@ -25,7 +25,7 @@ class QuizController extends GetxController {
 
   // Details page data (set by quizDetailsPreviews)
   final Rxn<QuizDetailsData> quizDetails = Rxn<QuizDetailsData>();
-  final Rxn<QuizDetailsData> studentQuizResult = Rxn<QuizDetailsData>();
+  // final Rxn<StudentQuizData> studentQuizResult = Rxn<StudentQuizData>();
   final RxString lastError = ''.obs;
 
   // List page UI state
@@ -375,7 +375,7 @@ class QuizController extends GetxController {
           lastError.value = failure.message;
           // 🔐 Prevent stale UI from showing old data on error:
           studentQuiz.value = null;
-          quizDetails.value = null; // keep alias in sync
+          studentQuiz.value = null; // keep alias in sync
           AppLogger.log.e(failure.message);
           return failure.message;
         },
@@ -389,7 +389,7 @@ class QuizController extends GetxController {
       loadStudent.value = false;
       lastError.value = e.toString();
       studentQuiz.value = null;
-      quizDetails.value = null;
+      studentQuiz.value = null;
       AppLogger.log.e(e);
       return e.toString();
     } finally {

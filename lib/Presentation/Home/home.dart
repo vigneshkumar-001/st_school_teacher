@@ -1,5 +1,4 @@
-/*
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:st_teacher_app/Core/Utility/app_color.dart';
@@ -1006,8 +1005,8 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-}
-*/
+}*/
+
 import 'package:flutter/material.dart';
 import 'package:st_teacher_app/Core/consents.dart';
 import 'package:get/get.dart';
@@ -1023,7 +1022,8 @@ import '../Homework/homework_create.dart';
 import '../Menu/menu_screen.dart';
 import 'dart:ui' show lerpDouble;
 import '../Profile/controller/teacher_data_controller.dart';
-import '../Quiz Screen/quiz_screen_create.dart'; // so we can call lerpDouble(...)
+import '../Quiz Screen/quiz_screen_create.dart';
+import 'home_new_screen.dart'; // so we can call lerpDouble(...)
 
 class Home extends StatefulWidget {
   final String? pages;
@@ -1386,11 +1386,23 @@ class _HomeState extends State<Home> {
                                 ),
                                 child: Column(
                                   children: [
-                                    Text(
-                                      'Actions',
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 20,
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    HomeNewScreen(page: 'home'),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Actions',
+                                        style: GoogleFont.ibmPlexSans(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 20,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(height: 8),

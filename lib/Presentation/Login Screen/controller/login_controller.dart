@@ -8,6 +8,7 @@ import 'package:st_teacher_app/api/data_source/apiDataSource.dart';
 
 import '../../../Core/Utility/snack_bar.dart';
 import '../../Attendance-teacher/controller/teacher_attendance_controller.dart';
+import '../../Home/home_new_screen.dart';
 import '../../Menu/menu_screen.dart';
 
 import '../../Profile/controller/teacher_data_controller.dart';
@@ -111,7 +112,7 @@ class LoginController extends GetxController {
             month: now.month,
             year: now.year,
           );
-          Get.offAll(Home(page: 'homeScreen'));
+          Get.offAll(HomeNewScreen(page: 'homeScreen'));
           isOtpLoading.value = false;
           AppLogger.log.i('token = $token');
         },
@@ -141,7 +142,7 @@ class LoginController extends GetxController {
           AppLogger.log.e(failure.message);
         },
         (response) async {
-          Get.offAll(Home(page: ''));
+          Get.offAll(HomeNewScreen(page: ''));
           // Home(pages: 'homeScreen', page: ''),
 
           // Get.offAll(Home(pages: 'homeScreen'));
