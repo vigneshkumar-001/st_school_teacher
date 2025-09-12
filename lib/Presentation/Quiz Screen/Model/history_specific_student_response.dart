@@ -38,6 +38,7 @@ class StudentQuizData {
   final String time;
   final List<SQQuestion> questions;
 
+
   StudentQuizData({
     required this.student,
     required this.quiz,

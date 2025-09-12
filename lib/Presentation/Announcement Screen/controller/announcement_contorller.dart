@@ -221,6 +221,7 @@ class AnnouncementContorller extends GetxController {
           if (showLoader) hidePopupLoader();
           AppLogger.log.i('Announcement Details Fetched ✅');
           categoryData.value = response.data;
+          AppLogger.log.i(response.data);
           return response.data; // return data for UI
         },
       );
