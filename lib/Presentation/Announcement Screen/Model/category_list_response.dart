@@ -41,7 +41,7 @@ class CategoryData {
   final String? image;
   final bool status;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  // final DateTime updatedAt;
 
   CategoryData({
     required this.id,
@@ -50,7 +50,7 @@ class CategoryData {
     this.image,
     required this.status,
     required this.createdAt,
-    required this.updatedAt,
+    // required this.updatedAt,
   });
 
   factory CategoryData.fromJson(Map<String, dynamic> json) {
@@ -58,10 +58,10 @@ class CategoryData {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       slug: json['slug'] ?? '',
-      image: json['image'],
+      image: json['image']?? '',
       status: json['status'] ?? false,
       createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      // updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 
@@ -73,7 +73,7 @@ class CategoryData {
       'image': image,
       'status': status,
       'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      // 'updatedAt': updatedAt.toIso8601String(),
     };
   }
 }

@@ -35,6 +35,7 @@ class StudentQuizData {
   final SQQuiz quiz;
   final int score;
   final int total;
+  final String time;
   final List<SQQuestion> questions;
 
 
@@ -43,6 +44,7 @@ class StudentQuizData {
     required this.quiz,
     required this.score,
     required this.total,
+    required this.time,
     required this.questions,
   });
 
@@ -52,6 +54,7 @@ class StudentQuizData {
       quiz: SQQuiz.fromJson((json['quiz'] as Map?)?.cast<String, dynamic>() ?? const {}),
       score: _toInt(json['score']),
       total: _toInt(json['total']),
+      time: json['time']?? '',
       questions: (json['questions'] as List? ?? const [])
           .map((e) => SQQuestion.fromJson((e as Map).cast<String, dynamic>()))
           .toList(),
