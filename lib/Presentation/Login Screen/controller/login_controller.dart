@@ -97,18 +97,15 @@ class LoginController extends GetxController {
           AppLogger.log.e(failure.message);
         },
         (response) async {
-
           // Home(pages: 'homeScreen', page: ''),
 
           // Get.offAll(Home(pages: 'homeScreen'));
-
-
 
           AppLogger.log.i(response.message);
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', response.token);
           String? token = prefs.getString('token');
-          await controller.getTeacherClassData();
+          await _loadInitialData();
           final now = DateTime.now();
           await teacherAttendanceController.getTeacherAttendanceMonth(
             month: now.month,
@@ -167,13 +164,19 @@ class LoginController extends GetxController {
     return null;
   }
 
+  Future<void> _loadInitialData() async {
+    await Future.wait([
+      controller.getTeacherClassData(),
+      announcementContorller.getCategoryList(),
+    ]);
+  }
+
   Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     if (token != null && token.isNotEmpty) {
       accessToken = token;
-      await controller.getTeacherClassData();
-      await announcementContorller.getCategoryList();
+      await _loadInitialData();
       return true;
     }
     return false;

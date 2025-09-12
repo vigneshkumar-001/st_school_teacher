@@ -1088,7 +1088,6 @@ class _AttendHistorySpecificStudentState
                   ),
                   const SizedBox(height: 25),
 
-                  // Posted on (time + date from API)
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 45,
@@ -1114,28 +1113,27 @@ class _AttendHistorySpecificStudentState
                             const SizedBox(height: 4),
                             Row(
                               children: [
+                                // Text(
+                                //   DateAndTimeConvert.formatDateTime(
+                                //     showTime: true,
+                                //     showDate: false,
+                                //     data?.time ?? '',
+                                //   ),
+                                //   style: GoogleFont.inter(
+                                //     fontSize: 13,
+                                //     fontWeight: FontWeight.w700,
+                                //     color: AppColor.black,
+                                //   ),
+                                // ),
+                                // SizedBox(width: 5),
                                 Text(
-                                  DateAndTimeConvert.formatDateTime(
-                                    showTime: true,
-                                    showDate: false,
-                                    details?.time.toString() ?? '',
+                                  DateAndTimeConvert.timeWithShortDate(
+                                    data?.time ?? '',
                                   ),
                                   style: GoogleFont.inter(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
                                     color: AppColor.black,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  DateAndTimeConvert.formatDateTime(
-                                    showTime: false,
-                                    showDate: true,
-                                    details?.date.toString() ?? '',
-                                  ),
-                                  style: GoogleFont.inter(
-                                    fontSize: 12,
-                                    color: AppColor.gray,
                                   ),
                                 ),
                               ],
@@ -1176,4 +1174,3 @@ class _AttendHistorySpecificStudentState
     );
   }
 }
- 
