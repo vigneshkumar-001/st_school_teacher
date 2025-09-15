@@ -2471,65 +2471,84 @@ class CommonContainer {
 
   static Widget tickContainer({
     required bool isChecked,
-    required VoidCallback onTap,
-    required iconOnTap,
+    required VoidCallback onTap,      // toggles from parent
+    VoidCallback? iconOnTap,          // <- typed properly (optional)
     required String text,
     String text2 = '',
     Color? textColor1,
     bool isError = false,
-
+    bool iconImage = false,
     Color? borderColor,
     Color? checkedBorderColor,
   }) {
     final Color resolvedBorder =
-        isError ? Colors.red : (borderColor ?? Colors.transparent);
-
-    // when checked, force green (or your override)
+    isError ? Colors.red : (borderColor ?? Colors.transparent);
     final Color currentBorder =
-        isChecked ? (checkedBorderColor ?? AppColor.green) : resolvedBorder;
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-              color: isChecked ? AppColor.white : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: currentBorder, width: 1.5),
-            ),
-            child:
-                isChecked
-                    ? Center(
+    isChecked ? (checkedBorderColor ?? AppColor.green) : resolvedBorder;
+    final Color t1Color = textColor1 ?? AppColor.black;
+
+    return Material(
+      color: Colors.transparent,
+      child: Row(
+        children: [
+          // ✅ whole left side (box + label) is tappable
+          Expanded(
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(12),
+              child: Row(
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      color: isChecked ? AppColor.white : AppColor.lightWhite,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: currentBorder, width: 1.5),
+                    ),
+                    child: isChecked
+                        ? Center(
                       child: Image.asset(
                         AppImages.tick,
                         height: 15,
                         color: AppColor.green,
                       ),
                     )
-                    : null,
+                        : null,
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: CustomTextField.richText(
+                      text: text,
+                      text2: text2,        // no need for ?? ''
+                      text1Color: t1Color, // no bang !
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        SizedBox(width: 15),
-        Expanded(
-          child: CustomTextField.richText(
-            text: text,
-            text2: text2 ?? '',
-            text1Color: textColor1!,
-          ),
-        ),
-        Spacer(),
-        InkWell(
-          onTap: iconOnTap,
-          child: Image.asset(
-            AppImages.rightSideArrow,
-            height: 10,
-            color: AppColor.lightgray,
-          ),
-        ),
-      ],
+
+          // right-side icon stays separately clickable
+          if (iconImage) const SizedBox(width: 8),
+          if (iconImage)
+            InkWell(
+              onTap: iconOnTap,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  AppImages.rightSideArrow,
+                  height: 10,
+                  color: AppColor.lightgray,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
-}
+
+  }
+

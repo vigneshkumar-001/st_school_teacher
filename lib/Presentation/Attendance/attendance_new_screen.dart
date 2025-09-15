@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -21,6 +22,7 @@ class AttendanceNewScreen extends StatefulWidget {
 }
 
 class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
+  bool agreed = false;
   bool isChecked = false;
   bool showError = false;
   bool isSelected = false;
@@ -59,28 +61,61 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
       for (final s in _students) {
         s.isPresent = _selectAll;
       }
+      // if at least one selected now, hide error
+      if (presentCount > 0) _showError = false;
     });
   }
 
   void _toggleSingle(int index) {
     setState(() {
       _students[index].isPresent = !_students[index].isPresent;
-      // Keep "Select All" in sync with list
       _selectAll = _students.every((s) => s.isPresent);
+      if (presentCount > 0) _showError = false;
     });
   }
 
+
   // Example validate: show red border on any unchecked if required
   void _validateBeforeSubmit() {
-    // optional: simple guard — at least one selected
     final hasSelection = _students.any((s) => s.isPresent);
-    if (!hasSelection) return; // no error UI, just do nothing
 
-    // clear old bars and show ONLY success (green)
+    // clear any existing snackbars first
     ScaffoldMessenger.of(context).clearSnackBars();
+
+    if (!hasSelection) {
+      // optional vibration so it "feels" like an error
+      HapticFeedback.heavyImpact();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(seconds: 2),
+          content: Row(
+            children: const [
+              Icon(Icons.error_rounded, color: Colors.white),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Please select at least one student before submitting.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      return; // stop here on error
+    }
+
+    // success flow
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: AppColor.green, // your green
+        backgroundColor: AppColor.green, // your green color
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -89,17 +124,23 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
           children: const [
             Icon(Icons.check_circle, color: Colors.white),
             SizedBox(width: 8),
-            Text('Attendance submitted', style: TextStyle(color: Colors.white)),
+            Expanded(
+              child: Text(
+                'Attendance submitted',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),
     );
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AttendanceHistory()),
+      MaterialPageRoute(builder: (_) => AttendanceHistory()),
     );
-    // TODO: call your controller/repo here
-    // await attendanceController.submit(...);
+
+    // TODO: await attendanceController.submit(...);
   }
 
   @override
@@ -243,6 +284,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                     children: [
                       // Select All
                       CommonContainer.tickContainer(
+
                         iconOnTap: () {},
                         isChecked: _selectAll,
                         onTap: _toggleSelectAll,
@@ -264,6 +306,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                           children: [
                             const SizedBox(height: 14),
                             CommonContainer.tickContainer(
+                              iconImage: true,
                               iconOnTap: () {
                                 // Right-arrow action (optional)
                               },

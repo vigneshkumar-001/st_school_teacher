@@ -13,6 +13,7 @@ import '../Exam Screen/screens/exam_create.dart';
 import '../Homework/controller/teacher_class_controller.dart';
 import '../Homework/homework_create.dart';
 import '../Menu/menu_screen.dart';
+import '../Profile/controller/teacher_data_controller.dart';
 import '../Quiz Screen/quiz_screen_create.dart';
 import 'message_screen.dart';
 
@@ -29,13 +30,35 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
   final TeacherClassController teacherClassController = Get.put(
     TeacherClassController(),
   );
-
+  final TeacherDataController controller = Get.put(TeacherDataController());
   int _currentIndex = 0;
   int _current = 1;
   int selectedIndex = 0;
   int subjectIndex = 0;
   bool showThirdContainer = false;
   double currentPage = 1;
+
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await teacherClassController.getTeacherClass();
+    });
+
+    _pageController = PageController(
+      viewportFraction: 0.70, // shows side peeks; adjust 0.66–0.75
+      initialPage: 1, // middle card selected on start
+    );
+
+    currentPage = 1;
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, String>> classData = [
     {'grade': '8', 'section': 'A'},
@@ -44,6 +67,8 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
     {'grade': '9', 'section': 'A'},
     {'grade': '9', 'section': 'C'},
   ];
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -146,14 +171,44 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                     color: AppColor.white,
                                   ),
                                 ),
-                                Text(
+                               /* Text(
                                   'Megha!',
                                   style: GoogleFont.ibmPlexSans(
                                     fontWeight: FontWeight.w900,
                                     fontSize: 33,
                                     color: AppColor.white,
                                   ),
-                                ),
+                                ),*/
+
+                                Obx(() {
+                                  final staffName =
+                                      controller
+                                          .teacherDataResponse
+                                          .value
+                                          ?.data
+                                          .profile
+                                          .staffName;
+
+                                  if (staffName == null || staffName.isEmpty) {
+                                    return Text(
+                                      '',
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 20,
+                                        color: AppColor.white,
+                                      ),
+                                    );
+                                  }
+
+                                  return Text(
+                                    '$staffName!',
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 25,
+                                      color: AppColor.white,
+                                    ),
+                                  );
+                                }),
                               ],
                             ),
                           ),
@@ -900,9 +955,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
 
                                           if (classList.isEmpty) {
                                             return Center(
-                                              child: Text(
-                                                "No classes available",
-                                              ),
+                                              child: Text("No classes available"),
                                             );
                                           }
 
@@ -937,22 +990,17 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 right: 0,
                                                 child: ListView.builder(
                                                   scrollDirection:
-                                                      Axis.horizontal,
+                                                  Axis.horizontal,
                                                   itemCount: classList.length,
                                                   padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 15,
-                                                        vertical: 5,
-                                                      ),
-                                                  itemBuilder: (
-                                                    context,
-                                                    index,
-                                                  ) {
-                                                    final item =
-                                                        classList[index];
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 15,
+                                                    vertical: 5,
+                                                  ),
+                                                  itemBuilder: (context, index) {
+                                                    final item = classList[index];
                                                     final grade = item.name;
-                                                    final section =
-                                                        item.section;
+                                                    final section = item.section;
                                                     final isSelected =
                                                         item == selectedClass;
 
@@ -973,165 +1021,169 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                         width: 75,
                                                         height: 50,
                                                         margin:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 0,
-                                                            ),
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 0,
+                                                        ),
                                                         decoration: BoxDecoration(
                                                           color:
-                                                              isSelected
-                                                                  ? AppColor
-                                                                      .white
-                                                                  : Colors
-                                                                      .transparent,
+                                                          isSelected
+                                                              ? AppColor.white
+                                                              : Colors
+                                                              .transparent,
                                                           borderRadius:
-                                                              BorderRadius.circular(
-                                                                16,
-                                                              ),
+                                                          BorderRadius.circular(
+                                                            16,
+                                                          ),
                                                           border:
-                                                              isSelected
-                                                                  ? Border.all(
-                                                                    color:
-                                                                        AppColor
-                                                                            .black,
-                                                                    width: 1.5,
-                                                                  )
-                                                                  : null,
+                                                          isSelected
+                                                              ? Border.all(
+                                                            color:
+                                                            AppColor
+                                                                .black,
+                                                            width: 1.5,
+                                                          )
+                                                              : null,
                                                           boxShadow:
-                                                              isSelected
-                                                                  ? [
-                                                                    BoxShadow(
-                                                                      color: AppColor
-                                                                          .white
-                                                                          .withOpacity(
-                                                                            0.5,
-                                                                          ),
-                                                                      blurRadius:
-                                                                          10,
-                                                                      offset:
-                                                                          Offset(
-                                                                            0,
-                                                                            4,
-                                                                          ),
-                                                                    ),
-                                                                  ]
-                                                                  : [],
+                                                          isSelected
+                                                              ? [
+                                                            BoxShadow(
+                                                              color: AppColor
+                                                                  .white
+                                                                  .withOpacity(
+                                                                0.5,
+                                                              ),
+                                                              blurRadius:
+                                                              10,
+                                                              offset:
+                                                              Offset(
+                                                                0,
+                                                                4,
+                                                              ),
+                                                            ),
+                                                          ]
+                                                              : [],
                                                         ),
                                                         child:
-                                                            isSelected
-                                                                ? Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    SizedBox(
-                                                                      height: 8,
+                                                        isSelected
+                                                            ? Column(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                          children: [
+                                                            SizedBox(
+                                                              height: 8,
+                                                            ),
+                                                            Center(
+                                                              child: Text(
+                                                                grade,
+                                                                style: GoogleFont.ibmPlexSans(
+                                                                  fontSize:
+                                                                  28,
+                                                                  color:
+                                                                  AppColor.black,
+                                                                  fontWeight:
+                                                                  FontWeight.bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              margin:
+                                                              EdgeInsets.only(
+                                                                bottom:
+                                                                0,
+                                                              ),
+                                                              padding: EdgeInsets.symmetric(
+                                                                horizontal:
+                                                                12,
+                                                                vertical:
+                                                                5,
+                                                              ),
+                                                              decoration: BoxDecoration(
+                                                                color:
+                                                                AppColor
+                                                                    .black,
+                                                                borderRadius: BorderRadius.only(
+                                                                  topLeft:
+                                                                  Radius.circular(
+                                                                    40,
+                                                                  ),
+                                                                  topRight:
+                                                                  Radius.circular(
+                                                                    40,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              child: Text(
+                                                                section,
+                                                                style: GoogleFont.ibmPlexSans(
+                                                                  fontSize:
+                                                                  20,
+                                                                  color:
+                                                                  AppColor.white,
+                                                                  fontWeight:
+                                                                  FontWeight.bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                            : Center(
+                                                          child: Padding(
+                                                            padding:
+                                                            const EdgeInsets.symmetric(
+                                                              vertical:
+                                                              12.0,
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                              MainAxisSize
+                                                                  .min,
+                                                              children: [
+                                                                Container(
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                    25,
+                                                                    vertical:
+                                                                    3,
+                                                                  ),
+                                                                  decoration: BoxDecoration(
+                                                                    color:
+                                                                    AppColor.white,
+                                                                    borderRadius: BorderRadius.circular(
+                                                                      20,
                                                                     ),
-                                                                    Center(
-                                                                      child: Text(
-                                                                        grade,
-                                                                        style: GoogleFont.ibmPlexSans(
-                                                                          fontSize:
-                                                                              28,
-                                                                          color:
-                                                                              AppColor.black,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    Container(
-                                                                      margin: EdgeInsets.only(
-                                                                        bottom:
-                                                                            0,
-                                                                      ),
-                                                                      padding: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            12,
-                                                                        vertical:
-                                                                            5,
-                                                                      ),
-                                                                      decoration: BoxDecoration(
-                                                                        color:
-                                                                            AppColor.black,
-                                                                        borderRadius: BorderRadius.only(
-                                                                          topLeft: Radius.circular(
-                                                                            40,
-                                                                          ),
-                                                                          topRight: Radius.circular(
-                                                                            40,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      child: Text(
-                                                                        section,
-                                                                        style: GoogleFont.ibmPlexSans(
-                                                                          fontSize:
-                                                                              20,
-                                                                          color:
-                                                                              AppColor.white,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )
-                                                                : Center(
-                                                                  child: Padding(
-                                                                    padding: const EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          12.0,
-                                                                    ),
-                                                                    child: Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .min,
-                                                                      children: [
-                                                                        Container(
-                                                                          padding: const EdgeInsets.symmetric(
-                                                                            horizontal:
-                                                                                25,
-                                                                            vertical:
-                                                                                3,
-                                                                          ),
-                                                                          decoration: BoxDecoration(
-                                                                            color:
-                                                                                AppColor.white,
-                                                                            borderRadius: BorderRadius.circular(
-                                                                              20,
-                                                                            ),
-                                                                          ),
-                                                                          child: Text(
-                                                                            grade,
-                                                                            style: GoogleFont.ibmPlexSans(
-                                                                              fontSize:
-                                                                                  14,
-                                                                              color:
-                                                                                  AppColor.gray,
-                                                                              fontWeight:
-                                                                                  FontWeight.w600,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          height:
-                                                                              5,
-                                                                        ),
-                                                                        Text(
-                                                                          section,
-                                                                          style: GoogleFont.ibmPlexSans(
-                                                                            fontSize:
-                                                                                20,
-                                                                            color:
-                                                                                AppColor.lightgray,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
-                                                                        ),
-                                                                      ],
+                                                                  ),
+                                                                  child: Text(
+                                                                    grade,
+                                                                    style: GoogleFont.ibmPlexSans(
+                                                                      fontSize:
+                                                                      14,
+                                                                      color:
+                                                                      AppColor.gray,
+                                                                      fontWeight:
+                                                                      FontWeight.w600,
                                                                     ),
                                                                   ),
                                                                 ),
+                                                                SizedBox(
+                                                                  height:
+                                                                  5,
+                                                                ),
+                                                                Text(
+                                                                  section,
+                                                                  style: GoogleFont.ibmPlexSans(
+                                                                    fontSize:
+                                                                    20,
+                                                                    color:
+                                                                    AppColor.lightgray,
+                                                                    fontWeight:
+                                                                    FontWeight.bold,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
                                                     );
                                                   },
