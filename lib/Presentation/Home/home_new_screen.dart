@@ -8,8 +8,12 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../dummy_screen.dart';
+import '../Attendance/attendance_new_screen.dart';
+import '../Exam Screen/screens/exam_create.dart';
 import '../Homework/controller/teacher_class_controller.dart';
+import '../Homework/homework_create.dart';
 import '../Menu/menu_screen.dart';
+import '../Quiz Screen/quiz_screen_create.dart';
 import 'message_screen.dart';
 
 class HomeNewScreen extends StatefulWidget {
@@ -210,7 +214,14 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                /* navigate */
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (context) =>
+                                                            HomeworkCreate(),
+                                                  ),
+                                                );
                                               },
                                               child: Container(
                                                 height:
@@ -365,7 +376,14 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                               children: [
                                                 InkWell(
                                                   onTap: () {
-                                                    /* navigate */
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (context) =>
+                                                                QuizScreenCreate(),
+                                                      ),
+                                                    );
                                                   },
                                                   child: Container(
                                                     height:
@@ -590,7 +608,16 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 SizedBox(width: 14),
 
                                                 InkWell(
-                                                  onTap: () {},
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (context) =>
+                                                                ExamCreate(),
+                                                      ),
+                                                    );
+                                                  },
                                                   child: ClipRRect(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -1173,7 +1200,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                             const SizedBox(width: 12),
                                             Container(
                                               decoration: BoxDecoration(
-                                        
                                                 gradient: LinearGradient(
                                                   colors: [
                                                     AppColor.blueG1,
@@ -1214,7 +1240,14 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                       ),
                                                 ),
                                                 onPressed: () {
-                                              Navigator.push(context, MaterialPageRoute(builder: (context) => MessageScreen()));
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              MessageScreen(),
+                                                    ),
+                                                  );
                                                 },
                                                 child: Row(
                                                   mainAxisAlignment:

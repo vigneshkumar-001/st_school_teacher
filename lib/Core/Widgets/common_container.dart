@@ -760,167 +760,166 @@ class CommonContainer {
                 ),
               ),
 
-              likeImage?   Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              likeImage
+                  ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                children: [
-                  Image.asset(AppImages.likeImage, height: 50),
-                  SizedBox(width: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColor.black.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            CText1,
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: AppColor.gray,
-                            ),
-                          ),
-
-                          SizedBox(width: 10),
-                          Container(
-                            width: 2,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.grey.shade200,
-                                  Colors.grey.shade300,
-                                  Colors.grey.shade200,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(1),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            time,
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: AppColor.gray,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ):
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColor.black.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              CText1,
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.gray,
-                              ),
-                            ),
-
-                            SizedBox(width: 10),
-                            Container(
-                              width: 2,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.grey.shade200,
-                                    Colors.grey.shade300,
-                                    Colors.grey.shade200,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(1),
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              time,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                color: AppColor.gray,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    view != null
-                        ? InkWell(
-                          onTap: onTap,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              border: Border.all(color: AppColor.borderGary),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 10,
-                              ),
-                              child: Text(
-                                view ?? '',
-                                style: GoogleFont.inter(
-                                  fontSize: 12,
-                                  color: AppColor.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                        : SizedBox.shrink(),
-                    InkWell(
-                      onTap: onIconTap,
-                      child: Container(
+                    children: [
+                      Image.asset(AppImages.likeImage, height: 50),
+                      SizedBox(width: 10),
+                      Container(
                         decoration: BoxDecoration(
-                          color: gradient == null ? backRoundColors : null,
-                          gradient: gradient,
-                          border: Border.all(
-                            color: AppColor.lowLightgray,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(30),
+                          color: AppColor.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(50),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(14.0),
-                          child: Image.asset(
-                            AppImages.rightSideArrow,
-                            color: AppColor.white,
-                            height: 14,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                CText1,
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+
+                              SizedBox(width: 10),
+                              Container(
+                                width: 2,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.grey.shade200,
+                                      Colors.grey.shade300,
+                                      Colors.grey.shade200,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                time,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  )
+                  : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColor.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                CText1,
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+
+                              SizedBox(width: 10),
+                              Container(
+                                width: 2,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.grey.shade200,
+                                      Colors.grey.shade300,
+                                      Colors.grey.shade200,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                time,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      view != null
+                          ? InkWell(
+                            onTap: onTap,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border.all(color: AppColor.borderGary),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 10,
+                                ),
+                                child: Text(
+                                  view ?? '',
+                                  style: GoogleFont.inter(
+                                    fontSize: 12,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                          : SizedBox.shrink(),
+                      InkWell(
+                        onTap: onIconTap,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: gradient == null ? backRoundColors : null,
+                            gradient: gradient,
+                            border: Border.all(
+                              color: AppColor.lowLightgray,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14.0),
+                            child: Image.asset(
+                              AppImages.rightSideArrow,
+                              color: AppColor.white,
+                              height: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
             ],
           ),
         ),
@@ -2467,6 +2466,70 @@ class CommonContainer {
           color: AppColor.blue,
         ),
       ),
+    );
+  }
+
+  static Widget tickContainer({
+    required bool isChecked,
+    required VoidCallback onTap,
+    required iconOnTap,
+    required String text,
+    String text2 = '',
+    Color? textColor1,
+    bool isError = false,
+
+    Color? borderColor,
+    Color? checkedBorderColor,
+  }) {
+    final Color resolvedBorder =
+        isError ? Colors.red : (borderColor ?? Colors.transparent);
+
+    // when checked, force green (or your override)
+    final Color currentBorder =
+        isChecked ? (checkedBorderColor ?? AppColor.green) : resolvedBorder;
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              color: isChecked ? AppColor.white : Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: currentBorder, width: 1.5),
+            ),
+            child:
+                isChecked
+                    ? Center(
+                      child: Image.asset(
+                        AppImages.tick,
+                        height: 15,
+                        color: AppColor.green,
+                      ),
+                    )
+                    : null,
+          ),
+        ),
+        SizedBox(width: 15),
+        Expanded(
+          child: CustomTextField.richText(
+            text: text,
+            text2: text2 ?? '',
+            text1Color: textColor1!,
+          ),
+        ),
+        Spacer(),
+        InkWell(
+          onTap: iconOnTap,
+          child: Image.asset(
+            AppImages.rightSideArrow,
+            height: 10,
+            color: AppColor.lightgray,
+          ),
+        ),
+      ],
     );
   }
 }

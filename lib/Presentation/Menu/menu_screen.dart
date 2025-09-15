@@ -9,6 +9,7 @@ import '../Announcement Screen/announcement_create.dart';
 import '../Announcement Screen/announcement_screen.dart';
 import '../Attendance-teacher/attendance_history_teacher.dart';
 import '../Attendance/attendance_history.dart';
+import '../Attendance/attendance_new_screen.dart';
 import '../Attendance/attendance_start.dart';
 import '../Exam Screen/screens/exam_create.dart';
 import '../Exam Screen/screens/exam_history.dart';
@@ -93,7 +94,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AttendanceStart(),
+                        builder: (context) => AttendanceNewScreen(),
                       ),
                     );
                   },

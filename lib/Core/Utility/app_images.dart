@@ -9,7 +9,7 @@ class AppImages {
   static String Quiz = 'asset/Images/Quiz.png';
   static String rightArrow = 'assets/images/Right arrow.png';
   static String plus = 'asset/Images/plus.png';
-  static String profilePicture= 'assets/images/Profile Picture.png';
+  static String profilePicture = 'assets/images/Profile Picture.png';
   static String rightSideArrow = 'asset/Images/RightSideArrorw.png';
   static String close = 'asset/Images/Close.png';
   static String myAttendance = 'asset/Images/My Attendance.png';
@@ -20,7 +20,7 @@ class AppImages {
   static String tick = 'asset/Images/tick.png';
   static String bcImage = 'asset/Images/BcImage.png';
   static String doubleArrow = 'asset/Images/2ArrowbuttonImage.png';
-  static const String phoneIcon  = 'assets/images/PhoneIcon.png';
+  static const String phoneIcon = 'assets/images/PhoneIcon.png';
   static String afternoon = 'asset/Images/Afternoon.png';
   static String morning = 'asset/Images/Morning.png';
   static String sportsDay = 'asset/Images/Sports Day.png';
