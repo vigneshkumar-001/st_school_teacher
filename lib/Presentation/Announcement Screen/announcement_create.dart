@@ -1650,8 +1650,11 @@ class AnnouncementCreate extends StatefulWidget {
 }
 
 class _AnnouncementCreateState extends State<AnnouncementCreate> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState> _categoryFieldKey = GlobalKey<FormFieldState>();
+
   // ---------- form + controllers ----------
-  final _formKey = GlobalKey<FormState>();
+
   final AnnouncementContorller announcementController = Get.put(
     AnnouncementContorller(),
   );
@@ -1818,6 +1821,8 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
         showCategoryClear = true;
       });
     }
+    _categoryFieldKey.currentState?.didChange(Category.text); // ✅ trigger validation
+    _categoryFieldKey.currentState?.validate();
   }
 
   // GetX controller for API
@@ -1912,6 +1917,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   Future<void> _validateAndProceed() async {
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
+
 
     final selected =
         (announcementContorller.classList.isNotEmpty
@@ -2163,7 +2169,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
       body: SafeArea(
         child: Obx(() {
           final classes = teacherClassController.classList;
-          final subjects = teacherClassController.subjectList;
+
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
@@ -2564,32 +2570,33 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                             ),
                             const SizedBox(height: 10),
                             GestureDetector(
-                              onTap: _openCategorySheet, // open bottom sheet
-                              child: AbsorbPointer(
-                                child: CommonContainer.fillingContainer(
-                                  onDetailsTap: () {
-                                    Category.clear();
-                                    setState(() => showCategoryClear = false);
-                                  },
-                                  imagePath:
-                                      showCategoryClear
-                                          ? AppImages.close
-                                          : AppImages.downArrow,
-                                  imageColor: AppColor.gray,
-                                  text:
-                                      Category.text
-                                          .toUpperCase(), // <-- display uppercase
-                                  controller: Category,
-                                  validator: (v) {
-                                    if (v == null || v.trim().isEmpty) {
-                                      return 'Category is required';
-                                    }
-                                    return null;
-                                  },
-                                  imageSize: 11,
-                                ),
+                              onTap: _openCategorySheet,
+                              child: CommonContainer.fillingContainer(
+                                readOnly: true,
+                                fieldKey: _categoryFieldKey,
+                                controller: Category,
+                                text: Category.text.toUpperCase(),
+                                imagePath: showCategoryClear ? AppImages.close : AppImages.downArrow,
+                                imageColor: AppColor.gray,
+                                imageSize: 11,
+                                validator: (v) {
+                                  if (v == null || v.trim().isEmpty) {
+                                    return 'Category is required';
+                                  }
+                                  return null;
+                                },
+                                onDetailsTap: () {
+                                  Category.clear();
+                                  setState(() => showCategoryClear = false);
+                                  _categoryFieldKey.currentState?.didChange('');
+                                  _categoryFieldKey.currentState?.validate();
+                                },
+                                onChanged: (v) {
+                                  setState(() => showHeadingClear = v.isNotEmpty);
+                                },
                               ),
                             ),
+
 
                             // GestureDetector(
                             //   onTap: _openCategorySheet, // open bottom sheet
@@ -2965,11 +2972,18 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
             children: [
               Text(
                 'Description $paragraphNumber',
-                style: GoogleFont.ibmPlexSans(fontSize: 14, color: AppColor.black),
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 14,
+                  color: AppColor.black,
+                ),
               ),
               InkWell(
                 onTap: () => setState(() => _sections.removeAt(index)),
-                child: Image.asset(AppImages.close, height: 26, color: AppColor.gray),
+                child: Image.asset(
+                  AppImages.close,
+                  height: 26,
+                  color: AppColor.gray,
+                ),
               ),
             ],
           ),
@@ -2979,8 +2993,10 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
             initialValue: item.paragraph,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'Description is required';
-              if (v.trim().length < 3) return 'Please enter at least 3 characters';
+              if (v == null || v.trim().isEmpty)
+                return 'Description is required';
+              if (v.trim().length < 3)
+                return 'Please enter at least 3 characters';
               return null;
             },
             builder: (state) {
@@ -2996,11 +3012,16 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                         width: 1.5,
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: TextFormField(
                       initialValue: state.value,
                       maxLines: 5,
-                      decoration: const InputDecoration(border: InputBorder.none),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                      ),
                       onChanged: (val) {
                         state.didChange(val);
                         setState(() => item.paragraph = val);
@@ -3024,8 +3045,6 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
     );
   }
 
-
-
   Widget _buildListContainer(SectionItem item, int index) {
     final listNumber = _getTypeIndex(SectionType.list, index);
 
@@ -3040,11 +3059,18 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
             children: [
               Text(
                 'List $listNumber',
-                style: GoogleFont.ibmPlexSans(fontSize: 14, color: AppColor.black),
+                style: GoogleFont.ibmPlexSans(
+                  fontSize: 14,
+                  color: AppColor.black,
+                ),
               ),
               InkWell(
                 onTap: () => setState(() => _sections.removeAt(index)),
-                child: Image.asset(AppImages.close, height: 26, color: AppColor.gray),
+                child: Image.asset(
+                  AppImages.close,
+                  height: 26,
+                  color: AppColor.gray,
+                ),
               ),
             ],
           ),
@@ -3063,8 +3089,10 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                   initialValue: item.listPoints[listIndex],
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'List point is required';
-                    if (v.trim().length < 3) return 'Enter at least 3 characters';
+                    if (v == null || v.trim().isEmpty)
+                      return 'List point is required';
+                    if (v.trim().length < 3)
+                      return 'Enter at least 3 characters';
                     return null;
                   },
                   builder: (state) {
@@ -3072,12 +3100,18 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColor.lightWhite,
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(
-                              color: state.hasError ? Colors.red : Colors.transparent,
+                              color:
+                                  state.hasError
+                                      ? Colors.red
+                                      : Colors.transparent,
                               width: 1.5,
                             ),
                           ),
@@ -3085,7 +3119,10 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                             children: [
                               Text(
                                 'List ${listIndex + 1}',
-                                style: GoogleFont.ibmPlexSans(fontSize: 14, color: AppColor.gray),
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.gray,
+                                ),
                               ),
                               const SizedBox(width: 10),
                               Container(
@@ -3126,8 +3163,15 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                               ),
                               const SizedBox(width: 8),
                               GestureDetector(
-                                onTap: () => setState(() => item.listPoints.removeAt(listIndex)),
-                                child: Image.asset(AppImages.close, height: 26, color: AppColor.gray),
+                                onTap:
+                                    () => setState(
+                                      () => item.listPoints.removeAt(listIndex),
+                                    ),
+                                child: Image.asset(
+                                  AppImages.close,
+                                  height: 26,
+                                  color: AppColor.gray,
+                                ),
                               ),
                             ],
                           ),
@@ -3137,7 +3181,10 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                             padding: const EdgeInsets.only(top: 6, left: 4),
                             child: Text(
                               state.errorText!,
-                              style: const TextStyle(color: Colors.red, fontSize: 12),
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                       ],
@@ -3175,7 +3222,6 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
       ),
     );
   }
-
 
   Widget _buildImageContainer(SectionItem item, int index) {
     final imageNumber = _getTypeIndex(SectionType.image, index);

@@ -139,7 +139,7 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                   const SizedBox(height: 35),
                   Center(
                     child: Text(
-                      'Homework Preview',
+                      'Homework Details',
                       style: GoogleFont.inter(
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
@@ -178,6 +178,17 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                               //       fit: BoxFit.contain,
                               //     ),
                               //   ),
+
+                              // ---- Remaining images (each full width) ----
+                              ...remainingImages.map<Widget>((task) {
+                                final url = (task['content'] ?? '').toString();
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _fullWidthNetImage(url),
+                                );
+                              }),
+
+                              const SizedBox(height: 16),
 
                               // ---- Title & main description ----
                               Text(
@@ -234,17 +245,6 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                 ),
                               ],
 
-                              const SizedBox(height: 16),
-
-                              // ---- Remaining images (each full width) ----
-                              ...remainingImages.map<Widget>((task) {
-                                final url = (task['content'] ?? '').toString();
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: _fullWidthNetImage(url),
-                                );
-                              }),
-
                               const SizedBox(height: 12),
 
                               // ---- Paragraphs ----
@@ -282,7 +282,10 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 25,vertical: 20),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 25,
+                                      vertical: 20,
+                                    ),
                                     child: Row(
                                       children: [
                                         // CircleAvatar(

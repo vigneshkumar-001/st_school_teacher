@@ -269,12 +269,28 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                           children: [
                                             InkWell(
                                               onTap: () {
+                                                final selected =
+                                                    teacherClassController
+                                                        .selectedClass
+                                                        .value;
+                                                AppLogger.log.i(selected?.name);
+                                                AppLogger.log.i(selected?.section);
+                                                if (selected == null) {
+                                                  Get.snackbar(
+                                                    "Error",
+                                                    "Please select a class",
+                                                  );
+                                                  return;
+                                                }
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                     builder:
                                                         (context) =>
-                                                            HomeworkCreate(),
+                                                            HomeworkCreate(
+                                                              className: selected?.name,
+                                                              section: selected?.section,
+                                                            ),
                                                   ),
                                                 );
                                               },
@@ -431,12 +447,28 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                               children: [
                                                 InkWell(
                                                   onTap: () {
+                                                    final selected =
+                                                        teacherClassController
+                                                            .selectedClass
+                                                            .value;
+                                                    AppLogger.log.i(selected?.name);
+                                                    AppLogger.log.i(selected?.section);
+                                                    if (selected == null) {
+                                                      Get.snackbar(
+                                                        "Error",
+                                                        "Please select a class",
+                                                      );
+                                                      return;
+                                                    }
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder:
                                                             (context) =>
-                                                                QuizScreenCreate(),
+                                                                QuizScreenCreate(
+                                                                  className: selected.name,
+                                                                  section: selected.section,
+                                                                ),
                                                       ),
                                                     );
                                                   },
@@ -664,12 +696,27 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
 
                                                 InkWell(
                                                   onTap: () {
+                                                    final selected =
+                                                        teacherClassController
+                                                            .selectedClass
+                                                            .value;
+                                                    AppLogger.log.i(selected?.name);
+                                                    AppLogger.log.i(selected?.section);
+                                                    if (selected == null) {
+                                                      Get.snackbar(
+                                                        "Error",
+                                                        "Please select a class",
+                                                      );
+                                                      return;
+                                                    }
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder:
                                                             (context) =>
-                                                                ExamCreate(),
+                                                                ExamCreate(
+
+                                                                ),
                                                       ),
                                                     );
                                                   },

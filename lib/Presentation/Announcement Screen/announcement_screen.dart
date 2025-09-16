@@ -2708,8 +2708,10 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
   @override
   void initState() {
     super.initState();
-    controller.getCategoryList();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.getCategoryList(showLoader: false); // ✅ Moved inside
+
       if (controller.announcementData.value == null) {
         controller.getAnnouncement(type: "general");
       }

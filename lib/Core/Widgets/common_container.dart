@@ -430,6 +430,7 @@ class CommonContainer {
 
   static Widget fillingContainer({
     required String text,
+    Key? fieldKey,
     TextEditingController? controller,
     String? imagePath,
     bool verticalDivider = true,
@@ -445,6 +446,7 @@ class CommonContainer {
     bool isDOB = false,
     bool isMobile = false,
     bool isPincode = false,
+    bool readOnly = false,
     BuildContext? context,
     FormFieldValidator<String>? validator,
     FocusNode? focusNode,
@@ -453,6 +455,7 @@ class CommonContainer {
   }) {
     return FormField<String>(
       validator: validator,
+      key: fieldKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       builder: (state) {
         final hasError = state.hasError;
@@ -546,7 +549,7 @@ class CommonContainer {
                         child: AbsorbPointer(
                           absorbing: isDOB, // disable keyboard if DOB
                           child: TextFormField(
-                            focusNode: focusNode,
+                            focusNode: focusNode,readOnly: readOnly,
                             controller: controller,
                             maxLines: maxLine,
                             maxLength:
