@@ -25,7 +25,11 @@ class QuizController extends GetxController {
 
   // Details page data (set by quizDetailsPreviews)
   final Rxn<QuizDetailsData> quizDetails = Rxn<QuizDetailsData>();
+
   // final Rxn<StudentQuizData> studentQuizResult = Rxn<StudentQuizData>();
+
+  final Rxn<QuizDetailsData> studentQuizResult = Rxn<QuizDetailsData>();
+ 
   final RxString lastError = ''.obs;
 
   // List page UI state
