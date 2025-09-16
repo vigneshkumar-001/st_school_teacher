@@ -1650,8 +1650,11 @@ class AnnouncementCreate extends StatefulWidget {
 }
 
 class _AnnouncementCreateState extends State<AnnouncementCreate> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState> _categoryFieldKey = GlobalKey<FormFieldState>();
+
   // ---------- form + controllers ----------
-  final _formKey = GlobalKey<FormState>();
+
   final AnnouncementContorller announcementController = Get.put(
     AnnouncementContorller(),
   );
@@ -1818,6 +1821,8 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
         showCategoryClear = true;
       });
     }
+    _categoryFieldKey.currentState?.didChange(Category.text); // ✅ trigger validation
+    _categoryFieldKey.currentState?.validate();
   }
 
   // GetX controller for API
@@ -1912,6 +1917,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   Future<void> _validateAndProceed() async {
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
+
 
     final selected =
         (announcementContorller.classList.isNotEmpty
@@ -2163,7 +2169,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
       body: SafeArea(
         child: Obx(() {
           final classes = teacherClassController.classList;
-          final subjects = teacherClassController.subjectList;
+
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
@@ -2564,27 +2570,33 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                             ),
                             const SizedBox(height: 10),
                             GestureDetector(
-                              onTap: _openCategorySheet, // open bottom sheet
-                              child: AbsorbPointer(
-                                child: CommonContainer.fillingContainer(
-                                  onDetailsTap: () {
-                                    Category.clear();
-                                    setState(() => showCategoryClear = false);
-                                  },
-                                  imagePath:
-                                      showCategoryClear
-                                          ? AppImages.close
-                                          : AppImages.downArrow,
-                                  imageColor: AppColor.gray,
-                                  text:
-                                      Category.text
-                                          .toUpperCase(), // <-- display uppercase
-                                  controller: Category,
-                                  verticalDivider: false,
-                                  imageSize: 11,
-                                ),
+                              onTap: _openCategorySheet,
+                              child: CommonContainer.fillingContainer(
+                                readOnly: true,
+                                fieldKey: _categoryFieldKey,
+                                controller: Category,
+                                text: Category.text.toUpperCase(),
+                                imagePath: showCategoryClear ? AppImages.close : AppImages.downArrow,
+                                imageColor: AppColor.gray,
+                                imageSize: 11,
+                                validator: (v) {
+                                  if (v == null || v.trim().isEmpty) {
+                                    return 'Category is required';
+                                  }
+                                  return null;
+                                },
+                                onDetailsTap: () {
+                                  Category.clear();
+                                  setState(() => showCategoryClear = false);
+                                  _categoryFieldKey.currentState?.didChange('');
+                                  _categoryFieldKey.currentState?.validate();
+                                },
+                                onChanged: (v) {
+                                  setState(() => showHeadingClear = v.isNotEmpty);
+                                },
                               ),
                             ),
+
 
                             // GestureDetector(
                             //   onTap: _openCategorySheet, // open bottom sheet
@@ -2948,6 +2960,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   // ---------- section builders (modular) ----------
   Widget _buildParagraphContainer(SectionItem item, int index) {
     final paragraphNumber = _getTypeIndex(SectionType.paragraph, index);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Column(
@@ -2975,28 +2988,57 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
             ],
           ),
           const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColor.lightWhite,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextFormField(
-              initialValue: item.paragraph,
-              maxLines: 5,
-              decoration: const InputDecoration(border: InputBorder.none),
-              onChanged: (val) => setState(() => item.paragraph = val),
-              validator: (v) {
-                // Soft validation: only enforce when user added this section
-                if (v == null || v.trim().isEmpty) {
-                  return 'Description is required';
-                }
-                if (v.trim().length < 3) {
-                  return 'Please enter at least 3 characters';
-                }
-                return null;
-              },
-            ),
+
+          FormField<String>(
+            initialValue: item.paragraph,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty)
+                return 'Description is required';
+              if (v.trim().length < 3)
+                return 'Please enter at least 3 characters';
+              return null;
+            },
+            builder: (state) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.lightWhite,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: state.hasError ? Colors.red : Colors.transparent,
+                        width: 1.5,
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: TextFormField(
+                      initialValue: state.value,
+                      maxLines: 5,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                      ),
+                      onChanged: (val) {
+                        state.didChange(val);
+                        setState(() => item.paragraph = val);
+                      },
+                    ),
+                  ),
+                  if (state.hasError)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, left: 4),
+                      child: Text(
+                        state.errorText!,
+                        style: const TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -3005,6 +3047,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
 
   Widget _buildListContainer(SectionItem item, int index) {
     final listNumber = _getTypeIndex(SectionType.list, index);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18.0),
       child: Column(
@@ -3033,7 +3076,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
           ),
           const SizedBox(height: 12),
 
-          // dynamic points
+          // dynamic points with validation
           ListView.builder(
             itemCount: item.listPoints.length,
             shrinkWrap: true,
@@ -3041,75 +3084,118 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
             itemBuilder: (context, listIndex) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 14),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColor.lightWhite,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        'List ${listIndex + 1}',
-                        style: GoogleFont.ibmPlexSans(
-                          fontSize: 14,
-                          color: AppColor.gray,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        width: 2,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.grey.shade200,
-                              Colors.grey.shade300,
-                              Colors.grey.shade200,
+                child: FormField<String>(
+                  key: ValueKey('list-$index-$listIndex'),
+                  initialValue: item.listPoints[listIndex],
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty)
+                      return 'List point is required';
+                    if (v.trim().length < 3)
+                      return 'Enter at least 3 characters';
+                    return null;
+                  },
+                  builder: (state) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColor.lightWhite,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color:
+                                  state.hasError
+                                      ? Colors.red
+                                      : Colors.transparent,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                'List ${listIndex + 1}',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.gray,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Container(
+                                width: 2,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.grey.shade200,
+                                      Colors.grey.shade300,
+                                      Colors.grey.shade200,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextFormField(
+                                  // validator handled by outer FormField
+                                  initialValue: state.value,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter point',
+                                    hintStyle: GoogleFont.ibmPlexSans(
+                                      fontSize: 14,
+                                      color: AppColor.gray,
+                                    ),
+                                    border: InputBorder.none,
+                                  ),
+                                  onChanged: (val) {
+                                    state.didChange(val);
+                                    item.listPoints[listIndex] = val;
+                                  },
+                                  maxLines: 1,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap:
+                                    () => setState(
+                                      () => item.listPoints.removeAt(listIndex),
+                                    ),
+                                child: Image.asset(
+                                  AppImages.close,
+                                  height: 26,
+                                  color: AppColor.gray,
+                                ),
+                              ),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(1),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: item.listPoints[listIndex],
-                          decoration: InputDecoration(
-                            hintStyle: GoogleFont.ibmPlexSans(
-                              fontSize: 14,
-                              color: AppColor.gray,
+                        if (state.hasError)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6, left: 4),
+                            child: Text(
+                              state.errorText!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                              ),
                             ),
-                            border: InputBorder.none,
                           ),
-                          onChanged:
-                              (value) => item.listPoints[listIndex] = value,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap:
-                            () => setState(
-                              () => item.listPoints.removeAt(listIndex),
-                            ),
-                        child: Image.asset(
-                          AppImages.close,
-                          height: 26,
-                          color: AppColor.gray,
-                        ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    );
+                  },
                 ),
               );
             },
           ),
 
+          // add new point
           GestureDetector(
             onTap: () => setState(() => item.listPoints.add('')),
             child: DottedBorder(

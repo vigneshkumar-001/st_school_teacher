@@ -8,6 +8,7 @@ import '../Core/Utility/app_color.dart';
 import 'Core/Utility/app_images.dart';
 import 'Core/Utility/google_fonts.dart';
 import 'Presentation/Home/home.dart';
+import 'Presentation/Home/home_new_screen.dart';
 import 'Presentation/Homework/controller/teacher_class_controller.dart';
 import 'Presentation/Login Screen/change_mobile_number.dart';
 import 'package:get/get.dart';
@@ -79,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (isLoggedIn) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Home(page: 'homeScreen')),
+        MaterialPageRoute(builder: (context) => HomeNewScreen(page: 'homeScreen')),
       );
     } else {
       Navigator.pushReplacement(

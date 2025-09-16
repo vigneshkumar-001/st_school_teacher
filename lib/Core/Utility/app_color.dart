@@ -33,6 +33,7 @@ class AppColor {
   static const bluehG2 = Color(0xff309FD4);
   static const orangeG1 = Color(0xffFBBF30);
   static const orangeG2 = Color(0xffD96A1B);
+  static const orangeG3 = Color(0xffDD751E);
   static const lowlightgreen = Color(0xffE8FCF1);
   static const lightgreen = Color(0xff3AD87C);
   static const splash = Color(0xffF3FAFF);
