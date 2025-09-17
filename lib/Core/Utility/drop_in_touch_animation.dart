@@ -7,7 +7,7 @@ class BouncyTap extends StatefulWidget {
     required this.child,
     this.onTap,
     this.borderRadius,
-    this.pressedScale = 0.60,
+    this.pressedScale = 0.90,
     this.downDuration = const Duration(milliseconds: 300),
     this.upDuration = const Duration(milliseconds: 20),
     this.upCurve = Curves.elasticOut,
