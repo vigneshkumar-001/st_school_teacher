@@ -11,6 +11,7 @@ import 'package:st_teacher_app/Presentation/Attendance/controller/attendance_his
 import 'package:st_teacher_app/Presentation/Attendance/model/attendance_history_response.dart';
 import '../../Core/Utility/google_fonts.dart';
 import 'attendance_history_student.dart';
+import 'attendance_new_screen.dart';
 import 'attendance_start.dart';
 import 'controller/attendance_controller.dart';
 
@@ -642,7 +643,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AttendanceStart(),
+                              builder: (context) => AttendanceNewScreen(),
                             ),
                           );
                         },
@@ -660,7 +661,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Take Attenedence',
+                              'Take Attendance',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
