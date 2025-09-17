@@ -1,12 +1,13 @@
 class ApiUrl {
-  static String baseUrl = 'https://school-back-end-594f59bea6cb.herokuapp.com';
-  static String baseUrl1 = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
+  static String baseUrl1 = 'https://school-back-end-594f59bea6cb.herokuapp.com';
+  static String baseUrl = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
 
   static String login = '$baseUrl/teacher-auth/login';
   static String changePhone = '$baseUrl/teacher/change-phone/request';
   static String verifyOtp = '$baseUrl/teacher-auth/verify-otp';
   static String changePhoneVerify = '$baseUrl/teacher/change-phone/verify';
   static String classList = '$baseUrl/teacher-student-attendance/class-list';
+  static String messageList = '$baseUrl/teacher-messages/list';
   static String teacherClassFetch = '$baseUrl/teacher-homework/meta';
   static String examList = '$baseUrl/teacher-exams/list';
   static String getHomeWork = '$baseUrl/teacher-homework/list';
@@ -25,6 +26,12 @@ class ApiUrl {
   static String announcementDetail({required int Id}) {
     return '$baseUrl/teacher-announcement/details/$Id';
   }
+
+
+  static String reactMessage({required int msgId}) {
+    return '$baseUrl/teacher-messages/$msgId/react';
+  }
+
 
   static String listAnnouncement({required String type}) {
     return '$baseUrl/teacher-announcement/list?tab=$type';

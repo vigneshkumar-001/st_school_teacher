@@ -174,7 +174,8 @@ class Request {
     Map<String, dynamic> queryParams,
     String method,
     bool isTokenRequired,
-  ) async {
+  ) async
+  {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     String? userId = prefs.getString('userId');
@@ -237,4 +238,56 @@ class Request {
       return null;
     }
   }
+
+  static Future<Response?> sendPatchRequest(
+      String url,
+      Map<String, dynamic> body,
+      bool isTokenRequired,
+      ) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    Dio dio = Dio();
+
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
+          return handler.next(options);
+        },
+        onResponse: (
+            Response<dynamic> response,
+            ResponseInterceptorHandler handler,
+            ) {
+          AppLogger.log.i(
+            "PATCH Request \n Token: $token \n API: $url \n RESPONSE: ${response.toString()}",
+          );
+          return handler.next(response);
+        },
+        onError: (DioException error, ErrorInterceptorHandler handler) async {
+          return handler.reject(error);
+        },
+      ),
+    );
+
+    try {
+      Response response = await dio.patch(
+        url,
+        data: body,
+        options: Options(
+          headers: {
+            "Authorization": token != null ? "Bearer $token" : "",
+          },
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      return response;
+    } catch (e) {
+      AppLogger.log.e("PATCH API: $url \n ERROR: $e");
+      return null;
+    }
+  }
+
 }

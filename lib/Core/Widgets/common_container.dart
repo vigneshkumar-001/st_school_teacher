@@ -320,7 +320,31 @@ class CommonContainer {
       onTap: onDetailsTap,
       child: Stack(
         children: [
-          Image.network(backRoundImage),
+          // Image.network(backRoundImage),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: CachedNetworkImage(
+              imageUrl: backRoundImage,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              placeholder:
+                  (context, url) => Container(
+                    height: 180,
+                    alignment: Alignment.center,
+                    child: const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+              errorWidget:
+                  (context, url, error) => const Icon(
+                    Icons.broken_image,
+                    size: 40,
+                    color: Colors.grey,
+                  ),
+            ),
+          ),
           Positioned(
             bottom: 0,
             right: 0,
@@ -706,6 +730,8 @@ class CommonContainer {
     Color? backRoundColors,
     Gradient? gradient,
     VoidCallback? onIconTap,
+    bool isLikeLoading = false,
+
     VoidCallback? onIconTapLike,
     VoidCallback? onTap,
     String? homeWorkImage,
@@ -770,7 +796,26 @@ class CommonContainer {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Image.asset(AppImages.likeImage, height: 50),
+                      SizedBox(
+                        height: 50,
+                        width: 50,
+                        child:
+                            isLikeLoading
+                                ? const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    padding: EdgeInsets.all(15),
+                                  ),
+                                )
+                                : InkWell(
+                                  onTap: onIconTapLike,
+                                  child: Image.asset(
+                                    AppImages.likeImage,
+                                    height: 50,
+                                  ),
+                                ),
+                      ),
+
                       SizedBox(width: 10),
                       Container(
                         decoration: BoxDecoration(
@@ -2543,7 +2588,7 @@ class CommonContainer {
               borderRadius: BorderRadius.circular(12),
               child: Row(
                 children: [
-    AnimatedContainer(
+                  AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     height: 30,
                     width: 30,
@@ -2573,8 +2618,8 @@ class CommonContainer {
                   Expanded(
                     child: CustomTextField.richText(
                       text: text,
-                      text2: text2, // no need for ?? ''
-                      text1Color: t1Color, // no bang !
+                      text2: text2,
+                      text1Color: t1Color,
                     ),
                   ),
                 ],
@@ -2582,7 +2627,6 @@ class CommonContainer {
             ),
           ),
 
-          // right-side icon stays separately clickable
           if (iconImage) const SizedBox(width: 8),
           if (iconImage)
             InkWell(

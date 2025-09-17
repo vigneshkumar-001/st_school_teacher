@@ -32,6 +32,7 @@ class HomeworkData {
   final int page;
   final int pageSize;
   final int total;
+
   /// e.g. { "Today": [ ... ], "Yesterday": [ ... ] }
   final Map<String, List<HomeworkItem>> groups;
 
@@ -48,10 +49,11 @@ class HomeworkData {
     final parsedGroups = <String, List<HomeworkItem>>{};
     rawGroups.forEach((section, value) {
       final list = (value is List) ? value : const [];
-      parsedGroups[section] = list
-          .whereType<Map<String, dynamic>>()
-          .map(HomeworkItem.fromJson)
-          .toList();
+      parsedGroups[section] =
+          list
+              .whereType<Map<String, dynamic>>()
+              .map(HomeworkItem.fromJson)
+              .toList();
     });
 
     return HomeworkData(
