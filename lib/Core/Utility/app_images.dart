@@ -7,6 +7,7 @@ class AppImages {
   static String likeImage = 'asset/Images/Like Image.png';
 
   static String Quiz = 'asset/Images/Quiz.png';
+  static String zoom = 'asset/Images/zoom.png';
   static String rightArrow = 'assets/images/Right arrow.png';
   static String plus = 'asset/Images/plus.png';
   static String profilePicture = 'assets/images/Profile Picture.png';

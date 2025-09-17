@@ -18,7 +18,11 @@ class AttendanceResponse {
   }
 
   Map<String, dynamic> toJson() {
-    return {'status': status, 'message': message, 'data': data.toJson()};
+    return {
+      'status': status,
+      'message': message,
+      'data': data.toJson(),
+    };
   }
 }
 
@@ -82,9 +86,8 @@ class AttendanceData {
       presentStudentsMorning: _studentList(json['present_students_morning']),
       absentStudentsMorning: _studentList(json['absent_students_morning']),
       lateStudentsMorning: _studentList(json['late_students_morning']),
-      presentStudentsAfternoon: _studentList(
-        json['present_students_afternoon'],
-      ),
+      presentStudentsAfternoon:
+      _studentList(json['present_students_afternoon']),
       absentStudentsAfternoon: _studentList(json['absent_students_afternoon']),
       lateStudentsAfternoon: _studentList(json['late_students_afternoon']),
       pendingAttendance: _studentList(json['pending_attendance']),
@@ -92,9 +95,9 @@ class AttendanceData {
       absentStudentsMorningCount: json['absent_students_morning_count'] ?? 0,
       lateStudentsMorningCount: json['late_students_morning_count'] ?? 0,
       presentStudentsAfternoonCount:
-          json['present_students_afternoon_count'] ?? 0,
+      json['present_students_afternoon_count'] ?? 0,
       absentStudentsAfternoonCount:
-          json['absent_students_afternoon_count'] ?? 0,
+      json['absent_students_afternoon_count'] ?? 0,
       lateStudentsAfternoonCount: json['late_students_afternoon_count'] ?? 0,
       pendingAttendanceCount: json['pending_attendance_count'] ?? 0,
       totalStudents: json['total_students'] ?? 0,
@@ -110,17 +113,17 @@ class AttendanceData {
       'morning_attendance_done': morningAttendanceDone,
       'afternoon_attendance_done': afternoonAttendanceDone,
       'present_students_morning':
-          presentStudentsMorning.map((e) => e.toJson()).toList(),
+      presentStudentsMorning.map((e) => e.toJson()).toList(),
       'absent_students_morning':
-          absentStudentsMorning.map((e) => e.toJson()).toList(),
+      absentStudentsMorning.map((e) => e.toJson()).toList(),
       'late_students_morning':
-          lateStudentsMorning.map((e) => e.toJson()).toList(),
+      lateStudentsMorning.map((e) => e.toJson()).toList(),
       'present_students_afternoon':
-          presentStudentsAfternoon.map((e) => e.toJson()).toList(),
+      presentStudentsAfternoon.map((e) => e.toJson()).toList(),
       'absent_students_afternoon':
-          absentStudentsAfternoon.map((e) => e.toJson()).toList(),
+      absentStudentsAfternoon.map((e) => e.toJson()).toList(),
       'late_students_afternoon':
-          lateStudentsAfternoon.map((e) => e.toJson()).toList(),
+      lateStudentsAfternoon.map((e) => e.toJson()).toList(),
       'pending_attendance': pendingAttendance.map((e) => e.toJson()).toList(),
       'present_students_morning_count': presentStudentsMorningCount,
       'absent_students_morning_count': absentStudentsMorningCount,
@@ -139,19 +142,57 @@ class AttendanceData {
     }
     return [];
   }
+
+  /// ✅ Computed getter: single student list
+  List<Student> get students {
+    return [
+      ...presentStudentsMorning,
+      ...absentStudentsMorning,
+      ...lateStudentsMorning,
+      ...presentStudentsAfternoon,
+      ...absentStudentsAfternoon,
+      ...lateStudentsAfternoon,
+      ...pendingAttendance,
+    ];
+  }
 }
 
 class Student {
   final int id;
   final String name;
+  bool isPresent;
 
-  Student({required this.id, required this.name});
+  Student({
+    required this.id,
+    required this.name,
+    this.isPresent = false,
+  });
 
   factory Student.fromJson(Map<String, dynamic> json) {
-    return Student(id: json['id'] ?? 0, name: json['name'] ?? '');
+    return Student(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      isPresent: json['is_present'] ?? json['isPresent'] ?? false,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name};
+    return {
+      'id': id,
+      'name': name,
+      'is_present': isPresent,
+    };
+  }
+
+  Student copyWith({
+    int? id,
+    String? name,
+    bool? isPresent,
+  }) {
+    return Student(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      isPresent: isPresent ?? this.isPresent,
+    );
   }
 }

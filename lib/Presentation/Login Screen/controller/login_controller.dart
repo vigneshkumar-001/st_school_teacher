@@ -168,7 +168,8 @@ class LoginController extends GetxController {
   Future<void> _loadInitialData() async {
     await Future.wait([
       controller.getTeacherClassData(),
-      announcementContorller.getCategoryList(),
+      announcementContorller.getCategoryList(showLoader: false),
+      announcementContorller.getAnnouncement(showLoader: false),
     ]);
   }
 
