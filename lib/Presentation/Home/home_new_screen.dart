@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:st_teacher_app/Core/Utility/custom_navigation.dart';
 import 'package:st_teacher_app/Core/consents.dart';
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/app_loader.dart';
+import '../../Core/Utility/drop_in_touch_animation.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../dummy_screen.dart';
 import '../Attendance/attendance_new_screen.dart';
@@ -264,7 +268,9 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                         ),
                                         child: Column(
                                           children: [
-                                            InkWell(
+                                            BouncyTap(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                               onTap: () {
                                                 final selected =
                                                     teacherClassController
@@ -274,6 +280,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 AppLogger.log.i(
                                                   selected?.section,
                                                 );
+
                                                 if (selected == null) {
                                                   Get.snackbar(
                                                     "Error",
@@ -281,26 +288,22 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                   );
                                                   return;
                                                 }
-                                                Navigator.push(
+                                                CustomNavigation.pushFadeScale(
                                                   context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (
-                                                          context,
-                                                        ) => HomeworkCreate(
-                                                          className:
-                                                              selected?.name,
-                                                          section:
-                                                              selected?.section,
-                                                        ),
+
+                                                  HomeworkCreate(
+                                                    className:
+                                                        selected
+                                                            .name, // ✅ selected is non-null here
+                                                    section: selected.section,
+
                                                   ),
                                                 );
                                               },
-                                              child: Container(
-                                                height:
-                                                    180, // ✅ give bounded height
-                                                width:
-                                                    325, // ✅ (optional but nice)
+                                              child: Ink(
+                                                // ✅ lets ripple + clipping render over your gradient
+                                                height: 180,
+                                                width: 325,
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
                                                     colors: [
@@ -353,7 +356,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                               children: [
                                                                 Text(
                                                                   'Assign ',
-
                                                                   textAlign:
                                                                       TextAlign
                                                                           .center,
@@ -420,7 +422,9 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                                 ),
                                                               ],
                                                             ),
-                                                            SizedBox(width: 30),
+                                                            const SizedBox(
+                                                              width: 30,
+                                                            ),
                                                             Image.asset(
                                                               AppImages
                                                                   .Homework,
@@ -430,14 +434,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                         ),
                                                       ),
                                                     ),
-                                                    /*   Positioned.fill(
-                                                      child: IgnorePointer(
-                                                        child: Image.asset(
-                                                          AppImages.Homework,
-                                                       height: 130,
-                                                        ),
-                                                      ),
-                                                    ),*/
                                                   ],
                                                 ),
                                               ),
@@ -447,7 +443,9 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
                                               children: [
-                                                InkWell(
+                                                BouncyTap(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                   onTap: () {
                                                     final selected =
                                                         teacherClassController
@@ -466,27 +464,21 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                       );
                                                       return;
                                                     }
-                                                    Navigator.push(
+                                                    CustomNavigation.pushFadeScale(
                                                       context,
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (
-                                                              context,
-                                                            ) => QuizScreenCreate(
-                                                              className:
-                                                                  selected.name,
-                                                              section:
-                                                                  selected
-                                                                      .section,
-                                                            ),
+
+                                                      QuizScreenCreate(
+                                                        className:
+                                                            selected.name,
+                                                        section:
+                                                            selected.section,
+
                                                       ),
                                                     );
                                                   },
                                                   child: Container(
-                                                    height:
-                                                        190, // ✅ give bounded height
-                                                    width:
-                                                        155.5, // ✅ (optional but nice)
+                                                    height: 190,
+                                                    width: 155.5,
                                                     decoration: BoxDecoration(
                                                       gradient: LinearGradient(
                                                         colors: [
@@ -704,7 +696,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 ),
                                                 SizedBox(width: 14),
 
-                                                InkWell(
+                                                BouncyTap(
                                                   onTap: () {
                                                     final selected =
                                                         teacherClassController
@@ -723,12 +715,15 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                       );
                                                       return;
                                                     }
-                                                    Navigator.push(
+                                                    CustomNavigation.pushFadeScale(
                                                       context,
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (context) =>
-                                                                ExamCreate(),
+
+                                                      ExamCreate(
+                                                        className:
+                                                            selected.name,
+                                                        section:
+                                                            selected.section,
+
                                                       ),
                                                     );
                                                   },
@@ -1271,7 +1266,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                   MaterialPageRoute(
                                                     builder:
                                                         (_) =>
-                                                            AttendanceStart(),
+                                                            AttendanceNewScreen(),
                                                   ),
                                                 );
                                               },
@@ -1294,7 +1289,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Text(
-                                                    'Take Attenedence',
+                                                    'Take Attendance',
                                                     style:
                                                         GoogleFont.ibmPlexSans(
                                                           fontSize: 13,

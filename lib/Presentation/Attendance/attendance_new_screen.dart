@@ -13,6 +13,7 @@ import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../../dummy_screen.dart';
 import 'attendance_history.dart';
+import 'attendance_history_student.dart';
 import 'controller/attendance_controller.dart';
 import 'model/attendence_response.dart';
 
@@ -195,7 +196,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return   Center(child: AppLoader.circularLoader());
+            return Center(child: AppLoader.circularLoader());
           }
 
           if (controller.students.isEmpty) {
@@ -366,7 +367,16 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                               CommonContainer.tickContainer(
                                 iconImage: true,
                                 iconOnTap: () {
-                                  // optional: add detail navigation here
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => AttendanceHistoryStudent(
+                                            studentId: s.id,
+                                            classId: s.id,
+                                          ),
+                                    ),
+                                  );
                                 },
                                 isChecked: s.isPresent,
                                 onTap:

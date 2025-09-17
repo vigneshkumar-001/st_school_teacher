@@ -17,7 +17,9 @@ import 'exam_history.dart';
 import 'package:st_teacher_app/Core/consents.dart';
 
 class ExamCreate extends StatefulWidget {
-  const ExamCreate({super.key});
+  final String? className;
+  final String? section;
+  const ExamCreate({super.key, this.className, this.section});
 
   @override
   State<ExamCreate> createState() => _ExamCreateState();
