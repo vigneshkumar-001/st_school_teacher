@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:st_teacher_app/Core/Utility/app_loader.dart';
 import 'package:st_teacher_app/Presentation/Login%20Screen/controller/login_controller.dart';
@@ -118,19 +119,34 @@ class _MyProfileState extends State<MyProfile> {
 
                     GestureDetector(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (_) => ProfileScreen()),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => ProfileScreen()),
+                        );
                       },
                       child: ListTile(
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.network(
-                            data?.profile.profileImg.toString() ?? '',
+                            data?.profile.profileImg ?? '',
                             height: 55,
-                            fit: BoxFit.cover,
                             width: 55,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 55,
+                                width: 55,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                  size: 30,
+                                ),
+                              );
+                            },
                           ),
                         ),
 
@@ -499,12 +515,49 @@ class _MyProfileState extends State<MyProfile> {
                       onTap: () {},
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.network(
-                          profile.profileImg.toString() ?? '',
-                          height: 80,
+                        child: CachedNetworkImage(
+                          imageUrl: profile.profileImg ?? '',
                           fit: BoxFit.cover,
+                          height: 80,
                           width: 80,
+                          placeholder:
+                              (context, url) => Container(
+                                height: 180,
+                                alignment: Alignment.center,
+                                child: const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                          errorWidget:
+                              (context, url, error) => const Icon(
+                                Icons.broken_image,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
                         ),
+                        // Image.network(
+                        //   profile.profileImg ?? '', // safely pass empty string if null
+                        //   height: 80,
+                        //   width: 80,
+                        //   fit: BoxFit.cover,
+                        //   errorBuilder: (context, error, stackTrace) {
+                        //     // Fallback if image is invalid or failed to load
+                        //     return Container(
+                        //       height: 80,
+                        //       width: 80,
+                        //       color: Colors.grey.shade200,
+                        //       child: const Icon(
+                        //         Icons.broken_image,
+                        //         size: 40,
+                        //         color: Colors.grey,
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
                       ),
                     ),
                   ),

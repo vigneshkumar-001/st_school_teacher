@@ -177,11 +177,11 @@ class _AttendanceStartState extends State<AttendanceStart> {
 
   Future<void> _saveAttendanceInBackground(int studentId, String status) async {
     try {
-      await attendanceController.presentOrAbsent(
-        studentId: studentId,
-        status: status,
-        classId: selectedClass.id,
-      );
+      // await attendanceController.presentOrAbsent(
+      //   studentId: studentId,
+      //   status: status,
+      //   classId: selectedClass.id,
+      // );
     } catch (e) {
       // handle/log if needed
     }

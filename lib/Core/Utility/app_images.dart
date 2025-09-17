@@ -10,7 +10,7 @@ class AppImages {
   static String zoom = 'asset/Images/zoom.png';
   static String rightArrow = 'assets/images/Right arrow.png';
   static String plus = 'asset/Images/plus.png';
-  static String profilePicture = 'assets/images/Profile Picture.png';
+  static String profilePicture = 'assets/images/ProfilePicture.png';
   static String rightSideArrow = 'asset/Images/RightSideArrorw.png';
   static String close = 'asset/Images/Close.png';
   static String myAttendance = 'asset/Images/My Attendance.png';

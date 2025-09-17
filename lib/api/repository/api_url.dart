@@ -50,7 +50,7 @@ class ApiUrl {
       '$baseUrl/teacher-quiz/attend/$classId';
 
   static String attendance =
-      '$baseUrl/teacher-student-attendance/mark-attendance';
+      '$baseUrl/teacher-student-attendance/fast/mark-bulk';
 
   static String studentAttendance({required int classId}) {
     return '$baseUrl/teacher-student-attendance/today-status/?class_id=$classId';

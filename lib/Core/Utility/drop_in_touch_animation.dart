@@ -13,7 +13,6 @@ class BouncyTap extends StatefulWidget {
     this.upCurve = Curves.elasticOut,
     this.haptics = true,
 
-    // 👇 ensures bounce is visible even on very quick taps
     this.awaitBounce = true,
     this.minDownHold = const Duration(milliseconds: 60),
     this.afterUpHold = const Duration(milliseconds: 5),
@@ -156,8 +155,11 @@ class _BouncyTapState extends State<BouncyTap> {
                 color: Colors.transparent, // 👉 try giving a background
                 child: InkWell(
                   borderRadius: widget.borderRadius,
-                  splashColor: widget.splashColor ?? Colors.blue.withOpacity(0.2), // customize
-                  highlightColor: widget.highlightColor ?? Colors.blue.withOpacity(0.1),
+                  splashColor:
+                      widget.splashColor ??
+                      Colors.blue.withOpacity(0.2), // customize
+                  highlightColor:
+                      widget.highlightColor ?? Colors.blue.withOpacity(0.1),
                   onTapDown: (_) {
                     _downAt = DateTime.now();
                     _setPressed(true);
@@ -177,9 +179,10 @@ class _BouncyTapState extends State<BouncyTap> {
                     if (widget.haptics) HapticFeedback.selectionClick();
 
                     if (widget.awaitBounce) {
-                      final elapsed = _downAt == null
-                          ? widget.minDownHold
-                          : DateTime.now().difference(_downAt!);
+                      final elapsed =
+                          _downAt == null
+                              ? widget.minDownHold
+                              : DateTime.now().difference(_downAt!);
                       if (elapsed < widget.minDownHold) {
                         await Future.delayed(widget.minDownHold - elapsed);
                       }
@@ -195,7 +198,6 @@ class _BouncyTapState extends State<BouncyTap> {
                   child: widget.child,
                 ),
               ),
-
             ),
           ),
         ),

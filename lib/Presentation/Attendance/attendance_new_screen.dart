@@ -16,6 +16,7 @@ import 'attendance_history.dart';
 import 'attendance_history_student.dart';
 import 'controller/attendance_controller.dart';
 import 'model/attendence_response.dart';
+import 'model/class_list_response.dart';
 
 class Student {
   final int id;
@@ -58,7 +59,8 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
   List<AttendanceModel> markedAttendance = [];
   int _selectedPill = 0;
   bool morningDone = false;
-  var selectedClass;
+  ClassData? selectedClass;
+
   int selectedLaterStudentIndex = 0;
   final AttendanceController attendanceController = Get.put(
     AttendanceController(),
@@ -171,8 +173,29 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
   }
 
   @override
+  // void initState() {
+  //   super.initState();
+  //
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     await attendanceController.getClassList();
+  //
+  //     if (attendanceController.classList.isNotEmpty) {
+  //       selectedClass = attendanceController.classList.first;
+  //
+  //       final attendanceData = await attendanceController.getTodayStatus(
+  //         selectedClass!.id,
+  //       );
+  //
+  //       // Safe to rebuild here
+  //       setState(() {});
+  //     }
+  //   });
+  // }
   void initState() {
     super.initState();
+
+    // Show loader while fetching
+    controller.isLoading.value = true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await attendanceController.getClassList();
@@ -180,13 +203,11 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
       if (attendanceController.classList.isNotEmpty) {
         selectedClass = attendanceController.classList.first;
 
-        final attendanceData = await attendanceController.getTodayStatus(
-          selectedClass.id,
-        );
-
-        // Safe to rebuild here
-        setState(() {});
+        await attendanceController.getTodayStatus(selectedClass!.id);
       }
+
+      // Data fetched, hide loader
+      controller.isLoading.value = false;
     });
   }
 
@@ -428,16 +449,72 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                             ),
                           ],
                         ),
+                        SizedBox(height: 15),
+                        Obx(() {
+                          return AppButton.button(
+                            loader:
+                                controller.isSubmitting.value
+                                    ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    : null, // Show loader only when submitting
+                            text:
+                                "Submit", // Always show 'Submit' when not submitting
+                            onTap:
+                                controller.isSubmitting.value
+                                    ? null
+                                    : () async {
+                                      if (controller.students.isEmpty) return;
 
-                        const SizedBox(height: 20),
-                        AppButton.button(
-                          text: 'Submit',
-                          onTap: () {
-                            final payload = _validateBeforeSubmit();
-                          },
-                          width: double.infinity,
-                          height: 46,
-                        ),
+                                      // Check at least one selected
+                                      if (!controller.students.any(
+                                        (s) => s.isPresent,
+                                      )) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              "Please select at least one student.",
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      final success = await controller
+                                          .submitBulkAttendance(
+                                            classId:
+                                                selectedClass!.id, // safe now
+                                            studentsList: controller.students,
+                                          );
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            success
+                                                ? "Attendance submitted successfully!"
+                                                : "Failed to submit attendance.",
+                                          ),
+                                          backgroundColor:
+                                              success
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                        ),
+                                      );
+                                    },
+                            width: double.infinity,
+                            height: 46,
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -561,11 +638,11 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                       selectedLaterStudentIndex = 0;
                     });
 
-                    attendanceController.getTodayStatus(selectedClass.id).then((
-                      data,
-                    ) {
-                      if (data != null) {}
-                    });
+                    attendanceController.getTodayStatus(selectedClass!.id).then(
+                      (data) {
+                        if (data != null) {}
+                      },
+                    );
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 55, vertical: 9),
