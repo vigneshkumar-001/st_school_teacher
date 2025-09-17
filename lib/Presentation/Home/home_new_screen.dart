@@ -290,11 +290,13 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 }
                                                 CustomNavigation.pushFadeScale(
                                                   context,
+
                                                   HomeworkCreate(
                                                     className:
                                                         selected
                                                             .name, // ✅ selected is non-null here
                                                     section: selected.section,
+
                                                   ),
                                                 );
                                               },
@@ -464,11 +466,13 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                     }
                                                     CustomNavigation.pushFadeScale(
                                                       context,
+
                                                       QuizScreenCreate(
                                                         className:
                                                             selected.name,
                                                         section:
                                                             selected.section,
+
                                                       ),
                                                     );
                                                   },
@@ -713,11 +717,13 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                     }
                                                     CustomNavigation.pushFadeScale(
                                                       context,
+
                                                       ExamCreate(
                                                         className:
                                                             selected.name,
                                                         section:
                                                             selected.section,
+
                                                       ),
                                                     );
                                                   },
