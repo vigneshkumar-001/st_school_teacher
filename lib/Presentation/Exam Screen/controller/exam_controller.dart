@@ -34,9 +34,65 @@ class ExamController extends GetxController {
     getExamList();
   }
 
+  RxString selectedFilter = "All".obs;
+
+  RxList<String> monthFilters = <String>[].obs;
+  void buildMonthFilters() {
+    final months = <String>{};
+
+    for (var e in exam) {
+      final date = DateTime.tryParse(e.time); // ✅ use 'time'
+      if (date != null) {
+        final monthYear = DateFormat("MMMM yyyy").format(date);
+        months.add(monthYear);
+      }
+    }
+
+    monthFilters.value = ["All", ...months.toList()]; // Always add "All"
+  }
+
+
+  RxList<Exam> get filteredExams {
+    if (selectedFilter.value == "All") return exam;
+    return exam.where((e) {
+      final date = DateTime.tryParse(e.time);
+      if (date == null) return false;
+      final monthYear = DateFormat("MMMM yyyy").format(date);
+      return monthYear == selectedFilter.value;
+    }).toList().obs; // <-- make it reactive
+  }
+
+
+  Map<String, List<Exam>> get groupedExams {
+    final Map<String, List<Exam>> grouped = {};
+
+    // Use filtered exams based on selected filter
+    final sourceList = selectedFilter.value == "All" ? exam : filteredExams;
+
+    for (var e in sourceList) {
+      final date = DateTime.tryParse(e.time); // ✅ use 'time' instead of 'startDate'
+      if (date == null) continue;
+
+      final now = DateTime.now();
+      String key;
+
+      if (DateUtils.isSameDay(date, now)) {
+        key = "Today";
+      } else if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) {
+        key = "Yesterday";
+      } else {
+        key = DateFormat("MMM dd, yyyy").format(date); // e.g. Sep 12, 2025
+      }
+
+      grouped.putIfAbsent(key, () => []).add(e);
+    }
+
+    return grouped;
+  }
+
+
   Future<void> createExam({
     bool showLoader = true,
-
     BuildContext? context,
     required int classId,
     required String heading,
@@ -80,6 +136,7 @@ class ExamController extends GetxController {
         (response) async {
           if (showLoader) hidePopupLoader();
           // Navigator.pop(context);
+          await getExamList();
           Get.off(ExamHistory());
           AppLogger.log.i(response.message);
         },
@@ -142,6 +199,7 @@ class ExamController extends GetxController {
         (response) {
           isLoading.value = false;
           exam.value = response.exams;
+          buildMonthFilters(); // ⬅️ build dynamic filters here
           AppLogger.log.i(response.exams);
           AppLogger.log.i("Fetched ${exam.toJson()} ");
         },

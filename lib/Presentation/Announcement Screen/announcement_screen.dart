@@ -2820,6 +2820,8 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       } else if (item.type == "announcement" ||
                           item.type == "holiday") {
                         _showAnnouncementDetails(context, item.id);
+                      } else if (item.type == "exam") {
+                        _showAnnouncementDetails(context, item.id);
                       }
                     },
                   ),

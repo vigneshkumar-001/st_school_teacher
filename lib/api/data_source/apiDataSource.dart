@@ -11,6 +11,7 @@ import 'package:st_teacher_app/Presentation/Attendance/model/attendence_response
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_history.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/class_list_response.dart';
 import 'package:st_teacher_app/Presentation/Exam%20Screen/model/student_marks_response.dart';
+import 'package:st_teacher_app/Presentation/Home/models/message_list_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/get_homework_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/teacher_class_response.dart';
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
@@ -21,6 +22,7 @@ import '../../Presentation/Announcement Screen/Model/announcement_details_respon
 import '../../Presentation/Announcement Screen/Model/announcement_list_general.dart';
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
 import '../../Presentation/Exam Screen/model/exam_list_response.dart';
+import '../../Presentation/Home/models/react_response.dart';
 import '../../Presentation/Homework/model/homework_details_response.dart';
 import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
@@ -1070,6 +1072,53 @@ class ApiDataSource extends BaseApiDataSource {
           return Right(AnnouncementCreateResponse.fromJson(response.data));
         } else {
           return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, MessageListResponse>> getMessageList() async {
+    try {
+      String url = ApiUrl.messageList;
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(MessageListResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, ReactResponse>> reactForStudentMessage({
+    required int msgId,
+    required bool like,
+  }) async {
+    try {
+      String url = ApiUrl.reactMessage(msgId: msgId);
+
+      final response = await Request.sendPatchRequest(url, {
+        'reacted': like,
+      }, true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response?.statusCode == 200 || response?.statusCode == 201)) {
+        if (response?.data['status'] == true) {
+          return Right(ReactResponse.fromJson(response?.data));
+        } else {
+          return Left(ServerFailure(response?.data['message']));
         }
       } else {
         return Left(ServerFailure((response as DioException).message ?? ""));

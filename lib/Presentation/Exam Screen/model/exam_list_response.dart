@@ -16,9 +16,10 @@ class ExamsResponse {
       status: json['status'] ?? false,
       code: json['code'] ?? 0,
       message: json['message'] ?? '',
-      exams: (json['exams'] as List<dynamic>?)
-          ?.map((e) => Exam.fromJson(e))
-          .toList() ??
+      exams:
+          (json['exams'] as List<dynamic>?)
+              ?.map((e) => Exam.fromJson(e))
+              .toList() ??
           [],
     );
   }
@@ -40,6 +41,7 @@ class Exam {
   final String section;
   final String startDate;
   final String endDate;
+  final String time;
   final String? announcementDate;
   final String? resultDate;
   final String timetableUrl;
@@ -51,6 +53,7 @@ class Exam {
     required this.section,
     required this.startDate,
     required this.endDate,
+    required this.time,
     this.announcementDate,
     this.resultDate,
     required this.timetableUrl,
@@ -64,6 +67,7 @@ class Exam {
       section: json['section'] ?? '',
       startDate: json['startDate'] ?? '',
       endDate: json['endDate'] ?? '',
+      time: json['time'] ?? '',
       announcementDate: json['announcementDate'],
       resultDate: json['resultDate'],
       timetableUrl: json['timetableUrl'] ?? '',
@@ -78,6 +82,7 @@ class Exam {
       "section": section,
       "startDate": startDate,
       "endDate": endDate,
+      "time": time,
       "announcementDate": announcementDate,
       "resultDate": resultDate,
       "timetableUrl": timetableUrl,
