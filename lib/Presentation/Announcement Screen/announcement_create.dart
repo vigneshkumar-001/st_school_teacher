@@ -1651,7 +1651,8 @@ class AnnouncementCreate extends StatefulWidget {
 
 class _AnnouncementCreateState extends State<AnnouncementCreate> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final GlobalKey<FormFieldState> _categoryFieldKey = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _categoryFieldKey =
+      GlobalKey<FormFieldState>();
 
   // ---------- form + controllers ----------
 
@@ -1821,7 +1822,9 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
         showCategoryClear = true;
       });
     }
-    _categoryFieldKey.currentState?.didChange(Category.text); // ✅ trigger validation
+    _categoryFieldKey.currentState?.didChange(
+      Category.text,
+    ); // ✅ trigger validation
     _categoryFieldKey.currentState?.validate();
   }
 
@@ -1917,7 +1920,6 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   Future<void> _validateAndProceed() async {
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
-
 
     final selected =
         (announcementContorller.classList.isNotEmpty
@@ -2115,7 +2117,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await announcementController.getCategoryList();
+      await announcementController.getCategoryList(showLoader: false);
       if (teacherClassController.classList.isNotEmpty) {
         final defaultClass = teacherClassController.classList.firstWhere(
           (c) =>
@@ -2576,7 +2578,10 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                                 fieldKey: _categoryFieldKey,
                                 controller: Category,
                                 text: Category.text.toUpperCase(),
-                                imagePath: showCategoryClear ? AppImages.close : AppImages.downArrow,
+                                imagePath:
+                                    showCategoryClear
+                                        ? AppImages.close
+                                        : AppImages.downArrow,
                                 imageColor: AppColor.gray,
                                 imageSize: 11,
                                 validator: (v) {
@@ -2592,11 +2597,12 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                                   _categoryFieldKey.currentState?.validate();
                                 },
                                 onChanged: (v) {
-                                  setState(() => showHeadingClear = v.isNotEmpty);
+                                  setState(
+                                    () => showHeadingClear = v.isNotEmpty,
+                                  );
                                 },
                               ),
                             ),
-
 
                             // GestureDetector(
                             //   onTap: _openCategorySheet, // open bottom sheet
@@ -3089,10 +3095,9 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                   initialValue: item.listPoints[listIndex],
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
-                      return 'List point is required';
-                    if (v.trim().length < 3)
-                      return 'Enter at least 3 characters';
+                    if (v == null || v.trim().isEmpty) {
+                      return 'List is required';
+                    }
                     return null;
                   },
                   builder: (state) {

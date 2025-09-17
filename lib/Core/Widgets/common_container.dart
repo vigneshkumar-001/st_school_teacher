@@ -2543,7 +2543,7 @@ class CommonContainer {
               borderRadius: BorderRadius.circular(12),
               child: Row(
                 children: [
-                  AnimatedContainer(
+    AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     height: 30,
                     width: 30,
