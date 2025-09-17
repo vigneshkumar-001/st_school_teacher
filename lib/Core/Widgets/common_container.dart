@@ -549,7 +549,8 @@ class CommonContainer {
                         child: AbsorbPointer(
                           absorbing: isDOB, // disable keyboard if DOB
                           child: TextFormField(
-                            focusNode: focusNode,readOnly: readOnly,
+                            focusNode: focusNode,
+                            readOnly: readOnly,
                             controller: controller,
                             maxLines: maxLine,
                             maxLength:
@@ -2474,8 +2475,8 @@ class CommonContainer {
 
   static Widget tickContainer({
     required bool isChecked,
-    required VoidCallback onTap,      // toggles from parent
-    VoidCallback? iconOnTap,          // <- typed properly (optional)
+    required VoidCallback onTap, // toggles from parent
+    VoidCallback? iconOnTap, // <- typed properly (optional)
     required String text,
     String text2 = '',
     Color? textColor1,
@@ -2485,9 +2486,9 @@ class CommonContainer {
     Color? checkedBorderColor,
   }) {
     final Color resolvedBorder =
-    isError ? Colors.red : (borderColor ?? Colors.transparent);
+        isError ? Colors.red : (borderColor ?? Colors.transparent);
     final Color currentBorder =
-    isChecked ? (checkedBorderColor ?? AppColor.green) : resolvedBorder;
+        isChecked ? (checkedBorderColor ?? AppColor.green) : resolvedBorder;
     final Color t1Color = textColor1 ?? AppColor.black;
 
     return Material(
@@ -2510,21 +2511,22 @@ class CommonContainer {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: currentBorder, width: 1.5),
                     ),
-                    child: isChecked
-                        ? Center(
-                      child: Image.asset(
-                        AppImages.tick,
-                        height: 15,
-                        color: AppColor.green,
-                      ),
-                    )
-                        : null,
+                    child:
+                        isChecked
+                            ? Center(
+                              child: Image.asset(
+                                AppImages.tick,
+                                height: 15,
+                                color: AppColor.green,
+                              ),
+                            )
+                            : null,
                   ),
                   const SizedBox(width: 15),
                   Expanded(
                     child: CustomTextField.richText(
                       text: text,
-                      text2: text2,        // no need for ?? ''
+                      text2: text2, // no need for ?? ''
                       text1Color: t1Color, // no bang !
                     ),
                   ),
@@ -2552,6 +2554,4 @@ class CommonContainer {
       ),
     );
   }
-
-  }
-
+}

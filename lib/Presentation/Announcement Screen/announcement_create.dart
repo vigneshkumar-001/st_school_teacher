@@ -2117,7 +2117,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await announcementController.getCategoryList();
+      await announcementController.getCategoryList(showLoader: false);
       if (teacherClassController.classList.isNotEmpty) {
         final defaultClass = teacherClassController.classList.firstWhere(
           (c) =>
