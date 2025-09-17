@@ -45,7 +45,7 @@ class _ResultListState extends State<ResultList> {
 
   EdgeInsets _indicatorPaddingFor(int currentIndex, int tabCount) {
     const double inner = 14; // space near the other tab
-    const double edge  = 12; // space near screen/card edges
+    const double edge = 12; // space near screen/card edges
 
     // first tab → keep left "edge" and right "inner"
     if (currentIndex == 0) return const EdgeInsets.fromLTRB(edge, 0, inner, 0);
@@ -57,13 +57,14 @@ class _ResultListState extends State<ResultList> {
     return const EdgeInsets.symmetric(horizontal: inner);
   }
 
-
   void _navigateToStudent(String name) {
     if (name != 'Kanjana') return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ExamResult()),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (_) => const ExamResult(examId: 0, tittle: ''),
+    //   ),
+    // );
   }
 
   @override
@@ -115,7 +116,9 @@ class _ResultListState extends State<ResultList> {
                               // --- Tab strip ---
                               Container(
                                 // keep this if you like a hairline outer margin
-                                margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 0.5,
+                                ),
                                 child: TabBar(
                                   controller: ctrl,
                                   isScrollable: true,
@@ -143,16 +146,26 @@ class _ResultListState extends State<ResultList> {
                                   // indicatorPadding: const EdgeInsets.symmetric(horizontal: 14),
 
                                   // --- OPTION B (smart for edges: still keeps both sides!)
-                                  indicatorPadding: _indicatorPaddingFor(ctrl.index, 2),
+                                  indicatorPadding: _indicatorPaddingFor(
+                                    ctrl.index,
+                                    2,
+                                  ),
 
                                   // Add space around each label so you get the visible gap between tabs
-                                  labelPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
+                                  labelPadding: const EdgeInsets.symmetric(
+                                    horizontal: 22,
+                                    vertical: 8,
+                                  ),
 
                                   // Tiny padding around the whole bar so the cap doesn't hug the screen edge
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
 
                                   dividerColor: Colors.transparent,
-                                  overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+                                  overlayColor: const MaterialStatePropertyAll(
+                                    Colors.transparent,
+                                  ),
                                   splashFactory: NoSplash.splashFactory,
                                   labelStyle: GoogleFont.ibmPlexSans(
                                     fontSize: 13,
@@ -160,7 +173,6 @@ class _ResultListState extends State<ResultList> {
                                   ),
                                 ),
                               ),
-
 
                               // --- Big white card with content ---
                               Positioned.fill(
@@ -277,14 +289,16 @@ class _ResultListState extends State<ResultList> {
                                             AppButton.button(
                                               width: 320,
                                               onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (context) =>
-                                                            ExamResult(),
-                                                  ),
-                                                );
+                                                // Navigator.push(
+                                                //   context,
+                                                //   MaterialPageRoute(
+                                                //     builder:
+                                                //         (_) => const ExamResult(
+                                                //           examId: 0,
+                                                //           tittle: '',
+                                                //         ),
+                                                //   ),
+                                                // );
                                               },
                                               text: 'Start Mark Filling',
                                               image: AppImages.buttonArrow,

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:st_teacher_app/Core/Utility/app_loader.dart';
+import 'package:st_teacher_app/Presentation/Exam%20Screen/controller/exam_controller.dart';
 
 import '../../../Core/Utility/app_color.dart';
 import '../../../Core/Utility/app_images.dart';
+import '../../../Core/Utility/date_and_time_convert.dart';
 import '../../../Core/Utility/google_fonts.dart';
 import '../../../Core/Widgets/common_container.dart';
 import 'exam_create.dart';
 import 'exam_result.dart';
+import 'package:get/get.dart';
 
 class ExamHistory extends StatefulWidget {
   const ExamHistory({super.key});
@@ -15,77 +19,179 @@ class ExamHistory extends StatefulWidget {
 }
 
 class _ExamHistoryState extends State<ExamHistory> {
+  final ExamController controller = Get.put(ExamController());
   int index = 0;
   String selectedClassName = 'All';
   final Color defaultCardColor = AppColor.white;
   final List<String> className = ['All', 'September', 'August', 'July', 'June'];
-  final List<Map<String, dynamic>> allTasks = [
-    {
-      'mainText': 'Lorem ipsum donae Exam',
-      'subText1': '13 Jul 25 ',
-      'subText2': '18 Jul 25 ',
-      'subText21': '21 Jul 25 ',
-      'subText3': ' 22 Jul 25 ',
-      'showSubText3': true,
-      'className': '7th C',
-      'time': '4.30Pm',
-      'screen': () => ExamResult(),
-      'backRoundColor': AppColor.lightBlueC1,
-      'gradient': LinearGradient(
-        colors: [AppColor.black, AppColor.black],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    },
-    {
-      'mainText': 'Lorem ipsum donae Exam',
-      'subText1': '13 Jul 25 ',
-      'subText2': '18 Jul 25 ',
-      'subText21': '21 Jul 25 ',
-      'className': '7th C',
-      'time': '4.30Pm',
-      'subText3': ' 22 Jul 25 ',
-      'screen': () {},
-      'backRoundColor': AppColor.lowLightYellow,
-      'gradient': LinearGradient(
-        colors: [AppColor.black, AppColor.black],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    },
-    {
-      'mainText': 'Lorem ipsum donae Exam',
-      'subText1': '13 Jul 25 ',
-      'subText2': '18 Jul 25 ',
-      'subText21': '21 Jul 25 ',
-      'className': '7th C',
-      'time': '4.30Pm',
-      'screen': () {},
-      'backRoundColor': AppColor.lowLightNavi,
-      'gradient': LinearGradient(
-        colors: [AppColor.black, AppColor.black],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    },
-    {
-      'mainText': 'Lorem ipsum donae Exam',
-      'subText1': '13 Jul 25 ',
-      'subText2': '18 Jul 25 ',
-      'subText21': '21 Jul 25 ',
-      'className': '7th C',
-      'time': '4.30Pm',
-      'screen': () {},
-      'backRoundColor': AppColor.lowLightPink,
-      'gradient': LinearGradient(
-        colors: [AppColor.black, AppColor.black],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    },
-  ];
+  final List<Map<String, dynamic>> allTasks = [];
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    CommonContainer.NavigatArrow(
+                      image: AppImages.leftSideArrow,
+                      imageColor: AppColor.lightBlack,
+                      container: AppColor.lowLightgray,
+                      onIconTap: () => Navigator.pop(context),
+                      border: Border.all(color: AppColor.lightgray, width: 0.3),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ExamCreate()),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            'Create Exam',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Image.asset(AppImages.doubleArrow, height: 19),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 35),
+
+                Center(
+                  child: Text(
+                    'Exams',
+                    style: GoogleFont.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 28.0),
+                  child: SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        // final name = quizController.classNames[index];
+                        // final isSelected =
+                        //     quizController.selectedClassName.value ==
+                        //         name;
+
+                        return GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColor.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: AppColor.borderGary),
+                            ),
+                            alignment: Alignment.center,
+                            child: buildClassNameRichText('ALL', AppColor.gray),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                Obx(() {
+                  if (controller.isLoading.value) {
+                    return Center(child: AppLoader.circularLoader());
+                  }
+
+                  if (controller.exam.isEmpty) {
+                    return const Center(child: Text("No exams available"));
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: controller.exam.length,
+                    itemBuilder: (context, index) {
+                      List<Color> colors = [
+                        AppColor.lightBlueC1,
+                        AppColor.lowLightYellow,
+                        AppColor.lowLightNavi,
+                        AppColor.lowLightPink,
+                      ];
+
+                      final bgColor = colors[index % colors.length];
+                      final exam = controller.exam[index];
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: CommonContainer.examHistory(
+                          sections: exam.section,
+                          classes: exam.className,
+                          image: exam.timetableUrl,
+                          backRoundColors: AppColor.black,
+                          subText1: DateAndTimeConvert.shortDate(
+                            exam.announcementDate.toString(),
+                          ),
+                          subText2: DateAndTimeConvert.shortDate(
+                            exam.startDate,
+                          ),
+                          subText21: DateAndTimeConvert.shortDate(exam.endDate),
+                          mainText: exam.heading,
+                          time: exam.announcementDate ?? "-",
+                          backRoundColor: bgColor,
+                          gradient: const LinearGradient(
+                            colors: [Colors.transparent, Colors.transparent],
+                          ),
+                          onIconTap: () {
+                            final examId = exam.id;
+                            final tittle = exam.heading;
+                            final startDate = exam.startDate;
+                            final endDate = exam.endDate;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => ExamResult(
+                                      endDate: endDate,
+                                      startDate: startDate,
+                                      examId: examId,
+                                      tittle: tittle,
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

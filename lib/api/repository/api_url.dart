@@ -8,14 +8,17 @@ class ApiUrl {
   static String changePhoneVerify = '$baseUrl/teacher/change-phone/verify';
   static String classList = '$baseUrl/teacher-student-attendance/class-list';
   static String teacherClassFetch = '$baseUrl/teacher-homework/meta';
+  static String examList = '$baseUrl/teacher-exams/list';
   static String getHomeWork = '$baseUrl/teacher-homework/list';
   static String createHomework = '$baseUrl/teacher-homework/create';
-  static String profileImageUrl = '$baseUrl/teacher-home/profiles/profile-image-url';
+  static String profileImageUrl =
+      '$baseUrl/teacher-home/profiles/profile-image-url';
   static String profile = '$baseUrl/teacher-home/profile';
   static String teacherQuizCreate = '$baseUrl/teacher-quiz/create';
   static String teacherQuizList = '$baseUrl/teacher-quiz/list';
   static String createAnnouncement = '$baseUrl/teacher-announcement/create';
   static String teacherExamsCreate = '$baseUrl/teacher-exams/create';
+  static String enterMarks = '$baseUrl/teacher-exams/enter-marks';
   // static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
   static String categoriesList = '$baseUrl/announcement-categories';
 
@@ -25,6 +28,10 @@ class ApiUrl {
 
   static String listAnnouncement({required String type}) {
     return '$baseUrl/teacher-announcement/list?tab=$type';
+  }
+
+  static String getStudentMarkL({required int examId}) {
+    return '$baseUrl/teacher-exams/$examId/students-with-marks';
   }
 
   static String studentQuizResult({

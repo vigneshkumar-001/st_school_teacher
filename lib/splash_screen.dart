@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Animation controller for 12 seconds
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 12),
+      duration: const Duration(seconds: 8),
     );
 
     _controller.addListener(() {
@@ -48,10 +48,9 @@ class _SplashScreenState extends State<SplashScreen>
       });
     });
 
-    _controller.forward(); // start animation
+    _controller.forward();
 
-    // Check login after 12 seconds
-    Future.delayed(const Duration(seconds: 12), () {
+    Future.delayed(const Duration(seconds: 8), () {
       _checkLoginStatus();
     });
   }
@@ -80,7 +79,9 @@ class _SplashScreenState extends State<SplashScreen>
     if (isLoggedIn) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeNewScreen(page: 'homeScreen')),
+        MaterialPageRoute(
+          builder: (context) => HomeNewScreen(page: 'homeScreen'),
+        ),
       );
     } else {
       Navigator.pushReplacement(

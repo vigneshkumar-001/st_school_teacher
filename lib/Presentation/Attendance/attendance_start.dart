@@ -14,7 +14,7 @@ import 'controller/attendance_controller.dart';
 class AttendanceModel {
   final int studentId;
   final int classId;
-  String status; // "present", "absent", "late"
+  String status;
 
   AttendanceModel({
     required this.studentId,
@@ -451,7 +451,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
         child: Obx(
           () =>
               attendanceController.isLoading.value
-                  ? Center(child: AppLoader.circularLoader( ))
+                  ? Center(child: AppLoader.circularLoader())
                   : SingleChildScrollView(
                     child: Column(
                       children: [
@@ -474,7 +474,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                       width: 0.3,
                                     ),
                                   ),
-                                    Spacer(),
+                                  Spacer(),
                                   InkWell(
                                     onTap: () {
                                       Navigator.push(
@@ -496,7 +496,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                             color: AppColor.gray,
                                           ),
                                         ),
-                                          SizedBox(width: 8),
+                                        SizedBox(width: 8),
                                         Image.asset(
                                           AppImages.historyImage,
                                           height: 24,
@@ -568,7 +568,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                 return _buildActionCard(loading);
                               }),
 
-                                SizedBox(height: 20),
+                              SizedBox(height: 20),
                               Text(
                                 'Students List',
                                 style: GoogleFont.ibmPlexSans(
@@ -577,7 +577,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                   color: AppColor.black,
                                 ),
                               ),
-                                SizedBox(height: 10),
+                              SizedBox(height: 10),
 
                               Container(
                                 decoration: BoxDecoration(
@@ -687,14 +687,14 @@ class _AttendanceStartState extends State<AttendanceStart> {
                                                     MaterialPageRoute(
                                                       builder:
                                                           (
-                                                          context,
+                                                            context,
                                                           ) => AttendanceHistoryStudent(
-                                                        studentId:
-                                                        student['id'],
-                                                        classId:
-                                                        selectedClass
-                                                            .id,
-                                                      ),
+                                                            studentId:
+                                                                student['id'],
+                                                            classId:
+                                                                selectedClass
+                                                                    .id,
+                                                          ),
                                                     ),
                                                   );
                                                 },
@@ -785,7 +785,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
         return Container(
           decoration: BoxDecoration(color: AppColor.white),
           child: Padding(
-            padding:   EdgeInsets.symmetric(vertical: 12),
+            padding: EdgeInsets.symmetric(vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(attendanceController.classList.length, (
@@ -816,10 +816,7 @@ class _AttendanceStartState extends State<AttendanceStart> {
                     });
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 55,
-                      vertical: 9,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 55, vertical: 9),
                     decoration: BoxDecoration(
                       color: AppColor.white,
                       borderRadius: BorderRadius.circular(30),
