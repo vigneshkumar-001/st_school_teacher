@@ -36,13 +36,7 @@ class _ExamCreateState extends State<ExamCreate> {
   TextEditingController headingController = TextEditingController();
   final TextEditingController dateRangeController = TextEditingController();
   final TextEditingController singleDateController = TextEditingController();
-  final List<Map<String, String>> classData = [
-    {'grade': '8', 'section': 'A'},
-    {'grade': '8', 'section': 'B'},
-    {'grade': '8', 'section': 'C'},
-    {'grade': '9', 'section': 'A'},
-    {'grade': '9', 'section': 'C'},
-  ];
+
   Future<void> _pickPermanentImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {

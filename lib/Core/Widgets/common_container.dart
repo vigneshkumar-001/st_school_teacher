@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -549,7 +550,8 @@ class CommonContainer {
                         child: AbsorbPointer(
                           absorbing: isDOB, // disable keyboard if DOB
                           child: TextFormField(
-                            focusNode: focusNode,readOnly: readOnly,
+                            focusNode: focusNode,
+                            readOnly: readOnly,
                             controller: controller,
                             maxLines: maxLine,
                             maxLength:
@@ -936,7 +938,10 @@ class CommonContainer {
     String? subText1,
     String? subText2,
     String? subText21,
+    String? image,
     String? subText3Text,
+    String? classes,
+    String? sections,
     required String time,
     VoidCallback? onIconTap,
     Gradient? gradient,
@@ -967,9 +972,57 @@ class CommonContainer {
                 ),
               ),
               SizedBox(height: 15),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColor.white,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 25,
+                ),
+                child: Column(
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: image ?? '',
+                      height: 130,
+                      width: 260,
+                      fit: BoxFit.cover,
+                      placeholder:
+                          (context, url) => Container(
+                            height: 180, // adjust to your card height
+                            alignment: Alignment.center,
+                            child: const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                      errorWidget:
+                          (context, url, error) => const Icon(
+                            Icons.broken_image,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(AppImages.zoom, height: 14, width: 14),
+                        SizedBox(width: 10),
+                        CustomTextField.textWith600(text: 'Zoom', fontSize: 11),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 15),
+
               RichText(
                 text: TextSpan(
-                  text: 'Announce on ',
+                  text: 'Announce on  ',
                   style: GoogleFont.ibmPlexSans(
                     fontSize: 11,
                     color: AppColor.gray,
@@ -991,7 +1044,7 @@ class CommonContainer {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Scheduled on ',
+                      text: 'Scheduled on  ',
                       style: GoogleFont.ibmPlexSans(
                         fontSize: 11,
                         color: AppColor.gray,
@@ -1063,7 +1116,7 @@ class CommonContainer {
                         children: [
                           RichText(
                             text: TextSpan(
-                              text: '7',
+                              text: classes,
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -1071,15 +1124,7 @@ class CommonContainer {
                               ),
                               children: [
                                 TextSpan(
-                                  text: 'th ',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColor.gray,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'C',
+                                  text: ' $sections',
                                   style: GoogleFont.ibmPlexSans(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w800,
@@ -1122,12 +1167,9 @@ class CommonContainer {
                     onTap: onIconTap,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: gradient == null ? backRoundColors : null,
-                        gradient: gradient,
-                        border: Border.all(
-                          color: AppColor.lowLightgray,
-                          width: 1,
-                        ),
+                        color: AppColor.black,
+
+                        border: Border.all(color: AppColor.black, width: 1),
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Padding(
@@ -2474,8 +2516,8 @@ class CommonContainer {
 
   static Widget tickContainer({
     required bool isChecked,
-    required VoidCallback onTap,      // toggles from parent
-    VoidCallback? iconOnTap,          // <- typed properly (optional)
+    required VoidCallback onTap, // toggles from parent
+    VoidCallback? iconOnTap, // <- typed properly (optional)
     required String text,
     String text2 = '',
     Color? textColor1,
@@ -2485,9 +2527,9 @@ class CommonContainer {
     Color? checkedBorderColor,
   }) {
     final Color resolvedBorder =
-    isError ? Colors.red : (borderColor ?? Colors.transparent);
+        isError ? Colors.red : (borderColor ?? Colors.transparent);
     final Color currentBorder =
-    isChecked ? (checkedBorderColor ?? AppColor.green) : resolvedBorder;
+        isChecked ? (checkedBorderColor ?? AppColor.green) : resolvedBorder;
     final Color t1Color = textColor1 ?? AppColor.black;
 
     return Material(
@@ -2503,28 +2545,35 @@ class CommonContainer {
                 children: [
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    height: 40,
-                    width: 40,
+                    height: 30,
+                    width: 30,
                     decoration: BoxDecoration(
                       color: isChecked ? AppColor.white : AppColor.lightWhite,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: currentBorder, width: 1.5),
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(color: currentBorder, width: 2),
                     ),
-                    child: isChecked
-                        ? Center(
-                      child: Image.asset(
-                        AppImages.tick,
-                        height: 15,
-                        color: AppColor.green,
-                      ),
-                    )
-                        : null,
+                    child:
+                        isChecked
+                            ? Center(
+                              child: ShaderMask(
+                                shaderCallback:
+                                    (bounds) => const LinearGradient(
+                                      colors: [Colors.green, Colors.green],
+                                    ).createShader(bounds),
+                                child: Image.asset(
+                                  AppImages.tick,
+                                  height: 14,
+                                  color: Colors.white, // mask fill
+                                ),
+                              ),
+                            )
+                            : null,
                   ),
                   const SizedBox(width: 15),
                   Expanded(
                     child: CustomTextField.richText(
                       text: text,
-                      text2: text2,        // no need for ?? ''
+                      text2: text2, // no need for ?? ''
                       text1Color: t1Color, // no bang !
                     ),
                   ),
@@ -2552,6 +2601,4 @@ class CommonContainer {
       ),
     );
   }
-
-  }
-
+}

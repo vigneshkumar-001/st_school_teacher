@@ -10,10 +10,27 @@ class AttendanceController extends GetxController {
   RxString currentLoadingStatus = ''.obs;
   RxBool isLoading = false.obs;
   RxBool isPresentLoading = false.obs;
+  final RxBool isAttendanceLoading = false.obs;
+  final RxBool isMarkingLoading = false.obs;
   String accessToken = '';
   RxList<ClassData> classList = <ClassData>[].obs;
-
+  final RxList<Student> students = <Student>[].obs;
   Rxn<AttendanceData> attendance = Rxn<AttendanceData>(); // <-- Added
+
+  int get presentCount => students.where((s) => s.isPresent).length;
+  int get absentCount => students.where((s) => !s.isPresent).length;
+
+  void toggleSingle(int index) {
+    students[index].isPresent = !students[index].isPresent;
+    students.refresh(); // 🔑 Needed for UI update
+  }
+
+  void toggleSelectAll(bool value) {
+    for (var s in students) {
+      s.isPresent = value;
+    }
+    students.refresh(); // 🔑
+  }
 
   @override
   void onInit() {
@@ -59,25 +76,28 @@ class AttendanceController extends GetxController {
     bool showLoader = true,
   }) async {
     try {
-      if (showLoader) isLoading.value = true;
+      if (showLoader) isAttendanceLoading.value = true;
 
       final results = await apiDataSource.getTodayStatus(classId);
+
       return await results.fold(
         (failure) {
-          if (showLoader) isLoading.value = false;
-          AppLogger.log.e(failure.message);
+          AppLogger.log.e("Attendance error: ${failure.message}");
           return null;
         },
         (response) async {
-          if (showLoader) isLoading.value = false;
+          students.assignAll(response.data.students ?? []);
           attendance.value = response.data;
+
+          AppLogger.log.i("Attendance fetched: ${students.length} students");
           return response.data;
         },
       );
     } catch (e) {
-      if (showLoader) isLoading.value = false;
-      AppLogger.log.e(e);
+      AppLogger.log.e("Attendance exception: $e");
       return null;
+    } finally {
+      if (showLoader) isAttendanceLoading.value = false;
     }
   }
 

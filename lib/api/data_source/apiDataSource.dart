@@ -10,6 +10,7 @@ import 'package:st_teacher_app/Presentation/Attendance/model/attendance_history_
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_history.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/class_list_response.dart';
+import 'package:st_teacher_app/Presentation/Exam%20Screen/model/student_marks_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/get_homework_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/teacher_class_response.dart';
 import 'package:st_teacher_app/Presentation/Quiz%20Screen/quiz_history.dart';
@@ -19,6 +20,7 @@ import '../../Presentation/Announcement Screen/Model/announcement_create_respons
 import '../../Presentation/Announcement Screen/Model/announcement_details_response.dart';
 import '../../Presentation/Announcement Screen/Model/announcement_list_general.dart';
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
+import '../../Presentation/Exam Screen/model/exam_list_response.dart';
 import '../../Presentation/Homework/model/homework_details_response.dart';
 import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
@@ -997,6 +999,83 @@ class ApiDataSource extends BaseApiDataSource {
       }
     } catch (e) {
       return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, ExamsResponse>> getExamList() async {
+    try {
+      String url = ApiUrl.examList;
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(ExamsResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, StudentMarksResponse>> getStudentExamList({
+    required int examId,
+  }) async {
+    try {
+      String url = ApiUrl.getStudentMarkL(examId: examId);
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(StudentMarksResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
+  Future<Either<Failure, AnnouncementCreateResponse>> markEnter({
+    required int examId,
+    required int studentId,
+    required int subjectId,
+    required int mark,
+  }) async {
+    try {
+      String url = ApiUrl.enterMarks;
+
+      final body = {
+        "examId": examId,
+        "studentId": studentId,
+        "subjectId": subjectId,
+        "mark": mark,
+      };
+
+      dynamic response = await Request.sendRequest(url, body, 'Post', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(AnnouncementCreateResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
     }
   }
 }
