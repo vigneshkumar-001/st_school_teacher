@@ -1100,14 +1100,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   );
   final QuizController controller = Get.put(QuizController());
 
-  // Data
-  // final List<QuestionModel> questionList = [];
-
-  // Subject tabs (coming from controller in real app)
-  final List<Map<String, dynamic>> tabs = const [
-    {"label": "Social Science"},
-    {"label": "English"},
-  ];
 
   // ===== State (inside your State class) =====
 

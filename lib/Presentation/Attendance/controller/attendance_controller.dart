@@ -17,6 +17,7 @@ class AttendanceController extends GetxController {
   final RxList<Student> students = <Student>[].obs;
   Rxn<AttendanceData> attendance = Rxn<AttendanceData>(); // <-- Added
 
+  RxBool isSubmitting = false.obs; // loader for submit button
   int get presentCount => students.where((s) => s.isPresent).length;
   int get absentCount => students.where((s) => !s.isPresent).length;
 
@@ -54,6 +55,7 @@ class AttendanceController extends GetxController {
           // classList.assignAll(response.data);
           classList.value = response.data ?? [];
           AppLogger.log.i(classList.toString());
+          AppLogger.log.i('Class Length${classList.length}');
 
           if (classList.isNotEmpty) {
             int firstClassId = classList.first.id ?? 0;
@@ -101,32 +103,51 @@ class AttendanceController extends GetxController {
     }
   }
 
-  Future<bool> presentOrAbsent({
-    required int studentId,
+  Future<bool> submitBulkAttendance({
     required int classId,
-    required String status,
+    required List<Student> studentsList,
   }) async {
     try {
-      final results = await apiDataSource.presentOrAbsent(
-        studentId: studentId,
+      isSubmitting.value = true;
+
+      // Prepare items for API
+      final items =
+          studentsList.map((s) {
+            return {
+              "student_id": s.id,
+              "status": s.isPresent ? "present" : "absent",
+            };
+          }).toList();
+
+      // 🔹 Combine into the body as backend expects
+      final body = {"class_id": classId, "items": items};
+
+      // 🔹 Print the body
+      AppLogger.log.i("Submitting bulk attendance: $body");
+      print("Submitting bulk attendance: $body");
+
+      // Call API
+      final results = await apiDataSource.presentOrAbsentBulk(
         classId: classId,
-        status: status,
+        items: items,
       );
+
       return results.fold(
         (failure) {
           AppLogger.log.e(failure.message);
           return false;
         },
         (response) async {
-          AppLogger.log.i(response.toString());
+          await getClassList();
+          AppLogger.log.i("Bulk attendance submitted successfully");
           return true;
-          // final prefs = await SharedPreferences.getInstance();
-          // await prefs.setString('token', response.token);
         },
       );
     } catch (e) {
       AppLogger.log.e(e);
       return false;
+    } finally {
+      isSubmitting.value = false;
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Core/Utility/snack_bar.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_response.dart';
 import 'package:st_teacher_app/Presentation/Home/models/message_list_response.dart';
 import 'package:st_teacher_app/Presentation/Home/models/react_response.dart';
@@ -17,8 +18,9 @@ class MessageController extends GetxController {
   String accessToken = '';
   RxList<NotificationItem> messageList = <NotificationItem>[].obs;
   var reactData = Rxn<ReactData>(); // nullable reactive variable
-// Track loading for each message separately
-  final RxSet<int> loadingMessages = <int>{}.obs; // stores ids of loading messages
+  // Track loading for each message separately
+  final RxSet<int> loadingMessages =
+      <int>{}.obs; // stores ids of loading messages
 
   @override
   void onInit() {
@@ -49,9 +51,9 @@ class MessageController extends GetxController {
     return grouped;
   }
 
-  Future<String?> getMessageList() async {
+  Future<String?> getMessageList({bool load = true}) async {
     try {
-      isLoading.value = true;
+      isLoading.value = load;
       final results = await apiDataSource.getMessageList();
       results.fold(
         (failure) {
@@ -77,18 +79,28 @@ class MessageController extends GetxController {
     }
     return null;
   }
-  Future<String?> reactForStudentMessage({required int msgId, bool like = true}) async {
-    try {
-      loadingMessages.add(msgId); // start loading for this msgId
 
-      final results = await apiDataSource.reactForStudentMessage(msgId: msgId, like: like);
+  Future<String?> reactForStudentMessage({
+    required int msgId,
+    bool like = true,
+  }) async {
+    try {
+      loadingMessages.add(msgId);
+
+      final results = await apiDataSource.reactForStudentMessage(
+        msgId: msgId,
+        like: like,
+      );
 
       results.fold(
-            (failure) {
+        (failure) {
           AppLogger.log.e(failure.message);
         },
-            (response) async {
+        (response) async {
+          await getMessageList(load: false);
+          CustomSnackBar.showSuccess('Reacted');
           reactData.value = response.data;
+
           AppLogger.log.i(messageList.toString());
         },
       );

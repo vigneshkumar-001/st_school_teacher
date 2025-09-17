@@ -20,6 +20,7 @@ import 'package:st_teacher_app/api/repository/api_url.dart';
 import '../../Presentation/Announcement Screen/Model/announcement_create_response.dart';
 import '../../Presentation/Announcement Screen/Model/announcement_details_response.dart';
 import '../../Presentation/Announcement Screen/Model/announcement_list_general.dart';
+import '../../Presentation/Attendance/model/attendance_bulk_response.dart';
 import '../../Presentation/Attendance/model/student_attendance_response.dart';
 import '../../Presentation/Exam Screen/model/exam_list_response.dart';
 import '../../Presentation/Home/models/react_response.dart';
@@ -260,32 +261,32 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-  Future<Either<Failure, LoginResponse>> presentOrAbsent({
-    required int studentId,
+  Future<Either<Failure, AttendanceBulkResponse>> presentOrAbsentBulk({
     required int classId,
-    required String status,
+    required List<Map<String, dynamic>> items,
   }) async {
     try {
-      String url = ApiUrl.attendance;
+      String url = ApiUrl.attendance; // same endpoint
 
-      dynamic response = await Request.sendRequest(
-        url,
-        {"student_id": studentId, "class_id": classId, "status": status},
-        'Post',
-        false,
-      );
+      final body = {"class_id": classId, "items": items};
+
+      dynamic response = await Request.sendRequest(url, body, 'Post', false);
+
       AppLogger.log.i(response);
-      if (response is! DioException && response.statusCode == 201) {
+
+      if (response is Response && response.statusCode == 201) {
         if (response.data['status'] == true) {
-          return Right(LoginResponse.fromJson(response.data));
+          return Right(AttendanceBulkResponse.fromJson(response.data));
         } else {
           return Left(ServerFailure(response.data['message']));
         }
+      } else if (response is DioException) {
+        return Left(ServerFailure(response.message ?? ""));
       } else {
-        return Left(ServerFailure((response as DioException).message ?? ""));
+        return Left(ServerFailure("Unknown error"));
       }
     } catch (e) {
-      return Left(ServerFailure(''));
+      return Left(ServerFailure(e.toString()));
     }
   }
 

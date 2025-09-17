@@ -51,21 +51,37 @@ class _ExamCreateState extends State<ExamCreate> {
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Ensure classList has data
       if (teacherClassController.classList.isNotEmpty) {
-        // 👇 Pick the first class as default
-        final defaultClass = teacherClassController.classList.first;
-
-        selectedIndex = 0;
-        selectedClassId = defaultClass.id;
-
+        final defaultClass = teacherClassController.classList.firstWhere(
+              (c) =>
+          c.name == (widget.className ?? c.name) &&
+              c.section == (widget.section ?? c.section),
+          orElse: () => teacherClassController.classList.first,
+        );
         teacherClassController.selectedClass.value = defaultClass;
-
-        setState(() {});
+        selectedIndex = teacherClassController.classList.indexOf(defaultClass);
+        selectedClassId = defaultClass.id;
       }
+
+
+
+      setState(() {});
     });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   // Ensure classList has data
+    //   if (teacherClassController.classList.isNotEmpty) {
+    //
+    //     final defaultClass = teacherClassController.classList.first;
+    //
+    //     selectedIndex = 0;
+    //     selectedClassId = defaultClass.id;
+    //
+    //     teacherClassController.selectedClass.value = defaultClass;
+    //
+    //     setState(() {});
+    //   }
+    // });
   }
 
   @override

@@ -219,25 +219,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   fit: BoxFit.cover,
                                 )
                               // 2) else show current profile from API
-                              else if (_isValidUrl(studentImageUrl))
+                              else if (studentImageUrl != null &&
+                                  studentImageUrl.isNotEmpty &&
+                                  _isValidUrl(studentImageUrl))
                                 Image.network(
-                                  studentImageUrl!,
+                                  studentImageUrl,
                                   fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (c, w, p) =>
-                                          p == null
-                                              ? w
-                                              : const Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                    ),
-                                              ),
-                                  errorBuilder:
-                                      (_, __, ___) => Image.asset(
-                                        AppImages.profilePicture,
-                                        fit: BoxFit.cover,
+                                  loadingBuilder: (
+                                    context,
+                                    child,
+                                    loadingProgress,
+                                  ) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
                                       ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      AppImages.profilePicture,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
                                 )
                               // 3) else fallback asset
                               else

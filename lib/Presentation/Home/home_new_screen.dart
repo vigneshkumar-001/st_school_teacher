@@ -63,14 +63,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
     super.dispose();
   }
 
-  final List<Map<String, String>> classData = [
-    {'grade': '8', 'section': 'A'},
-    {'grade': '8', 'section': 'B'},
-    {'grade': '8', 'section': 'C'},
-    {'grade': '9', 'section': 'A'},
-    {'grade': '9', 'section': 'C'},
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -296,7 +288,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                         selected
                                                             .name, // ✅ selected is non-null here
                                                     section: selected.section,
-
                                                   ),
                                                 );
                                               },
@@ -472,7 +463,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                             selected.name,
                                                         section:
                                                             selected.section,
-
                                                       ),
                                                     );
                                                   },
@@ -723,7 +713,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                             selected.name,
                                                         section:
                                                             selected.section,
-
                                                       ),
                                                     );
                                                   },
@@ -1362,18 +1351,18 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
-                                                    Text(
-                                                      '3',
-                                                      style:
-                                                          GoogleFont.ibmPlexSans(
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                AppColor.white,
-                                                          ),
-                                                    ),
-                                                    SizedBox(width: 4),
+                                                    // Text(
+                                                    //   '3',
+                                                    //   style:
+                                                    //       GoogleFont.ibmPlexSans(
+                                                    //         fontSize: 15,
+                                                    //         fontWeight:
+                                                    //             FontWeight.bold,
+                                                    //         color:
+                                                    //             AppColor.white,
+                                                    //       ),
+                                                    // ),
+                                                    // SizedBox(width: 4),
                                                     Text(
                                                       'Messages',
                                                       style:
