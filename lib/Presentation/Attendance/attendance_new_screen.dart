@@ -8,6 +8,7 @@ import 'package:st_teacher_app/Core/consents.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
+import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import '../../dummy_screen.dart';
@@ -194,7 +195,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return   Center(child: AppLoader.circularLoader());
           }
 
           if (controller.students.isEmpty) {
