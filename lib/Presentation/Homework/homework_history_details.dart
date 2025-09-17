@@ -82,6 +82,30 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
     );
   }
 
+  /// Preview (short) + onTap full-screen
+  Widget _shortPreviewNetImage(String url) {
+    return GestureDetector(
+      onTap: () => _openFullScreenNetwork(url), // full screen on tap
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          height: 200, // 👈 short preview fixed height
+          width: double.infinity,
+          color: Colors.grey[200],
+          child: Image.network(
+            url,
+            fit: BoxFit.cover, // 👈 cover makes it look neat
+            errorBuilder: (_, __, ___) => Image.asset(
+              AppImages.homeworkPreviewImage2,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,9 +208,10 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                 final url = (task['content'] ?? '').toString();
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
-                                  child: _fullWidthNetImage(url),
+                                  child: _shortPreviewNetImage(url), // 👈 now short preview + full screen
                                 );
                               }),
+
 
                               const SizedBox(height: 16),
 

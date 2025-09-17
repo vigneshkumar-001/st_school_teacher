@@ -143,6 +143,96 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                   if (widget.permanentImage != null)
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => Scaffold(
+                                                    backgroundColor:
+                                                        Colors.black,
+                                                    body: GestureDetector(
+                                                      onTap:
+                                                          () => Navigator.pop(
+                                                            context,
+                                                          ),
+                                                      child: Center(
+                                                        child: InteractiveViewer(
+                                                          child: Image.file(
+                                                            widget
+                                                                .permanentImage!,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                        child: Image.file(
+                                          widget.permanentImage!,
+                                          fit: BoxFit.cover,
+                                          height: 200,
+                                          width: double.infinity,
+                                        ),
+                                      ),
+                                    ),
+                                  widget.images != null &&
+                                          widget.images.isNotEmpty
+                                      ? Column(
+                                        children:
+                                            widget.images.map((img) {
+                                              return Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (_) => Scaffold(
+                                                              backgroundColor:
+                                                                  Colors.black,
+                                                              body: GestureDetector(
+                                                                onTap:
+                                                                    () => Navigator.pop(
+                                                                      context,
+                                                                    ),
+                                                                child: Center(
+                                                                  child: InteractiveViewer(
+                                                                    child:
+                                                                        Image.file(
+                                                                          img,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Image.file(
+                                                    img,
+                                                    fit: BoxFit.cover,
+                                                    height: 200,
+                                                    width: double.infinity,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                      )
+                                      : const SizedBox.shrink(),
+                                ],
+                              ),
+
+                              /* Column(
+                                children: [
+                                  if (widget.permanentImage != null)
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
                                       child: Image.file(
                                         widget.permanentImage!,
                                         fit: BoxFit.cover,
@@ -170,8 +260,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                       )
                                       : const SizedBox.shrink(),
                                 ],
-                              ),
-
+                              ),*/
                               SizedBox(height: 20),
                               // Image.asset(AppImages.homeworkPreviewImage2),
                               // SizedBox(height: 20),
@@ -237,7 +326,10 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 25,vertical: 20),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 25,
+                                      vertical: 20,
+                                    ),
                                     child: Row(
                                       children: [
                                         // CircleAvatar(
@@ -251,7 +343,6 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                             color: AppColor.lightBlack,
                                           ),
                                         ),
-
                                       ],
                                     ),
                                   ),
@@ -475,17 +566,17 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     publish: true,
                                     contents: contents,
                                     imageFiles: [
-                                      if (widget.permanentImage != null) widget.permanentImage!,
+                                      if (widget.permanentImage != null)
+                                        widget.permanentImage!,
                                       ...widget.images.whereType<File>(),
                                     ],
                                   );
 
-
                                   stopwatch.stop();
 
-
-                                  AppLogger.log.i('createHomeWork executed in ${stopwatch.elapsedMilliseconds} ms');
-
+                                  AppLogger.log.i(
+                                    'createHomeWork executed in ${stopwatch.elapsedMilliseconds} ms',
+                                  );
                                 },
                                 width: 145,
                                 height: 60,
