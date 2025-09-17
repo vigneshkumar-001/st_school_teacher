@@ -146,12 +146,12 @@ class AttendanceData {
   /// ✅ Computed getter: single student list
   List<Student> get students {
     return [
-      ...presentStudentsMorning,
-      ...absentStudentsMorning,
-      ...lateStudentsMorning,
-      ...presentStudentsAfternoon,
-      ...absentStudentsAfternoon,
-      ...lateStudentsAfternoon,
+      // ...presentStudentsMorning,
+      // ...absentStudentsMorning,
+      // ...lateStudentsMorning,
+      // ...presentStudentsAfternoon,
+      // ...absentStudentsAfternoon,
+      // ...lateStudentsAfternoon,
       ...pendingAttendance,
     ];
   }
