@@ -40,6 +40,7 @@ class ExamStudent {
   final String admissionNo;
   final String phone;
   final bool isComplete;
+  final int totalObtained; // 👈 add this
   final List<Mark> marks;
 
   ExamStudent({
@@ -48,6 +49,7 @@ class ExamStudent {
     required this.admissionNo,
     required this.phone,
     required this.isComplete,
+    required this.totalObtained, // 👈 include here
     required this.marks,
   });
 
@@ -58,6 +60,7 @@ class ExamStudent {
       admissionNo: json['admissionNo'] ?? '',
       phone: json['phone'] ?? '',
       isComplete: json['isComplete'] ?? false,
+      totalObtained: json['totalObtained'] ?? 0, // 👈 map from API
       marks:
           (json['marks'] as List<dynamic>?)
               ?.map((e) => Mark.fromJson(e))
@@ -72,6 +75,7 @@ class ExamStudent {
       "name": name,
       "admissionNo": admissionNo,
       "phone": phone,
+      "totalObtained": totalObtained,
       "isComplete": isComplete,
       "marks": marks.map((e) => e.toJson()).toList(),
     };

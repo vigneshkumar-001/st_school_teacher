@@ -28,6 +28,10 @@ class ApiUrl {
   }
 
 
+  static String examDetails({required int examId}) {
+    return '$baseUrl/teacher-exams/details/$examId';
+  }
+
   static String reactMessage({required int msgId}) {
     return '$baseUrl/teacher-messages/$msgId/react';
   }

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:st_teacher_app/Core/consents.dart';
 import '../../../Core/Utility/snack_bar.dart';
+import '../model/exam_details_response.dart';
 import '../model/exam_list_response.dart';
 import '../model/student_marks_response.dart';
 
@@ -27,6 +28,7 @@ class ExamController extends GetxController {
   RxString frontImageUrl = ''.obs;
   RxList<Exam> exam = <Exam>[].obs;
   RxList<ExamStudent> examStudent = <ExamStudent>[].obs;
+  Rx<ExamDetailsDatas?> examDetails = Rx<ExamDetailsDatas?>(null);
 
   @override
   void onInit() {
@@ -41,7 +43,7 @@ class ExamController extends GetxController {
     final months = <String>{};
 
     for (var e in exam) {
-      final date = DateTime.tryParse(e.time); // ✅ use 'time'
+      final date = DateTime.tryParse(e.announcementDate.toString());
       if (date != null) {
         final monthYear = DateFormat("MMMM yyyy").format(date);
         months.add(monthYear);
@@ -51,17 +53,18 @@ class ExamController extends GetxController {
     monthFilters.value = ["All", ...months.toList()]; // Always add "All"
   }
 
-
   RxList<Exam> get filteredExams {
     if (selectedFilter.value == "All") return exam;
-    return exam.where((e) {
-      final date = DateTime.tryParse(e.time);
-      if (date == null) return false;
-      final monthYear = DateFormat("MMMM yyyy").format(date);
-      return monthYear == selectedFilter.value;
-    }).toList().obs; // <-- make it reactive
+    return exam
+        .where((e) {
+          final date = DateTime.tryParse(e.announcementDate.toString());
+          if (date == null) return false;
+          final monthYear = DateFormat("MMMM yyyy").format(date);
+          return monthYear == selectedFilter.value;
+        })
+        .toList()
+        .obs; // <-- make it reactive
   }
-
 
   Map<String, List<Exam>> get groupedExams {
     final Map<String, List<Exam>> grouped = {};
@@ -70,7 +73,9 @@ class ExamController extends GetxController {
     final sourceList = selectedFilter.value == "All" ? exam : filteredExams;
 
     for (var e in sourceList) {
-      final date = DateTime.tryParse(e.time); // ✅ use 'time' instead of 'startDate'
+      final date = DateTime.tryParse(
+        e.announcementDate.toString(),
+      ); // ✅ use 'time' instead of 'startDate'
       if (date == null) continue;
 
       final now = DateTime.now();
@@ -78,7 +83,10 @@ class ExamController extends GetxController {
 
       if (DateUtils.isSameDay(date, now)) {
         key = "Today";
-      } else if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) {
+      } else if (DateUtils.isSameDay(
+        date,
+        now.subtract(const Duration(days: 1)),
+      )) {
         key = "Yesterday";
       } else {
         key = DateFormat("MMM dd, yyyy").format(date); // e.g. Sep 12, 2025
@@ -89,7 +97,6 @@ class ExamController extends GetxController {
 
     return grouped;
   }
-
 
   Future<void> createExam({
     bool showLoader = true,
@@ -210,7 +217,31 @@ class ExamController extends GetxController {
     }
   }
 
-  Future<void> getStudentExamList({required int examId}) async {
+  Future<void> getExamDetailsList({required int examId}) async {
+    try {
+      isLoading.value = true;
+
+      final results = await apiDataSource.getExamDetailsList(examId: examId);
+      results.fold(
+        (failure) {
+          isLoading.value = false;
+          AppLogger.log.e(failure.message);
+        },
+        (response) {
+          isLoading.value = false;
+          examDetails.value = response.data;
+          buildMonthFilters(); // ⬅️ build dynamic filters here
+          AppLogger.log.i(response.data);
+          AppLogger.log.i("Fetched ${exam.toJson()} ");
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      AppLogger.log.e(e);
+    }
+  }
+
+  /*  Future<void> getStudentExamList({required int examId}) async {
     try {
       isLoading.value = true;
 
@@ -233,26 +264,73 @@ class ExamController extends GetxController {
       isLoading.value = false;
       AppLogger.log.e(e);
     }
+  }*/
+  Future<void> getStudentExamList({required int examId}) async {
+    try {
+      isLoading.value = true;
+
+      final results = await apiDataSource.getStudentExamList(examId: examId);
+      results.fold(
+        (failure) {
+          isLoading.value = false;
+          AppLogger.log.e(failure.message);
+        },
+        (response) {
+          isLoading.value = false;
+          examStudent.value = response.students;
+
+          // Find first incomplete student
+          final firstIncompleteIndex = examStudent.indexWhere(
+            (s) => s.isComplete == false,
+          );
+          if (firstIncompleteIndex != -1) {
+            currentIndex.value = firstIncompleteIndex;
+          } else {
+            currentIndex.value = 0;
+          }
+
+          // Reset subject highlight
+          subjectIndex.value = 0;
+
+          // Determine maxShownIndex based on marks
+          final student = examStudent[currentIndex.value];
+          final hasAnyMark = student.marks.any(
+            (m) => m.obtainedMarks != null && m.obtainedMarks! > 0,
+          );
+          maxShownIndex.value = hasAnyMark ? student.marks.length - 1 : 0;
+
+          AppLogger.log.i("Fetched students ${examStudent.length}");
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      AppLogger.log.e(e);
+    }
   }
 
   void nextSubject({required int examId}) {
     final student = examStudent[currentIndex.value];
     final subject = student.marks[subjectIndex.value];
 
-    // Store locally (update list value immediately)
+    // Save marks in backend
     if (subject.obtainedMarks != null) {
-      // Fire and forget API call in background
       markEnter(
         examId: examId,
         studentId: student.id,
         subjectId: subject.subjectId,
         mark: subject.obtainedMarks!,
-        showLoader: false, // don't block UI
+        showLoader: false,
       );
     }
 
+    // Move to next subject
     if (subjectIndex.value < student.marks.length - 1) {
       subjectIndex.value++;
+
+      // Unlock next subject if needed
+      if (subjectIndex.value > maxShownIndex.value) {
+        maxShownIndex.value = subjectIndex.value;
+      }
     }
   }
 
@@ -302,51 +380,71 @@ class ExamController extends GetxController {
     examStudent[currentIndex.value] = student;
   }
 
-  // --- Clear current subject ---
   void clearCurrentSubject() {
     final student = examStudent[currentIndex.value];
     student.marks[subjectIndex.value].obtainedMarks = null;
     examStudent[currentIndex.value] = student;
   }
 
+  /*  void nextStudent() {
+    if (currentIndex.value < examStudent.length - 1) {
+      currentIndex.value++;
+      subjectIndex.value = 0; // reset to first subject
+      maxShownIndex.value = 0; // reset visible index
+    }
+  }*/
   void nextStudent() {
     if (currentIndex.value < examStudent.length - 1) {
       currentIndex.value++;
+      final student = examStudent[currentIndex.value];
+      subjectIndex.value = 0;
+
+      final hasAnyMark = student.marks.any(
+        (m) => m.obtainedMarks != null && m.obtainedMarks! > 0,
+      );
+      maxShownIndex.value = hasAnyMark ? student.marks.length - 1 : 0;
     }
   }
 
   void previousStudent() {
     if (currentIndex.value > 0) {
       currentIndex.value--;
+      final student = examStudent[currentIndex.value];
+      subjectIndex.value = 0;
+
+      final hasAnyMark = student.marks.any(
+        (m) => m.obtainedMarks != null && m.obtainedMarks! > 0,
+      );
+      maxShownIndex.value = hasAnyMark ? student.marks.length - 1 : 0;
     }
   }
-}
 
-void showPopupLoader() {
-  Get.dialog(
-    Center(
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CircularProgressIndicator(
-            color: AppColor.black,
-            strokeAlign: 1,
+  void showPopupLoader() {
+    Get.dialog(
+      Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(
+              color: AppColor.black,
+              strokeAlign: 1,
+            ),
           ),
         ),
       ),
-    ),
-    barrierDismissible: false, // user can't dismiss by tapping outside
-    barrierColor: Colors.black.withOpacity(0.3), // transparent background
-  );
-}
+      barrierDismissible: false, // user can't dismiss by tapping outside
+      barrierColor: Colors.black.withOpacity(0.3), // transparent background
+    );
+  }
 
-void hidePopupLoader() {
-  if (Get.isDialogOpen ?? false) {
-    Get.back();
+  void hidePopupLoader() {
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
   }
 }

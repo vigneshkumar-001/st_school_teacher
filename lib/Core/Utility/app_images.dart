@@ -29,6 +29,7 @@ class AppImages {
   static String list = 'asset/Images/List.png';
   static String paragraph = 'asset/Images/Paragraph.png';
   static String picherImageDark = 'asset/Images/picherImageDark.png';
+  static String noDataFound = 'asset/Images/noDataFound.png';
   static String uploadImage = 'asset/Images/UploadImage.png';
   static String homeworkPreviewImage1 =
       'asset/Images/Homework_Preview_Image1.png';
