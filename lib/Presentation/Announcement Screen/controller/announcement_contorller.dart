@@ -74,7 +74,7 @@ class AnnouncementContorller extends GetxController {
         (response) {
           if (showLoader) hidePopupLoader();
           AppLogger.log.i('Announcement Details Fetched ✅');
-          announcementDetails.value = response.data; // store in observable
+          announcementDetails.value = response.data;
           return response.data; // return data for UI
         },
       );

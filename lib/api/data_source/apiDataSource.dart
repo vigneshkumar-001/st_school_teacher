@@ -10,6 +10,7 @@ import 'package:st_teacher_app/Presentation/Attendance/model/attendance_history_
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/attendence_student_history.dart';
 import 'package:st_teacher_app/Presentation/Attendance/model/class_list_response.dart';
+import 'package:st_teacher_app/Presentation/Exam%20Screen/model/exam_details_response.dart';
 import 'package:st_teacher_app/Presentation/Exam%20Screen/model/student_marks_response.dart';
 import 'package:st_teacher_app/Presentation/Home/models/message_list_response.dart';
 import 'package:st_teacher_app/Presentation/Homework/model/get_homework_response.dart';
@@ -1026,6 +1027,27 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
+  Future<Either<Failure, ExamDetailsResponse>> getExamDetailsList({required int examId}) async {
+    try {
+      String url = ApiUrl.examDetails(examId: examId);
+
+      dynamic response = await Request.sendGetRequest(url, {}, 'get', true);
+      AppLogger.log.i(response);
+      if (response is! DioException &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response.data['status'] == true) {
+          return Right(ExamDetailsResponse.fromJson(response.data));
+        } else {
+          return Left(ServerFailure(response.data['message']));
+        }
+      } else {
+        return Left(ServerFailure((response as DioException).message ?? ""));
+      }
+    } catch (e) {
+      return Left(ServerFailure(''));
+    }
+  }
+
   Future<Either<Failure, StudentMarksResponse>> getStudentExamList({
     required int examId,
   }) async {
@@ -1066,19 +1088,36 @@ class ApiDataSource extends BaseApiDataSource {
       };
 
       dynamic response = await Request.sendRequest(url, body, 'Post', true);
-      AppLogger.log.i(response);
-      if (response is! DioException &&
-          (response.statusCode == 200 || response.statusCode == 201)) {
-        if (response.data['status'] == true) {
-          return Right(AnnouncementCreateResponse.fromJson(response.data));
+      AppLogger.log.i("Raw response: $response");
+
+      // ✅ Case 1: Dio response
+      if (response is Response) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (response.data['status'] == true) {
+            return Right(AnnouncementCreateResponse.fromJson(response.data));
+          } else {
+            // API error (e.g. Invalid mark)
+            return Left(
+              ServerFailure(response.data['message'] ?? "Unknown error"),
+            );
+          }
         } else {
-          return Left(ServerFailure(response.data['message']));
+          return Left(ServerFailure("${response.data['message']}"));
         }
-      } else {
-        return Left(ServerFailure((response as DioException).message ?? ""));
       }
-    } catch (e) {
-      return Left(ServerFailure(''));
+
+      // ✅ Case 2: DioException (network, timeout, server crash, etc.)
+      if (response is DioException) {
+        return Left(ServerFailure(response.message ?? "Network error"));
+      }
+
+      // ✅ Unexpected type
+      return Left(
+        ServerFailure("Unexpected response: ${response.runtimeType}"),
+      );
+    } catch (e, stack) {
+      AppLogger.log.e("Mark Enter Error => $e\n$stack");
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -1099,7 +1138,7 @@ class ApiDataSource extends BaseApiDataSource {
         return Left(ServerFailure((response as DioException).message ?? ""));
       }
     } catch (e) {
-      return Left(ServerFailure(''));
+      return Left(ServerFailure(e.toString()));
     }
   }
 

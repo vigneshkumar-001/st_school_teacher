@@ -16,10 +16,14 @@ class ExamResult extends StatefulWidget {
   final String tittle;
   final String startDate;
   final String endDate;
+  final bool? showCompleted; // 👈 new flag
+  final int? studentId; // 👈 filter by ID if given
 
   const ExamResult({
     super.key,
     this.examId = 0,
+    this.showCompleted, // 👈 optional
+    this.studentId,
     this.tittle = "",
     this.startDate = "",
     this.endDate = "",
@@ -35,29 +39,67 @@ class _ExamResultState extends State<ExamResult> {
   int studentIndex = 0;
   int subjectIndex = 0;
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     controller.getStudentExamList(examId: widget.examId);
+  //
+  //     // if (controller.announcementData.value == null) {
+  //     //   controller.getAnnouncement(type: "general");
+  //     // }
+  //   });
+  // }
+  /*  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await controller.getStudentExamList(examId: widget.examId);
+
+      if (widget.studentId != null) {
+        final idx = controller.examStudent.indexWhere(
+          (s) => s.id == widget.studentId,
+        );
+        if (idx != -1) {
+          controller.currentIndex.value = idx;
+        }
+      }
+    });
+  }*/
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.getStudentExamList(examId: widget.examId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await controller.getStudentExamList(examId: widget.examId);
 
-      // if (controller.announcementData.value == null) {
-      //   controller.getAnnouncement(type: "general");
-      // }
+      if (widget.studentId != null) {
+        int idx = controller.examStudent.indexWhere(
+          (s) => s.id == widget.studentId,
+        );
+
+        // 👇 Apply filter if flag passed
+        if (widget.showCompleted != null) {
+          final filtered =
+              controller.examStudent
+                  .where((s) => s.isComplete == widget.showCompleted)
+                  .toList();
+
+          idx = filtered.indexWhere((s) => s.id == widget.studentId);
+          if (idx != -1) {
+            // reset full list to only filtered students
+            controller.examStudent.value = filtered;
+            controller.currentIndex.value = idx;
+          }
+        } else {
+          if (idx != -1) {
+            controller.currentIndex.value = idx;
+          }
+        }
+      }
     });
-  }
-
-  void _clear() {
-    setState(() => marks[studentIndex][subjectIndex] = 0);
-  }
-
-  Widget _clearChip() {
-    return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: _clear,
-      child: Image.asset(AppImages.clear, height: 24, width: 25),
-    );
   }
 
   @override
@@ -73,9 +115,8 @@ class _ExamResultState extends State<ExamResult> {
           if (controller.examStudent.isEmpty) {
             return const Center(child: Text("No students found"));
           }
-
-          // --- Current student ---
           final student = controller.examStudent[controller.currentIndex.value];
+          final totalSubjects = student.marks.length;
 
           return SingleChildScrollView(
             child: Padding(
@@ -101,7 +142,14 @@ class _ExamResultState extends State<ExamResult> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ResultList(),
+                              builder:
+                                  (context) => ResultList(
+                                    startDate: widget.startDate,
+                                    endDate: widget.endDate,
+
+                                    examId: widget.examId,
+                                    tittle: widget.tittle,
+                                  ),
                             ),
                           );
                         },
@@ -203,9 +251,9 @@ class _ExamResultState extends State<ExamResult> {
                                   ],
                                 ),
                               ),
-                              // --- Entered/Total Subjects ---
+
                               Text(
-                                "${student.marks.where((m) => m.obtainedMarks != null).length}",
+                                "${controller.currentIndex.value + 1}",
                                 style: GoogleFont.ibmPlexSans(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -213,7 +261,7 @@ class _ExamResultState extends State<ExamResult> {
                                 ),
                               ),
                               Text(
-                                " Out of ${student.marks.length}",
+                                " Out of ${controller.examStudent.length}",
                                 style: GoogleFont.ibmPlexSans(
                                   fontSize: 12,
                                   color: AppColor.lightgray,
@@ -235,7 +283,8 @@ class _ExamResultState extends State<ExamResult> {
                               ),
                               child: Column(
                                 children: List.generate(
-                                  controller.maxShownIndex.value + 1,
+                                  controller.maxShownIndex.value +
+                                      1, // Only use maxShownIndex
                                   (i) {
                                     final mark = student.marks[i];
                                     final isActive =
@@ -248,7 +297,10 @@ class _ExamResultState extends State<ExamResult> {
                                       ),
                                       decoration: BoxDecoration(
                                         border:
-                                            i == controller.maxShownIndex.value
+                                            i ==
+                                                    controller
+                                                        .maxShownIndex
+                                                        .value // <-- use maxShownIndex here
                                                 ? null
                                                 : const Border(
                                                   bottom: BorderSide(
