@@ -74,10 +74,10 @@ class _ExamResultDoneState extends State<ExamResultDone> {
                 ),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ResultList()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => ResultList()),
+                    // );
                   },
                   child: DottedBorder(
                     color: AppColor.blue,

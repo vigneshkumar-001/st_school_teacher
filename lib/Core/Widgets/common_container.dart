@@ -731,6 +731,7 @@ class CommonContainer {
     Gradient? gradient,
     VoidCallback? onIconTap,
     bool isLikeLoading = false,
+    bool rightSideArrow = true,
 
     VoidCallback? onIconTapLike,
     VoidCallback? onTap,
@@ -946,28 +947,31 @@ class CommonContainer {
                             ),
                           )
                           : SizedBox.shrink(),
-                      InkWell(
-                        onTap: onIconTap,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: gradient == null ? backRoundColors : null,
-                            gradient: gradient,
-                            border: Border.all(
-                              color: AppColor.lowLightgray,
-                              width: 1,
+                      rightSideArrow
+                          ? InkWell(
+                            onTap: onIconTap,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color:
+                                    gradient == null ? backRoundColors : null,
+                                gradient: gradient,
+                                border: Border.all(
+                                  color: AppColor.lowLightgray,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: Image.asset(
+                                  AppImages.rightSideArrow,
+                                  color: AppColor.white,
+                                  height: 14,
+                                ),
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Image.asset(
-                              AppImages.rightSideArrow,
-                              color: AppColor.white,
-                              height: 14,
-                            ),
-                          ),
-                        ),
-                      ),
+                          )
+                          : SizedBox.shrink(),
                     ],
                   ),
             ],
@@ -979,6 +983,7 @@ class CommonContainer {
 
   static examHistory({
     required Color backRoundColor,
+    required BuildContext context,
     required String mainText,
     String? subText1,
     String? subText2,
@@ -1027,40 +1032,99 @@ class CommonContainer {
                   vertical: 20,
                   horizontal: 25,
                 ),
-                child: Column(
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: image ?? '',
-                      height: 130,
-                      width: 260,
-                      fit: BoxFit.cover,
-                      placeholder:
-                          (context, url) => Container(
-                            height: 180, // adjust to your card height
-                            alignment: Alignment.center,
-                            child: const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                child: GestureDetector(
+                  onTap: () {
+                    if (image != null && image.isNotEmpty) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (ctx) => Scaffold(
+                                backgroundColor: Colors.black,
+                                body: Stack(
+                                  children: [
+                                    Center(
+                                      child: InteractiveViewer(
+                                        panEnabled: true,
+                                        minScale: 0.8,
+                                        maxScale: 4,
+                                        child: CachedNetworkImage(
+                                          imageUrl: image!,
+                                          fit: BoxFit.contain,
+                                          placeholder:
+                                              (context, url) => const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                          errorWidget:
+                                              (context, url, error) =>
+                                                  const Icon(
+                                                    Icons.broken_image,
+                                                    color: Colors.white,
+                                                    size: 80,
+                                                  ),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 40,
+                                      left: 20,
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 30,
+                                        ),
+                                        onPressed:
+                                            () => Navigator.of(ctx).pop(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                        ),
+                      );
+                    }
+                  },
+                  child: Column(
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: image ?? '',
+                        height: 130,
+                        width: 260,
+                        fit: BoxFit.cover,
+                        placeholder:
+                            (context, url) => Container(
+                              height: 180,
+                              alignment: Alignment.center,
+                              child: const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
                             ),
+                        errorWidget:
+                            (context, url, error) => const Icon(
+                              Icons.broken_image,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(AppImages.zoom, height: 14, width: 14),
+                          SizedBox(width: 10),
+                          CustomTextField.textWith600(
+                            text: 'Zoom',
+                            fontSize: 11,
                           ),
-                      errorWidget:
-                          (context, url, error) => const Icon(
-                            Icons.broken_image,
-                            size: 40,
-                            color: Colors.grey,
-                          ),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(AppImages.zoom, height: 14, width: 14),
-                        SizedBox(width: 10),
-                        CustomTextField.textWith600(text: 'Zoom', fontSize: 11),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 15),

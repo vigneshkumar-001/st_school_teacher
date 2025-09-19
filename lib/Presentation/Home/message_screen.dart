@@ -110,6 +110,7 @@ class _MessageScreenState extends State<MessageScreen> {
                                 final isLoading = controller.loadingMessages
                                     .contains(msg.id);
                                 return CommonContainer.homeworkhistory(
+                                  rightSideArrow: false,
                                   onIconTapLike: () async {
                                     await controller.reactForStudentMessage(
                                       msgId: msg.id,

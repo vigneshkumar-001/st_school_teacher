@@ -2193,6 +2193,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:intl/intl.dart';
+import 'package:st_teacher_app/Presentation/Exam%20Screen/screens/result_list.dart';
 
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
@@ -2200,6 +2201,7 @@ import '../../Core/Utility/app_loader.dart';
 import '../../Core/Utility/custom_textfield.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
+import '../Exam Screen/controller/exam_controller.dart';
 import 'Model/announcement_details_response.dart';
 import 'Model/announcement_list_general.dart';
 import 'controller/announcement_contorller.dart';
@@ -2213,6 +2215,7 @@ class AnnouncementScreen extends StatefulWidget {
 
 class _AnnouncementScreenState extends State<AnnouncementScreen> {
   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
+  final ExamController examController = Get.put(ExamController());
 
   int selectedIndex = 0; // 0 = General, 1 = Teacher
 
@@ -2705,6 +2708,98 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     );
   }
 
+  void showExamTimeTable(BuildContext context, int examId) async {
+    // Fetch details if not already fetched
+    if (examController.examDetails.value == null ||
+        examController.examDetails.value!.exam.id != examId) {
+      await examController.getExamDetailsList(examId: examId);
+    }
+
+    final details = examController.examDetails.value;
+    if (details == null) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.75,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          builder: (_, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Grab Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Timetable Image
+                  const SizedBox(height: 20),
+
+                  // Exam Title
+                  Text(
+                    details.exam.heading ?? '',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Exam Dates
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${details.exam.startDate} to ${details.exam.endDate}',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                  if (details.exam.timetableUrl != null &&
+                      details.exam.timetableUrl!.isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.network(
+                        details.exam.timetableUrl!,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -2816,12 +2911,23 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                     gradientEndColor: AppColor.black,
                     onDetailsTap: () async {
                       if (item.type == "exammark") {
-                        _examResult(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => ResultList(
+                                  examId: item.id,
+                                  tittle: item.title,
+                                  startDate: '',
+                                  endDate: '',
+                                ),
+                          ),
+                        );
                       } else if (item.type == "announcement" ||
                           item.type == "holiday") {
                         _showAnnouncementDetails(context, item.id);
                       } else if (item.type == "exam") {
-                        _showAnnouncementDetails(context, item.id);
+                        showExamTimeTable(context, item.id);
                       }
                     },
                   ),

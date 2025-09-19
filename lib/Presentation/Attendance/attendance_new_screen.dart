@@ -221,7 +221,23 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
           }
 
           if (controller.students.isEmpty) {
-            return const Center(child: Text("No students available"));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("No students available"),
+                  SizedBox(height: 15),
+                  Image.asset(AppImages.noDataFound),
+                  SizedBox(height: 20),
+                  AppButton.button(
+                    text: "History",
+                    onTap: () async {},
+                    width: 250,
+                    height: 50,
+                  ),
+                ],
+              ),
+            );
           }
           return SingleChildScrollView(
             child: Padding(
@@ -462,9 +478,8 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                                         strokeWidth: 2,
                                       ),
                                     )
-                                    : null, // Show loader only when submitting
-                            text:
-                                "Submit", // Always show 'Submit' when not submitting
+                                    : null,
+                            text: "Submit",
                             onTap:
                                 controller.isSubmitting.value
                                     ? null

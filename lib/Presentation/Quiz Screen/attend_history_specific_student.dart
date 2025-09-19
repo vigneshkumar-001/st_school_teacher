@@ -1374,21 +1374,23 @@ class _AttendHistorySpecificStudentState
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                // Text(
-                                //   DateAndTimeConvert.formatDateTime(
-                                //     showTime: true,
-                                //     showDate: false,
-                                //     data?.time ?? '',
-                                //   ),
-                                //   style: GoogleFont.inter(
-                                //     fontSize: 13,
-                                //     fontWeight: FontWeight.w700,
-                                //     color: AppColor.black,
-                                //   ),
-                                // ),
-                                // SizedBox(width: 5),
                                 Text(
-                                  DateAndTimeConvert.timeWithShortDate(
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: true,
+                                    showDate: false,
+                                    data?.time ?? '',
+                                  ),
+                                  style: GoogleFont.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  DateAndTimeConvert.formatDateTime(
+                                    showTime: false,
+                                    showDate: true,
                                     data?.time ?? '',
                                   ),
                                   style: GoogleFont.inter(
