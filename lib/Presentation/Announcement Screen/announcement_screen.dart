@@ -2873,7 +2873,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               );
             },
             child: ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics:  BouncingScrollPhysics(),
               padding: const EdgeInsets.all(15),
               itemCount: data.items.length + 1,
               itemBuilder: (context, index) {
