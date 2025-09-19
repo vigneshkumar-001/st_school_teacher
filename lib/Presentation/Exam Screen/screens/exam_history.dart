@@ -222,6 +222,7 @@ class _ExamHistoryState extends State<ExamHistory> {
                                           bottom: 16,
                                         ),
                                         child: CommonContainer.examHistory(
+                                          context: context,
                                           sections: exam.section,
                                           classes: exam.className,
                                           image: exam.timetableUrl,
@@ -480,6 +481,7 @@ class _ExamHistoryState extends State<ExamHistory> {
                                               bottom: 16,
                                             ),
                                             child: CommonContainer.examHistory(
+                                              context: context,
                                               subText1:
                                                   task['subText1'] as String? ??
                                                   '',
