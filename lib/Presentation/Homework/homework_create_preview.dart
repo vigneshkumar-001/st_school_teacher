@@ -486,7 +486,7 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     showLoader: true,
                                     classId: widget.selectedClassId,
                                     subjectId: widget.subjectId,
-                                    heading: widget.heading ?? '',
+                                    heading: widget.heading   ?? '',
                                     description: mainDescription,
                                     publish: true,
                                     contents: contents,
@@ -504,6 +504,113 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                               ),*/
                               AppButton.button(
                                 onTap: () async {
+                                  List<Map<String, dynamic>> contents = [];
+
+                                  // Add list items
+                                  for (var listItem in widget.listPoints) {
+                                    contents.add({
+                                      "type": "list",
+                                      "content": listItem,
+                                    });
+                                  }
+
+                                  // Add paragraph contents
+                                  if (widget.description.length > 1) {
+                                    for (
+                                      var i = 1;
+                                      i < widget.description.length;
+                                      i++
+                                    ) {
+                                      var para = widget.description[i];
+                                      if (para.trim().isNotEmpty) {
+                                        contents.add({
+                                          "type": "paragraph",
+                                          "content": para,
+                                        });
+                                      }
+                                    }
+                                  }
+
+                                  // First description goes to 'description' field
+                                  String mainDescription =
+                                      widget.description.isNotEmpty
+                                          ? widget.description[0]
+                                          : '';
+
+                                  final stopwatch = Stopwatch()..start();
+
+                                  try {
+                                    await homeworkController.createHomeWork(
+                                      context: context,
+                                      showLoader: true,
+                                      classId: widget.selectedClassId,
+                                      subjectId: widget.subjectId,
+                                      heading: widget.heading ?? '',
+                                      description: mainDescription,
+                                      publish: true,
+                                      contents: contents,
+                                      imageFiles: [
+                                        if (widget.permanentImage != null)
+                                          widget.permanentImage!,
+                                        ...widget.images.whereType<File>(),
+                                      ],
+                                    );
+
+                                    stopwatch.stop();
+                                    AppLogger.log.i(
+                                      'createHomeWork executed in ${stopwatch.elapsedMilliseconds} ms',
+                                    );
+
+                                    //  Success message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          'Publish Successfully ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.green,
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: const EdgeInsets.all(16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        duration: const Duration(seconds: 3),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    stopwatch.stop();
+                                    AppLogger.log.e("Error: $e");
+
+                                    // ❌ Error message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Failed to publish: $e',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.red,
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: const EdgeInsets.all(16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        duration: const Duration(seconds: 3),
+                                      ),
+                                    );
+                                  }
+                                },
+
+                                /*       onTap: () async {
                                   List<Map<String, dynamic>> contents = [];
 
                                   // Add list items
@@ -577,7 +684,28 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                   AppLogger.log.i(
                                     'createHomeWork executed in ${stopwatch.elapsedMilliseconds} ms',
                                   );
-                                },
+
+                                  ///  Success message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        'Publish Successfully',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      backgroundColor:
+                                          AppColor.green, // 👈 green background
+                                      behavior: SnackBarBehavior.floating,
+                                      margin: const EdgeInsets.all(16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                  );
+                                },*/
                                 width: 145,
                                 height: 60,
                                 text: 'Publish',
