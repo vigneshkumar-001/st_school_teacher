@@ -371,8 +371,12 @@ class _ExamResultState extends State<ExamResult> {
                             CommonContainer.sidePill(
                               icon: Icons.chevron_right,
                               label: 'Next',
-                              onTap: controller.nextStudent,
+                              onTap: () => controller.nextStudent(),
+                              // remove isDisabled
                             ),
+
+
+
                             const SizedBox(height: 10),
                             Text(
                               'Student',

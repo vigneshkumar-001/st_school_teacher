@@ -225,13 +225,59 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("No students available"),
                   SizedBox(height: 15),
-                  Image.asset(AppImages.noDataFound),
-                  SizedBox(height: 20),
+                  RichText(
+                    text: TextSpan(
+                      text: selectedClass?.className ?? '',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 14,
+                        color: AppColor.gray,
+                        fontWeight: FontWeight.w800,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: ' ${selectedClass?.section ?? ''}',
+                          style: GoogleFont.ibmPlexSans(
+                            fontSize: 14,
+                            color: AppColor.gray,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' Section',
+                          style: GoogleFont.ibmPlexSans(
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    attendanceController.attendance.value?.messages ?? '',
+                    textAlign: TextAlign.center,
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Container(child: Image.asset(AppImages.noDataFound)),
+                  ),
+                  SizedBox(height: 30),
                   AppButton.button(
                     text: "History",
-                    onTap: () async {},
+                    onTap: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AttendanceHistory(),
+                        ),
+                      );
+                    },
                     width: 250,
                     height: 50,
                   ),

@@ -323,13 +323,29 @@ class ExamController extends GetxController {
       );
     }
 
-    // Move to next subject
+    // Move to next subject if not last
     if (subjectIndex.value < student.marks.length - 1) {
       subjectIndex.value++;
 
       // Unlock next subject if needed
       if (subjectIndex.value > maxShownIndex.value) {
         maxShownIndex.value = subjectIndex.value;
+      }
+    } else {
+      // ✅ If last subject, check if all subjects are filled
+      final allSubjectsComplete = student.marks.every(
+        (m) => m.obtainedMarks != null,
+      );
+
+      if (allSubjectsComplete) {
+        // Move to next student automatically
+        nextStudent();
+      } else {
+        Get.snackbar(
+          "Incomplete",
+          "Please enter marks for all subjects before moving to next student",
+          snackPosition: SnackPosition.BOTTOM,
+        );
       }
     }
   }
@@ -386,23 +402,42 @@ class ExamController extends GetxController {
     examStudent[currentIndex.value] = student;
   }
 
-  /*  void nextStudent() {
-    if (currentIndex.value < examStudent.length - 1) {
-      currentIndex.value++;
-      subjectIndex.value = 0; // reset to first subject
-      maxShownIndex.value = 0; // reset visible index
-    }
-  }*/
   void nextStudent() {
+    final student = examStudent[currentIndex.value];
+
+    // ❌ Stop if not on last subject
+    if (subjectIndex.value != student.marks.length - 1) {
+      Get.snackbar(
+        "Incomplete",
+        "Please finish entering marks till the last subject before moving to next student",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // ❌ Stop if any subject is still empty
+    final allSubjectsComplete = student.marks.every(
+      (m) => m.obtainedMarks != null,
+    );
+    if (!allSubjectsComplete) {
+      Get.snackbar(
+        "Incomplete",
+        "Please enter marks for all subjects before moving to the next student",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // ✅ Allowed only if current student is fully completed
     if (currentIndex.value < examStudent.length - 1) {
       currentIndex.value++;
-      final student = examStudent[currentIndex.value];
+      final nextStudent = examStudent[currentIndex.value];
       subjectIndex.value = 0;
 
-      final hasAnyMark = student.marks.any(
+      final hasAnyMark = nextStudent.marks.any(
         (m) => m.obtainedMarks != null && m.obtainedMarks! > 0,
       );
-      maxShownIndex.value = hasAnyMark ? student.marks.length - 1 : 0;
+      maxShownIndex.value = hasAnyMark ? nextStudent.marks.length - 1 : 0;
     }
   }
 

@@ -2414,30 +2414,37 @@ class CommonContainer {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    bool isDisabled = false, // 👈 added
   }) {
     return InkWell(
       borderRadius: BorderRadius.circular(22),
-      onTap: onTap,
+      onTap: isDisabled ? null : onTap, // 👈 disable tap
       child: Container(
         width: 68,
         height: 96,
         decoration: BoxDecoration(
-          color: AppColor.white,
+          color: isDisabled ? AppColor.lowLightgray : AppColor.white, // 👈 dim background
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: AppColor.lowLightgray),
+          border: Border.all(
+            color: isDisabled ? AppColor.lowLightgray : AppColor.lowLightgray,
+          ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 22),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, color: AppColor.gray, size: 28),
+            Icon(
+              icon,
+              color: isDisabled ? AppColor.gray.withOpacity(0.4) : AppColor.gray, // 👈 dim icon
+              size: 28,
+            ),
             Text(
               label,
               textAlign: TextAlign.center,
               style: GoogleFont.ibmPlexSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: AppColor.gray,
+                color: isDisabled ? AppColor.gray.withOpacity(0.4) : AppColor.gray, // 👈 dim text
               ),
             ),
           ],
@@ -2445,6 +2452,7 @@ class CommonContainer {
       ),
     );
   }
+
 
   static Widget topLinkTab({
     required String text,
