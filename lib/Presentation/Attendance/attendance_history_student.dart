@@ -72,7 +72,6 @@ class _AttendanceHistoryStudentState extends State<AttendanceHistoryStudent> {
     // Load local data (safe)
     loadStudentAttendance(_focusedDay);
 
-    // Delay reactive updates until after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await attendanceController.getClassList();
       if (attendanceController.classList.isNotEmpty) {

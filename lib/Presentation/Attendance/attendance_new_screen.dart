@@ -673,64 +673,70 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                           ),
                         ],
                       ),*/
-      bottomNavigationBar: Obx(() {
-        return Container(
-          decoration: BoxDecoration(color: AppColor.white),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(attendanceController.classList.length, (
-                index,
-              ) {
-                final isSelected = subjectIndex == index;
-                final classItem = attendanceController.classList[index];
+      bottomNavigationBar: SafeArea(
+        child: Obx(() {
+          return Container(
+            decoration: BoxDecoration(color: AppColor.white),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(attendanceController.classList.length, (
+                  index,
+                ) {
+                  final isSelected = subjectIndex == index;
+                  final classItem = attendanceController.classList[index];
 
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      subjectIndex = index;
-                      selectedClass = attendanceController.classList[index];
-                      // reset per-class temp state
-                      selectedIndex = 0;
-                      _pendingTabTapped = false;
-                      _laterTabTapped = false;
-                      pendingStudentIndex = 0;
-                      selectedLaterStudentIndex = 0;
-                    });
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        subjectIndex = index;
+                        selectedClass = attendanceController.classList[index];
+                        // reset per-class temp state
+                        selectedIndex = 0;
+                        _pendingTabTapped = false;
+                        _laterTabTapped = false;
+                        pendingStudentIndex = 0;
+                        selectedLaterStudentIndex = 0;
+                      });
 
-                    attendanceController.getTodayStatus(selectedClass!.id).then(
-                      (data) {
-                        if (data != null) {}
-                      },
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 55, vertical: 9),
-                    decoration: BoxDecoration(
-                      color: AppColor.white,
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: isSelected ? AppColor.blue : AppColor.borderGary,
-                        width: 1.5,
+                      attendanceController
+                          .getTodayStatus(selectedClass!.id)
+                          .then((data) {
+                            if (data != null) {}
+                          });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 55,
+                        vertical: 9,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColor.white,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color:
+                              isSelected ? AppColor.blue : AppColor.borderGary,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        "${classItem.className} ${classItem.section}",
+                        style: GoogleFont.ibmPlexSans(
+                          fontSize: 11,
+                          color: isSelected ? AppColor.blue : AppColor.gray,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w400,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      "${classItem.className} ${classItem.section}",
-                      style: GoogleFont.ibmPlexSans(
-                        fontSize: 11,
-                        color: isSelected ? AppColor.blue : AppColor.gray,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                );
-              }),
+                  );
+                }),
+              ),
             ),
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 
@@ -739,7 +745,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
     required String label,
     required bool selected,
     VoidCallback? onTap,
-    bool showCount = true, // ← new
+    bool showCount = true,
     double horizontalPadding = 40,
   }) {
     final Color border = selected ? AppColor.blue : AppColor.borderGary;

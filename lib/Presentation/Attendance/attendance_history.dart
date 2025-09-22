@@ -79,20 +79,59 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
     });
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _scrollController = ScrollController();
+  //   monthDates = getFullMonthDates(currentMonth);
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     loadAttendance();
+  //     scrollToSelectedDate();
+  //   });
+  // }
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     monthDates = getFullMonthDates(currentMonth);
+
+    if (attendanceController.classList.isNotEmpty) {
+      selectedClass =
+          attendanceController.classList.first; // ✅ set default class
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadAttendance();
+      loadAttendance(); // ✅ load for default class
       scrollToSelectedDate();
     });
   }
 
   AttendanceHistoryData? attendanceData;
-
   void loadAttendance() async {
+    if (attendanceController.classList.isEmpty) {
+      print('Class list is empty!');
+      return;
+    }
+
+    final data = await attendanceHistoryController.fetchAttendance(
+      selectedDate,
+      selectedClass.id,
+      showLoader: true,
+    );
+
+    if (data != null) {
+      setState(() {
+        attendanceData = data;
+
+        tabs[0]['count'] = data.fullPresentCount;
+        tabs[1]['count'] = data.fullAbsentCount;
+        tabs[2]['count'] = data.morningAbsentCount;
+        tabs[3]['count'] = data.afternoonAbsentCount;
+      });
+    }
+  }
+
+  /*void loadAttendance() async {
     if (attendanceController.classList.isNotEmpty) {
       selectedClass = attendanceController.classList.first;
     } else {
@@ -116,7 +155,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
         tabs[3]['count'] = data.afternoonAbsentCount;
       });
     }
-  }
+  }*/
 
   void scrollToSelectedDate() {
     final index = getFullMonthDates(currentMonth).indexWhere((item) {
@@ -572,9 +611,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                             child: Obx(() {
                               if (attendanceHistoryController.isLoading.value) {
                                 return Center(
-                                  child: AppLoader.circularLoader(
-
-                                  ),
+                                  child: AppLoader.circularLoader(),
                                 );
                               }
 
@@ -683,6 +720,66 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
       ),
       bottomNavigationBar: Obx(() {
         return Container(
+          decoration: const BoxDecoration(color: AppColor.white),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(attendanceController.classList.length, (
+                index,
+              ) {
+                final isSelected = subjectIndex == index;
+                final classItem = attendanceController.classList[index];
+
+                return GestureDetector(
+                  onTap: () {
+                    HapticFeedback.heavyImpact();
+
+                    setState(() {
+                      subjectIndex = index;
+                      selectedClass = classItem; // ✅ update selected class
+                    });
+
+                    // ✅ Now you can use the correct selectedClass
+                    print(
+                      "Selected class: ${selectedClass.className} ${selectedClass.section} (id: ${selectedClass.id})",
+                    );
+
+                    attendanceController.getTodayStatus(selectedClass.id);
+                    loadAttendance();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 55,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: isSelected ? AppColor.blue : AppColor.borderGary,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Text(
+                      "${classItem.className} ${classItem.section}",
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 11,
+                        color: isSelected ? AppColor.blue : AppColor.gray,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        );
+      }),
+
+      /*  bottomNavigationBar: Obx(() {
+        return Container(
           decoration: BoxDecoration(color: AppColor.white),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -703,14 +800,8 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
                       // selectedClass = attendanceController.classList[index];
                     });
 
-                    // Then fetch data async
-                    // attendanceController.getTodayStatus(selectedClass.id).then((
-                    //   data,
-                    // ) {
-                    //   if (data != null) {
-                    //     _prepareTabs(data);
-                    //   }
-                    // });
+
+                     attendanceController.getTodayStatus(selectedClass.id);
                   },
 
                   child: Container(
@@ -741,79 +832,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
             ),
           ),
         );
-      }),
+      }),*/
     );
   }
 }
-
-/*SizedBox(height: 34),
-              Container(
-                decoration: BoxDecoration(color: AppColor.white),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        children: List.generate(tab.length, (index) {
-                          final isSelected = subjectIndex == index;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: GestureDetector(
-                              onTap: () => setState(() => subjectIndex = index),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: isSelected ? 55 : 55,
-                                  vertical: isSelected ? 9 : 9,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      isSelected
-                                          ? AppColor.white
-                                          : AppColor.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(
-                                    color:
-                                        isSelected
-                                            ? AppColor.blue
-                                            : AppColor.borderGary,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    isSelected
-                                        ? Image.asset(
-                                          AppImages.tick,
-                                          height: 15,
-                                          color: AppColor.blue,
-                                        )
-                                        : SizedBox.shrink(),
-                                    SizedBox(width: isSelected ? 5 : 0),
-                                    Text(
-                                      " ${tab[index]['label']}",
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 12,
-                                        color:
-                                            isSelected
-                                                ? AppColor.blue
-                                                : AppColor.gray,
-                                        fontWeight:
-                                            isSelected
-                                                ? FontWeight.w700
-                                                : FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-              ),*/
