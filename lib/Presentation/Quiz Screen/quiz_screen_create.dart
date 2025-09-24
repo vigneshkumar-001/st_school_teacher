@@ -1100,7 +1100,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   );
   final QuizController controller = Get.put(QuizController());
 
-
   // ===== State (inside your State class) =====
 
   // show only 1 question initially
@@ -1126,9 +1125,47 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   bool _classInvalid = false;
   bool _subjectInvalid = false;
 
+  // --- Class scroller centering ---
+  final ScrollController _classScroll = ScrollController();
+  static const double _classItemWidth = 90; // must match your item width
+  static const double _classGap =
+      0; // horizontal gap between items (update if you add spacing)
+
+  void _centerSelectedClass({bool animate = true}) {
+    if (!_classScroll.hasClients) return;
+
+    final viewport = _classScroll.position.viewportDimension;
+    final itemExtent = _classItemWidth + _classGap;
+    final targetCenter = selectedIndex * itemExtent + (_classItemWidth / 2.0);
+    final targetOffset = targetCenter - (viewport / 2.0);
+
+    final maxExtent = _classScroll.position.maxScrollExtent;
+    final offset = targetOffset.clamp(0.0, maxExtent);
+
+    if (animate) {
+      _classScroll.animateTo(
+        offset,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
+    } else {
+      _classScroll.jumpTo(offset);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ... your existing defaultClass / subject setup ...
+
+      setState(() {}); // you already had this
+      // Center the default/initial selection
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _centerSelectedClass(animate: false);
+      });
+    });
 
     // Always show at least 1 description field
     descriptionControllers.add(TextEditingController());
@@ -1281,7 +1318,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                   ),
                 ),
 
-                 SizedBox(height: 8),
+                SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -1527,54 +1564,353 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                       color: AppColor.white,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 20,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // ------------------ Class ------------------
-                          Text(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ------------------ Class ------------------
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 20,
+                          ),
+                          child: Text(
                             'Class',
                             style: GoogleFont.ibmPlexSans(
                               fontSize: 14,
                               color: AppColor.black,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                        ),
+                        const SizedBox(height: 20),
 
-                          SizedBox(
-                            height: 100,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Positioned.fill(
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppColor.white.withOpacity(0.3),
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.lowLightgray,
-                                          AppColor.white.withOpacity(0.3),
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.topRight,
-                                      ),
+                        SizedBox(
+                          height: 100,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Positioned.fill(
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColor.white.withOpacity(0.3),
+                                        AppColor.lowLightgray,
+                                        AppColor.lowLightgray,
+                                        AppColor.lowLightgray,
+                                        AppColor.lowLightgray,
+                                        AppColor.lowLightgray,
+                                        AppColor.white.withOpacity(0.3),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.topRight,
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  top: -20,
-                                  bottom: -20,
-                                  left: 0,
-                                  right: 0,
-                                  child: ListView.builder(
+                              ),
+                              Positioned(
+                                top: -20,
+                                bottom: -20,
+                                left: 0,
+                                right: 0,
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    final count = classes.length;
+                                    // total width of all cards + gaps
+                                    final totalW =
+                                        count * _classItemWidth +
+                                        (count - 1) * _classGap;
+                                    // if content is narrower than viewport, add symmetric side padding to center the row
+                                    final sidePad =
+                                        totalW < constraints.maxWidth
+                                            ? (constraints.maxWidth - totalW) /
+                                                2.0
+                                            : 0.0;
+
+                                    return ListView.builder(
+                                      controller: _classScroll,
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: classes.length,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: sidePad,
+                                      ), // <-- key change
+                                      itemBuilder: (context, index) {
+                                        final item = classes[index];
+                                        final isSelected =
+                                            index == selectedIndex;
+
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedIndex = index;
+                                              selectedClassId = item.id;
+                                              teacherClassController
+                                                  .selectedClass
+                                                  .value = item;
+                                            });
+                                            // center after layout updates
+                                            WidgetsBinding.instance
+                                                .addPostFrameCallback((_) {
+                                                  _centerSelectedClass();
+                                                });
+                                          },
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                              milliseconds: 120,
+                                            ),
+                                            curve: Curves.easeInOut,
+                                            width:
+                                                _classItemWidth, // <-- keep in sync
+                                            height: isSelected ? 120 : 80,
+                                            margin: const EdgeInsets.symmetric(
+                                              horizontal:
+                                                  _classGap /
+                                                  2, // <-- if you add spacing, bump _classGap
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  isSelected
+                                                      ? AppColor.white
+                                                      : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(24),
+                                              border:
+                                                  isSelected
+                                                      ? Border.all(
+                                                        color: AppColor.blueG1,
+                                                        width: 1.5,
+                                                      )
+                                                      : null,
+                                              boxShadow:
+                                                  isSelected
+                                                      ? [
+                                                        BoxShadow(
+                                                          color: AppColor.white
+                                                              .withOpacity(0.5),
+                                                          blurRadius: 10,
+                                                          offset: const Offset(
+                                                            0,
+                                                            4,
+                                                          ),
+                                                        ),
+                                                      ]
+                                                      : [],
+                                            ),
+                                            // ===== your existing inner UI (unchanged) =====
+                                            child:
+                                                isSelected
+                                                    ? Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        const SizedBox(
+                                                          height: 8,
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            ShaderMask(
+                                                              shaderCallback:
+                                                                  (
+                                                                    bounds,
+                                                                  ) => const LinearGradient(
+                                                                    colors: [
+                                                                      AppColor
+                                                                          .blueG1,
+                                                                      AppColor
+                                                                          .blue,
+                                                                    ],
+                                                                    begin:
+                                                                        Alignment
+                                                                            .topLeft,
+                                                                    end:
+                                                                        Alignment
+                                                                            .bottomRight,
+                                                                  ).createShader(
+                                                                    Rect.fromLTWH(
+                                                                      0,
+                                                                      0,
+                                                                      bounds
+                                                                          .width,
+                                                                      bounds
+                                                                          .height,
+                                                                    ),
+                                                                  ),
+                                                              blendMode:
+                                                                  BlendMode
+                                                                      .srcIn,
+                                                              child: Text(
+                                                                item.name,
+                                                                style: GoogleFont.ibmPlexSans(
+                                                                  fontSize: 28,
+                                                                  color:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets.only(
+                                                                    top: 8.0,
+                                                                  ),
+                                                              child: ShaderMask(
+                                                                shaderCallback:
+                                                                    (
+                                                                      bounds,
+                                                                    ) => const LinearGradient(
+                                                                      colors: [
+                                                                        AppColor
+                                                                            .blueG1,
+                                                                        AppColor
+                                                                            .blue,
+                                                                      ],
+                                                                      begin:
+                                                                          Alignment
+                                                                              .topLeft,
+                                                                      end:
+                                                                          Alignment
+                                                                              .bottomRight,
+                                                                    ).createShader(
+                                                                      Rect.fromLTWH(
+                                                                        0,
+                                                                        0,
+                                                                        bounds
+                                                                            .width,
+                                                                        bounds
+                                                                            .height,
+                                                                      ),
+                                                                    ),
+                                                                blendMode:
+                                                                    BlendMode
+                                                                        .srcIn,
+                                                                child: Text(
+                                                                  'th',
+                                                                  style: GoogleFont.ibmPlexSans(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          height: 55,
+                                                          width:
+                                                              double.infinity,
+                                                          decoration: const BoxDecoration(
+                                                            gradient: LinearGradient(
+                                                              colors: [
+                                                                AppColor.blueG1,
+                                                                AppColor.blue,
+                                                              ],
+                                                              begin:
+                                                                  Alignment
+                                                                      .topLeft,
+                                                              end:
+                                                                  Alignment
+                                                                      .topRight,
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius.vertical(
+                                                                  bottom:
+                                                                      Radius.circular(
+                                                                        22,
+                                                                      ),
+                                                                ),
+                                                          ),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Text(
+                                                            item.section,
+                                                            style:
+                                                                GoogleFont.ibmPlexSans(
+                                                                  fontSize: 20,
+                                                                  color:
+                                                                      AppColor
+                                                                          .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                    : Center(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Container(
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      20,
+                                                                  vertical: 3,
+                                                                ),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                  color:
+                                                                      AppColor
+                                                                          .white,
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        20,
+                                                                      ),
+                                                                ),
+                                                            child: Text(
+                                                              item.name,
+                                                              style: GoogleFont.ibmPlexSans(
+                                                                fontSize: 14,
+                                                                color:
+                                                                    AppColor
+                                                                        .gray,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Text(
+                                                            item.section,
+                                                            style: GoogleFont.ibmPlexSans(
+                                                              fontSize: 20,
+                                                              color:
+                                                                  AppColor
+                                                                      .lightgray,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                            // ===== end unchanged UI =====
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+
+                                /*ListView.builder(
                                     scrollDirection: Axis.horizontal,
                                     itemCount: classes.length,
                                     padding: const EdgeInsets.symmetric(
@@ -1582,18 +1918,22 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                     ),
                                     itemBuilder: (context, index) {
                                       final item = classes[index];
-                                      final isSelected = index == selectedIndex;
+                                      final isSelected =
+                                          index == selectedIndex;
 
                                       return GestureDetector(
                                         onTap: () {
                                           setState(() {
                                             selectedIndex = index;
                                             selectedClassId = item.id;
-                                            teacherClassController
-                                                .selectedClass
-                                                .value = item;
+                                            teacherClassController.selectedClass.value = item;
+                                          });
+                                          // Center after the frame updates sizes/positions
+                                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                                            _centerSelectedClass();
                                           });
                                         },
+
                                         child: AnimatedContainer(
                                           duration: const Duration(
                                             milliseconds: 120,
@@ -1609,9 +1949,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                 isSelected
                                                     ? AppColor.white
                                                     : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              24,
-                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(24),
                                             border:
                                                 isSelected
                                                     ? Border.all(
@@ -1641,7 +1980,9 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     children: [
-                                                      const SizedBox(height: 8),
+                                                      const SizedBox(
+                                                        height: 8,
+                                                      ),
                                                       Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -1675,7 +2016,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                                   ),
                                                                 ),
                                                             blendMode:
-                                                                BlendMode.srcIn,
+                                                                BlendMode
+                                                                    .srcIn,
                                                             child: Text(
                                                               item.name,
                                                               style: GoogleFont.ibmPlexSans(
@@ -1727,7 +2069,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                               child: Text(
                                                                 'th',
                                                                 style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 14,
+                                                                  fontSize:
+                                                                      14,
                                                                   color:
                                                                       Colors
                                                                           .white,
@@ -1742,22 +2085,21 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                       ),
                                                       Container(
                                                         height: 55,
-                                                        width: double.infinity,
+                                                        width:
+                                                            double.infinity,
                                                         decoration: BoxDecoration(
-                                                          gradient:
-                                                              const LinearGradient(
-                                                                colors: [
-                                                                  AppColor
-                                                                      .blueG1,
-                                                                  AppColor.blue,
-                                                                ],
-                                                                begin:
-                                                                    Alignment
-                                                                        .topLeft,
-                                                                end:
-                                                                    Alignment
-                                                                        .topRight,
-                                                              ),
+                                                          gradient: const LinearGradient(
+                                                            colors: [
+                                                              AppColor.blueG1,
+                                                              AppColor.blue,
+                                                            ],
+                                                            begin:
+                                                                Alignment
+                                                                    .topLeft,
+                                                            end:
+                                                                Alignment
+                                                                    .topRight,
+                                                          ),
                                                           borderRadius:
                                                               const BorderRadius.vertical(
                                                                 bottom:
@@ -1792,29 +2134,31 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                         Container(
                                                           padding:
                                                               const EdgeInsets.symmetric(
-                                                                horizontal: 20,
+                                                                horizontal:
+                                                                    20,
                                                                 vertical: 3,
                                                               ),
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                AppColor.white,
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  20,
-                                                                ),
-                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color:
+                                                                    AppColor
+                                                                        .white,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      20,
+                                                                    ),
+                                                              ),
                                                           child: Text(
                                                             item.name,
-                                                            style:
-                                                                GoogleFont.ibmPlexSans(
-                                                                  fontSize: 14,
-                                                                  color:
-                                                                      AppColor
-                                                                          .gray,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
+                                                            style: GoogleFont.ibmPlexSans(
+                                                              fontSize: 14,
+                                                              color:
+                                                                  AppColor
+                                                                      .gray,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
                                                           ),
                                                         ),
                                                         const SizedBox(
@@ -1828,7 +2172,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                                                 AppColor
                                                                     .lightgray,
                                                             fontWeight:
-                                                                FontWeight.bold,
+                                                                FontWeight
+                                                                    .bold,
                                                           ),
                                                         ),
                                                       ],
@@ -1837,35 +2182,41 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                         ),
                                       );
                                     },
-                                  ),
-                                ),
-                              ],
+                                  ),*/
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_classInvalid)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8, left: 4),
+                            child: Text(
+                              'Class is required',
+                              style: TextStyle(color: Colors.red, fontSize: 12),
                             ),
                           ),
-                          if (_classInvalid)
-                            const Padding(
-                              padding: EdgeInsets.only(top: 8, left: 4),
-                              child: Text(
-                                'Class is required',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
 
-                          const SizedBox(height: 40),
+                        const SizedBox(height: 40),
 
-                          // ------------------ Subject ------------------
-                          Text(
+                        // ------------------ Subject ------------------
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 20,
+                          ),
+                          child: Text(
                             'Subject',
                             style: GoogleFont.ibmPlexSans(
                               fontSize: 14,
                               color: AppColor.black,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Wrap(
+                        ),
+                        const SizedBox(height: 10),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: BouncingScrollPhysics(),
+                          child: Wrap(
                             spacing: 10,
                             children: List.generate(subjects.length, (index) {
                               final sub = subjects[index];
@@ -1921,435 +2272,455 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                               );
                             }),
                           ),
-                          if (_subjectInvalid)
-                            const Padding(
-                              padding: EdgeInsets.only(top: 8, left: 4),
-                              child: Text(
-                                'Subject is required',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
+                        ),
+                        if (_subjectInvalid)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8, left: 4),
+                            child: Text(
+                              'Subject is required',
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
+
+                        const SizedBox(height: 25),
+
+                        // ------------------ Heading ------------------
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 20,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Heading',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.black,
                                 ),
                               ),
-                            ),
 
-                          const SizedBox(height: 25),
-
-                          // ------------------ Heading ------------------
-                          Text(
-                            'Heading',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 14,
-                              color: AppColor.black,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color:
-                                    _headingInvalid
-                                        ? Colors.red
-                                        : Colors.transparent,
-                                width: 1.2,
-                              ),
-                            ),
-                            child: CommonContainer.fillingContainer(
-                              onDetailsTap: () {
-                                headingController.clear();
-                                setState(() {
-                                  showClearIcon = false;
-                                  _headingInvalid = true; // empty -> invalid
-                                });
-                              },
-                              // If your component supports onChanged, this helps clear red faster:
-                              onChanged: (v) {
-                                setState(() {
-                                  if (_headingInvalid && v.trim().isNotEmpty) {
-                                    _headingInvalid = false;
-                                  }
-                                  showClearIcon = v.isNotEmpty;
-                                });
-                              },
-                              imagePath: showClearIcon ? AppImages.close : null,
-                              imageColor: AppColor.gray,
-                              text: '',
-                              controller: headingController,
-                              verticalDivider: false,
-                            ),
-                          ),
-                          if (_headingInvalid)
-                            const Padding(
-                              padding: EdgeInsets.only(top: 6, left: 4),
-                              child: Text(
-                                'Heading is required',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
+                              const SizedBox(height: 10),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color:
+                                        _headingInvalid
+                                            ? Colors.red
+                                            : Colors.transparent,
+                                    width: 1.2,
+                                  ),
                                 ),
-                              ),
-                            ),
-
-                          const SizedBox(height: 25),
-
-                          // ------------------ Time Limit ------------------
-                          Text(
-                            'Time Limit',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 14,
-                              color: AppColor.black,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color:
-                                    _timeLimitInvalid
-                                        ? Colors.red
-                                        : Colors.transparent,
-                                width: 1.2,
-                              ),
-                            ),
-                            child: GestureDetector(
-                              onTap: () => _pickMinutes(context),
-                              child: AbsorbPointer(
-                                // Prevents keyboard; value only set via picker
                                 child: CommonContainer.fillingContainer(
-                                  imagePath: AppImages.clock,
-                                  imageColor: AppColor.lightgray,
-                                  text: '',
-                                  controller: timeLimitController,
-                                  verticalDivider: false,
-                                  onChanged: (v) {
+                                  onDetailsTap: () {
+                                    headingController.clear();
                                     setState(() {
-                                      _minutes = _digitsOrZero(v);
-                                      _timeLimitInvalid = _minutes <= 0;
+                                      showClearIcon = false;
+                                      _headingInvalid =
+                                          true; // empty -> invalid
                                     });
                                   },
+                                  // If your component supports onChanged, this helps clear red faster:
+                                  onChanged: (v) {
+                                    setState(() {
+                                      if (_headingInvalid &&
+                                          v.trim().isNotEmpty) {
+                                        _headingInvalid = false;
+                                      }
+                                      showClearIcon = v.isNotEmpty;
+                                    });
+                                  },
+                                  imagePath:
+                                      showClearIcon ? AppImages.close : null,
+                                  imageColor: AppColor.gray,
+                                  text: '',
+                                  controller: headingController,
+                                  verticalDivider: false,
                                 ),
                               ),
-                            ),
-                          ),
-
-                          if (_timeLimitInvalid)
-                            const Padding(
-                              padding: EdgeInsets.only(top: 6, left: 4),
-                              child: Text(
-                                'Time Limit is required',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-
-                          const SizedBox(height: 25),
-
-                          // ------------------ Questions & Answers ------------------
-                          Column(
-                            children: List.generate(questionList.length, (
-                              qIndex,
-                            ) {
-                              final q = questionList[qIndex];
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 24),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // ===== Small UI tweak (optional): add a remove icon for qIndex > 0 =====
-                                    // Right under your "Q${qIndex + 1}" Text, show a delete icon only for questions after the first.
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Q${qIndex + 1}",
-                                          style: GoogleFont.ibmPlexSans(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColor.borderGary,
-                                          ),
-                                        ),
-                                        if (qIndex > 0)
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.delete_outline,
-                                              color: Colors.red,
-                                            ),
-                                            onPressed:
-                                                () => _removeQuestion(qIndex),
-                                            tooltip: 'Remove Question',
-                                          ),
-                                      ],
+                              if (_headingInvalid)
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 6, left: 4),
+                                  child: Text(
+                                    'Heading is required',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
                                     ),
+                                  ),
+                                ),
 
-                                    SizedBox(height: 10),
+                              const SizedBox(height: 25),
 
-                                    // Question field
-                                    TextFormField(
-                                      initialValue: q.question,
-                                      maxLines: 3,
-                                      decoration: InputDecoration(
-                                        hintText: "Enter question",
-                                        filled: true,
-                                        fillColor: AppColor.lightWhite,
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color:
-                                                _invalidQuestions.contains(
-                                                      qIndex,
-                                                    )
-                                                    ? Colors.red
-                                                    : Colors.transparent,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: AppColor.blue,
-                                          ),
-                                        ),
-                                      ),
-                                      onChanged: (val) {
-                                        q.question = val;
-                                        if (val.trim().isNotEmpty) {
-                                          setState(
-                                            () => _invalidQuestions.remove(
-                                              qIndex,
-                                            ),
-                                          );
-                                        }
+                              // ------------------ Time Limit ------------------
+                              Text(
+                                'Time Limit',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color:
+                                        _timeLimitInvalid
+                                            ? Colors.red
+                                            : Colors.transparent,
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: GestureDetector(
+                                  onTap: () => _pickMinutes(context),
+                                  child: AbsorbPointer(
+                                    // Prevents keyboard; value only set via picker
+                                    child: CommonContainer.fillingContainer(
+                                      imagePath: AppImages.clock,
+                                      imageColor: AppColor.lightgray,
+                                      text: '',
+                                      controller: timeLimitController,
+                                      verticalDivider: false,
+                                      onChanged: (v) {
+                                        setState(() {
+                                          _minutes = _digitsOrZero(v);
+                                          _timeLimitInvalid = _minutes <= 0;
+                                        });
                                       },
                                     ),
-                                    if (_invalidQuestions.contains(qIndex))
-                                      const Padding(
-                                        padding: EdgeInsets.only(
-                                          top: 6,
-                                          left: 4,
-                                        ),
-                                        child: Text(
-                                          'Question is required',
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Answer',
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-
-                                    Column(
-                                      children: List.generate(q.answers.length, (
-                                        aIndex,
-                                      ) {
-                                        final a = q.answers[aIndex];
-                                        final isInvalid =
-                                            _invalidAnswers[qIndex]?.contains(
-                                              aIndex,
-                                            ) ??
-                                            false;
-
-                                        return Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 8,
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 12,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color: AppColor.lightWhite,
-                                                  borderRadius:
-                                                      BorderRadius.circular(18),
-                                                  border: Border.all(
-                                                    color:
-                                                        isInvalid
-                                                            ? Colors.red
-                                                            : Colors
-                                                                .transparent,
-                                                    width: 1.2,
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: TextFormField(
-                                                        initialValue: a.text,
-                                                        decoration: InputDecoration(
-                                                          hintText:
-                                                              'List ${aIndex + 1}',
-                                                          hintStyle:
-                                                              GoogleFont.ibmPlexSans(
-                                                                fontSize: 14,
-                                                                color:
-                                                                    AppColor
-                                                                        .gray,
-                                                              ),
-                                                          border:
-                                                              InputBorder.none,
-                                                        ),
-                                                        onChanged: (val) {
-                                                          a.text = val;
-
-                                                          // Your rule: first option auto-correct
-                                                          a.isCorrect =
-                                                              (aIndex == 0);
-
-                                                          if (val
-                                                              .trim()
-                                                              .isNotEmpty) {
-                                                            setState(() {
-                                                              _invalidAnswers[qIndex]
-                                                                  ?.remove(
-                                                                    aIndex,
-                                                                  );
-                                                              if ((_invalidAnswers[qIndex]
-                                                                      ?.isEmpty ??
-                                                                  true)) {
-                                                                _invalidAnswers
-                                                                    .remove(
-                                                                      qIndex,
-                                                                    );
-                                                              }
-                                                            });
-                                                          }
-                                                        },
-                                                      ),
-                                                    ),
-                                                    if (aIndex == 0)
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets.only(
-                                                              left: 8,
-                                                            ),
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                AppColor.white,
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  14,
-                                                                ),
-                                                          ),
-                                                          child: const Padding(
-                                                            padding:
-                                                                EdgeInsets.symmetric(
-                                                                  vertical: 6,
-                                                                  horizontal:
-                                                                      14,
-                                                                ),
-                                                            child: Text(
-                                                              "Answer",
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors.blue,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                              ),
-                                              if (isInvalid)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                        top: 6,
-                                                        left: 4,
-                                                      ),
-                                                  child: Text(
-                                                    'Answer ${aIndex + 1} is required',
-                                                    style: const TextStyle(
-                                                      color: Colors.red,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        );
-                                      }),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ),
-
-                          const SizedBox(height: 25),
-
-                          // ------------------ Add Question ------------------
-                          GestureDetector(
-                            onTap: _addMoreQuestion,
-                            child: DottedBorder(
-                              color: AppColor.blue,
-                              strokeWidth: 1.5,
-                              dashPattern: const [8, 4],
-                              borderType: BorderType.RRect,
-                              radius: const Radius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Add Question',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                    color: AppColor.blue,
                                   ),
                                 ),
                               ),
-                            ),
+
+                              if (_timeLimitInvalid)
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 6, left: 4),
+                                  child: Text(
+                                    'Time Limit is required',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+
+                              const SizedBox(height: 25),
+
+                              // ------------------ Questions & Answers ------------------
+                              Column(
+                                children: List.generate(questionList.length, (
+                                  qIndex,
+                                ) {
+                                  final q = questionList[qIndex];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 24),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // ===== Small UI tweak (optional): add a remove icon for qIndex > 0 =====
+                                        // Right under your "Q${qIndex + 1}" Text, show a delete icon only for questions after the first.
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Q${qIndex + 1}",
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.borderGary,
+                                              ),
+                                            ),
+                                            if (qIndex > 0)
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.delete_outline,
+                                                  color: Colors.red,
+                                                ),
+                                                onPressed:
+                                                    () =>
+                                                        _removeQuestion(qIndex),
+                                                tooltip: 'Remove Question',
+                                              ),
+                                          ],
+                                        ),
+
+                                        SizedBox(height: 10),
+
+                                        // Question field
+                                        TextFormField(
+                                          initialValue: q.question,
+                                          maxLines: 3,
+                                          decoration: InputDecoration(
+                                            hintText: "Enter question",
+                                            filled: true,
+                                            fillColor: AppColor.lightWhite,
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              borderSide: BorderSide(
+                                                color:
+                                                    _invalidQuestions.contains(
+                                                          qIndex,
+                                                        )
+                                                        ? Colors.red
+                                                        : Colors.transparent,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              borderSide: BorderSide(
+                                                color: AppColor.blue,
+                                              ),
+                                            ),
+                                          ),
+                                          onChanged: (val) {
+                                            q.question = val;
+                                            if (val.trim().isNotEmpty) {
+                                              setState(
+                                                () => _invalidQuestions.remove(
+                                                  qIndex,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                        if (_invalidQuestions.contains(qIndex))
+                                          const Padding(
+                                            padding: EdgeInsets.only(
+                                              top: 6,
+                                              left: 4,
+                                            ),
+                                            child: Text(
+                                              'Question is required',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Answer',
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+
+                                        Column(
+                                          children: List.generate(q.answers.length, (
+                                            aIndex,
+                                          ) {
+                                            final a = q.answers[aIndex];
+                                            final isInvalid =
+                                                _invalidAnswers[qIndex]
+                                                    ?.contains(aIndex) ??
+                                                false;
+
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: 8,
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 12,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColor.lightWhite,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            18,
+                                                          ),
+                                                      border: Border.all(
+                                                        color:
+                                                            isInvalid
+                                                                ? Colors.red
+                                                                : Colors
+                                                                    .transparent,
+                                                        width: 1.2,
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: TextFormField(
+                                                            initialValue:
+                                                                a.text,
+                                                            decoration: InputDecoration(
+                                                              hintText:
+                                                                  'List ${aIndex + 1}',
+                                                              hintStyle:
+                                                                  GoogleFont.ibmPlexSans(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color:
+                                                                        AppColor
+                                                                            .gray,
+                                                                  ),
+                                                              border:
+                                                                  InputBorder
+                                                                      .none,
+                                                            ),
+                                                            onChanged: (val) {
+                                                              a.text = val;
+
+                                                              // Your rule: first option auto-correct
+                                                              a.isCorrect =
+                                                                  (aIndex == 0);
+
+                                                              if (val
+                                                                  .trim()
+                                                                  .isNotEmpty) {
+                                                                setState(() {
+                                                                  _invalidAnswers[qIndex]
+                                                                      ?.remove(
+                                                                        aIndex,
+                                                                      );
+                                                                  if ((_invalidAnswers[qIndex]
+                                                                          ?.isEmpty ??
+                                                                      true)) {
+                                                                    _invalidAnswers
+                                                                        .remove(
+                                                                          qIndex,
+                                                                        );
+                                                                  }
+                                                                });
+                                                              }
+                                                            },
+                                                          ),
+                                                        ),
+                                                        if (aIndex == 0)
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets.only(
+                                                                  left: 8,
+                                                                ),
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                color:
+                                                                    AppColor
+                                                                        .white,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      14,
+                                                                    ),
+                                                              ),
+                                                              child: const Padding(
+                                                                padding:
+                                                                    EdgeInsets.symmetric(
+                                                                      vertical:
+                                                                          6,
+                                                                      horizontal:
+                                                                          14,
+                                                                    ),
+                                                                child: Text(
+                                                                  "Answer",
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .blue,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  if (isInvalid)
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            top: 6,
+                                                            left: 4,
+                                                          ),
+                                                      child: Text(
+                                                        'Answer ${aIndex + 1} is required',
+                                                        style: const TextStyle(
+                                                          color: Colors.red,
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            );
+                                          }),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ),
+
+                              const SizedBox(height: 25),
+
+                              // ------------------ Add Question ------------------
+                              GestureDetector(
+                                onTap: _addMoreQuestion,
+                                child: DottedBorder(
+                                  color: AppColor.blue,
+                                  strokeWidth: 1.5,
+                                  dashPattern: const [8, 4],
+                                  borderType: BorderType.RRect,
+                                  radius: const Radius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Add Question',
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: AppColor.blue,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 40),
+
+                              // ------------------ Publish ------------------
+                              AppButton.button(
+                                onTap: () async {
+                                  HapticFeedback.heavyImpact();
+
+                                  final payload = _validateAndBuildPayload();
+                                  if (payload == null) return;
+
+                                  AppLogger.log.i(payload);
+                                  await controller.quizCreate(context, payload);
+                                },
+                                width: 145,
+                                height: 60,
+                                text: 'Publish',
+                                image: AppImages.buttonArrow,
+                              ),
+                            ],
                           ),
-
-                          const SizedBox(height: 40),
-
-                          // ------------------ Publish ------------------
-                          AppButton.button(
-                            onTap: () async {
-                              HapticFeedback.heavyImpact();
-
-                              final payload = _validateAndBuildPayload();
-                              if (payload == null) return;
-
-                              AppLogger.log.i(payload);
-                              await controller.quizCreate(context, payload);
-                            },
-                            width: 145,
-                            height: 60,
-                            text: 'Publish',
-                            image: AppImages.buttonArrow,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

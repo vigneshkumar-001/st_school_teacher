@@ -38,7 +38,7 @@ class TeacherData {
 class Profile {
   final String staffName;
   final String mobile;
-  final String profileImg;
+  late final String profileImg;
 
   Profile({required this.staffName, required this.mobile,required this.profileImg});
 

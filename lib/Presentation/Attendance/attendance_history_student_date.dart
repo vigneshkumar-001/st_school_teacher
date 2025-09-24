@@ -51,7 +51,7 @@ class _AttendanceHistoryStudentDateState
   late DateTime selectedDate;
   bool isLoading = true;
 
-/*  @override
+  /*  @override
   void initState() {
     super.initState();
     selectedDate = widget.selectedDate;
@@ -346,6 +346,7 @@ class _AttendanceHistoryStudentDateState
                       ),
                       SizedBox(height: 15),
 
+
                       /*  Stack(
                         alignment: Alignment.centerLeft,
                         children: [
@@ -412,6 +413,8 @@ class _AttendanceHistoryStudentDateState
                           ),
                         ],
                       ),*/
+
+
                       GradientProgressBar(
                         progress:
                             (attendanceData?.thisMonthPresentPercentage ?? 0) /

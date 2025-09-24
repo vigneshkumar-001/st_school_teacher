@@ -477,6 +477,227 @@ class CommonContainer {
     FocusNode? focusNode,
     Color borderColor = AppColor.red,
     Color? imageColor,
+
+    // 👇 NEW
+    VoidCallback? onFieldTap,
+  }) {
+    return FormField<String>(
+      validator: validator,
+      key: fieldKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      builder: (state) {
+        final hasError = state.hasError;
+
+        Future<void> _handleDobTap() async {
+          if (!isDOB || context == null) return;
+
+          final DateTime startDate = DateTime(2021, 6, 1);
+          final DateTime endDate = DateTime(2022, 5, 31);
+          final DateTime initialDate = DateTime(2021, 6, 2);
+
+          final pickedDate = await showDatePicker(
+            context: context!,
+            initialDate: initialDate,
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2025),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  dialogBackgroundColor: AppColor.white,
+                  colorScheme: const ColorScheme.light(
+                    primary: AppColor.blue,
+                    onPrimary: Colors.white,
+                    onSurface: AppColor.black,
+                  ),
+                  textButtonTheme: TextButtonThemeData(
+                    style: TextButton.styleFrom(foregroundColor: AppColor.blue),
+                  ),
+                ),
+                child: child!,
+              );
+            },
+          );
+
+          if (pickedDate != null) {
+            if (pickedDate.isBefore(startDate) || pickedDate.isAfter(endDate)) {
+              ScaffoldMessenger.of(context!).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Invalid Date of Birth!\nPlease select a date between 01-06-2021 and 31-05-2022.',
+                  ),
+                  backgroundColor: Colors.red,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            } else {
+              controller?.text =
+              "${pickedDate.day.toString().padLeft(2, '0')}-"
+                  "${pickedDate.month.toString().padLeft(2, '0')}-"
+                  "${pickedDate.year}";
+              state.didChange(controller?.text ?? '');
+            }
+          }
+        }
+
+        // 👇 unified tap handler: DOB first, else custom onFieldTap
+        void _handleTap() {
+          if (isDOB) {
+            _handleDobTap();
+          } else {
+            onFieldTap?.call();
+          }
+        }
+
+        final effectiveInputFormatters =
+        isMobile || isAadhaar || isPincode
+            ? <TextInputFormatter>[
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(
+            isMobile ? 10 : (isAadhaar ? 12 : 6),
+          ),
+        ]
+            : (inputFormatters ?? const []);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Wrap the whole field area so taps anywhere open the sheet/date picker
+            GestureDetector(
+              onTap: _handleTap, // 👈 tap anywhere in the field area
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: AppColor.lightWhite,
+                  border: Border.all(
+                    color: hasError ? AppColor.red : Colors.transparent,
+                    width: 1.5,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: flex,
+                        child: AbsorbPointer(
+                          absorbing: isDOB || readOnly, // no keyboard for pickers / readOnly
+                          child: TextFormField(
+                            focusNode: focusNode,
+                            readOnly: readOnly,
+                            controller: controller,
+                            maxLines: maxLine,
+                            maxLength: isMobile
+                                ? 10
+                                : (isAadhaar ? 12 : (isPincode ? 6 : null)),
+                            keyboardType: keyboardType,
+                            inputFormatters: effectiveInputFormatters,
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 14,
+                              color: AppColor.black,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: '',
+                              counterText: '',
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                              border: InputBorder.none,
+                              isDense: true,
+                              errorText: null,
+                            ),
+                            // 👇 also trigger from the field itself
+                            onTap: _handleTap,
+                            showCursor: !(isDOB || readOnly),
+                            enableInteractiveSelection: !(isDOB || readOnly),
+                            onChanged: (v) {
+                              state.didChange(v);
+                              onChanged?.call(v);
+                            },
+                          ),
+                        ),
+                      ),
+
+                      if (verticalDivider)
+                        Container(
+                          width: 2,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.grey.shade200,
+                                Colors.grey.shade300,
+                                Colors.grey.shade200,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      const SizedBox(width: 20),
+
+                      if (imagePath != null)
+                        InkWell(
+                          onTap: () {
+                            controller?.clear();
+                            state.didChange(''); // clear validation state
+                            onDetailsTap?.call();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 15),
+                            child: Image.asset(
+                              imagePath,
+                              height: imageSize,
+                              width: imageSize,
+                              color: imageColor,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            if (hasError)
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0, top: 4),
+                child: Text(
+                  state.errorText!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+  /* static Widget fillingContainer({
+    required String text,
+    Key? fieldKey,
+    TextEditingController? controller,
+    String? imagePath,
+    bool verticalDivider = true,
+    Function(String)? onChanged,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    VoidCallback? onDetailsTap,
+    double imageSize = 20,
+    int? maxLine,
+    int flex = 4,
+    bool isTamil = false,
+    bool isAadhaar = false,
+    bool isDOB = false,
+    bool isMobile = false,
+    bool isPincode = false,
+    bool readOnly = false,
+    BuildContext? context,
+    FormFieldValidator<String>? validator,
+    FocusNode? focusNode,
+    Color borderColor = AppColor.red,
+    Color? imageColor,
   }) {
     return FormField<String>(
       validator: validator,
@@ -661,7 +882,7 @@ class CommonContainer {
         );
       },
     );
-  }
+  }*/
 
   static textWithSmall({
     required String text,
@@ -1991,6 +2212,165 @@ class CommonContainer {
     EdgeInsetsGeometry? sectionTextPadding,
     Color? backgroundColor,
     Color? sectionBgColor,
+
+    // NEW: cap inner content width while background is full width
+    double? maxContentWidth, // e.g., 720; defaults below
+  }) {
+    return Container(
+      width: double.infinity, // 🔥 full-width background
+      decoration: BoxDecoration(
+        color: backgroundColor ?? AppColor.profileClass1st,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding:
+          containerPadding ??
+          const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      child: Align(
+        alignment: Alignment.centerLeft, // keep content left-aligned
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxContentWidth ?? 720),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Heading text
+              RichText(
+                text: TextSpan(
+                  text: standardText1,
+                  style: GoogleFont.ibmPlexSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColor.black,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: standardText2,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColor.black,
+                      ),
+                    ),
+                    TextSpan(
+                      text: standardText3,
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 16,
+                        color: AppColor.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+
+              // Chips area (wraps to next line, no overflow)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // prevent a single chip from hogging the whole line
+                  final double maxChipWidth = constraints.maxWidth - 48;
+
+                  return Wrap(
+                    alignment: WrapAlignment.start,
+                    runAlignment: WrapAlignment.start,
+                    spacing: 10, // horizontal gap
+                    runSpacing: 10, // vertical gap
+                    children:
+                        sections.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final section = entry.value;
+                          final padding =
+                              (paddings != null && paddings.length > index)
+                                  ? paddings[index]
+                                  : const EdgeInsets.only(right: 0, bottom: 0);
+
+                          final bool isExpanded = section == expandedSection;
+                          final List<String> subjects =
+                              sectionSubjects?[section] ?? [];
+                          final bool hasSubjects =
+                              isExpanded && subjects.isNotEmpty;
+
+                          return Padding(
+                            padding: padding,
+                            child: InkWell(
+                              onTap: () {
+                                if (onSectionTap != null) {
+                                  onSectionTap(
+                                    isExpanded ? '' : section,
+                                  ); // toggle expand/collapse
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color:
+                                      sectionBgColor ??
+                                      AppColor.white.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColor.white),
+                                ),
+                                padding:
+                                    sectionTextPadding ??
+                                    const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: maxChipWidth,
+                                  ),
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: section,
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColor.black,
+                                          ),
+                                        ),
+                                        if (hasSubjects)
+                                          TextSpan(
+                                            text: ' - ${subjects.join(", ")}',
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColor.black,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /*  static Widget myProfileContainer({
+    required String standardText1,
+    required String standardText2,
+    required String standardText3,
+    required List<String> sections,
+    Map<String, List<String>>? sectionSubjects, // Map section -> subjects
+    String? expandedSection, // currently expanded section
+    Function(String section)? onSectionTap,
+    List<EdgeInsets>? paddings,
+    EdgeInsetsGeometry? containerPadding,
+    EdgeInsetsGeometry? sectionTextPadding,
+    Color? backgroundColor,
+    Color? sectionBgColor,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -2095,7 +2475,7 @@ class CommonContainer {
         ],
       ),
     );
-  }
+  }*/
 
   static Widget studentInfoScreen({
     required String text,
@@ -2423,7 +2803,10 @@ class CommonContainer {
         width: 68,
         height: 96,
         decoration: BoxDecoration(
-          color: isDisabled ? AppColor.lowLightgray : AppColor.white, // 👈 dim background
+          color:
+              isDisabled
+                  ? AppColor.lowLightgray
+                  : AppColor.white, // 👈 dim background
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: isDisabled ? AppColor.lowLightgray : AppColor.lowLightgray,
@@ -2435,7 +2818,10 @@ class CommonContainer {
           children: [
             Icon(
               icon,
-              color: isDisabled ? AppColor.gray.withOpacity(0.4) : AppColor.gray, // 👈 dim icon
+              color:
+                  isDisabled
+                      ? AppColor.gray.withOpacity(0.4)
+                      : AppColor.gray, // 👈 dim icon
               size: 28,
             ),
             Text(
@@ -2444,7 +2830,10 @@ class CommonContainer {
               style: GoogleFont.ibmPlexSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: isDisabled ? AppColor.gray.withOpacity(0.4) : AppColor.gray, // 👈 dim text
+                color:
+                    isDisabled
+                        ? AppColor.gray.withOpacity(0.4)
+                        : AppColor.gray, // 👈 dim text
               ),
             ),
           ],
@@ -2452,7 +2841,6 @@ class CommonContainer {
       ),
     );
   }
-
 
   static Widget topLinkTab({
     required String text,
