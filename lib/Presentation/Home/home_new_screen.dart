@@ -19,6 +19,7 @@ import '../Homework/homework_create.dart';
 import '../Menu/menu_screen.dart';
 import '../Profile/controller/teacher_data_controller.dart';
 import '../Quiz Screen/quiz_screen_create.dart';
+import 'controller/message_controller.dart';
 import 'message_screen.dart';
 
 class HomeNewScreen extends StatefulWidget {
@@ -35,6 +36,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
     TeacherClassController(),
   );
   final TeacherDataController controller = Get.put(TeacherDataController());
+  final MessageController msgController = Get.put(MessageController());
   int _currentIndex = 0;
   int _current = 1;
   int selectedIndex = 0;
@@ -192,6 +194,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                           ?.data
                                           .profile
                                           .staffName;
+                                  final msgCount = msgController.count.value;
 
                                   if (staffName == null || staffName.isEmpty) {
                                     return Text(
@@ -1039,7 +1042,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                           ),
                                                           curve:
                                                               Curves.easeInOut,
-                                                          width: 75,
+                                                          width: 85,
                                                           height: 50,
                                                           margin:
                                                               const EdgeInsets.symmetric(
@@ -1581,18 +1584,20 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  // Text(
-                                                  //   '3',
-                                                  //   style:
-                                                  //       GoogleFont.ibmPlexSans(
-                                                  //         fontSize: 15,
-                                                  //         fontWeight:
-                                                  //             FontWeight.bold,
-                                                  //         color:
-                                                  //             AppColor.white,
-                                                  //       ),
-                                                  // ),
-                                                  // SizedBox(width: 4),
+                                                  Obx(
+                                                        () => Text(
+                                                      msgController.count.value != 0
+                                                          ? msgController.count.value.toString()
+                                                          : '',
+                                                      style: GoogleFont.ibmPlexSans(
+                                                        fontSize: 15,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: AppColor.white,
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                  SizedBox(width: 4),
                                                   Text(
                                                     'Messages',
                                                     style:

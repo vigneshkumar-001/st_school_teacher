@@ -29,158 +29,176 @@ class _ExamHistoryState extends State<ExamHistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColor.blue,
-          backgroundColor: AppColor.white,
-          strokeWidth: 2,
-          displacement: 50,
-          onRefresh: () async {
-            await controller.getExamList();
-            await Future.delayed(const Duration(milliseconds: 600));
-          },
-          child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
-            children: [
-              // Top Row
-              Row(
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return Center(child: AppLoader.circularLoader());
+          }
+
+          final grouped = controller.groupedExams;
+
+          if (grouped.isEmpty) {
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 80),
+              decoration: BoxDecoration(color: AppColor.white),
+              child: Column(
                 children: [
-                  CommonContainer.NavigatArrow(
-                    image: AppImages.leftSideArrow,
-                    imageColor: AppColor.lightBlack,
-                    container: AppColor.lowLightgray,
-                    onIconTap: () => Navigator.pop(context),
-                    border: Border.all(color: AppColor.lightgray, width: 0.3),
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ExamCreate()),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          'Create Exam',
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.blue,
-                          ),
-                        ),
-                        const SizedBox(width: 15),
-                        Image.asset(AppImages.doubleArrow, height: 19),
-                      ],
+                  Center(
+                    child: Text(
+                      'No exams available',
+                      style: GoogleFont.ibmPlexSans(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: AppColor.gray,
+                      ),
                     ),
                   ),
+                  SizedBox(height: 30),
+                  Image.asset(AppImages.noDataFound),
                 ],
               ),
+            );
 
-              const SizedBox(height: 35),
+          }
 
-              Center(
-                child: Text(
-                  'Exams',
-                  style: GoogleFont.inter(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.black,
+          int colorIndex = 0; // global color counter
+
+          return RefreshIndicator(
+            color: AppColor.blue,
+            backgroundColor: AppColor.white,
+            strokeWidth: 2,
+            displacement: 50,
+            onRefresh: () async {
+              await controller.getExamList();
+              await Future.delayed(const Duration(milliseconds: 600));
+            },
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
+              children: [
+                // Top Row
+                Row(
+                  children: [
+                    CommonContainer.NavigatArrow(
+                      image: AppImages.leftSideArrow,
+                      imageColor: AppColor.lightBlack,
+                      container: AppColor.lowLightgray,
+                      onIconTap: () => Navigator.pop(context),
+                      border: Border.all(color: AppColor.lightgray, width: 0.3),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ExamCreate()),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            'Create Exam',
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Image.asset(AppImages.doubleArrow, height: 19),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 35),
+
+                Center(
+                  child: Text(
+                    'Exams',
+                    style: GoogleFont.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: AppColor.black,
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColor.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 15,
+                const SizedBox(height: 20),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColor.white,
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 5,
-                          vertical: 5,
-                        ),
-                        child: SizedBox(
-                          height: 40,
-                          child: Obx(() {
-                            final selected =
-                                controller
-                                    .selectedFilter
-                                    .value; // reactive value
-                            return ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: controller.monthFilters.length,
-                              itemBuilder: (context, index) {
-                                final filter = controller.monthFilters[index];
-                                final isSelected = selected == filter;
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 15,
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 5,
+                          ),
+                          child: SizedBox(
+                            height: 40,
+                            child: Obx(() {
+                              final selected =
+                                  controller
+                                      .selectedFilter
+                                      .value; // reactive value
+                              return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: controller.monthFilters.length,
+                                itemBuilder: (context, index) {
+                                  final filter = controller.monthFilters[index];
+                                  final isSelected = selected == filter;
 
-                                return GestureDetector(
-                                  onTap: () {
-                                    controller.selectedFilter.value = filter;
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 12),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          isSelected
-                                              ? AppColor.blue
-                                              : AppColor.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
+                                  return GestureDetector(
+                                    onTap: () {
+                                      controller.selectedFilter.value = filter;
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(right: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
                                         color:
                                             isSelected
                                                 ? AppColor.blue
-                                                : AppColor.borderGary,
+                                                : AppColor.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color:
+                                              isSelected
+                                                  ? AppColor.blue
+                                                  : AppColor.borderGary,
+                                        ),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        filter,
+                                        style: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : AppColor.gray,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      filter,
-                                      style: TextStyle(
-                                        color:
-                                            isSelected
-                                                ? Colors.white
-                                                : AppColor.gray,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          }),
+                                  );
+                                },
+                              );
+                            }),
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 15),
-                      Obx(() {
-                        if (controller.isLoading.value) {
-                          return Center(child: AppLoader.circularLoader());
-                        }
-
-                        final grouped = controller.groupedExams;
-
-                        if (grouped.isEmpty) {
-                          return const Center(
-                            child: Text("No exams available"),
-                          );
-                        }
-
-                        int colorIndex = 0; // global color counter
-
-                        return Column(
+                        const SizedBox(height: 15),
+                        Column(
                           children:
                               grouped.entries.map((entry) {
                                 final groupTitle = entry.key;
@@ -275,15 +293,15 @@ class _ExamHistoryState extends State<ExamHistory> {
                                   ],
                                 );
                               }).toList(),
-                        );
-                      }),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

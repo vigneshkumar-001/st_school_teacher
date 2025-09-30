@@ -13,6 +13,10 @@ class TeacherClassController extends GetxController {
   RxList<TeacherClass> classList = <TeacherClass>[].obs;
   RxList<TeacherSubject> subjectList = <TeacherSubject>[].obs;
 
+
+
+
+
   @override
   void onInit() {
     super.onInit();

@@ -17,6 +17,7 @@ class MessageController extends GetxController {
   final RxBool isMarkingLoading = false.obs;
   String accessToken = '';
   RxList<NotificationItem> messageList = <NotificationItem>[].obs;
+  var count = 0.obs;
   var reactData = Rxn<ReactData>(); // nullable reactive variable
   // Track loading for each message separately
   final RxSet<int> loadingMessages =
@@ -66,6 +67,7 @@ class MessageController extends GetxController {
           // Store in memory
           // classList.assignAll(response.data);
           messageList.value = response.data.items;
+          count.value = response.data. pendingCount ;
           AppLogger.log.i(messageList.toString());
 
           // final prefs = await SharedPreferences.getInstance();

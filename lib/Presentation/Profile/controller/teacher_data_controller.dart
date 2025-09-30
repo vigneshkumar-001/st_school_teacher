@@ -21,6 +21,19 @@ class TeacherDataController extends GetxController {
     super.onInit();
     getTeacherClassData();
   }
+  final RxInt profileImgVersion = 0.obs;
+
+
+  void applyNewProfileImage(String newUrl) {
+    final resp = teacherDataResponse.value;
+    if (resp != null) {
+      resp.data.profile.profileImg = newUrl;
+      // notify Obx listeners
+      teacherDataResponse.refresh();
+      // bump cache-buster
+      profileImgVersion.value++;
+    }
+  }
 
   Future<String?> getTeacherClassData() async {
     try {
@@ -79,7 +92,7 @@ class TeacherDataController extends GetxController {
           if (showLoader) hidePopupLoader();
           AppLogger.log.e(failure.message);
         },
-        (response) async {
+        (response) async {await getTeacherClassData();
           if (showLoader) hidePopupLoader();
           Get.back();
           AppLogger.log.i(response);

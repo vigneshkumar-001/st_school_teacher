@@ -45,7 +45,26 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
             return Center(child: AppLoader.circularLoader());
           }
           if (controller.homeworkList.isEmpty) {
-            return Center(child: Text("No Homework Found"));
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 80),
+              decoration: BoxDecoration(color: AppColor.white),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(
+                      'No Homework Found',
+                      style: GoogleFont.ibmPlexSans(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: AppColor.gray,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  Image.asset(AppImages.noDataFound),
+                ],
+              ),
+            );
           }
 
           return SingleChildScrollView(
@@ -202,7 +221,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                             entry,
                                           ) {
                                             final int index = entry.key;
-                                            final HomeworkItem  hw = entry.value;
+                                            final HomeworkItem hw = entry.value;
 
                                             const List<Color> colors = [
                                               AppColor.lightBlueC1,
@@ -237,11 +256,12 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                                 avatarImage: '',
                                                 mainText: hw.title,
                                                 smaleText: '',
-                                                time:  DateAndTimeConvert.formatDateTime(
-                                                  showTime: true,
-                                                  showDate: false,
-                                                  hw.time.toString(),
-                                                ),
+                                                time:
+                                                    DateAndTimeConvert.formatDateTime(
+                                                      showTime: true,
+                                                      showDate: false,
+                                                      hw.time.toString(),
+                                                    ),
                                                 aText1: ' ',
                                                 aText2: '',
                                                 backRoundColor: bgColor,
