@@ -248,7 +248,6 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
                     Obx(() {
                       return AppButton.button(
                         text: 'Get OTP',
