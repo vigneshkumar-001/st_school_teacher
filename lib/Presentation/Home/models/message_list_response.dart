@@ -1,4 +1,4 @@
-class  MessageListResponse  {
+class MessageListResponse {
   final bool status;
   final int code;
   final String message;
@@ -32,22 +32,25 @@ class  MessageListResponse  {
 
 class MessageListData {
   final List<NotificationItem> items;
+  final int pendingCount;
 
-  MessageListData({required this.items});
+  MessageListData({required this.items, required this.pendingCount});
 
   factory MessageListData.fromJson(Map<String, dynamic> json) {
     var list = <NotificationItem>[];
     if (json['items'] != null) {
-      list = List<Map<String, dynamic>>.from(json['items'])
-          .map((e) => NotificationItem.fromJson(e))
-          .toList();
+      list =
+          List<Map<String, dynamic>>.from(
+            json['items'],
+          ).map((e) => NotificationItem.fromJson(e)).toList();
     }
-    return MessageListData(items: list);
+    return MessageListData(items: list, pendingCount: json['pendingCount']?? 0);
   }
 
   Map<String, dynamic> toJson() {
     return {
       'items': items.map((e) => e.toJson()).toList(),
+      'pendingCount': pendingCount,
     };
   }
 }
@@ -78,7 +81,7 @@ class NotificationItem {
       createdAt: DateTime.parse(json['createdAt']),
       reacted: json['reacted'] ?? false,
       reactedAt:
-      json['reactedAt'] != null ? DateTime.parse(json['reactedAt']) : null,
+          json['reactedAt'] != null ? DateTime.parse(json['reactedAt']) : null,
       student: Student.fromJson(json['student'] ?? {}),
       studentClass: StudentClass.fromJson(json['class'] ?? {}),
     );
@@ -104,17 +107,11 @@ class Student {
   Student({required this.id, required this.name});
 
   factory Student.fromJson(Map<String, dynamic> json) {
-    return Student(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-    );
+    return Student(id: json['id'] ?? 0, name: json['name'] ?? '');
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }
 
@@ -134,10 +131,6 @@ class StudentClass {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'section': section,
-    };
+    return {'id': id, 'name': name, 'section': section};
   }
 }

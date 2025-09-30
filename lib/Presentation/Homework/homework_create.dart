@@ -83,9 +83,47 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   // picker
   final ImagePicker _picker = ImagePicker();
 
+  // --- Class scroller centering ---
+  final ScrollController _classScroll = ScrollController();
+  static const double _classItemWidth = 90; // must match your item width
+  static const double _classGap =
+      0; // horizontal gap between items (update if you add spacing)
+
+  void _centerSelectedClass({bool animate = true}) {
+    if (!_classScroll.hasClients) return;
+
+    final viewport = _classScroll.position.viewportDimension;
+    final itemExtent = _classItemWidth + _classGap;
+    final targetCenter = selectedIndex * itemExtent + (_classItemWidth / 2.0);
+    final targetOffset = targetCenter - (viewport / 2.0);
+
+    final maxExtent = _classScroll.position.maxScrollExtent;
+    final offset = targetOffset.clamp(0.0, maxExtent);
+
+    if (animate) {
+      _classScroll.animateTo(
+        offset,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
+    } else {
+      _classScroll.jumpTo(offset);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ... your existing defaultClass / subject setup ...
+
+      setState(() {}); // you already had this
+      // Center the default/initial selection
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _centerSelectedClass(animate: false);
+      });
+    });
 
     // Always show at least 1 description field
     descriptionControllers.add(TextEditingController());
@@ -358,176 +396,159 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                         color: AppColor.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 20,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Class picker
-                            Text(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Class picker
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 20,
+                            ),
+                            child: Text(
                               'Class',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 14,
                                 color: AppColor.black,
                               ),
                             ),
-                            SizedBox(height: 35),
-                            SizedBox(
-                              height: 100,
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Positioned.fill(
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            AppColor.white.withOpacity(0.3),
-                                            AppColor.lowLightgray,
-                                            AppColor.lowLightgray,
-                                            AppColor.lowLightgray,
-                                            AppColor.lowLightgray,
-                                            AppColor.lowLightgray,
-                                            AppColor.white.withOpacity(0.3),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.topRight,
-                                        ),
+                          ),
+                          SizedBox(height: 35),
+                          SizedBox(
+                            height: 100,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Positioned.fill(
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColor.white.withOpacity(0.3),
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.lowLightgray,
+                                          AppColor.white.withOpacity(0.3),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.topRight,
                                       ),
                                     ),
                                   ),
-                                  Positioned(
-                                    top: -20,
-                                    bottom: -20,
-                                    left: 0,
-                                    right: 0,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: classes.length,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 2,
-                                      ),
-                                      itemBuilder: (context, index) {
-                                        final item = classes[index];
-                                        final isSelected =
-                                            index == selectedIndex;
+                                ),
+                                Positioned(
+                                  top: -20,
+                                  bottom: -20,
+                                  left: 0,
+                                  right: 0,
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final count = classes.length;
+                                      // total width of all cards + gaps
+                                      final totalW =
+                                          count * _classItemWidth +
+                                          (count - 1) * _classGap;
+                                      // if content is narrower than viewport, add symmetric side padding to center the row
+                                      final sidePad =
+                                          totalW < constraints.maxWidth
+                                              ? (constraints.maxWidth -
+                                                      totalW) /
+                                                  2.0
+                                              : 0.0;
 
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedIndex = index;
-                                              selectedClassId = item.id;
-                                              teacherClassController
-                                                  .selectedClass
-                                                  .value = item;
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                              milliseconds: 120,
-                                            ),
-                                            curve: Curves.easeInOut,
-                                            width: 90,
-                                            height: isSelected ? 120 : 80,
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 0,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  isSelected
-                                                      ? AppColor.white
-                                                      : Colors.transparent,
-                                              borderRadius:
-                                                  BorderRadius.circular(24),
-                                              border:
-                                                  isSelected
-                                                      ? Border.all(
-                                                        color: AppColor.blueG1,
-                                                        width: 1.5,
-                                                      )
-                                                      : null,
-                                              boxShadow:
-                                                  isSelected
-                                                      ? [
-                                                        BoxShadow(
-                                                          color: AppColor.white
-                                                              .withOpacity(0.5),
-                                                          blurRadius: 10,
-                                                          offset: const Offset(
-                                                            0,
-                                                            4,
-                                                          ),
-                                                        ),
-                                                      ]
-                                                      : [],
-                                            ),
-                                            child:
-                                                isSelected
-                                                    ? Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        const SizedBox(
-                                                          height: 8,
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            ShaderMask(
-                                                              shaderCallback:
-                                                                  (
-                                                                    bounds,
-                                                                  ) => const LinearGradient(
-                                                                    colors: [
-                                                                      AppColor
-                                                                          .blueG1,
-                                                                      AppColor
-                                                                          .blue,
-                                                                    ],
-                                                                    begin:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    end:
-                                                                        Alignment
-                                                                            .bottomRight,
-                                                                  ).createShader(
-                                                                    Rect.fromLTWH(
-                                                                      0,
-                                                                      0,
-                                                                      bounds
-                                                                          .width,
-                                                                      bounds
-                                                                          .height,
-                                                                    ),
-                                                                  ),
-                                                              blendMode:
-                                                                  BlendMode
-                                                                      .srcIn,
-                                                              child: Text(
-                                                                item.name,
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 28,
-                                                                  color:
-                                                                      Colors
-                                                                          .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                      return ListView.builder(
+                                        controller: _classScroll,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: classes.length,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: sidePad,
+                                        ), // <-- key change
+                                        itemBuilder: (context, index) {
+                                          final item = classes[index];
+                                          final isSelected =
+                                              index == selectedIndex;
+
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedIndex = index;
+                                                selectedClassId = item.id;
+                                                teacherClassController
+                                                    .selectedClass
+                                                    .value = item;
+                                              });
+                                              // center after layout updates
+                                              WidgetsBinding.instance
+                                                  .addPostFrameCallback((_) {
+                                                    _centerSelectedClass();
+                                                  });
+                                            },
+                                            child: AnimatedContainer(
+                                              duration: const Duration(
+                                                milliseconds: 120,
+                                              ),
+                                              curve: Curves.easeInOut,
+                                              width:
+                                                  _classItemWidth, // <-- keep in sync
+                                              height: isSelected ? 120 : 80,
+                                              margin: const EdgeInsets.symmetric(
+                                                horizontal:
+                                                    _classGap /
+                                                    2, // <-- if you add spacing, bump _classGap
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    isSelected
+                                                        ? AppColor.white
+                                                        : Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(24),
+                                                border:
+                                                    isSelected
+                                                        ? Border.all(
+                                                          color:
+                                                              AppColor.blueG1,
+                                                          width: 1.5,
+                                                        )
+                                                        : null,
+                                                boxShadow:
+                                                    isSelected
+                                                        ? [
+                                                          BoxShadow(
+                                                            color: AppColor
+                                                                .white
+                                                                .withOpacity(
+                                                                  0.5,
                                                                 ),
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets.only(
-                                                                    top: 8.0,
-                                                                  ),
-                                                              child: ShaderMask(
+                                                            blurRadius: 10,
+                                                            offset:
+                                                                const Offset(
+                                                                  0,
+                                                                  4,
+                                                                ),
+                                                          ),
+                                                        ]
+                                                        : [],
+                                              ),
+                                              // ===== your existing inner UI (unchanged) =====
+                                              child:
+                                                  isSelected
+                                                      ? Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          const SizedBox(
+                                                            height: 8,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              ShaderMask(
                                                                 shaderCallback:
                                                                     (
                                                                       bounds,
@@ -558,10 +579,10 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                                                     BlendMode
                                                                         .srcIn,
                                                                 child: Text(
-                                                                  'th',
+                                                                  item.name,
                                                                   style: GoogleFont.ibmPlexSans(
                                                                     fontSize:
-                                                                        14,
+                                                                        28,
                                                                     color:
                                                                         Colors
                                                                             .white,
@@ -571,126 +592,459 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                                                   ),
                                                                 ),
                                                               ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets.only(
+                                                                      top: 8.0,
+                                                                    ),
+                                                                child: ShaderMask(
+                                                                  shaderCallback:
+                                                                      (
+                                                                        bounds,
+                                                                      ) => const LinearGradient(
+                                                                        colors: [
+                                                                          AppColor
+                                                                              .blueG1,
+                                                                          AppColor
+                                                                              .blue,
+                                                                        ],
+                                                                        begin:
+                                                                            Alignment.topLeft,
+                                                                        end:
+                                                                            Alignment.bottomRight,
+                                                                      ).createShader(
+                                                                        Rect.fromLTWH(
+                                                                          0,
+                                                                          0,
+                                                                          bounds
+                                                                              .width,
+                                                                          bounds
+                                                                              .height,
+                                                                        ),
+                                                                      ),
+                                                                  blendMode:
+                                                                      BlendMode
+                                                                          .srcIn,
+                                                                  child: Text(
+                                                                    'th',
+                                                                    style: GoogleFont.ibmPlexSans(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color:
+                                                                          Colors
+                                                                              .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Container(
+                                                            height: 55,
+                                                            width:
+                                                                double.infinity,
+                                                            decoration: const BoxDecoration(
+                                                              gradient: LinearGradient(
+                                                                colors: [
+                                                                  AppColor
+                                                                      .blueG1,
+                                                                  AppColor.blue,
+                                                                ],
+                                                                begin:
+                                                                    Alignment
+                                                                        .topLeft,
+                                                                end:
+                                                                    Alignment
+                                                                        .topRight,
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius.vertical(
+                                                                    bottom:
+                                                                        Radius.circular(
+                                                                          22,
+                                                                        ),
+                                                                  ),
+                                                            ),
+                                                            alignment:
+                                                                Alignment
+                                                                    .center,
+                                                            child: Text(
+                                                              item.section,
+                                                              style: GoogleFont.ibmPlexSans(
+                                                                fontSize: 20,
+                                                                color:
+                                                                    AppColor
+                                                                        .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                      : Center(
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical: 3,
+                                                                  ),
+                                                              decoration: BoxDecoration(
+                                                                color:
+                                                                    AppColor
+                                                                        .white,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      20,
+                                                                    ),
+                                                              ),
+                                                              child: Text(
+                                                                item.name,
+                                                                style: GoogleFont.ibmPlexSans(
+                                                                  fontSize: 14,
+                                                                  color:
+                                                                      AppColor
+                                                                          .gray,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                            Text(
+                                                              item.section,
+                                                              style: GoogleFont.ibmPlexSans(
+                                                                fontSize: 20,
+                                                                color:
+                                                                    AppColor
+                                                                        .lightgray,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
                                                             ),
                                                           ],
                                                         ),
-                                                        Container(
-                                                          height: 55,
-                                                          width:
-                                                              double.infinity,
-                                                          decoration: BoxDecoration(
-                                                            gradient: const LinearGradient(
-                                                              colors: [
-                                                                AppColor.blueG1,
-                                                                AppColor.blue,
-                                                              ],
-                                                              begin:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              end:
-                                                                  Alignment
-                                                                      .topRight,
-                                                            ),
-                                                            borderRadius:
-                                                                const BorderRadius.vertical(
-                                                                  bottom:
-                                                                      Radius.circular(
-                                                                        22,
-                                                                      ),
+                                                      ),
+                                              // ===== end unchanged UI =====
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+
+                                  /*ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: classes.length,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 2,
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      final item = classes[index];
+                                      final isSelected =
+                                          index == selectedIndex;
+
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            selectedIndex = index;
+                                            selectedClassId = item.id;
+                                            teacherClassController.selectedClass.value = item;
+                                          });
+                                          // Center after the frame updates sizes/positions
+                                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                                            _centerSelectedClass();
+                                          });
+                                        },
+
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                            milliseconds: 120,
+                                          ),
+                                          curve: Curves.easeInOut,
+                                          width: 90,
+                                          height: isSelected ? 120 : 80,
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                isSelected
+                                                    ? AppColor.white
+                                                    : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(24),
+                                            border:
+                                                isSelected
+                                                    ? Border.all(
+                                                      color: AppColor.blueG1,
+                                                      width: 1.5,
+                                                    )
+                                                    : null,
+                                            boxShadow:
+                                                isSelected
+                                                    ? [
+                                                      BoxShadow(
+                                                        color: AppColor.white
+                                                            .withOpacity(0.5),
+                                                        blurRadius: 10,
+                                                        offset: const Offset(
+                                                          0,
+                                                          4,
+                                                        ),
+                                                      ),
+                                                    ]
+                                                    : [],
+                                          ),
+                                          child:
+                                              isSelected
+                                                  ? Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      const SizedBox(
+                                                        height: 8,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          ShaderMask(
+                                                            shaderCallback:
+                                                                (
+                                                                  bounds,
+                                                                ) => const LinearGradient(
+                                                                  colors: [
+                                                                    AppColor
+                                                                        .blueG1,
+                                                                    AppColor
+                                                                        .blue,
+                                                                  ],
+                                                                  begin:
+                                                                      Alignment
+                                                                          .topLeft,
+                                                                  end:
+                                                                      Alignment
+                                                                          .bottomRight,
+                                                                ).createShader(
+                                                                  Rect.fromLTWH(
+                                                                    0,
+                                                                    0,
+                                                                    bounds
+                                                                        .width,
+                                                                    bounds
+                                                                        .height,
+                                                                  ),
                                                                 ),
+                                                            blendMode:
+                                                                BlendMode
+                                                                    .srcIn,
+                                                            child: Text(
+                                                              item.name,
+                                                              style: GoogleFont.ibmPlexSans(
+                                                                fontSize: 28,
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
                                                           ),
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child: Text(
-                                                            item.section,
-                                                            style:
-                                                                GoogleFont.ibmPlexSans(
-                                                                  fontSize: 20,
-                                                                  color:
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets.only(
+                                                                  top: 8.0,
+                                                                ),
+                                                            child: ShaderMask(
+                                                              shaderCallback:
+                                                                  (
+                                                                    bounds,
+                                                                  ) => const LinearGradient(
+                                                                    colors: [
                                                                       AppColor
+                                                                          .blueG1,
+                                                                      AppColor
+                                                                          .blue,
+                                                                    ],
+                                                                    begin:
+                                                                        Alignment
+                                                                            .topLeft,
+                                                                    end:
+                                                                        Alignment
+                                                                            .bottomRight,
+                                                                  ).createShader(
+                                                                    Rect.fromLTWH(
+                                                                      0,
+                                                                      0,
+                                                                      bounds
+                                                                          .width,
+                                                                      bounds
+                                                                          .height,
+                                                                    ),
+                                                                  ),
+                                                              blendMode:
+                                                                  BlendMode
+                                                                      .srcIn,
+                                                              child: Text(
+                                                                'th',
+                                                                style: GoogleFont.ibmPlexSans(
+                                                                  fontSize:
+                                                                      14,
+                                                                  color:
+                                                                      Colors
                                                                           .white,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
                                                                 ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                    : Center(
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          Container(
-                                                            padding:
-                                                                const EdgeInsets.symmetric(
-                                                                  horizontal:
-                                                                      20,
-                                                                  vertical: 3,
-                                                                ),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                  color:
-                                                                      AppColor
-                                                                          .white,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                        20,
-                                                                      ),
-                                                                ),
-                                                            child: Text(
-                                                              item.name,
-                                                              style: GoogleFont.ibmPlexSans(
-                                                                fontSize: 14,
-                                                                color:
-                                                                    AppColor
-                                                                        .gray,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
                                                               ),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Text(
-                                                            item.section,
-                                                            style: GoogleFont.ibmPlexSans(
-                                                              fontSize: 20,
-                                                              color:
-                                                                  AppColor
-                                                                      .lightgray,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
                                                             ),
                                                           ),
                                                         ],
                                                       ),
+                                                      Container(
+                                                        height: 55,
+                                                        width:
+                                                            double.infinity,
+                                                        decoration: BoxDecoration(
+                                                          gradient: const LinearGradient(
+                                                            colors: [
+                                                              AppColor.blueG1,
+                                                              AppColor.blue,
+                                                            ],
+                                                            begin:
+                                                                Alignment
+                                                                    .topLeft,
+                                                            end:
+                                                                Alignment
+                                                                    .topRight,
+                                                          ),
+                                                          borderRadius:
+                                                              const BorderRadius.vertical(
+                                                                bottom:
+                                                                    Radius.circular(
+                                                                      22,
+                                                                    ),
+                                                              ),
+                                                        ),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Text(
+                                                          item.section,
+                                                          style:
+                                                              GoogleFont.ibmPlexSans(
+                                                                fontSize: 20,
+                                                                color:
+                                                                    AppColor
+                                                                        .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                  : Center(
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal:
+                                                                    20,
+                                                                vertical: 3,
+                                                              ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color:
+                                                                    AppColor
+                                                                        .white,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      20,
+                                                                    ),
+                                                              ),
+                                                          child: Text(
+                                                            item.name,
+                                                            style: GoogleFont.ibmPlexSans(
+                                                              fontSize: 14,
+                                                              color:
+                                                                  AppColor
+                                                                      .gray,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Text(
+                                                          item.section,
+                                                          style: GoogleFont.ibmPlexSans(
+                                                            fontSize: 20,
+                                                            color:
+                                                                AppColor
+                                                                    .lightgray,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                                  ),
+                                        ),
+                                      );
+                                    },
+                                  ),*/
+                                ),
+                              ],
                             ),
+                          ),
 
-                            const SizedBox(height: 40),
+                          const SizedBox(height: 40),
 
-                            // Subject picker
-                            Text(
+                          // Subject picker
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 20,
+                            ),
+                            child: Text(
                               'Subject',
                               style: GoogleFont.ibmPlexSans(
                                 fontSize: 14,
                                 color: AppColor.black,
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            Wrap(
+                          ),
+                          const SizedBox(height: 10),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: BouncingScrollPhysics(),
+                            child: Wrap(
                               spacing: 10,
                               children: List.generate(subjects.length, (index) {
                                 final sub = subjects[index];
@@ -746,380 +1100,415 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                 );
                               }),
                             ),
+                          ),
 
-                            const SizedBox(height: 25),
+                          const SizedBox(height: 25),
 
-                            // Permanent (hero) image
-                            GestureDetector(
-                              onTap: _pickPermanentImage,
-                              child: DottedBorder(
-                                borderType: BorderType.RRect,
-                                radius: const Radius.circular(20),
-                                color: AppColor.lightgray,
-                                strokeWidth: 1.5,
-                                dashPattern: const [8, 4],
-                                padding: const EdgeInsets.all(1),
-                                child: Container(
-                                  height: 120,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColor.lightWhite,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      if (_permanentImage == null)
-                                        Expanded(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Image.asset(
-                                                AppImages.uploadImage,
-                                                height: 30,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                'Upload',
-                                                style: GoogleFont.ibmPlexSans(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppColor.lightgray,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      else ...[
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          child: Image.file(
-                                            File(_permanentImage!.path),
-                                            width: 200,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 35.0,
-                                          ),
-                                          child: InkWell(
-                                            onTap:
-                                                () => setState(
-                                                  () => _permanentImage = null,
-                                                ),
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                  AppImages.close,
-                                                  height: 26,
-                                                  color: AppColor.gray,
-                                                ),
-                                                Text(
-                                                  'Clear',
-                                                  style: GoogleFont.ibmPlexSans(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: AppColor.lightgray,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                              ),
+                          // Permanent (hero) image
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 20,
                             ),
-
-                            const SizedBox(height: 25),
-
-                            // Heading (validated)
-                            Text(
-                              'Heading',
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 14,
-                                color: AppColor.black,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            CommonContainer.fillingContainer(
-                              onDetailsTap: () {
-                                headingController.clear();
-                                setState(() => showClearIcon = false);
-                              },
-                              imagePath: showClearIcon ? AppImages.close : null,
-                              imageColor: AppColor.gray,
-                              text: '',
-                              controller: headingController,
-                              verticalDivider: false,
-                              validator: (v) {
-                                if (v == null || v.trim().isEmpty)
-                                  return 'Heading is required';
-                                if (v.trim().length < 3)
-                                  return 'Heading must be at least 3 characters';
-                                return null;
-                              },
-                              onChanged:
-                                  (v) => setState(
-                                    () => showClearIcon = v.isNotEmpty,
-                                  ),
-                            ),
-
-                            const SizedBox(height: 25),
-
-                            // Descriptions (each validated like Heading)
-                            Column(
-                              children: List.generate(
-                                descriptionControllers.length,
-                                (index) {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Description',
-                                            style: GoogleFont.ibmPlexSans(
-                                              fontSize: 14,
-                                              color: AppColor.black,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          if (descriptionControllers.length > 1)
-                                            GestureDetector(
-                                              onTap:
-                                                  () => removeDescriptionField(
-                                                    index,
-                                                  ),
-                                              child: Image.asset(
-                                                AppImages.close,
-                                                height: 22,
-                                                color: AppColor.gray,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      CommonContainer.fillingContainer(
-                                        maxLine: 10,
-                                        text: '',
-                                        controller:
-                                            descriptionControllers[index],
-                                        verticalDivider: false,
-                                        validator: (v) {
-                                          if (v == null || v.trim().isEmpty)
-                                            return 'Description is required';
-                                          if (v.trim().length < 3)
-                                            return 'Please enter at least 3 characters';
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 16),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-
-                            if (_listSectionOpened) ...[
-                              const SizedBox(height: 20),
-                              Text(
-                                'List',
-                                style: GoogleFont.ibmPlexSans(fontSize: 14),
-                              ),
-                              const SizedBox(height: 12),
-                              ListView.builder(
-                                itemCount: _listTextFields.length,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: _pickPermanentImage,
+                                  child: DottedBorder(
+                                    borderType: BorderType.RRect,
+                                    radius: const Radius.circular(20),
+                                    color: AppColor.lightgray,
+                                    strokeWidth: 1.5,
+                                    dashPattern: const [8, 4],
+                                    padding: const EdgeInsets.all(1),
                                     child: Container(
+                                      height: 120,
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 12,
+                                        horizontal: 12,
                                       ),
                                       decoration: BoxDecoration(
                                         color: AppColor.lightWhite,
-                                        borderRadius: BorderRadius.circular(18),
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Row(
                                         children: [
-                                          Text(
-                                            'List ${index + 1}',
-                                            style: GoogleFont.ibmPlexSans(
-                                              fontSize: 14,
-                                              color: AppColor.gray,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Container(
-                                            width: 2,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter,
-                                                colors: [
-                                                  Colors.grey.shade200,
-                                                  Colors.grey.shade300,
-                                                  Colors.grey.shade200,
+                                          if (_permanentImage == null)
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Image.asset(
+                                                    AppImages.uploadImage,
+                                                    height: 30,
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Text(
+                                                    'Upload',
+                                                    style:
+                                                        GoogleFont.ibmPlexSans(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              AppColor
+                                                                  .lightgray,
+                                                        ),
+                                                  ),
                                                 ],
                                               ),
+                                            )
+                                          else ...[
+                                            ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(1),
+                                                  BorderRadius.circular(12),
+                                              child: Image.file(
+                                                File(_permanentImage!.path),
+                                                width: 200,
+                                                height: 100,
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: TextField(
-                                              controller:
-                                                  _listControllers[index],
-                                              decoration: InputDecoration(
-                                                hintStyle:
-                                                    GoogleFont.ibmPlexSans(
-                                                      fontSize: 14,
+                                            const Spacer(),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 35.0,
+                                                  ),
+                                              child: InkWell(
+                                                onTap:
+                                                    () => setState(
+                                                      () =>
+                                                          _permanentImage =
+                                                              null,
+                                                    ),
+                                                child: Column(
+                                                  children: [
+                                                    Image.asset(
+                                                      AppImages.close,
+                                                      height: 26,
                                                       color: AppColor.gray,
                                                     ),
-                                                border: InputBorder.none,
+                                                    Text(
+                                                      'Clear',
+                                                      style:
+                                                          GoogleFont.ibmPlexSans(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color:
+                                                                AppColor
+                                                                    .lightgray,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                              onChanged:
-                                                  (value) =>
-                                                      _listTextFields[index] =
-                                                          value,
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          GestureDetector(
-                                            onTap: () => _removeListItem(index),
-                                            child: Image.asset(
-                                              AppImages.close,
-                                              height: 26,
-                                              color: AppColor.gray,
-                                            ),
-                                          ),
+                                          ],
                                         ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              GestureDetector(
-                                onTap: _addMoreListPoint,
-                                child: DottedBorder(
-                                  color: AppColor.blue,
-                                  strokeWidth: 1.5,
-                                  dashPattern: const [8, 4],
-                                  borderType: BorderType.RRect,
-                                  radius: const Radius.circular(20),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Add List ${_listTextFields.length + 1} Point',
-                                      style: GoogleFont.ibmPlexSans(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: AppColor.blue,
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                            ListView.builder(
-                              itemCount: _sections.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                final item = _sections[index];
-                                switch (item.type) {
-                                  case SectionType.image:
-                                    return _buildImageContainer(item, index);
-                                  case SectionType.paragraph:
-                                    return _buildParagraphContainer(
-                                      item,
-                                      index,
-                                    );
-                                  case SectionType.list:
-                                    return _buildListContainer(item, index);
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 25),
 
-                            // Add buttons
-                            Row(
-                              children: [
+                                const SizedBox(height: 25),
+
+                                // Heading (validated)
                                 Text(
-                                  'Add',
+                                  'Heading',
                                   style: GoogleFont.ibmPlexSans(
                                     fontSize: 14,
                                     color: AppColor.black,
                                   ),
                                 ),
-                                 // SizedBox(width: 15),
-                                Spacer(),
-                                CommonContainer.addMore(
-                                  onTap:
-                                      () => setState(
-                                        () => _sections.add(
-                                          SectionItem.image(null),
-                                        ),
+                                const SizedBox(height: 10),
+                                CommonContainer.fillingContainer(
+                                  onDetailsTap: () {
+                                    headingController.clear();
+                                    setState(() => showClearIcon = false);
+                                  },
+                                  imagePath:
+                                      showClearIcon ? AppImages.close : null,
+                                  imageColor: AppColor.gray,
+                                  text: '',
+                                  controller: headingController,
+                                  verticalDivider: false,
+                                  validator: (v) {
+                                    if (v == null || v.trim().isEmpty)
+                                      return 'Heading is required';
+                                    if (v.trim().length < 3)
+                                      return 'Heading must be at least 3 characters';
+                                    return null;
+                                  },
+                                  onChanged:
+                                      (v) => setState(
+                                        () => showClearIcon = v.isNotEmpty,
                                       ),
-                                  mainText: 'Image',
-                                  imagePath: AppImages.picherImageDark,
                                 ),
-                                const SizedBox(width: 8),
-                                CommonContainer.addMore(
-                                  onTap:
-                                      () => setState(
-                                        () => _sections.add(
-                                          SectionItem.paragraph(''),
-                                        ),
-                                      ),
-                                  mainText: 'Paragraph',
-                                  imagePath: AppImages.paragraph,
+
+                                const SizedBox(height: 25),
+
+                                // Descriptions (each validated like Heading)
+                                Column(
+                                  children: List.generate(
+                                    descriptionControllers.length,
+                                    (index) {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Description',
+                                                style: GoogleFont.ibmPlexSans(
+                                                  fontSize: 14,
+                                                  color: AppColor.black,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              if (descriptionControllers
+                                                      .length >
+                                                  1)
+                                                GestureDetector(
+                                                  onTap:
+                                                      () =>
+                                                          removeDescriptionField(
+                                                            index,
+                                                          ),
+                                                  child: Image.asset(
+                                                    AppImages.close,
+                                                    height: 22,
+                                                    color: AppColor.gray,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          CommonContainer.fillingContainer(
+                                            maxLine: 10,
+                                            text: '',
+                                            controller:
+                                                descriptionControllers[index],
+                                            verticalDivider: false,
+                                            validator: (v) {
+                                              if (v == null || v.trim().isEmpty)
+                                                return 'Description is required';
+                                              if (v.trim().length < 3)
+                                                return 'Please enter at least 3 characters';
+                                              return null;
+                                            },
+                                          ),
+                                          const SizedBox(height: 16),
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
-                                const SizedBox(width: 8),
-                                CommonContainer.addMore(
-                                  onTap:
-                                      () => setState(
-                                        () => _sections.add(
-                                          SectionItem.list(['']),
+
+                                if (_listSectionOpened) ...[
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    'List',
+                                    style: GoogleFont.ibmPlexSans(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  ListView.builder(
+                                    itemCount: _listTextFields.length,
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 14,
+                                        ),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 12,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColor.lightWhite,
+                                            borderRadius: BorderRadius.circular(
+                                              18,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'List ${index + 1}',
+                                                style: GoogleFont.ibmPlexSans(
+                                                  fontSize: 14,
+                                                  color: AppColor.gray,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Container(
+                                                width: 2,
+                                                height: 30,
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomCenter,
+                                                    colors: [
+                                                      Colors.grey.shade200,
+                                                      Colors.grey.shade300,
+                                                      Colors.grey.shade200,
+                                                    ],
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(1),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: TextField(
+                                                  controller:
+                                                      _listControllers[index],
+                                                  decoration: InputDecoration(
+                                                    hintStyle:
+                                                        GoogleFont.ibmPlexSans(
+                                                          fontSize: 14,
+                                                          color: AppColor.gray,
+                                                        ),
+                                                    border: InputBorder.none,
+                                                  ),
+                                                  onChanged:
+                                                      (value) =>
+                                                          _listTextFields[index] =
+                                                              value,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              GestureDetector(
+                                                onTap:
+                                                    () =>
+                                                        _removeListItem(index),
+                                                child: Image.asset(
+                                                  AppImages.close,
+                                                  height: 26,
+                                                  color: AppColor.gray,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  GestureDetector(
+                                    onTap: _addMoreListPoint,
+                                    child: DottedBorder(
+                                      color: AppColor.blue,
+                                      strokeWidth: 1.5,
+                                      dashPattern: const [8, 4],
+                                      borderType: BorderType.RRect,
+                                      radius: const Radius.circular(20),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'Add List ${_listTextFields.length + 1} Point',
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: AppColor.blue,
+                                          ),
                                         ),
                                       ),
-                                  mainText: 'List',
-                                  imagePath: AppImages.list,
+                                    ),
+                                  ),
+                                ],
+                                ListView.builder(
+                                  itemCount: _sections.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    final item = _sections[index];
+                                    switch (item.type) {
+                                      case SectionType.image:
+                                        return _buildImageContainer(
+                                          item,
+                                          index,
+                                        );
+                                      case SectionType.paragraph:
+                                        return _buildParagraphContainer(
+                                          item,
+                                          index,
+                                        );
+                                      case SectionType.list:
+                                        return _buildListContainer(item, index);
+                                    }
+                                  },
+                                ),
+                                const SizedBox(height: 25),
+
+                                // Add buttons
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Add',
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontSize: 14,
+                                        color: AppColor.black,
+                                      ),
+                                    ),
+                                    // SizedBox(width: 15),
+                                    Spacer(),
+                                    CommonContainer.addMore(
+                                      onTap:
+                                          () => setState(
+                                            () => _sections.add(
+                                              SectionItem.image(null),
+                                            ),
+                                          ),
+                                      mainText: 'Image',
+                                      imagePath: AppImages.picherImageDark,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    CommonContainer.addMore(
+                                      onTap:
+                                          () => setState(
+                                            () => _sections.add(
+                                              SectionItem.paragraph(''),
+                                            ),
+                                          ),
+                                      mainText: 'Paragraph',
+                                      imagePath: AppImages.paragraph,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    CommonContainer.addMore(
+                                      onTap:
+                                          () => setState(
+                                            () => _sections.add(
+                                              SectionItem.list(['']),
+                                            ),
+                                          ),
+                                      mainText: 'List',
+                                      imagePath: AppImages.list,
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 40),
+
+                                // Preview (validates)
+                                AppButton.button(
+                                  onTap: _validateAndProceed,
+                                  width: 145,
+                                  height: 60,
+                                  text: 'Preview',
+                                  image: AppImages.buttonArrow,
                                 ),
                               ],
                             ),
-
-                            const SizedBox(height: 40),
-
-                            // Preview (validates)
-                            AppButton.button(
-                              onTap: _validateAndProceed,
-                              width: 145,
-                              height: 60,
-                              text: 'Preview',
-                              image: AppImages.buttonArrow,
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

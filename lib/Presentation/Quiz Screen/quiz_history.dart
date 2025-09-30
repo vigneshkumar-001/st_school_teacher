@@ -45,7 +45,27 @@ class _QuizHistoryState extends State<QuizHistory> {
           final hasData = groups.isNotEmpty;
 
           if (!hasData) {
-            return Center(child: Text("No quizzes found"));
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 80),
+              decoration: BoxDecoration(color: AppColor.white),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(
+                      'No quizzes found',
+                      style: GoogleFont.ibmPlexSans(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: AppColor.gray,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  Image.asset(AppImages.noDataFound),
+                ],
+              ),
+            );
+
           }
 
           return SingleChildScrollView(

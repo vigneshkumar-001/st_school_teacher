@@ -151,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     alignment: Alignment.centerLeft,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColor.lightgray,
+                        color: AppColor.white,
                         border: Border.all(
                           color: AppColor.lowLightBlue,
                           width: 1,
