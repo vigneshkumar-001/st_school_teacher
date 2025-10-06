@@ -38,8 +38,6 @@ class ExamController extends GetxController {
 
   RxString selectedFilter = "All".obs;
 
-
-
   RxList<String> monthFilters = <String>[].obs;
   void buildMonthFilters() {
     final months = <String>{};
@@ -143,10 +141,11 @@ class ExamController extends GetxController {
           CustomSnackBar.showError(failure.message);
         },
         (response) async {
-          if (showLoader) hidePopupLoader();
-          // Navigator.pop(context);
           await getExamList();
           Get.off(ExamHistory());
+          if (showLoader) hidePopupLoader();
+          // Navigator.pop(context);
+
           AppLogger.log.i(response.message);
         },
       );
@@ -405,30 +404,30 @@ class ExamController extends GetxController {
   }
 
   void nextStudent() {
-    final student = examStudent[currentIndex.value];
-
-    // ❌ Stop if not on last subject
-    if (subjectIndex.value != student.marks.length - 1) {
-      Get.snackbar(
-        "Incomplete",
-        "Please finish entering marks till the last subject before moving to next student",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    // ❌ Stop if any subject is still empty
-    final allSubjectsComplete = student.marks.every(
-      (m) => m.obtainedMarks != null,
-    );
-    if (!allSubjectsComplete) {
-      Get.snackbar(
-        "Incomplete",
-        "Please enter marks for all subjects before moving to the next student",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
+    // final student = examStudent[currentIndex.value];
+    //
+    // // ❌ Stop if not on last subject
+    // if (subjectIndex.value != student.marks.length - 1) {
+    //   Get.snackbar(
+    //     "Incomplete",
+    //     "Please finish entering marks till the last subject before moving to next student",
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    //   return;
+    // }
+    //
+    // // ❌ Stop if any subject is still empty
+    // final allSubjectsComplete = student.marks.every(
+    //   (m) => m.obtainedMarks != null,
+    // );
+    // if (!allSubjectsComplete) {
+    //   Get.snackbar(
+    //     "Incomplete",
+    //     "Please enter marks for all subjects before moving to the next student",
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    //   return;
+    // }
 
     // ✅ Allowed only if current student is fully completed
     if (currentIndex.value < examStudent.length - 1) {

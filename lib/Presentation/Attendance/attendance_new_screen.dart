@@ -295,7 +295,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                       CommonContainer.NavigatArrow(
                         image: AppImages.leftSideArrow,
                         imageColor: AppColor.lightBlack,
-                        container: AppColor.lowLightgray,
+                        container: AppColor.white,
                         onIconTap: () => Navigator.pop(context),
                         border: Border.all(
                           color: AppColor.lightgray,
