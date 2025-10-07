@@ -37,8 +37,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
   );
   final TeacherDataController controller = Get.put(TeacherDataController());
   final MessageController msgController = Get.put(MessageController());
-  int _currentIndex = 0;
-  int _current = 1;
   int selectedIndex = 0;
   int subjectIndex = 0;
   bool showThirdContainer = false;
@@ -47,6 +45,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await teacherClassController.getTeacherClass();
     });
@@ -169,14 +168,31 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Good Morning',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 25,
-                                    color: AppColor.white,
+                                Obx(
+                                  () => Text(
+                                    controller
+                                            .teacherDataResponse
+                                            .value
+                                            ?.data
+                                            .greetingText
+                                            .toString() ??
+                                        '',
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 25,
+                                      color: AppColor.white,
+                                    ),
                                   ),
                                 ),
+
+                                // Text(
+                                //   'Good Morning',
+                                //   style: GoogleFont.ibmPlexSans(
+                                //     fontWeight: FontWeight.w600,
+                                //     fontSize: 25,
+                                //     color: AppColor.white,
+                                //   ),
+                                // ),
 
                                 /* Text(
                                   'Megha!',
