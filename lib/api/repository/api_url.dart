@@ -1,11 +1,7 @@
 class ApiUrl {
-  static String baseUrl = 'https://school-back-end-594f59bea6cb.herokuapp.com';
- 
-  static String baseUrl1 =
-      'https://school-backend-v2-19bebceab98e.herokuapp.com';
- 
+  static String baseUrl12 = 'https://school-back-end-594f59bea6cb.herokuapp.com';
   static String baseUrl1 = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
- 
+  static String baseUrl = 'http://backend.stjosephmatricschool.com';
 
   static String login = '$baseUrl/teacher-auth/login';
   static String changePhone = '$baseUrl/teacher/change-phone/request';
