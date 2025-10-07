@@ -2863,7 +2863,26 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           }
 
           if (data == null || data.items.isEmpty) {
-            return const Center(child: Text("No announcements available"));
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 80),
+              decoration: BoxDecoration(color: AppColor.white),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(
+                      'No announcements available',
+                      style: GoogleFont.ibmPlexSans(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: AppColor.gray,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  Image.asset(AppImages.noDataFound),
+                ],
+              ),
+            );
           }
 
           return RefreshIndicator(
@@ -2873,7 +2892,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               );
             },
             child: ListView.builder(
-              physics:  BouncingScrollPhysics(),
+              physics: BouncingScrollPhysics(),
               padding: const EdgeInsets.all(15),
               itemCount: data.items.length + 1,
               itemBuilder: (context, index) {

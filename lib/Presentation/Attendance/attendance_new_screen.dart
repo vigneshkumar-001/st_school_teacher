@@ -213,7 +213,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(backgroundColor: AppColor.white,
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
@@ -244,7 +244,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: ' Section',
+                          text: ' No student available',
                           style: GoogleFont.ibmPlexSans(
                             fontWeight: FontWeight.normal,
                           ),
