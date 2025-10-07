@@ -21,8 +21,8 @@ class TeacherDataController extends GetxController {
     super.onInit();
     getTeacherClassData();
   }
-  final RxInt profileImgVersion = 0.obs;
 
+  final RxInt profileImgVersion = 0.obs;
 
   void applyNewProfileImage(String newUrl) {
     final resp = teacherDataResponse.value;
@@ -92,7 +92,8 @@ class TeacherDataController extends GetxController {
           if (showLoader) hidePopupLoader();
           AppLogger.log.e(failure.message);
         },
-        (response) async {await getTeacherClassData();
+        (response) async {
+          await getTeacherClassData();
           if (showLoader) hidePopupLoader();
           Get.back();
           AppLogger.log.i(response);

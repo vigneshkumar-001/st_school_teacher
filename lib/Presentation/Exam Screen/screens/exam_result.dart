@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:st_teacher_app/Core/Utility/custom_textfield.dart';
 
 import '../../../Core/Utility/app_color.dart';
 import '../../../Core/Utility/app_images.dart';
@@ -16,6 +17,8 @@ class ExamResult extends StatefulWidget {
   final String tittle;
   final String startDate;
   final String endDate;
+  final String? classs;
+  final String? section;
   final bool? showCompleted; // optional filter
   final int? studentId; // optional preselect
 
@@ -27,6 +30,8 @@ class ExamResult extends StatefulWidget {
     this.endDate = "",
     this.showCompleted,
     this.studentId,
+    this.classs,
+    this.section,
   });
 
   @override
@@ -353,6 +358,10 @@ class _ExamResultState extends State<ExamResult> {
                       fontSize: 22,
                       color: AppColor.black,
                     ),
+                  ),
+                  const SizedBox(height: 9),
+                  CustomTextField.textWithSmall(
+                    text: '${widget.classs.toString() ?? ''} ${widget.section.toString() ?? ''}',
                   ),
 
                   const SizedBox(height: 20),

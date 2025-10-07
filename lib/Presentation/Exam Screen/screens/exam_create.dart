@@ -52,7 +52,7 @@ class _ExamCreateState extends State<ExamCreate> {
     }
   }
 
-  @override
+  /*  @override
   void initState() {
     super.initState();
 
@@ -98,6 +98,60 @@ class _ExamCreateState extends State<ExamCreate> {
         });
       }
     });
+    singleDateController.addListener(() {
+      if (_singleDateInvalid && singleDateController.text.trim().isNotEmpty) {
+        setState(() {
+          _singleDateInvalid = false;
+          _singleDateError = null;
+        });
+      }
+    });
+  }*/
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (teacherClassController.classList.isNotEmpty) {
+        final defaultClass = teacherClassController.classList.firstWhere(
+          (c) => c.name == widget.className && c.section == widget.section,
+          orElse: () => teacherClassController.classList.first,
+        );
+
+        teacherClassController.selectedClass.value = defaultClass;
+        teacherClassController.selectedClassIndex.value = teacherClassController
+            .classList
+            .indexOf(defaultClass);
+
+        // auto-scroll if needed
+        if (teacherClassController.classList.length > 3 && mounted) {
+          final viewportWidth = MediaQuery.of(context).size.width;
+          _centerOnSelected(
+            index: teacherClassController.selectedClassIndex.value,
+            viewportWidth: viewportWidth,
+            itemCount: teacherClassController.classList.length,
+          );
+        }
+      }
+    });
+
+    // input listeners
+    headingController.addListener(() {
+      if (_headingInvalid && headingController.text.trim().isNotEmpty) {
+        setState(() => _headingInvalid = false);
+      }
+    });
+
+    dateRangeController.addListener(() {
+      if (_dateRangeInvalid && dateRangeController.text.trim().isNotEmpty) {
+        setState(() {
+          _dateRangeInvalid = false;
+          _dateRangeError = null;
+        });
+      }
+    });
+
     singleDateController.addListener(() {
       if (_singleDateInvalid && singleDateController.text.trim().isNotEmpty) {
         setState(() {
@@ -218,7 +272,7 @@ class _ExamCreateState extends State<ExamCreate> {
 
     // all good -> submit
     controller.createExam(
-      classId: selectedClassId ?? 1,
+      classId: teacherClassController.selectedClass.value?.id ?? 1, // ✅ FIXED
       heading: heading,
       startDate: startDate,
       endDate: endDate,
@@ -384,8 +438,75 @@ class _ExamCreateState extends State<ExamCreate> {
     );
   }
 
-  /// Centered layout for <= 3 classes, scrollable for > 3
   Widget _buildClassStrip(List<dynamic> classes) {
+    if (classes.isEmpty) return const SizedBox.shrink();
+
+    return Obx(() {
+      final selectedClass = teacherClassController.selectedClass.value;
+
+      // ≤ 3 → centered row
+      if (classes.length <= 3) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(classes.length, (index) {
+            final item = classes[index];
+            final isSelected = selectedClass?.id == item.id;
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: _buildClassCard(
+                item: item,
+                isSelected: isSelected,
+                onTap: () {
+                  teacherClassController.selectedClass.value = item;
+                  teacherClassController.selectedClassIndex.value = index;
+                },
+              ),
+            );
+          }),
+        );
+      }
+
+      // > 3 → scrollable
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final viewportWidth = constraints.maxWidth;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_classScrollController.hasClients && selectedClass != null) {
+              final index = classes.indexWhere((c) => c.id == selectedClass.id);
+              if (index >= 0) {
+                _centerOnSelected(index: index, viewportWidth: viewportWidth);
+              }
+            }
+          });
+
+          return ListView.builder(
+            controller: _classScrollController,
+            scrollDirection: Axis.horizontal,
+            itemCount: classes.length,
+            itemBuilder: (context, index) {
+              final item = classes[index];
+              final isSelected = selectedClass?.id == item.id;
+
+              return _buildClassCard(
+                item: item,
+                isSelected: isSelected,
+                onTap: () {
+                  teacherClassController.selectedClass.value = item;
+                  teacherClassController.selectedClassIndex.value = index;
+                  _centerOnSelected(index: index, viewportWidth: viewportWidth);
+                },
+              );
+            },
+          );
+        },
+      );
+    });
+  }
+
+  /// Centered layout for <= 3 classes, scrollable for > 3
+  /*  Widget _buildClassStrip(List<dynamic> classes) {
     if (classes.isEmpty) return const SizedBox.shrink();
 
     // ≤ 3 → centered row
@@ -456,7 +577,7 @@ class _ExamCreateState extends State<ExamCreate> {
         );
       },
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {

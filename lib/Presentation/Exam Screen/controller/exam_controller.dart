@@ -38,8 +38,6 @@ class ExamController extends GetxController {
 
   RxString selectedFilter = "All".obs;
 
-
-
   RxList<String> monthFilters = <String>[].obs;
   void buildMonthFilters() {
     final months = <String>{};
@@ -143,10 +141,11 @@ class ExamController extends GetxController {
           CustomSnackBar.showError(failure.message);
         },
         (response) async {
-          if (showLoader) hidePopupLoader();
-          // Navigator.pop(context);
           await getExamList();
           Get.off(ExamHistory());
+          if (showLoader) hidePopupLoader();
+          // Navigator.pop(context);
+
           AppLogger.log.i(response.message);
         },
       );

@@ -37,8 +37,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
   );
   final TeacherDataController controller = Get.put(TeacherDataController());
   final MessageController msgController = Get.put(MessageController());
-  int _currentIndex = 0;
-  int _current = 1;
   int selectedIndex = 0;
   int subjectIndex = 0;
   bool showThirdContainer = false;
@@ -47,6 +45,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await teacherClassController.getTeacherClass();
     });
@@ -169,14 +168,31 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Good Morning',
-                                  style: GoogleFont.ibmPlexSans(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 25,
-                                    color: AppColor.white,
+                                Obx(
+                                  () => Text(
+                                    controller
+                                            .teacherDataResponse
+                                            .value
+                                            ?.data
+                                            .greetingText
+                                            .toString() ??
+                                        '',
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 25,
+                                      color: AppColor.white,
+                                    ),
                                   ),
                                 ),
+
+                                // Text(
+                                //   'Good Morning',
+                                //   style: GoogleFont.ibmPlexSans(
+                                //     fontWeight: FontWeight.w600,
+                                //     fontSize: 25,
+                                //     color: AppColor.white,
+                                //   ),
+                                // ),
 
                                 /* Text(
                                   'Megha!',
@@ -963,9 +979,9 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                       child: Obx(() {
                                         final classList =
                                             teacherClassController.classList;
-                                        final selectedClass =
+                                        final selectedIndex =
                                             teacherClassController
-                                                .selectedClass
+                                                .selectedClassIndex
                                                 .value;
 
                                         if (teacherClassController
@@ -1018,7 +1034,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                   child: ListView.builder(
                                                     scrollDirection:
                                                         Axis.horizontal,
-                                                    shrinkWrap: true,
                                                     physics:
                                                         classList.length <= 4
                                                             ? const NeverScrollableScrollPhysics()
@@ -1040,25 +1055,35 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                     ) {
                                                       final item =
                                                           classList[index];
-                                                      final grade = item.name;
-                                                      final section =
-                                                          item.section;
                                                       final isSelected =
-                                                          item == selectedClass;
+                                                          index ==
+                                                          selectedIndex;
 
                                                       return GestureDetector(
                                                         onTap: () {
                                                           teacherClassController
                                                               .selectedClass
                                                               .value = item;
+                                                          teacherClassController
+                                                              .selectedClassIndex
+                                                              .value = index;
+
                                                           AppLogger.log.i(
                                                             "Selected class: ${item.name} - ${item.section}",
                                                           );
+
+                                                          // ✅ auto-filter subjects by this class
+                                                          teacherClassController
+                                                              .filterSubjectsByClass(
+                                                                item.id,
+                                                              );
                                                         },
                                                         child: AnimatedContainer(
-                                                          duration: Duration(
-                                                            milliseconds: 200,
-                                                          ),
+                                                          duration:
+                                                              const Duration(
+                                                                milliseconds:
+                                                                    200,
+                                                              ),
                                                           curve:
                                                               Curves.easeInOut,
                                                           width: 85,
@@ -1100,7 +1125,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                                         blurRadius:
                                                                             10,
                                                                         offset:
-                                                                            Offset(
+                                                                            const Offset(
                                                                               0,
                                                                               4,
                                                                             ),
@@ -1115,13 +1140,13 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                                         MainAxisAlignment
                                                                             .spaceBetween,
                                                                     children: [
-                                                                      SizedBox(
+                                                                      const SizedBox(
                                                                         height:
                                                                             8,
                                                                       ),
                                                                       Center(
                                                                         child: Text(
-                                                                          grade,
+                                                                          item.name,
                                                                           style: GoogleFont.ibmPlexSans(
                                                                             fontSize:
                                                                                 28,
@@ -1133,17 +1158,17 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                                         ),
                                                                       ),
                                                                       Container(
-                                                                        margin: EdgeInsets.only(
+                                                                        margin: const EdgeInsets.only(
                                                                           bottom:
                                                                               0,
                                                                         ),
-                                                                        padding: EdgeInsets.symmetric(
+                                                                        padding: const EdgeInsets.symmetric(
                                                                           horizontal:
                                                                               12,
                                                                           vertical:
                                                                               5,
                                                                         ),
-                                                                        decoration: BoxDecoration(
+                                                                        decoration: const BoxDecoration(
                                                                           color:
                                                                               AppColor.black,
                                                                           borderRadius: BorderRadius.only(
@@ -1156,7 +1181,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                                           ),
                                                                         ),
                                                                         child: Text(
-                                                                          section,
+                                                                          item.section,
                                                                           style: GoogleFont.ibmPlexSans(
                                                                             fontSize:
                                                                                 20,
@@ -1194,7 +1219,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                                               ),
                                                                             ),
                                                                             child: Text(
-                                                                              grade,
+                                                                              item.name,
                                                                               style: GoogleFont.ibmPlexSans(
                                                                                 fontSize:
                                                                                     14,
@@ -1205,12 +1230,12 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                                               ),
                                                                             ),
                                                                           ),
-                                                                          SizedBox(
+                                                                          const SizedBox(
                                                                             height:
                                                                                 5,
                                                                           ),
                                                                           Text(
-                                                                            section,
+                                                                            item.section,
                                                                             style: GoogleFont.ibmPlexSans(
                                                                               fontSize:
                                                                                   20,
