@@ -1,4 +1,4 @@
-class  TeacherClassResponse  {
+class TeacherClassResponse {
   final bool status;
   final int code;
   final String message;
@@ -25,19 +25,18 @@ class TeacherData {
   final List<TeacherClass> classes;
   final List<TeacherSubject> subjects;
 
-  TeacherData({
-    required this.classes,
-    required this.subjects,
-  });
+  TeacherData({required this.classes, required this.subjects});
 
   factory TeacherData.fromJson(Map<String, dynamic> json) {
     return TeacherData(
-      classes: (json['classes'] as List)
-          .map((e) => TeacherClass.fromJson(e))
-          .toList(),
-      subjects: (json['subjects'] as List)
-          .map((e) => TeacherSubject.fromJson(e))
-          .toList(),
+      classes:
+          (json['classes'] as List)
+              .map((e) => TeacherClass.fromJson(e))
+              .toList(),
+      subjects:
+          (json['subjects'] as List)
+              .map((e) => TeacherSubject.fromJson(e))
+              .toList(),
     );
   }
 }
@@ -47,11 +46,7 @@ class TeacherClass {
   final String name;
   final String section;
 
-  TeacherClass({
-    required this.id,
-    required this.name,
-    required this.section,
-  });
+  TeacherClass({required this.id, required this.name, required this.section});
 
   factory TeacherClass.fromJson(Map<String, dynamic> json) {
     return TeacherClass(
@@ -65,16 +60,15 @@ class TeacherClass {
 class TeacherSubject {
   final int id;
   final String name;
+  final int classId;
 
-  TeacherSubject({
-    required this.id,
-    required this.name,
-  });
+  TeacherSubject({required this.id, required this.name, required this.classId});
 
   factory TeacherSubject.fromJson(Map<String, dynamic> json) {
     return TeacherSubject(
       id: json['id'],
       name: json['name'],
+      classId: json['classId'],
     );
   }
 }

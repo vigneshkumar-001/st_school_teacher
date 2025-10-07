@@ -278,7 +278,7 @@ class _ExamHistoryState extends State<ExamHistory> {
                                               context,
                                               MaterialPageRoute(
                                                 builder:
-                                                    (_) => ExamResult(
+                                                    (_) => ExamResult(classs: exam.className,section: exam.section,
                                                       examId: exam.id,
                                                       tittle: exam.heading,
                                                       startDate: exam.startDate,

@@ -406,6 +406,7 @@ class ApiDataSource extends BaseApiDataSource {
         return Left(ServerFailure((response as DioException).message ?? ""));
       }
     } catch (e) {
+      AppLogger.log.e(e);
       return Left(ServerFailure(''));
     }
   }
@@ -943,12 +944,18 @@ class ApiDataSource extends BaseApiDataSource {
         if (response.data['status'] == true) {
           return Right(AnnouncementCreateResponse.fromJson(response.data));
         } else {
-          return Left(ServerFailure(response.data['message']));
+          final msg = response.data['message']?.toString() ?? "Something went wrong";
+          return Left(ServerFailure(msg));
         }
       } else {
-        return Left(ServerFailure((response as DioException).message ?? ""));
+        final dioErr = response as DioException;
+        final msg = dioErr.response?.data?['message']?.toString() ??
+            dioErr.message ??
+            "Request failed";
+        return Left(ServerFailure(msg));
       }
-    } catch (e) {
+    } catch (e,st) {
+      AppLogger.log.e("createExam error", error: e, stackTrace: st);
       return Left(ServerFailure(''));
     }
   }

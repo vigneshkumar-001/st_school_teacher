@@ -1,6 +1,11 @@
 class ApiUrl {
   static String baseUrl = 'https://school-back-end-594f59bea6cb.herokuapp.com';
+ 
+  static String baseUrl1 =
+      'https://school-backend-v2-19bebceab98e.herokuapp.com';
+ 
   static String baseUrl1 = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
+ 
 
   static String login = '$baseUrl/teacher-auth/login';
   static String changePhone = '$baseUrl/teacher/change-phone/request';
@@ -27,7 +32,6 @@ class ApiUrl {
     return '$baseUrl/teacher-announcement/details/$Id';
   }
 
-
   static String examDetails({required int examId}) {
     return '$baseUrl/teacher-exams/details/$examId';
   }
@@ -35,7 +39,6 @@ class ApiUrl {
   static String reactMessage({required int msgId}) {
     return '$baseUrl/teacher-messages/$msgId/react';
   }
-
 
   static String listAnnouncement({required String type}) {
     return '$baseUrl/teacher-announcement/list?tab=$type';

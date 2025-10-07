@@ -99,12 +99,12 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> with SingleTick
     return Scaffold(
       backgroundColor: AppColor.white,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.05),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -129,7 +129,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> with SingleTick
                         CommonContainer.NavigatArrow(
                           image: AppImages.leftSideArrow,
                           imageColor: AppColor.lightBlack,
-                          container: AppColor.lowLightgray,
+                          container: AppColor.white,
                           onIconTap: () => Navigator.pop(context),
                           border: Border.all(
                             color: AppColor.lightgray,
@@ -241,7 +241,7 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> with SingleTick
                       /// Get OTP Button
                       Obx(() {
                         return Container(
-                          margin: EdgeInsets.only(top: height * 0.025),
+                          margin: EdgeInsets.only(top: height * 0.005),
                           width: double.infinity,
                           height: height * 0.065,
                           child: ElevatedButton(
@@ -287,100 +287,100 @@ class _ChangeMobileNumberState extends State<ChangeMobileNumber> with SingleTick
                   ),
                 ),
               ),
+            ),
 
-              /// Splash Bottom Carousel & "We Are"
-              if (widget.page == 'splash')
-                Expanded(
-                  flex: 0,
-                  child: Stack(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(top: height * 0.05),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [AppColor.splash, Colors.white],
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25),
-                          ),
+            /// Splash Bottom Carousel & "We Are"
+            if (widget.page == 'splash')
+              Expanded(
+                flex: 0,
+                child: Stack(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: height * 0.05),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [AppColor.splash, Colors.white],
                         ),
-                        padding: EdgeInsets.only(top: height * 0.05),
-                        child: Column(
-                          children: [
-                            if (!isKeyboardOpen) ...[
-                              SizedBox(
-                                height: height * 0.15,
-                                child: CarouselSlider(
-                                  items: images.map((imagePath) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                        width: width * 0.8,
-                                      ),
-                                    );
-                                  }).toList(),
-                                  options: CarouselOptions(
-                                    enlargeCenterPage: true,
-                                    height: height * 0.15,
-                                    autoPlay: true,
-                                    autoPlayInterval: const Duration(seconds: 3),
-                                    enlargeFactor: 0.3,
-                                    viewportFraction: 0.7,
-                                    padEnds: false,
-                                  ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          topRight: Radius.circular(25),
+                        ),
+                      ),
+                      padding: EdgeInsets.only(top: height * 0.05),
+                      child: Column(
+                        children: [
+                          if (!isKeyboardOpen) ...[
+                            SizedBox(
+                              height: height * 0.15,
+                              child: CarouselSlider(
+                                items: images.map((imagePath) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.asset(
+                                      imagePath,
+                                      fit: BoxFit.cover,
+                                      width: width * 0.6,
+                                    ),
+                                  );
+                                }).toList(),
+                                options: CarouselOptions(
+                                  enlargeCenterPage: false,
+                                  height: height * 0.15,
+                                  autoPlay: true,
+                                  autoPlayInterval: const Duration(seconds: 3),
+                                  enlargeFactor: 0.3,
+                                  viewportFraction: 0.63,
+                                  padEnds: false,
                                 ),
                               ),
-                              SizedBox(height: height * 0.03),
-                              SizedBox(
-                                height: height * 0.15,
-                                child: CarouselSlider(
-                                  items: images1.map((imagePath) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(15),
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                        width: width * 0.8,
-                                      ),
-                                    );
-                                  }).toList(),
-                                  options: CarouselOptions(
-                                    height: height * 0.15,
-                                    autoPlay: true,
-                                    autoPlayInterval: const Duration(seconds: 3),
-                                    viewportFraction: 0.75,
-                                    enlargeCenterPage: true,
-                                    padEnds: false,
-                                    reverse: true,
-                                  ),
+                            ),
+                            SizedBox(height: height * 0.03),
+                            SizedBox(
+                              height: height * 0.15,
+                              child: CarouselSlider(
+                                items: images1.map((imagePath) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.asset(
+                                      imagePath,
+                                      fit: BoxFit.cover,
+                                      width: width * 0.6,
+                                    ),
+                                  );
+                                }).toList(),
+                                options: CarouselOptions(
+                                  height: height * 0.15,
+                                  autoPlay: true,
+                                  autoPlayInterval: const Duration(seconds: 3),
+                                  viewportFraction: 0.63,
+                                  enlargeCenterPage: false,
+                                  padEnds: false,
+                                  reverse: true,
                                 ),
                               ),
-                              SizedBox(height: height * 0.01),
-                            ],
+                            ),
+                            SizedBox(height: height * 0.01),
                           ],
-                        ),
+                        ],
                       ),
+                    ),
 
-                      /// "We Are" Text
-                      Positioned(
-                        top: height * 0.01,
-                        right: width * 0.05,
-                        child: CustomTextField.textWithSmall(
-                          text: 'We Are',
-                          color: AppColor.weAreColor,
-                          fontSize: width * 0.085,
-                        ),
+                    /// "We Are" Text
+                    Positioned(
+                      top: height * 0.01,
+                      right: width * 0.05,
+                      child: CustomTextField.textWithSmall(
+                        text: 'We Are',
+                        color: AppColor.weAreColor,
+                        fontSize: width * 0.085,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );

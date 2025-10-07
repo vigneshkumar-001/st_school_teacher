@@ -12,6 +12,7 @@ import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
 import 'homework_create_preview.dart';
 import 'homework_history.dart';
+import 'model/teacher_class_response.dart';
 
 enum SectionType { image, paragraph, list }
 
@@ -56,6 +57,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   final _formKey = GlobalKey<FormState>();
 
   // class/subject pickers
+
   int selectedIndex = 0;
   int subjectIndex = 0;
   String? selectedSubject;
@@ -110,8 +112,96 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       _classScroll.jumpTo(offset);
     }
   }
+/*  @override
+  void initState() {
+    super.initState();
+
+    // Always show at least 1 description field
+    descriptionControllers.add(TextEditingController());
+
+    // Heading controller listener for clear icon
+    headingController.addListener(() {
+      setState(() => showClearIcon = headingController.text.isNotEmpty);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Default class setup
+      if (teacherClassController.classList.isNotEmpty) {
+        final defaultClass = teacherClassController.classList.firstWhere(
+              (c) =>
+          c.name == (widget.className ?? c.name) &&
+              c.section == (widget.section ?? c.section),
+          orElse: () => teacherClassController.classList.first,
+        );
+        teacherClassController.selectedClass.value = defaultClass;
+        selectedIndex = teacherClassController.classList.indexOf(defaultClass);
+        selectedClassId = defaultClass.id;
+
+
+        teacherClassController.filterSubjectsByClass(defaultClass.id);
+
+        // Default subject setup only if nothing selected yet
+        if (teacherClassController.filteredSubjects.isNotEmpty &&
+            teacherClassController.selectedSubject.value == null) {
+          subjectIndex = 0;
+          selectedSubject = teacherClassController.filteredSubjects[0].name;
+          selectedSubjectId = teacherClassController.filteredSubjects[0].id;
+          teacherClassController.selectedSubject.value =
+          teacherClassController.filteredSubjects[0];
+          teacherClassController.selectedSubjectIndex.value = 0;
+        }
+      }
+
+      // Center selected class in horizontal scroll
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _centerSelectedClass(animate: false);
+      });
+
+      setState(() {});
+    });
+  }*/
 
   @override
+  void initState() {
+    super.initState();
+
+    // show at least 1 description
+    descriptionControllers.add(TextEditingController());
+
+    headingController.addListener(() {
+      setState(() => showClearIcon = headingController.text.isNotEmpty);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final classes = teacherClassController.classList;
+      if (classes.isNotEmpty) {
+        // If nothing selected yet, set default ONCE
+        if (teacherClassController.selectedClass.value == null) {
+          final def = classes.firstWhere(
+                (c) => c.name == (widget.className ?? c.name) && c.section == (widget.section ?? c.section),
+            orElse: () => classes.first,
+          );
+          teacherClassController.selectedClass.value = def;
+          teacherClassController.selectedClassIndex.value = classes.indexOf(def);
+          teacherClassController.filterSubjectsByClass(def.id);
+        } else {
+          // already had a selection (back from preview) → just ensure subjects are synced
+          final cur = teacherClassController.selectedClass.value!;
+          teacherClassController.filterSubjectsByClass(cur.id);
+        }
+      }
+
+      // center current selection
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _centerSelectedClass(animate: false);
+      });
+
+      setState(() {});
+    });
+  }
+
+
+/*  @override
   void initState() {
     super.initState();
 
@@ -153,7 +243,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
 
       setState(() {});
     });
-  }
+  }*/
 
   @override
   void dispose() {
@@ -236,7 +326,90 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
   }
 
+
   void _validateAndProceed() {
+    FocusScope.of(context).unfocus();
+
+    // 🔹 Trigger TextFormFields’ validators
+    if (!_formKey.currentState!.validate()) return;
+
+    // 🔹 Extra guards for Class
+    final selectedClass = teacherClassController.selectedClass.value ??
+        (teacherClassController.classList.isNotEmpty
+            ? teacherClassController.classList[
+        teacherClassController.selectedClassIndex.value]
+            : null);
+
+    if (selectedClass == null) {
+      _showSnack('Please select a class.');
+      return;
+    }
+
+    // 🔹 Extra guards for Subject
+    final selectedSubject = teacherClassController.selectedSubject.value ??
+        (teacherClassController.filteredSubjects.isNotEmpty
+            ? teacherClassController.filteredSubjects[
+        teacherClassController.selectedSubjectIndex.value]
+            : null);
+
+    if (selectedSubject == null) {
+      _showSnack('Please select a subject.');
+      return;
+    }
+
+    // 🔹 At least 1 description paragraph
+    if (!_validateAtLeastOneDescriptionFilled()) {
+      _showSnack('Please enter at least one description.');
+      return;
+    }
+
+    // 🔹 Collect final data
+    final selectedSubjectId = selectedSubject.id;
+
+    final paragraphs = <String>[
+      ...descriptionControllers
+          .map((c) => c.text.trim())
+          .where((t) => t.isNotEmpty),
+      ..._sections
+          .where((s) =>
+      s.type == SectionType.paragraph && s.paragraph.trim().isNotEmpty)
+          .map((s) => s.paragraph.trim()),
+    ];
+
+    final images = _sections
+        .where((s) => s.type == SectionType.image && s.image != null)
+        .map((s) => File(s.image!.path))
+        .toList();
+
+    final listPoints = [
+      ..._listTextFields.map((t) => t.trim()).where((t) => t.isNotEmpty),
+      ..._sections
+          .where((s) => s.type == SectionType.list)
+          .expand((s) => s.listPoints.map((t) => t.trim()))
+          .where((t) => t.isNotEmpty),
+    ];
+
+    // 🔹 Navigate to preview
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HomeworkCreatePreview(
+          listPoints: listPoints,
+          subjectId: selectedSubjectId,
+          subjects: selectedSubject.name,
+          selectedClassId: selectedClass.id, // ✅ always use current selected class
+          description: paragraphs,
+          images: images,
+          permanentImage:
+          _permanentImage != null ? File(_permanentImage!.path) : null,
+          heading: headingController.text.trim(),
+        ),
+      ),
+    );
+  }
+
+
+  /*void _validateAndProceed() {
     FocusScope.of(context).unfocus();
 
     // Trigger TextFormFields’ validators
@@ -249,24 +422,27 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       _showSnack('Please select a class.');
       return;
     }
-    if (selectedSubjectId == null &&
+    if (teacherClassController.selectedSubject.value == null &&
         teacherClassController.subjectList.isEmpty) {
       _showSnack('Please select a subject.');
       return;
     }
 
-    // At least 1 description paragraph overall (keep this if you still want the global rule)
+    // At least 1 description paragraph overall (keep this if you st ill want the global rule)
     if (!_validateAtLeastOneDescriptionFilled()) {
       _showSnack('Please enter at least one description.');
       return;
     }
 
     // ok → collect & go
-    final selected =
-        (teacherClassController.selectedClass.value ??
+    final selectedClass =
+        teacherClassController.selectedClass.value ??
             (teacherClassController.classList.isNotEmpty
                 ? teacherClassController.classList.first
-                : null));
+                : null);
+
+    final selectedSubject = teacherClassController.selectedSubject.value;
+    final selectedSubjectId = selectedSubject?.id;
 
     final paragraphs = <String>[
       // legacy descriptions
@@ -277,17 +453,16 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       ..._sections
           .where(
             (s) =>
-                s.type == SectionType.paragraph &&
-                s.paragraph.trim().isNotEmpty,
-          )
+        s.type == SectionType.paragraph &&
+            s.paragraph.trim().isNotEmpty,
+      )
           .map((s) => s.paragraph),
     ];
 
-    final images =
-        _sections
-            .where((s) => s.type == SectionType.image && s.image != null)
-            .map((s) => File(s.image!.path))
-            .toList();
+    final images = _sections
+        .where((s) => s.type == SectionType.image && s.image != null)
+        .map((s) => File(s.image!.path))
+        .toList();
 
     final listPoints = [
       // legacy list block
@@ -302,21 +477,21 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => HomeworkCreatePreview(
-              listPoints: listPoints,
-              subjectId: selectedSubjectId,
-              subjects: selectedSubject ?? '',
-              selectedClassId: selected?.id ?? selectedClassId,
-              description: paragraphs,
-              images: images,
-              permanentImage:
-                  _permanentImage != null ? File(_permanentImage!.path) : null,
-              heading: headingController.text,
-            ),
+        builder: (_) => HomeworkCreatePreview(
+          listPoints: listPoints,
+          subjectId: selectedSubjectId,
+          subjects: selectedSubject?.name ?? '',
+          selectedClassId: selectedClass?.id ?? selectedClassId,
+          description: paragraphs,
+          images: images,
+          permanentImage:
+          _permanentImage != null ? File(_permanentImage!.path) : null,
+          heading: headingController.text,
+        ),
       ),
     );
-  }
+  }*/
+
 
   @override
   Widget build(BuildContext context) {
@@ -464,284 +639,172 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                                         itemCount: classes.length,
                                         padding: EdgeInsets.symmetric(
                                           horizontal: sidePad,
-                                        ), // <-- key change
-                                        itemBuilder: (context, index) {
-                                          final item = classes[index];
-                                          final isSelected =
-                                              index == selectedIndex;
+                                        ),
+                                          itemBuilder: (context, index) {
+                                            return Obx(() {
+                                              final item = classes[index];
+                                              final isSelected = teacherClassController.selectedClassIndex.value == index;
 
-                                          return GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                selectedIndex = index;
-                                                selectedClassId = item.id;
-                                                teacherClassController
-                                                    .selectedClass
-                                                    .value = item;
-                                              });
-                                              // center after layout updates
-                                              WidgetsBinding.instance
-                                                  .addPostFrameCallback((_) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  final selectedClass = teacherClassController.classList[index];
+                                                  teacherClassController.selectedClass.value = selectedClass;
+                                                  teacherClassController.selectedClassIndex.value = index;
+
+                                                  teacherClassController.filterSubjectsByClass(selectedClass.id);
+
+                                                  if (teacherClassController.filteredSubjects.isNotEmpty) {
+                                                    teacherClassController.selectedSubjectIndex.value = 0;
+                                                    teacherClassController.selectedSubject.value =
+                                                    teacherClassController.filteredSubjects[0];
+                                                  } else {
+                                                    teacherClassController.selectedSubjectIndex.value = -1;
+                                                    teacherClassController.selectedSubject.value = null;
+                                                  }
+
+                                                  WidgetsBinding.instance.addPostFrameCallback((_) {
                                                     _centerSelectedClass();
                                                   });
-                                            },
-                                            child: AnimatedContainer(
-                                              duration: const Duration(
-                                                milliseconds: 120,
-                                              ),
-                                              curve: Curves.easeInOut,
-                                              width:
-                                                  _classItemWidth, // <-- keep in sync
-                                              height: isSelected ? 120 : 80,
-                                              margin: const EdgeInsets.symmetric(
-                                                horizontal:
-                                                    _classGap /
-                                                    2, // <-- if you add spacing, bump _classGap
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    isSelected
-                                                        ? AppColor.white
-                                                        : Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(24),
-                                                border:
-                                                    isSelected
-                                                        ? Border.all(
-                                                          color:
-                                                              AppColor.blueG1,
-                                                          width: 1.5,
-                                                        )
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(milliseconds: 120),
+                                                  curve: Curves.easeInOut,
+                                                  width: _classItemWidth,
+                                                  height: isSelected ? 120 : 80,
+                                                  margin: const EdgeInsets.symmetric(horizontal: _classGap / 2),
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected ? AppColor.white : Colors.transparent,
+                                                    borderRadius: BorderRadius.circular(24),
+                                                    border: isSelected
+                                                        ? Border.all(color: AppColor.blueG1, width: 1.5)
                                                         : null,
-                                                boxShadow:
-                                                    isSelected
+                                                    boxShadow: isSelected
                                                         ? [
-                                                          BoxShadow(
-                                                            color: AppColor
-                                                                .white
-                                                                .withOpacity(
-                                                                  0.5,
-                                                                ),
-                                                            blurRadius: 10,
-                                                            offset:
-                                                                const Offset(
-                                                                  0,
-                                                                  4,
-                                                                ),
-                                                          ),
-                                                        ]
+                                                      BoxShadow(
+                                                        color: AppColor.white.withOpacity(0.5),
+                                                        blurRadius: 10,
+                                                        offset: const Offset(0, 4),
+                                                      ),
+                                                    ]
                                                         : [],
-                                              ),
-                                              // ===== your existing inner UI (unchanged) =====
-                                              child:
-                                                  isSelected
-                                                      ? Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
+                                                  ),
+                                                  child: isSelected
+                                                      ? // ✅ SELECTED UI
+                                                  Column(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      const SizedBox(height: 8),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
                                                         children: [
-                                                          const SizedBox(
-                                                            height: 8,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              ShaderMask(
-                                                                shaderCallback:
-                                                                    (
-                                                                      bounds,
-                                                                    ) => const LinearGradient(
-                                                                      colors: [
-                                                                        AppColor
-                                                                            .blueG1,
-                                                                        AppColor
-                                                                            .blue,
-                                                                      ],
-                                                                      begin:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      end:
-                                                                          Alignment
-                                                                              .bottomRight,
-                                                                    ).createShader(
-                                                                      Rect.fromLTWH(
-                                                                        0,
-                                                                        0,
-                                                                        bounds
-                                                                            .width,
-                                                                        bounds
-                                                                            .height,
-                                                                      ),
-                                                                    ),
-                                                                blendMode:
-                                                                    BlendMode
-                                                                        .srcIn,
-                                                                child: Text(
-                                                                  item.name,
-                                                                  style: GoogleFont.ibmPlexSans(
-                                                                    fontSize:
-                                                                        28,
-                                                                    color:
-                                                                        Colors
-                                                                            .white,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
+                                                          ShaderMask(
+                                                            shaderCallback: (bounds) =>
+                                                                const LinearGradient(
+                                                                  colors: [AppColor.blueG1, AppColor.blue],
+                                                                  begin: Alignment.topLeft,
+                                                                  end: Alignment.bottomRight,
+                                                                ).createShader(
+                                                                  Rect.fromLTWH(0, 0, bounds.width, bounds.height),
                                                                 ),
-                                                              ),
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets.only(
-                                                                      top: 8.0,
-                                                                    ),
-                                                                child: ShaderMask(
-                                                                  shaderCallback:
-                                                                      (
-                                                                        bounds,
-                                                                      ) => const LinearGradient(
-                                                                        colors: [
-                                                                          AppColor
-                                                                              .blueG1,
-                                                                          AppColor
-                                                                              .blue,
-                                                                        ],
-                                                                        begin:
-                                                                            Alignment.topLeft,
-                                                                        end:
-                                                                            Alignment.bottomRight,
-                                                                      ).createShader(
-                                                                        Rect.fromLTWH(
-                                                                          0,
-                                                                          0,
-                                                                          bounds
-                                                                              .width,
-                                                                          bounds
-                                                                              .height,
-                                                                        ),
-                                                                      ),
-                                                                  blendMode:
-                                                                      BlendMode
-                                                                          .srcIn,
-                                                                  child: Text(
-                                                                    'th',
-                                                                    style: GoogleFont.ibmPlexSans(
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          Colors
-                                                                              .white,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Container(
-                                                            height: 55,
-                                                            width:
-                                                                double.infinity,
-                                                            decoration: const BoxDecoration(
-                                                              gradient: LinearGradient(
-                                                                colors: [
-                                                                  AppColor
-                                                                      .blueG1,
-                                                                  AppColor.blue,
-                                                                ],
-                                                                begin:
-                                                                    Alignment
-                                                                        .topLeft,
-                                                                end:
-                                                                    Alignment
-                                                                        .topRight,
-                                                              ),
-                                                              borderRadius:
-                                                                  BorderRadius.vertical(
-                                                                    bottom:
-                                                                        Radius.circular(
-                                                                          22,
-                                                                        ),
-                                                                  ),
-                                                            ),
-                                                            alignment:
-                                                                Alignment
-                                                                    .center,
+                                                            blendMode: BlendMode.srcIn,
                                                             child: Text(
-                                                              item.section,
+                                                              item.name,
                                                               style: GoogleFont.ibmPlexSans(
-                                                                fontSize: 20,
-                                                                color:
-                                                                    AppColor
-                                                                        .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                fontSize: 28,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Colors.white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(top: 8.0),
+                                                            child: ShaderMask(
+                                                              shaderCallback: (bounds) =>
+                                                                  const LinearGradient(
+                                                                    colors: [AppColor.blueG1, AppColor.blue],
+                                                                    begin: Alignment.topLeft,
+                                                                    end: Alignment.bottomRight,
+                                                                  ).createShader(
+                                                                    Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                                                                  ),
+                                                              blendMode: BlendMode.srcIn,
+                                                              child: Text(
+                                                                'th',
+                                                                style: GoogleFont.ibmPlexSans(
+                                                                  fontSize: 14,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: Colors.white,
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
                                                         ],
-                                                      )
-                                                      : Center(
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            Container(
-                                                              padding:
-                                                                  const EdgeInsets.symmetric(
-                                                                    horizontal:
-                                                                        20,
-                                                                    vertical: 3,
-                                                                  ),
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                    AppColor
-                                                                        .white,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      20,
-                                                                    ),
-                                                              ),
-                                                              child: Text(
-                                                                item.name,
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 14,
-                                                                  color:
-                                                                      AppColor
-                                                                          .gray,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            Text(
-                                                              item.section,
-                                                              style: GoogleFont.ibmPlexSans(
-                                                                fontSize: 20,
-                                                                color:
-                                                                    AppColor
-                                                                        .lightgray,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ],
+                                                      ),
+                                                      Container(
+                                                        height: 55,
+                                                        width: double.infinity,
+                                                        decoration: const BoxDecoration(
+                                                          gradient: LinearGradient(
+                                                            colors: [AppColor.blueG1, AppColor.blue],
+                                                            begin: Alignment.topLeft,
+                                                            end: Alignment.topRight,
+                                                          ),
+                                                          borderRadius: BorderRadius.vertical(
+                                                            bottom: Radius.circular(22),
+                                                          ),
+                                                        ),
+                                                        alignment: Alignment.center,
+                                                        child: Text(
+                                                          item.section,
+                                                          style: GoogleFont.ibmPlexSans(
+                                                            fontSize: 20,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: AppColor.white,
+                                                          ),
                                                         ),
                                                       ),
-                                              // ===== end unchanged UI =====
-                                            ),
-                                          );
-                                        },
+                                                    ],
+                                                  )
+                                                      : // 🚫 UNSELECTED UI
+                                                  Center(
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Container(
+                                                          padding: const EdgeInsets.symmetric(
+                                                            horizontal: 20,
+                                                            vertical: 3,
+                                                          ),
+                                                          decoration: BoxDecoration(
+                                                            color: AppColor.white,
+                                                            borderRadius: BorderRadius.circular(20),
+                                                          ),
+                                                          child: Text(
+                                                            item.name,
+                                                            style: GoogleFont.ibmPlexSans(
+                                                              fontSize: 14,
+                                                              color: AppColor.gray,
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Text(
+                                                          item.section,
+                                                          style: GoogleFont.ibmPlexSans(
+                                                            fontSize: 20,
+                                                            color: AppColor.lightgray,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                          }
+
                                       );
                                     },
                                   ),
@@ -1024,7 +1087,7 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                             ),
                           ),
 
-                          const SizedBox(height: 40),
+                          const SizedBox(height: 20),
 
                           // Subject picker
                           Padding(
@@ -1040,67 +1103,80 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 10),
+
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             physics: BouncingScrollPhysics(),
                             child: Wrap(
                               spacing: 10,
-                              children: List.generate(subjects.length, (index) {
-                                final sub = subjects[index];
-                                final isSelected = subjectIndex == index;
-                                return GestureDetector(
-                                  onTap:
-                                      () => setState(() {
-                                        subjectIndex = index;
-                                        selectedSubject = sub.name;
-                                        selectedSubjectId = sub.id;
-                                      }),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: isSelected ? 25 : 35,
-                                      vertical: 14,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColor.white,
-                                      borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(
-                                        color:
-                                            isSelected
-                                                ? AppColor.blue
-                                                : AppColor.borderGary,
-                                        width: 1.5,
+                              children: List.generate(
+                                teacherClassController.filteredSubjects.length,
+                                (index) {
+                                  final sub =
+                                      teacherClassController
+                                          .filteredSubjects[index];
+                                  final selectedIndexs =
+                                      teacherClassController
+                                          .selectedSubjectIndex
+                                          .value;
+                                  final isSelected = selectedIndexs == index;
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      teacherClassController
+                                          .selectedSubjectIndex
+                                          .value = index;
+                                      teacherClassController
+                                          .selectedSubject
+                                          .value = sub;
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isSelected ? 25 : 35,
+                                        vertical: 14,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColor.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        border: Border.all(
+                                          color:
+                                              isSelected
+                                                  ? AppColor.blue
+                                                  : AppColor.borderGary,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (isSelected) ...[
+                                            Image.asset(
+                                              AppImages.tick,
+                                              height: 15,
+                                              color: AppColor.blue,
+                                            ),
+                                            const SizedBox(width: 10),
+                                          ],
+                                          Text(
+                                            sub.name,
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontSize: 12,
+                                              color:
+                                                  isSelected
+                                                      ? AppColor.blue
+                                                      : AppColor.gray,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (isSelected) ...[
-                                          Image.asset(
-                                            AppImages.tick,
-                                            height: 15,
-                                            color: AppColor.blue,
-                                          ),
-                                          const SizedBox(width: 10),
-                                        ],
-                                        Text(
-                                          sub.name,
-                                          style: GoogleFont.ibmPlexSans(
-                                            fontSize: 12,
-                                            color:
-                                                isSelected
-                                                    ? AppColor.blue
-                                                    : AppColor.gray,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
+                                  );
+                                },
+                              ),
                             ),
                           ),
+
 
                           const SizedBox(height: 25),
 

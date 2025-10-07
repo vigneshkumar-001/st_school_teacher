@@ -28,6 +28,9 @@ class _QuizHistoryState extends State<QuizHistory> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await quizController.quizList();
+      if (!quizController.classNames.contains(quizController.selectedClassName.value)) {
+        quizController.selectClass('All');
+      }
     });
   }
 
