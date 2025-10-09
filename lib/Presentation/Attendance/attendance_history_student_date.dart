@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Core/Utility/google_fonts.dart';
 import 'package:st_teacher_app/Presentation/Attendance/controller/student_attendence_controller.dart';
@@ -36,6 +37,7 @@ class AttendanceHistoryStudentDate extends StatefulWidget {
       _AttendanceHistoryStudentDateState();
 }
 
+/*
 class _AttendanceHistoryStudentDateState
     extends State<AttendanceHistoryStudentDate> {
   DateTime selectedMonth = DateTime.now();
@@ -51,7 +53,8 @@ class _AttendanceHistoryStudentDateState
   late DateTime selectedDate;
   bool isLoading = true;
 
-  /*  @override
+  */
+/*  @override
   void initState() {
     super.initState();
     selectedDate = widget.selectedDate;
@@ -63,7 +66,8 @@ class _AttendanceHistoryStudentDateState
         selectedClass = attendanceController.classList.first;
       }
     });
-  }*/
+  }*//*
+
   @override
   void initState() {
     super.initState();
@@ -308,6 +312,75 @@ class _AttendanceHistoryStudentDateState
                       ),
 
                       SizedBox(height: 50),
+                      if (data?.eventsStatus == true) ...[
+                        const SizedBox(height: 20),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(22),
+                          child: Stack(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                height: 200,
+                                child: ((data!.eventImage ?? '').isNotEmpty)
+                                    ? Image.network(
+                                  data.eventImage!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: Colors.grey[300],
+                                    alignment: Alignment.center,
+                                    child: const Icon(Icons.broken_image),
+                                  ),
+                                )
+                                    : Container(
+                                  color: Colors.grey[300],
+                                  alignment: Alignment.center,
+                                  child: const Icon(Icons.image_not_supported),
+                                ),
+                              ),
+                              // Gradient + title
+                              Positioned.fill(
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 18,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.black.withOpacity(0.1),
+                                          Colors.black,
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            (data.eventTitle?.trim().isNotEmpty ?? false)
+                                                ? data.eventTitle!
+                                                : 'Event',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFont.ibmPlexSans(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColor.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       // CommonContainer.announcementsScreen(
                       //   additionalText2: '3Pm ',
                       //   additionalText3: 'to ',
@@ -347,7 +420,8 @@ class _AttendanceHistoryStudentDateState
                       SizedBox(height: 15),
 
 
-                      /*  Stack(
+                      */
+/*  Stack(
                         alignment: Alignment.centerLeft,
                         children: [
                           Container(
@@ -412,7 +486,8 @@ class _AttendanceHistoryStudentDateState
                             ),
                           ),
                         ],
-                      ),*/
+                      ),*//*
+
 
 
                       GradientProgressBar(
@@ -472,6 +547,403 @@ class _AttendanceHistoryStudentDateState
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+*/
+
+
+class _AttendanceHistoryStudentDateState
+    extends State<AttendanceHistoryStudentDate> {
+  DateTime selectedDate = DateTime.now();
+
+  final StudentAttendanceController controller = Get.put(
+    StudentAttendanceController(),
+  );
+  final AttendanceController attendanceController = Get.put(
+    AttendanceController(),
+  );
+  StudentAttendanceData? attendanceData;
+  var selectedClass;
+  bool isLoading = true;
+
+  int current = 15;
+  int total = 20;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.selectedDate;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await attendanceController.getClassList();
+      if (attendanceController.classList.isNotEmpty) {
+        selectedClass = attendanceController.classList.first;
+        _fetchAttendance();
+      }
+    });
+  }
+
+  void _fetchAttendance() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final result = await controller.studentDayAttendance(
+      studentId: widget.studentId,
+      classId: widget.classId,
+      date: selectedDate,
+      showLoader: true,
+    );
+
+    if (result != null) {
+      setState(() {
+        attendanceData = result;
+        current =
+            ((attendanceData?.thisMonthPresentPercentage ?? 0) * total ~/ 100)
+                .toInt();
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void goToPreviousDay() {
+    setState(() {
+      selectedDate = selectedDate.subtract(Duration(days: 1));
+    });
+    _fetchAttendance();
+  }
+
+  void goToNextDay() {
+    setState(() {
+      selectedDate = selectedDate.add(Duration(days: 1));
+    });
+    _fetchAttendance();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final targetProgress = current / total;
+    final progressWidth = screenWidth * targetProgress;
+
+    return Scaffold(
+      backgroundColor: AppColor.lowLightgray,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonContainer.NavigatArrow(
+                  image: AppImages.leftSideArrow,
+                  onIconTap: () => Navigator.pop(context),
+                  container: AppColor.white,
+                  border: Border.all(color: AppColor.lightgray, width: 0.3),
+                ),
+                SizedBox(height: 18),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      text: widget.className ?? '',
+                      style: GoogleFonts.ibmPlexSans(
+                        fontSize: 14,
+                        color: AppColor.gray,
+                        fontWeight: FontWeight.w800,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: ' ${widget.section ?? ''}',
+                          style: GoogleFonts.ibmPlexSans(
+                            fontSize: 14,
+                            color: AppColor.gray,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' Section',
+                          style: GoogleFonts.ibmPlexSans(
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 3),
+                Center(
+                  child: Text(
+                    widget.studentName ?? '',
+                    style: GoogleFonts.ibmPlexSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.black,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+          
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColor.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 30,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(CupertinoIcons.left_chevron),
+                              onPressed: goToPreviousDay,
+                            ),
+                            Spacer(),
+                            Text(
+                              DateFormat('dd MMMM').format(selectedDate),
+                              style: GoogleFonts.ibmPlexSans(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Spacer(),
+                            IconButton(
+                              icon: Icon(CupertinoIcons.right_chevron),
+                              onPressed: goToNextDay,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 38),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColor.lowLightgray),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CurvedAttendanceCard(
+                                  imagePath: AppImages.morning,
+                                  isAbsent: attendanceData?.morning == "present",
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Morning',
+                                  style: GoogleFonts.ibmPlexSans(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                                SizedBox(width: 22),
+                                SizedBox(
+                                  height: 70,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: List.generate(8, (index) {
+                                      return Container(
+                                        width: 2,
+                                        height: 5,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppColor.lightgray.withOpacity(0.1),
+                                              AppColor.white.withOpacity(0.4),
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                                SizedBox(width: 22),
+                                CurvedAttendanceCard(
+                                  imagePath: AppImages.afternoon,
+                                  isAbsent: attendanceData?.afternoon == "present",
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Afternoon',
+                                  style: GoogleFonts.ibmPlexSans(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 50),
+          
+                        if (attendanceData?.eventsStatus == true) ...[
+                          const SizedBox(height: 20),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(22),
+                            child: Stack(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 200,
+                                  child: (attendanceData?.eventImage?.isNotEmpty ?? false)
+                                      ? Image.network(
+                                    attendanceData!.eventImage!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      color: Colors.grey[300],
+                                      alignment: Alignment.center,
+                                      child: const Icon(Icons.broken_image),
+                                    ),
+                                  )
+                                      : Container(
+                                    color: Colors.grey[300],
+                                    alignment: Alignment.center,
+                                    child:
+                                    const Icon(Icons.image_not_supported),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 18,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.black.withOpacity(0.1),
+                                            Colors.black,
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              (attendanceData?.eventTitle?.trim().isNotEmpty ?? false)
+                                                  ? attendanceData!.eventTitle!
+                                                  : 'Event',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.ibmPlexSans(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColor.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+          
+                        SizedBox(height: 20),
+          
+                        Row(
+                          children: [
+                            Text(
+                              '${attendanceData?.monthName ?? ''} Overall Attendance ',
+                              style: GoogleFonts.ibmPlexSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.black,
+                              ),
+                            ),
+                            Spacer(),
+                            Text(
+                              'Average',
+                              style: GoogleFonts.ibmPlexSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.orange,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 15),
+          
+                        GradientProgressBar(
+                          progress: (attendanceData?.thisMonthPresentPercentage ?? 0) / 100,
+                        ),
+          
+                        SizedBox(height: 15),
+          
+                        Text(
+                          "${attendanceData?.fullDayPresentCount ?? '0'} Out of ${attendanceData?.totalWorkingDays ?? '0'}",
+                          style: GoogleFonts.ibmPlexSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColor.gray,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 27),
+                Center(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      HapticFeedback.heavyImpact();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AttendanceHistoryStudent(),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColor.lightgray, width: 1),
+                      padding: EdgeInsets.symmetric(horizontal: 45, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(AppImages.leftSideArrow, height: 14),
+                        SizedBox(width: 12),
+                        Text(
+                          'Back to Calendar',
+                          style: GoogleFonts.ibmPlexSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.gray,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

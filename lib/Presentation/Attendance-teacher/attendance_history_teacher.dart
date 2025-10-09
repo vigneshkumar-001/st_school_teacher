@@ -87,7 +87,7 @@ class _AttendanceHistoryTeacherState extends State<AttendanceHistoryTeacher> {
     if (status == null) return null;
 
     if (status.holidayStatus) return Colors.green;
-    if (!status.isNullStatus && status.eventsStatus == true) {
+    if (status.isNullStatus && status.eventsStatus == true) {
       return Colors.orange;
     }
     if (!status.isNullStatus &&

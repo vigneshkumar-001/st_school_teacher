@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:st_teacher_app/Presentation/Announcement%20Screen/controller/announcement_contorller.dart';
 import 'package:st_teacher_app/Presentation/Login%20Screen/controller/login_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../Core/Utility/app_color.dart';
 import 'Core/Utility/app_images.dart';
+import 'Core/Utility/custom_app_button.dart';
 import 'Core/Utility/google_fonts.dart';
 import 'Presentation/Home/home.dart';
 import 'Presentation/Home/home_new_screen.dart';
@@ -26,12 +29,14 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   double _progress = 0.0;
+
   final TeacherClassController controller = Get.put(TeacherClassController());
   final TeacherDataController imgData = Get.put(TeacherDataController());
   final AnnouncementContorller announcementContorller = Get.put(
     AnnouncementContorller(),
   );
   final LoginController loginController = Get.put(LoginController());
+  final String latestVersion = "2.3.1";
   @override
   void initState() {
     super.initState();
@@ -51,9 +56,30 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 8), () {
-      _checkLoginStatus();
+      _checkAppVersion();
     });
   }
+
+  Future<void> _checkAppVersion() async {
+    // Try to read version from API data
+    final currentVersion =
+    imgData.teacherDataResponse.value?.data?.appVersions?.android?.latestVersion?.toString();
+
+    // Case 1: If token not present → API didn’t load → skip version check
+    if (currentVersion == null || currentVersion.isEmpty) {
+      _checkLoginStatus(); // Go to login flow
+      return;
+    }
+
+
+    if (currentVersion == latestVersion) {
+      _checkLoginStatus(); // Go to home or login based on token
+    } else {
+      // Case 3: Version mismatch → show update bottom sheet
+      _showUpdateBottomSheet();
+    }
+  }
+
 
   // void _checkLoginStatus() async {
   //   final isLoggedIn = await loginController.isLoggedIn();
@@ -90,6 +116,68 @@ class _SplashScreenState extends State<SplashScreen>
           builder: (context) => ChangeMobileNumber(page: 'splash'),
         ),
       );
+    }
+  }
+
+  void _showUpdateBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Update Available",
+                style: GoogleFonts.ibmPlexSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              Text(
+                "A new version of the app is available. Please update to continue.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.ibmPlexSans(fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+              AppButton.button(
+                text: 'Update Now',
+                onTap: () {
+                  openPlayStore();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void openPlayStore() async {
+    final storeUrl =
+        imgData.teacherDataResponse.value?.data.appVersions.android.storeUrl
+            .toString() ??
+            '';
+
+    if (storeUrl.isEmpty) {
+      print('No Play Store URL available.');
+      return;
+    }
+
+    final uri = Uri.parse(storeUrl);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      print('Could not open the Play Store link.');
     }
   }
 
@@ -133,7 +221,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   FractionallySizedBox(
                                     alignment: Alignment.centerLeft,
                                     widthFactor:
-                                        _progress, // updated with controller
+                                    _progress, // updated with controller
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
@@ -156,7 +244,7 @@ class _SplashScreenState extends State<SplashScreen>
                         SizedBox(height: 15),
 
                         Text(
-                          'V 1.2',
+                          'V $latestVersion',
                           style: GoogleFont.ibmPlexSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
