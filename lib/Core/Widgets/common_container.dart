@@ -305,7 +305,131 @@ class CommonContainer {
     }
   */
 
+
   static announcementsScreen({
+    required String mainText,
+    required String backRoundImage,
+    required String additionalText1,
+    required String additionalText2,
+    VoidCallback? onDetailsTap,
+    IconData? iconData,
+    double verticalPadding = 9,
+    Color? gradientStartColor,
+    Color? gradientEndColor,
+  }) {
+    return InkWell(
+      onTap: onDetailsTap,
+      child: Container(
+        height: 180, //  Fixed height for all cards
+        width: double.infinity, //  Full width (parent constraint)
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(22)),
+        clipBehavior: Clip.hardEdge, //  Ensure borderRadius clips children
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: CachedNetworkImage(
+                imageUrl: backRoundImage,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                placeholder:
+                    (context, url) => Container(
+                  alignment: Alignment.center,
+                  child: const SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+                errorWidget:
+                    (context, url, error) => const Icon(
+                  Icons.broken_image,
+                  size: 40,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+
+            // ✅ Gradient overlay
+            Positioned(
+              bottom: 0,
+              right: 0,
+              left: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      gradientStartColor ?? AppColor.black.withOpacity(0.01),
+                      gradientEndColor ?? AppColor.black,
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(22),
+                    bottomRight: Radius.circular(22),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 25,
+                    vertical: verticalPadding,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            mainText,
+                            style: GoogleFont.ibmPlexSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColor.white,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (iconData != null)
+                            Icon(iconData, size: 22, color: AppColor.white),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (additionalText1.isNotEmpty)
+                                Text(
+                                  additionalText1,
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 12,
+                                    color: AppColor.lowLightgray,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              Text(
+                                additionalText2,
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+/*  static announcementsScreen({
     required String mainText,
     required String backRoundImage,
     required String additionalText1,
@@ -418,7 +542,7 @@ class CommonContainer {
         ],
       ),
     );
-  }
+  }*/
 
   static checkMark({required VoidCallback onTap, String? imagePath}) {
     return Center(

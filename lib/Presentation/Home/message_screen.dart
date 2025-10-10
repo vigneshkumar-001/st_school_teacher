@@ -69,19 +69,25 @@ class _MessageScreenState extends State<MessageScreen> {
               itemCount: groups.length + 1, // +1 for back button row
               itemBuilder: (context, groupIndex) {
                 if (groupIndex == 0) {
-                  return Row(
-                    children: [
-                      CommonContainer.NavigatArrow(
-                        image: AppImages.leftSideArrow,
-                        imageColor: AppColor.lightBlack,
-                        container: AppColor.lowLightgray,
-                        onIconTap: () => Navigator.pop(context),
-                        border: Border.all(
-                          color: AppColor.lightgray,
-                          width: 0.3,
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 18,
+                    ),
+                    child: Row(
+                      children: [
+                        CommonContainer.NavigatArrow(
+                          image: AppImages.leftSideArrow,
+                          imageColor: AppColor.lightBlack,
+                          container: AppColor.lowLightgray,
+                          onIconTap: () => Navigator.pop(context),
+                          border: Border.all(
+                            color: AppColor.lightgray,
+                            width: 0.3,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 }
 
@@ -93,73 +99,76 @@ class _MessageScreenState extends State<MessageScreen> {
                   onRefresh: () async {
                     await controller.getMessageList();
                   },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Header
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Center(
-                          child: Text(
-                            groupTitle,
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.gray,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Section Header
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Center(
+                            child: Text(
+                              groupTitle,
+                              style: GoogleFont.ibmPlexSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColor.gray,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColor.white,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: ListView.builder(
-                          itemCount: messages.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final msg = messages[index];
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColor.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: ListView.builder(
+                            itemCount: messages.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final msg = messages[index];
 
-                            return Obx(() {
-                              final isLoading = controller.loadingMessages
-                                  .contains(msg.id);
-                              return CommonContainer.homeworkhistory(
-                                rightSideArrow: false,
-                                onIconTapLike: () async {
-                                  await controller.reactForStudentMessage(
-                                    msgId: msg.id,
-                                    like: !(msg.reacted ?? false),
-                                  );
-                                },
-                                homeWorkText: msg.student.name,
-                                likeImage: !(msg.reacted ?? false),
-                                isLikeLoading: isLoading,
-                                avatarImage: '',
-                                mainText: msg.text,
-                                smaleText: '',
-                                time:
-                                    DateAndTimeConvert.formatDateTime(
-                                      msg.createdAt.toIso8601String(),
-                                      showTime: true,
-                                      showDate: false,
-                                    ) ??
-                                    "-",
-                                className: msg.studentClass.name,
-                                aText1: '',
-                                aText2: '',
-                                CText1:
-                                    "${msg.studentClass.name} ${msg.studentClass.section}",
-                                backRoundColor: colors[index % colors.length],
-                                section: msg.studentClass.section,
-                              );
-                            });
-                          },
+                              return Obx(() {
+                                final isLoading = controller.loadingMessages
+                                    .contains(msg.id);
+                                return CommonContainer.homeworkhistory(
+                                  rightSideArrow: false,
+                                  onIconTapLike: () async {
+                                    await controller.reactForStudentMessage(
+                                      msgId: msg.id,
+                                      like: !(msg.reacted ?? false),
+                                    );
+                                  },
+                                  homeWorkText: msg.student.name,
+                                  likeImage: !(msg.reacted ?? false),
+                                  isLikeLoading: isLoading,
+                                  avatarImage: '',
+                                  mainText: msg.text,
+                                  smaleText: '',
+                                  time:
+                                      DateAndTimeConvert.formatDateTime(
+                                        msg.createdAt.toIso8601String(),
+                                        showTime: true,
+                                        showDate: false,
+                                      ) ??
+                                      "-",
+                                  className: msg.studentClass.name,
+                                  aText1: '',
+                                  aText2: '',
+                                  CText1:
+                                      "${msg.studentClass.name} ${msg.studentClass.section}",
+                                  backRoundColor: colors[index % colors.length],
+                                  section: msg.studentClass.section,
+                                );
+                              });
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

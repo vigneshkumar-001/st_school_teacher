@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
     AnnouncementContorller(),
   );
   final LoginController loginController = Get.put(LoginController());
-  final String latestVersion = "2.3.0";
+  final String latestVersion = "2.3.1";
   @override
   void initState() {
     super.initState();
@@ -221,7 +221,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   FractionallySizedBox(
                                     alignment: Alignment.centerLeft,
                                     widthFactor:
-                                        _progress, // updated with controller
+                                    _progress, // updated with controller
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),

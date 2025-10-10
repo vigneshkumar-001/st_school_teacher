@@ -213,7 +213,8 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: AppColor.white,
+    return Scaffold(
+      backgroundColor: AppColor.white,
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
@@ -489,7 +490,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
+                                horizontal: 0.0,
                               ),
                               child: Obx(
                                 () => _pill(
@@ -500,7 +501,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 8),
                             Obx(
                               () => _pill(
                                 count: controller.absentCount, // ✅ auto updates
@@ -760,7 +761,7 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
         borderRadius: BorderRadius.circular(25),
         border: Border.all(color: border, width: 1.2),
       ),
-      child: Row(
+      child: /*Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (showCount) ...[
@@ -779,6 +780,38 @@ class _AttendanceNewScreenState extends State<AttendanceNewScreen> {
               fontSize: 13,
               color: text,
               fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),*/ Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            // <- lets text shrink/ellipsis instead of overflow
+            child: RichText(
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                children: [
+                  if (showCount)
+                    TextSpan(
+                      text: '$count ',
+                      style: GoogleFont.ibmPlexSans(
+                        fontSize: 13,
+                        color: text,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  TextSpan(
+                    text: label,
+                    style: GoogleFont.ibmPlexSans(
+                      fontSize: 13,
+                      color: text,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

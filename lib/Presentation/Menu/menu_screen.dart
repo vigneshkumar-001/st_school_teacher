@@ -209,37 +209,36 @@ class _MenuScreenState extends State<MenuScreen> {
                 SizedBox(height: 15),
                 Row(
                   children: [
-                    CommonContainer.menuScrollContainer(
-                      onIconTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AttendanceHistoryTeacher(),
-                          ),
-                        );
-                      },
-                      mainText: 'My\nAttendance',
-                      image: AppImages.myAttendance,
+                    Expanded(
+                      child: CommonContainer.menuScrollContainer(
+                        onIconTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AttendanceHistoryTeacher(),
+                            ),
+                          );
+                        },
+                        mainText: 'My\nAttendance',
+                        image: AppImages.myAttendance,
+                      ),
                     ),
-                    // SizedBox(width: 20),
-                    // CommonContainer.menuScrollContainer(
-                    //   onIconTap: () {},
-                    //   mainText: 'Assigned\nClasses',
-                    //   image: AppImages.assignedClasses,
-                    // ),
-                    SizedBox(width: 20),
-                    CommonContainer.menuScrollContainer(
-                      onIconTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => MyProfile()),
-                        );
-                      },
-                      mainText: 'My\nProfile',
-                      image: AppImages.myProfile,
+                    const SizedBox(width: 20), // keep your gap
+                    Expanded(
+                      child: CommonContainer.menuScrollContainer(
+                        onIconTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => MyProfile()),
+                          );
+                        },
+                        mainText: 'My\nProfile',
+                        image: AppImages.myProfile,
+                      ),
                     ),
                   ],
                 ),
+
                 SizedBox(height: 15),
               ],
             ),
