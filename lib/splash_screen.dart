@@ -167,7 +167,7 @@ class _SplashScreenState extends State<SplashScreen>
     final storeUrl =
         imgData.teacherDataResponse.value?.data.appVersions.android.storeUrl
             .toString() ??
-            '';
+        '';
 
     if (storeUrl.isEmpty) {
       print('No URL available.');
