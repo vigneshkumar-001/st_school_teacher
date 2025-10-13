@@ -161,25 +161,52 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
+
   void openPlayStore() async {
+
     final storeUrl =
         imgData.teacherDataResponse.value?.data.appVersions.android.storeUrl
             .toString() ??
             '';
 
     if (storeUrl.isEmpty) {
-      print('No Play Store URL available.');
+      print('No URL available.');
       return;
     }
 
     final uri = Uri.parse(storeUrl);
+    print('Trying to launch: $uri');
 
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      print('Could not open the Play Store link.');
+    // Try in-app or platform default mode
+    final success = await launchUrl(
+      uri,
+      mode: LaunchMode.platformDefault, // or LaunchMode.inAppWebView
+    );
+
+    if (!success) {
+      print('Could not open the link. Maybe no browser is installed.');
     }
   }
+
+  // void openPlayStore() async {
+  //   final storeUrl =
+  //       imgData.teacherDataResponse.value?.data.appVersions.android.storeUrl
+  //           .toString() ??
+  //           '';
+  //
+  //   if (storeUrl.isEmpty) {
+  //     print('No Play Store URL available.');
+  //     return;
+  //   }
+  //
+  //   final uri = Uri.parse(storeUrl);
+  //
+  //   if (await canLaunchUrl(uri)) {
+  //     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     print('Could not open the Play Store link.');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
