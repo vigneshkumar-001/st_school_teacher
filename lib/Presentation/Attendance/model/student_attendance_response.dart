@@ -11,9 +11,9 @@ class StudentAttendanceResponse {
 
   factory StudentAttendanceResponse.fromJson(Map<String, dynamic> json) {
     return StudentAttendanceResponse(
-      status: json['status'] as bool,
-      message: json['message'] as String,
-      data: StudentAttendanceData.fromJson(json['data']),
+      status: json['status'] ?? false,
+      message: json['message'] ?? '',
+      data: StudentAttendanceData.fromJson(json['data'] ?? {}),
     );
   }
 }
@@ -30,6 +30,9 @@ class StudentAttendanceData {
   final bool fullDayPresent;
   final bool holidayStatus;
   final bool eventsStatus;
+  final bool isNullStatus;
+  final String? eventTitle;
+  final String? eventImage;
   final String monthName;
   final int totalWorkingDays;
   final int fullDayPresentCount;
@@ -48,6 +51,9 @@ class StudentAttendanceData {
     required this.fullDayPresent,
     required this.holidayStatus,
     required this.eventsStatus,
+    required this.isNullStatus,
+    this.eventTitle,
+    this.eventImage,
     required this.monthName,
     required this.totalWorkingDays,
     required this.fullDayPresentCount,
@@ -56,29 +62,32 @@ class StudentAttendanceData {
   });
 
   factory StudentAttendanceData.fromJson(Map<String, dynamic> json) {
-    var list = json['monthly_attendance_summary'] as List? ?? [];
-    List<MonthlyAttendanceSummary> summaryList =
-    list.map((e) => MonthlyAttendanceSummary.fromJson(e)).toList();
+    var summaryList = (json['monthly_attendance_summary'] as List? ?? [])
+        .map((e) => MonthlyAttendanceSummary.fromJson(e))
+        .toList();
 
     return StudentAttendanceData(
-      studentId: json['student_id'] as String,
-      studentClass: json['class'] as String,
-      section: json['section'] as String,
-      classId: json['class_id'].toString(),
+      studentId: json['student_id']?.toString().trim() ?? '',
+      studentClass: json['class'] ?? '',
+      section: json['section'] ?? '',
+      classId: json['class_id']?.toString() ?? '',
       teacherId: json['teacher_id'] is int
-          ? json['teacher_id'] as int
-          : int.tryParse(json['teacher_id'].toString()) ?? 0,
-      date: json['date'] as String,
-      morning: json['morning'] as String,
-      afternoon: json['afternoon'] as String,
-      fullDayPresent: json['full_day_present'] as bool,
-      holidayStatus: json['holiday_status'] as bool,
-      eventsStatus: json['events_status'] as bool,
-      monthName: json['monthName'] as String,
-      totalWorkingDays: json['totalWorkingDays'] as int,
-      fullDayPresentCount: json['fullDayPresentCount'] as int,
+          ? json['teacher_id']
+          : int.tryParse(json['teacher_id']?.toString() ?? '0') ?? 0,
+      date: json['date'] ?? '',
+      morning: json['morning'] ?? '',
+      afternoon: json['afternoon'] ?? '',
+      fullDayPresent: json['full_day_present'] ?? false,
+      holidayStatus: json['holiday_status'] ?? false,
+      eventsStatus: json['events_status'] ?? false,
+      isNullStatus: json['is_null_status'] ?? false,
+      eventTitle: json['event_title'] ?? '',
+      eventImage: json['event_image'] ?? '',
+      monthName: json['monthName'] ?? '',
+      totalWorkingDays: json['totalWorkingDays'] ?? 0,
+      fullDayPresentCount: json['fullDayPresentCount'] ?? 0,
       thisMonthPresentPercentage:
-      (json['this_month_present_percentage'] as num).toDouble(),
+      (json['this_month_present_percentage'] as num?)?.toDouble() ?? 0.0,
       monthlyAttendanceSummary: summaryList,
     );
   }
@@ -88,12 +97,15 @@ class MonthlyAttendanceSummary {
   final String date;
   final String status;
 
-  MonthlyAttendanceSummary({required this.date, required this.status});
+  MonthlyAttendanceSummary({
+    required this.date,
+    required this.status,
+  });
 
   factory MonthlyAttendanceSummary.fromJson(Map<String, dynamic> json) {
     return MonthlyAttendanceSummary(
-      date: json['date'] as String,
-      status: json['status'] as String,
+      date: json['date'] ?? '',
+      status: json['status'] ?? '',
     );
   }
 }

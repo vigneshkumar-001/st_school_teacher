@@ -282,7 +282,7 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                     // Assign Homework card
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 31,
+                                        horizontal: 27,
                                       ),
                                       child: Column(
                                         children: [
@@ -319,9 +319,6 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                               );
                                             },
                                             child: Ink(
-                                              // ✅ lets ripple + clipping render over your gradient
-                                              // height: 180,
-                                              // width: 325,
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
                                                   colors: [
@@ -350,109 +347,184 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                 borderRadius:
                                                     BorderRadius.circular(20),
                                               ),
-                                              child: Stack(
-                                                children: [
-                                                  Positioned.fill(
-                                                    child: IgnorePointer(
-                                                      child: Image.asset(
-                                                        AppImages.bcImage,
-                                                        fit: BoxFit.cover,
+                                              child: LayoutBuilder(
+                                                builder: (
+                                                  context,
+                                                  constraints,
+                                                ) {
+                                                  final screenWidth =
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.width;
+                                                  final screenHeight =
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.height;
+
+                                                  // Responsive sizing
+                                                  final containerWidth =
+                                                      screenWidth *
+                                                      0.85; // 85% of screen width
+                                                  final containerHeight =
+                                                      screenHeight *
+                                                      0.22; // 22% of screen height
+
+                                                  return Container(
+                                                    width: containerWidth,
+                                                    height: containerHeight,
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          AppColor.greenG4
+                                                              .withOpacity(0.9),
+                                                          AppColor.greenG4
+                                                              .withOpacity(0.8),
+                                                          AppColor.greenG4
+                                                              .withOpacity(0.8),
+                                                          AppColor.greenG4
+                                                              .withOpacity(0.7),
+                                                          AppColor.greenG1
+                                                              .withOpacity(0.8),
+                                                          AppColor.greenG1
+                                                              .withOpacity(0.8),
+                                                          AppColor.greenG1
+                                                              .withOpacity(0.8),
+                                                          AppColor.greenG1
+                                                              .withOpacity(0.8),
+                                                          AppColor.greenG1
+                                                              .withOpacity(0.8),
+                                                        ],
+                                                        begin:
+                                                            Alignment.topRight,
+                                                        end: Alignment.topLeft,
                                                       ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                          left: 28,
-                                                          top: 10,right: 15,bottom: 10
-                                                        ),
-                                                    child: Row(
+                                                    child: Stack(
                                                       children: [
-                                                        Flexible(
-                                                          child: Column(
+                                                        // ✅ Background image (non-interactive)
+                                                        Positioned.fill(
+                                                          child: IgnorePointer(
+                                                            child: Image.asset(
+                                                              AppImages.bcImage,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                        ),
+
+                                                        // ✅ Foreground content
+                                                        Positioned(
+                                                          top:
+                                                              containerHeight *
+                                                              0.1,
+                                                          left:
+                                                              containerWidth *
+                                                              0.05,
+                                                          right:
+                                                              containerWidth *
+                                                              0.05,
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
                                                             children: [
-                                                              Text(
-                                                                'Assign ',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 26,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      AppColor
-                                                                          .white,
-                                                                ).copyWith(
-                                                                  shadows: const [
-                                                                    Shadow(
-                                                                      offset:
-                                                                          Offset(
+                                                              // Texts (Assign Homework)
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    'Assign ',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: GoogleFont.ibmPlexSans(
+                                                                      fontSize:
+                                                                          containerWidth *
+                                                                          0.08,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color:
+                                                                          AppColor
+                                                                              .white,
+                                                                    ).copyWith(
+                                                                      shadows: const [
+                                                                        Shadow(
+                                                                          offset: Offset(
                                                                             0,
                                                                             5,
                                                                           ),
-                                                                      blurRadius:
-                                                                          12,
-                                                                      color: Color(
-                                                                        0x40000000,
-                                                                      ),
+                                                                          blurRadius:
+                                                                              12,
+                                                                          color: Color(
+                                                                            0x40000000,
+                                                                          ),
+                                                                        ),
+                                                                      ],
                                                                     ),
-                                                                  ],
-                                                                ),
+                                                                  ),
+                                                                  Text(
+                                                                    'Homework',
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: GoogleFont.ibmPlexSans(
+                                                                      fontSize:
+                                                                          containerWidth *
+                                                                          0.05,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      color:
+                                                                          AppColor
+                                                                              .white,
+                                                                    ).copyWith(
+                                                                      shadows: const [
+                                                                        Shadow(
+                                                                          offset: Offset(
+                                                                            0,
+                                                                            5,
+                                                                          ),
+                                                                          blurRadius:
+                                                                              12,
+                                                                          color: Color(
+                                                                            0x40000000,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
-                                                              Text(
-                                                                'Homework',
-                                                                maxLines: 1,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 18,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color:
-                                                                      AppColor
-                                                                          .white,
-                                                                ).copyWith(
-                                                                  shadows: const [
-                                                                    Shadow(
-                                                                      offset:
-                                                                          Offset(
-                                                                            0,
-                                                                            5,
-                                                                          ),
-                                                                      blurRadius:
-                                                                          12,
-                                                                      color: Color(
-                                                                        0x40000000,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
+
+                                                              // Image
+                                                              Image.asset(
+                                                                AppImages
+                                                                    .Homework,
+                                                                height:
+                                                                    containerHeight *
+                                                                    0.75,
                                                               ),
                                                             ],
                                                           ),
                                                         ),
-                                                        const SizedBox(
-                                                          width: 30,
-                                                        ),
-                                                        Image.asset(
-                                                          AppImages.Homework,
-                                                          height: 130,
-                                                        ),
                                                       ],
                                                     ),
-                                                  ),
-                                                ],
+                                                  );
+                                                },
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(height: 10),
+                                          const SizedBox(height: 14),
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
@@ -487,189 +559,255 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                     ),
                                                   );
                                                 },
-                                                child: Container(
-                                                  // height: 190,
-                                                  // width: 155.5,
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [
-                                                        AppColor.bluehG1,
-                                                        AppColor.bluehG1,
-                                                        AppColor.bluehG1,
-                                                        AppColor.bluehG1,
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.95),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.90),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.85),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.80),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.75),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.70),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.65),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.60),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.55),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.50),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.45),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.40),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.35),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.30),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.25),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.20),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.15),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.10),
-                                                        AppColor.bluehG1
-                                                            .withOpacity(0.06),
-                                                        AppColor.white
-                                                            .withOpacity(0.06),
-                                                        AppColor.white
-                                                            .withOpacity(0.10),
-                                                        AppColor.white
-                                                            .withOpacity(0.20),
-                                                        AppColor.white,
-                                                        AppColor.white,
-                                                        AppColor.white,
-                                                        AppColor.white,
-                                                        AppColor.white,
-                                                        AppColor.white,
-                                                      ],
-                                                      begin:
-                                                          Alignment.topCenter,
-                                                      end:
-                                                          Alignment
-                                                              .bottomCenter,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
+                                                child: LayoutBuilder(
+                                                  builder: (
+                                                    context,
+                                                    constraints,
+                                                  ) {
+                                                    final screenWidth =
+                                                        MediaQuery.of(
+                                                          context,
+                                                        ).size.width;
+                                                    final screenHeight =
+                                                        MediaQuery.of(
+                                                          context,
+                                                        ).size.height;
+
+                                                    // ✅ Responsive scaling
+                                                    final containerWidth =
+                                                        screenWidth *
+                                                        0.40; // ~40% of screen width
+                                                    final containerHeight =
+                                                        screenHeight *
+                                                        0.25; // ~25% of screen height
+
+                                                    return Container(
+                                                      width: containerWidth,
+                                                      height: containerHeight,
+                                                      decoration: BoxDecoration(
+                                                        gradient: LinearGradient(
+                                                          colors: [
+                                                            AppColor.bluehG1,
+                                                            AppColor.bluehG1,
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.95,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.9,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.85,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.8,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.75,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.7,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.65,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.6,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.55,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.5,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.45,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.4,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.35,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.3,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.25,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.2,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.15,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.1,
+                                                                ),
+                                                            AppColor.bluehG1
+                                                                .withOpacity(
+                                                                  0.06,
+                                                                ),
+                                                            AppColor.white
+                                                                .withOpacity(
+                                                                  0.06,
+                                                                ),
+                                                            AppColor.white
+                                                                .withOpacity(
+                                                                  0.1,
+                                                                ),
+                                                            AppColor.white
+                                                                .withOpacity(
+                                                                  0.2,
+                                                                ),
+                                                            AppColor.white,
+                                                            AppColor.white,
+                                                          ],
+                                                          begin:
+                                                              Alignment
+                                                                  .topCenter,
+                                                          end:
+                                                              Alignment
+                                                                  .bottomCenter,
                                                         ),
-                                                  ),
-                                                  child: Stack(
-                                                    children: [
-                                                      Positioned.fill(
-                                                        child: IgnorePointer(
-                                                          child: Image.asset(
-                                                            AppImages.bcImage,
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets.only(
-                                                              top: 15,
-                                                              bottom: 20,
-                                                              right: 32,
-                                                              left: 32,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
                                                             ),
-                                                        child: Flexible(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            mainAxisSize:
-                                                                MainAxisSize.min,
-                                                            children: [
-                                                              Text(
-                                                                'Conduct ',
-                                                          
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color:
-                                                                      AppColor
-                                                                          .white,
-                                                                ).copyWith(
-                                                                  shadows: const [
-                                                                    Shadow(
-                                                                      offset:
-                                                                          Offset(
-                                                                            0,
-                                                                            4,
-                                                                          ),
-                                                                      blurRadius:
-                                                                          12,
-                                                                      color: Color(
-                                                                        0x40000000,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
+                                                      ),
+                                                      child: Stack(
+                                                        children: [
+                                                          // ✅ Background image
+                                                          Positioned.fill(
+                                                            child: IgnorePointer(
+                                                              child: Image.asset(
+                                                                AppImages
+                                                                    .bcImage,
+                                                                fit:
+                                                                    BoxFit
+                                                                        .cover,
                                                               ),
-                                                              Text(
-                                                                'Quiz',
-                                                          
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: GoogleFont.ibmPlexSans(
-                                                                  fontSize: 25,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      AppColor
-                                                                          .white,
-                                                                ).copyWith(
-                                                                  shadows: const [
-                                                                    Shadow(
-                                                                      offset:
-                                                                          Offset(
-                                                                            0,
-                                                                            4,
-                                                                          ),
-                                                                      blurRadius:
-                                                                          12,
-                                                                      color: Color(
-                                                                        0x40000000,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                          
-                                                              Image.asset(
-                                                                AppImages.Quiz,
-                                                                height: 95,
-                                                                width: 90,
-                                                              ),
-                                                            ],
+                                                            ),
                                                           ),
-                                                        ),
+
+                                                          // ✅ Foreground content
+                                                          Positioned(
+                                                            top:
+                                                                containerHeight *
+                                                                0.08,
+                                                            left: 0,
+                                                            right: 0,
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  'Conduct',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style: GoogleFont.ibmPlexSans(
+                                                                    fontSize:
+                                                                        containerWidth *
+                                                                        0.1, // responsive
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    color:
+                                                                        AppColor
+                                                                            .white,
+                                                                  ).copyWith(
+                                                                    shadows: const [
+                                                                      Shadow(
+                                                                        offset:
+                                                                            Offset(
+                                                                              0,
+                                                                              4,
+                                                                            ),
+                                                                        blurRadius:
+                                                                            12,
+                                                                        color: Color(
+                                                                          0x40000000,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  'Quiz',
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style: GoogleFont.ibmPlexSans(
+                                                                    fontSize:
+                                                                        containerWidth *
+                                                                        0.16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        AppColor
+                                                                            .white,
+                                                                  ).copyWith(
+                                                                    shadows: const [
+                                                                      Shadow(
+                                                                        offset:
+                                                                            Offset(
+                                                                              0,
+                                                                              4,
+                                                                            ),
+                                                                        blurRadius:
+                                                                            12,
+                                                                        color: Color(
+                                                                          0x40000000,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  height:
+                                                                      containerHeight *
+                                                                      0.05,
+                                                                ),
+                                                                Image.asset(
+                                                                  AppImages
+                                                                      .Quiz,
+                                                                  height:
+                                                                      containerHeight *
+                                                                      0.45,
+                                                                  width:
+                                                                      containerWidth *
+                                                                      0.6,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                      /*   Positioned.fill(
-                                                    child: IgnorePointer(
-                                                      child: Image.asset(
-                                                        AppImages.Homework,
-                                                     height: 130,
-                                                      ),
-                                                    ),
-                                                  ),*/
-                                                    ],
-                                                  ),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                               SizedBox(width: 14),
@@ -707,260 +845,238 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                                       BorderRadius.circular(
                                                         22,
                                                       ), // outer rim radius
-                                                  child: Flexible(
-                                                    child: Container(
-                                                      // crisp white rim around the card
-                                                      color: Colors.white,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            2,
-                                                          ), // rim thickness
-                                                      child: Container(
-                                                        // height: 190,
-                                                        // width: 155.5,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                20,
-                                                              ),
-                                                          // FBBF30 → DD751E → D96A1B (top-left → bottom-right)
-                                                          gradient: LinearGradient(
-                                                            colors: [
-                                                              Color(0xFFFBBF30),
-                                                              Color(0xFFDD751E),
-                                                              Color(0xFFD96A1B),
-                                                            ],
-                                                            begin:
-                                                                Alignment.topLeft,
-                                                            end:
-                                                                Alignment
-                                                                    .bottomRight,
-                                                            stops: [
-                                                              0.0,
-                                                              0.55,
-                                                              1.0,
-                                                            ],
+                                                  child: Container(
+                                                    // crisp white rim around the card
+                                                    color: Colors.white,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          2,
+                                                        ), // rim thickness
+                                                    child: LayoutBuilder(
+                                                      builder: (
+                                                        context,
+                                                        constraints,
+                                                      ) {
+                                                        final screenWidth =
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.width;
+                                                        final screenHeight =
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.height;
+
+                                                        // ✅ Responsive sizing
+                                                        final containerWidth =
+                                                            screenWidth *
+                                                            0.40; // 40% of screen width
+                                                        final containerHeight =
+                                                            screenHeight *
+                                                            0.25; // 25% of screen height
+
+                                                        return Container(
+                                                          width: containerWidth,
+                                                          height:
+                                                              containerHeight,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  20,
+                                                                ),
+                                                            gradient: const LinearGradient(
+                                                              colors: [
+                                                                Color(
+                                                                  0xFFFBBF30,
+                                                                ),
+                                                                Color(
+                                                                  0xFFDD751E,
+                                                                ),
+                                                                Color(
+                                                                  0xFFD96A1B,
+                                                                ),
+                                                              ],
+                                                              begin:
+                                                                  Alignment
+                                                                      .topLeft,
+                                                              end:
+                                                                  Alignment
+                                                                      .bottomRight,
+                                                              stops: [
+                                                                0.0,
+                                                                0.55,
+                                                                1.0,
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                        child: Stack(
-                                                          children: [
-                                                            // doodle background (very light)
-                                                            Positioned.fill(
-                                                              child: IgnorePointer(
-                                                                child: Opacity(
-                                                                  opacity: 0.08,
+                                                          child: Stack(
+                                                            children: [
+                                                              // ✅ background pattern image
+                                                              Positioned.fill(
+                                                                child: IgnorePointer(
+                                                                  child: Opacity(
+                                                                    opacity:
+                                                                        0.08,
+                                                                    child: Image.asset(
+                                                                      AppImages
+                                                                          .bcImage,
+                                                                      fit:
+                                                                          BoxFit
+                                                                              .cover,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+
+                                                              // ✅ bottom white fade overlay
+                                                              Positioned(
+                                                                left: 0,
+                                                                right: 0,
+                                                                bottom: 0,
+                                                                height:
+                                                                    containerHeight *
+                                                                    0.55,
+                                                                child: ClipRRect(
+                                                                  borderRadius: const BorderRadius.only(
+                                                                    topLeft:
+                                                                        Radius.elliptical(
+                                                                          10,
+                                                                          10,
+                                                                        ),
+                                                                    topRight:
+                                                                        Radius.elliptical(
+                                                                          10,
+                                                                          10,
+                                                                        ),
+                                                                  ),
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                      gradient: LinearGradient(
+                                                                        begin:
+                                                                            Alignment.topCenter,
+                                                                        end:
+                                                                            Alignment.bottomCenter,
+                                                                        colors: [
+                                                                          AppColor.white.withOpacity(
+                                                                            0.099,
+                                                                          ),
+                                                                          AppColor.white.withOpacity(
+                                                                            0.099,
+                                                                          ),
+                                                                          AppColor.white.withOpacity(
+                                                                            0.099,
+                                                                          ),
+                                                                          Colors
+                                                                              .white,
+                                                                        ],
+                                                                        stops: const [
+                                                                          0.0,
+                                                                          0.0,
+                                                                          0.0,
+                                                                          0.65,
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+
+                                                              // ✅ top text ("Schedule" / "Exam")
+                                                              Positioned(
+                                                                top:
+                                                                    containerHeight *
+                                                                    0.09,
+                                                                left: 0,
+                                                                right: 0,
+                                                                child: Column(
+                                                                  children: [
+                                                                    Text(
+                                                                      'Schedule',
+                                                                      style: GoogleFont.ibmPlexSans(
+                                                                        fontSize:
+                                                                            containerWidth *
+                                                                            0.1, // dynamic
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                        color:
+                                                                            Colors.white,
+                                                                      ).copyWith(
+                                                                        shadows: const [
+                                                                          Shadow(
+                                                                            offset: Offset(
+                                                                              0,
+                                                                              2,
+                                                                            ),
+                                                                            blurRadius:
+                                                                                6,
+                                                                            color: Color(
+                                                                              0x55000000,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          containerHeight *
+                                                                          0.01,
+                                                                    ),
+                                                                    Text(
+                                                                      'Exam',
+                                                                      style: GoogleFont.ibmPlexSans(
+                                                                        fontSize:
+                                                                            containerWidth *
+                                                                            0.18, // dynamic
+                                                                        fontWeight:
+                                                                            FontWeight.w800,
+                                                                        color:
+                                                                            Colors.white,
+                                                                      ).copyWith(
+                                                                        shadows: const [
+                                                                          Shadow(
+                                                                            offset: Offset(
+                                                                              0,
+                                                                              3,
+                                                                            ),
+                                                                            blurRadius:
+                                                                                10,
+                                                                            color: Color(
+                                                                              0x55000000,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+
+                                                              // ✅ bottom image icon
+                                                              Positioned(
+                                                                bottom:
+                                                                    containerHeight *
+                                                                    0.07,
+                                                                left: 0,
+                                                                right: 0,
+                                                                child: Center(
                                                                   child: Image.asset(
                                                                     AppImages
-                                                                        .bcImage,
+                                                                        .scheduleExam,
+                                                                    height:
+                                                                        containerHeight *
+                                                                        0.45,
+                                                                    width:
+                                                                        containerWidth *
+                                                                        0.55,
                                                                     fit:
                                                                         BoxFit
-                                                                            .cover,
+                                                                            .contain,
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                    
-                                                            // bottom-only white fade with rounded top edge
-                                                            Positioned(
-                                                              left: 0,
-                                                              right: 0,
-                                                              bottom: 0,
-                                                              height:
-                                                                  110, // raise/lower white area
-                                                              child: ClipRRect(
-                                                                borderRadius:
-                                                                    const BorderRadius.only(
-                                                                      topLeft:
-                                                                          Radius.elliptical(
-                                                                            10,
-                                                                            10,
-                                                                          ),
-                                                                      topRight:
-                                                                          Radius.elliptical(
-                                                                            10,
-                                                                            10,
-                                                                          ),
-                                                                    ),
-                                                                child: Container(
-                                                                  decoration: BoxDecoration(
-                                                                    gradient: LinearGradient(
-                                                                      begin:
-                                                                          Alignment
-                                                                              .topCenter,
-                                                                      end:
-                                                                          Alignment
-                                                                              .bottomCenter,
-                                                                      colors: [
-                                                                        AppColor
-                                                                            .white
-                                                                            .withOpacity(
-                                                                              0.0999,
-                                                                            ),
-                                                                        AppColor
-                                                                            .white
-                                                                            .withOpacity(
-                                                                              0.099,
-                                                                            ),
-                                                                        AppColor
-                                                                            .white
-                                                                            .withOpacity(
-                                                                              0.099,
-                                                                            ),
-                                                                        Colors
-                                                                            .white, // solid at bottom
-                                                                      ],
-                                                                      stops: [
-                                                                        0.0,
-                                                                        0.0,
-                                                                        0.0,
-                                                                        0.65,
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                    
-                                                            // subtle flat white spotlight behind the icon
-                                                            /*  Positioned(
-                                                                                                bottom: 0,
-                                                                                                left: 0,
-                                                                                                right: 0,
-                                                                                                top: 20,
-                                                                                                child: Center(
-                                                                                                  child: Transform.scale(
-                                                                                                    scaleY: 0.20, // flatten circle → oval
-                                                                                                    child: ClipRRect(
-                                                    borderRadius: const BorderRadius.only(
-                                                      topLeft: Radius.elliptical(10, 10),
-                                                      topRight: Radius.elliptical(10, 10),
-                                                    ),
-                                                    child: Container(
-                                                    
-                                                      decoration:  BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        gradient: RadialGradient(
-                                                          center: Alignment(0, 0.60),
-                                                          radius: 0.90,
-                                                          colors: [
-                                                            Colors.white.withOpacity(0.5),
-                                                            Color(0x66FFFFFF),
-                                                            Color(0x00FFFFFF),
-                                                          ],
-                                                          stops: [0.10, 0.0, 1.0],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),*/
-                                                    
-                                                            // texts
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets.only(
-                                                                    top: 15,
-                                                                    bottom: 110,
-                                                                    right: 40,
-                                                                    left: 40,
-                                                                  ),
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  Text(
-                                                                    'Schedule',
-                                                                    maxLines: 1,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    style: GoogleFont.ibmPlexSans(
-                                                                      fontSize:
-                                                                          17,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      color:
-                                                                          Colors
-                                                                              .white,
-                                                                    ).copyWith(
-                                                                      shadows: const [
-                                                                        Shadow(
-                                                                          offset:
-                                                                              Offset(
-                                                                                0,
-                                                                                2,
-                                                                              ),
-                                                                          blurRadius:
-                                                                              6,
-                                                                          color: Color(
-                                                                            0x55000000,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    height: 2,
-                                                                  ),
-                                                                  Text(
-                                                                    'Exam',
-                                                                    maxLines: 1,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    style: GoogleFont.ibmPlexSans(
-                                                                      fontSize:
-                                                                          28, // a touch larger like Figma
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800,
-                                                                      color:
-                                                                          Colors
-                                                                              .white,
-                                                                    ).copyWith(
-                                                                      shadows: const [
-                                                                        Shadow(
-                                                                          offset:
-                                                                              Offset(
-                                                                                0,
-                                                                                3,
-                                                                              ),
-                                                                          blurRadius:
-                                                                              10,
-                                                                          color: Color(
-                                                                            0x55000000,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                    
-                                                            // icon
-                                                            Positioned(
-                                                              bottom: 14,
-                                                              left: 0,
-                                                              right: 0,
-                                                              child: Center(
-                                                                child: Image.asset(
-                                                                  AppImages
-                                                                      .scheduleExam,
-                                                                  height: 92,
-                                                                  width: 84,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
                                                     ),
                                                   ),
                                                 ),
@@ -1261,269 +1377,11 @@ class _HomeNewScreenState extends State<HomeNewScreen> {
                                       }),
                                     ),
 
-                                    /*  SizedBox(
-                                      height: 70,
-                                      child: Obx(() {
-                                        final classList =
-                                            teacherClassController.classList;
-                                        final selectedClass =
-                                            teacherClassController
-                                                .selectedClass
-                                                .value;
-
-                                        if (teacherClassController
-                                            .isLoading
-                                            .value) {
-                                          return Center(
-                                            child: AppLoader.circularLoader(),
-                                          );
-                                        }
-
-                                        if (classList.isEmpty) {
-                                          return Center(
-                                            child: Text("No classes available"),
-                                          );
-                                        }
-
-                                        return Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            Positioned.fill(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      AppColor.white
-                                                          .withOpacity(0.3),
-                                                      AppColor.lowLightgray,
-                                                      AppColor.lowLightgray,
-                                                      AppColor.lowLightgray,
-                                                      AppColor.lowLightgray,
-                                                      AppColor.lowLightgray,
-                                                      AppColor.white
-                                                          .withOpacity(0.3),
-                                                    ],
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.topRight,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: -20,
-                                              bottom: -20,
-                                              left: 0,
-                                              right: 0,
-                                              child: ListView.builder(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                itemCount: classList.length,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 15,
-                                                      vertical: 5,
-                                                    ),
-                                                itemBuilder: (context, index) {
-                                                  final item = classList[index];
-                                                  final grade = item.name;
-                                                  final section = item.section;
-                                                  final isSelected =
-                                                      item == selectedClass;
-
-                                                  return GestureDetector(
-                                                    onTap: () {
-                                                      teacherClassController
-                                                          .selectedClass
-                                                          .value = item;
-                                                      AppLogger.log.i(
-                                                        "Selected class: ${item.name} - ${item.section}",
-                                                      );
-                                                    },
-                                                    child: AnimatedContainer(
-                                                      duration: Duration(
-                                                        milliseconds: 200,
-                                                      ),
-                                                      curve: Curves.easeInOut,
-                                                      width: 75,
-                                                      height: 50,
-                                                      margin:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 0,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            isSelected
-                                                                ? AppColor.white
-                                                                : Colors
-                                                                    .transparent,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              16,
-                                                            ),
-                                                        border:
-                                                            isSelected
-                                                                ? Border.all(
-                                                                  color:
-                                                                      AppColor
-                                                                          .black,
-                                                                  width: 1.5,
-                                                                )
-                                                                : null,
-                                                        boxShadow:
-                                                            isSelected
-                                                                ? [
-                                                                  BoxShadow(
-                                                                    color: AppColor
-                                                                        .white
-                                                                        .withOpacity(
-                                                                          0.5,
-                                                                        ),
-                                                                    blurRadius:
-                                                                        10,
-                                                                    offset:
-                                                                        Offset(
-                                                                          0,
-                                                                          4,
-                                                                        ),
-                                                                  ),
-                                                                ]
-                                                                : [],
-                                                      ),
-                                                      child:
-                                                          isSelected
-                                                              ? Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceBetween,
-                                                                children: [
-                                                                  SizedBox(
-                                                                    height: 8,
-                                                                  ),
-                                                                  Center(
-                                                                    child: Text(
-                                                                      grade,
-                                                                      style: GoogleFont.ibmPlexSans(
-                                                                        fontSize:
-                                                                            28,
-                                                                        color:
-                                                                            AppColor.black,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Container(
-                                                                    margin:
-                                                                        EdgeInsets.only(
-                                                                          bottom:
-                                                                              0,
-                                                                        ),
-                                                                    padding: EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          12,
-                                                                      vertical:
-                                                                          5,
-                                                                    ),
-                                                                    decoration: BoxDecoration(
-                                                                      color:
-                                                                          AppColor
-                                                                              .black,
-                                                                      borderRadius: BorderRadius.only(
-                                                                        topLeft:
-                                                                            Radius.circular(
-                                                                              40,
-                                                                            ),
-                                                                        topRight:
-                                                                            Radius.circular(
-                                                                              40,
-                                                                            ),
-                                                                      ),
-                                                                    ),
-                                                                    child: Text(
-                                                                      section,
-                                                                      style: GoogleFont.ibmPlexSans(
-                                                                        fontSize:
-                                                                            20,
-                                                                        color:
-                                                                            AppColor.white,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                              : Center(
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            12.0,
-                                                                      ),
-                                                                  child: Column(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    children: [
-                                                                      Container(
-                                                                        padding: const EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              25,
-                                                                          vertical:
-                                                                              3,
-                                                                        ),
-                                                                        decoration: BoxDecoration(
-                                                                          color:
-                                                                              AppColor.white,
-                                                                          borderRadius: BorderRadius.circular(
-                                                                            20,
-                                                                          ),
-                                                                        ),
-                                                                        child: Text(
-                                                                          grade,
-                                                                          style: GoogleFont.ibmPlexSans(
-                                                                            fontSize:
-                                                                                14,
-                                                                            color:
-                                                                                AppColor.gray,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            5,
-                                                                      ),
-                                                                      Text(
-                                                                        section,
-                                                                        style: GoogleFont.ibmPlexSans(
-                                                                          fontSize:
-                                                                              20,
-                                                                          color:
-                                                                              AppColor.lightgray,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }),
-                                    ),*/
                                     const SizedBox(height: 40),
 
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 24.0,
+                                        horizontal: 20.0,
                                       ),
                                       child: Row(
                                         children: [

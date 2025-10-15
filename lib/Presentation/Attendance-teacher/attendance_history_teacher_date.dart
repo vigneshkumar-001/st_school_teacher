@@ -235,6 +235,77 @@ class _AttendanceHistoryTeacherDateState
                             ),
                           ),
                         ),
+                        if (data?.eventsStatus == true) ...[
+                          const SizedBox(height: 20),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(22),
+                            child: Stack(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 200,
+                                  child: ((data!.eventImage ?? '').isNotEmpty)
+                                      ? Image.network(
+                                    data.eventImage!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      color: Colors.grey[300],
+                                      alignment: Alignment.center,
+                                      child: const Icon(Icons.broken_image),
+                                    ),
+                                  )
+                                      : Container(
+                                    color: Colors.grey[300],
+                                    alignment: Alignment.center,
+                                    child: const Icon(Icons.image_not_supported),
+                                  ),
+                                ),
+                                // Gradient + title
+                                Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 18,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.black.withOpacity(0.1),
+                                            Colors.black,
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              (data.eventTitle?.trim().isNotEmpty ?? false)
+                                                  ? data.eventTitle!
+                                                  : 'Event',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFont.ibmPlexSans(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColor.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+
                         // SizedBox(height: 20),
                         // CommonContainer.announcementsScreen(
                         //   additionalText2: '3Pm ',

@@ -13,15 +13,18 @@ class TeacherDailyAttendanceResponse {
     return TeacherDailyAttendanceResponse(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
-      data:
-          json['data'] != null
-              ? TeacherDailyAttendanceData.fromJson(json['data'])
-              : null,
+      data: json['data'] != null
+          ? TeacherDailyAttendanceData.fromJson(json['data'])
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'status': status, 'message': message, 'data': data?.toJson()};
+    return {
+      'status': status,
+      'message': message,
+      'data': data?.toJson(),
+    };
   }
 }
 
@@ -32,8 +35,12 @@ class TeacherDailyAttendanceData {
   final String morning;
   final String afternoon;
   final bool fullDayPresent;
+  final bool fullDayAbsent;
   final bool holidayStatus;
   final bool eventsStatus;
+  final bool isNullStatus;
+  final String? eventTitle;
+  final String? eventImage;
   final String monthName;
   final int totalWorkingDays;
   final int fullDayPresentCount;
@@ -46,8 +53,12 @@ class TeacherDailyAttendanceData {
     required this.morning,
     required this.afternoon,
     required this.fullDayPresent,
+    required this.fullDayAbsent,
     required this.holidayStatus,
     required this.eventsStatus,
+    required this.isNullStatus,
+    this.eventTitle,
+    this.eventImage,
     required this.monthName,
     required this.totalWorkingDays,
     required this.fullDayPresentCount,
@@ -62,13 +73,17 @@ class TeacherDailyAttendanceData {
       morning: json['morning'] ?? '',
       afternoon: json['afternoon'] ?? '',
       fullDayPresent: json['full_day_present'] ?? false,
+      fullDayAbsent: json['full_day_absent'] ?? false,
       holidayStatus: json['holiday_status'] ?? false,
       eventsStatus: json['events_status'] ?? false,
+      isNullStatus: json['is_null_status'] ?? false,
+      eventTitle: json['event_title'],
+      eventImage: json['event_image'],
       monthName: json['monthName'] ?? '',
       totalWorkingDays: json['totalWorkingDays'] ?? 0,
       fullDayPresentCount: json['fullDayPresentCount'] ?? 0,
       thisMonthPresentPercentage:
-          (json['this_month_present_percentage'] ?? 0).toDouble(),
+      (json['this_month_present_percentage'] ?? 0).toDouble(),
     );
   }
 
@@ -80,8 +95,12 @@ class TeacherDailyAttendanceData {
       'morning': morning,
       'afternoon': afternoon,
       'full_day_present': fullDayPresent,
+      'full_day_absent': fullDayAbsent,
       'holiday_status': holidayStatus,
       'events_status': eventsStatus,
+      'is_null_status': isNullStatus,
+      'event_title': eventTitle,
+      'event_image': eventImage,
       'monthName': monthName,
       'totalWorkingDays': totalWorkingDays,
       'fullDayPresentCount': fullDayPresentCount,
