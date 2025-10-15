@@ -37,7 +37,7 @@ dependencies:
   google_fonts: any
   intl: ^0.19.0
   table_calendar: any
-  image_picker: ^1.1.0
+  image_picker: ^1.1.1
   dotted_border: ^2.0.0
   dotted_line: ^3.2.3
   carousel_slider: any
