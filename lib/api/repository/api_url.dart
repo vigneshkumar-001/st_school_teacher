@@ -25,6 +25,8 @@ class ApiUrl {
   // static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
   static String categoriesList = '$baseUrl/announcement-categories';
 
+  static String notificationUnregister = '$baseUrl/notifications/teachers/unregister';
+
   static String announcementDetail({required int Id}) {
     return '$baseUrl/teacher-announcement/details/$Id';
   }
