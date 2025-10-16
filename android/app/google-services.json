@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "410162839577",
+    "project_id": "st-teacher-app",
+    "storage_bucket": "st-teacher-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410162839577:android:8a4be11411814f5a6a6a88",
+        "android_client_info": {
+          "package_name": "com.example.st_teacher_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDo17iewVB0fvOUtyQBU6z3UpxWILsDkA0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

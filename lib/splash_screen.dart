@@ -63,14 +63,20 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _checkAppVersion() async {
     // Try to read version from API data
     final currentVersion =
-    imgData.teacherDataResponse.value?.data?.appVersions?.android?.latestVersion?.toString();
+        imgData
+            .teacherDataResponse
+            .value
+            ?.data
+            ?.appVersions
+            ?.android
+            ?.latestVersion
+            ?.toString();
 
     // Case 1: If token not present → API didn’t load → skip version check
     if (currentVersion == null || currentVersion.isEmpty) {
       _checkLoginStatus(); // Go to login flow
       return;
     }
-
 
     if (currentVersion == latestVersion) {
       _checkLoginStatus(); // Go to home or login based on token
@@ -79,7 +85,6 @@ class _SplashScreenState extends State<SplashScreen>
       _showUpdateBottomSheet();
     }
   }
-
 
   // void _checkLoginStatus() async {
   //   final isLoggedIn = await loginController.isLoggedIn();
@@ -161,9 +166,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-
   void openPlayStore() async {
-
     final storeUrl =
         imgData.teacherDataResponse.value?.data.appVersions.android.storeUrl
             .toString() ??
@@ -248,7 +251,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   FractionallySizedBox(
                                     alignment: Alignment.centerLeft,
                                     widthFactor:
-                                    _progress, // updated with controller
+                                        _progress, // updated with controller
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
