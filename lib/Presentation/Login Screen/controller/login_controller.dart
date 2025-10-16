@@ -33,6 +33,31 @@ class LoginController extends GetxController {
     super.onInit();
   }
 
+  Future<String?> sendFcmToken(String token) async {
+    try {
+      isLoading.value = true;
+      final results = await apiDataSource.sendFcmToken(token: token);
+      results.fold(
+        (failure) {
+          isLoading.value = false;
+          AppLogger.log.e(failure.message);
+          AppLogger.log.i('I Not sended Fcm Token To Api ');
+        },
+        (response) async {
+          isLoading.value = false;
+          AppLogger.log.i('I sended Fcm Token To Api ');
+
+          AppLogger.log.i(response.message);
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      AppLogger.log.e(e);
+      return e.toString();
+    }
+    return null;
+  }
+
   Future<String?> mobileNumberLogin(String phone) async {
     try {
       isLoading.value = true;
@@ -106,6 +131,8 @@ class LoginController extends GetxController {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', response.token);
           String? token = prefs.getString('token');
+          final _fcmToken = prefs.getString('fcmToken');
+          sendFcmToken(_fcmToken!);
           await _loadInitialData();
           final now = DateTime.now();
           await teacherAttendanceController.getTeacherAttendanceMonth(

@@ -7,6 +7,7 @@ class ApiUrl {
   static String changePhone = '$baseUrl/teacher/change-phone/request';
   static String verifyOtp = '$baseUrl/teacher-auth/verify-otp';
   static String changePhoneVerify = '$baseUrl/teacher/change-phone/verify';
+  static String notifications = '$baseUrl/notifications/teachers/register';
   static String classList = '$baseUrl/teacher-student-attendance/class-list';
   static String messageList = '$baseUrl/teacher-messages/list';
   static String teacherClassFetch = '$baseUrl/teacher-homework/meta';

@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
     AnnouncementContorller(),
   );
   final LoginController loginController = Get.put(LoginController());
-  final String latestVersion = "2.3.0";
+  final String latestVersion = "2.3.1";
   @override
   void initState() {
     super.initState();
@@ -63,14 +63,20 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _checkAppVersion() async {
     // Try to read version from API data
     final currentVersion =
-    imgData.teacherDataResponse.value?.data?.appVersions?.android?.latestVersion?.toString();
+        imgData
+            .teacherDataResponse
+            .value
+            ?.data
+            ?.appVersions
+            ?.android
+            ?.latestVersion
+            ?.toString();
 
     // Case 1: If token not present → API didn’t load → skip version check
     if (currentVersion == null || currentVersion.isEmpty) {
       _checkLoginStatus(); // Go to login flow
       return;
     }
-
 
     if (currentVersion == latestVersion) {
       _checkLoginStatus(); // Go to home or login based on token
@@ -79,7 +85,6 @@ class _SplashScreenState extends State<SplashScreen>
       _showUpdateBottomSheet();
     }
   }
-
 
   // void _checkLoginStatus() async {
   //   final isLoggedIn = await loginController.isLoggedIn();
@@ -168,18 +173,43 @@ class _SplashScreenState extends State<SplashScreen>
         '';
 
     if (storeUrl.isEmpty) {
-      print('No Play Store URL available.');
+      print('No URL available.');
       return;
     }
 
     final uri = Uri.parse(storeUrl);
+    print('Trying to launch: $uri');
 
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      print('Could not open the Play Store link.');
+    // Try in-app or platform default mode
+    final success = await launchUrl(
+      uri,
+      mode: LaunchMode.platformDefault, // or LaunchMode.inAppWebView
+    );
+
+    if (!success) {
+      print('Could not open the link. Maybe no browser is installed.');
     }
   }
+
+  // void openPlayStore() async {
+  //   final storeUrl =
+  //       imgData.teacherDataResponse.value?.data.appVersions.android.storeUrl
+  //           .toString() ??
+  //           '';
+  //
+  //   if (storeUrl.isEmpty) {
+  //     print('No Play Store URL available.');
+  //     return;
+  //   }
+  //
+  //   final uri = Uri.parse(storeUrl);
+  //
+  //   if (await canLaunchUrl(uri)) {
+  //     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     print('Could not open the Play Store link.');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
