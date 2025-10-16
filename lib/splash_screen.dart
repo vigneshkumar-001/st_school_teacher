@@ -37,6 +37,8 @@ class _SplashScreenState extends State<SplashScreen>
   );
   final LoginController loginController = Get.put(LoginController());
   final String latestVersion = "2.3.1";
+
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Animation controller for 12 seconds
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 8),
+      duration: const Duration(seconds: 3),
     );
 
     _controller.addListener(() {
@@ -55,10 +57,42 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 8), () {
+    Future.delayed(const Duration(seconds: 3), () {
       _checkAppVersion();
     });
   }
+
+  //new
+/*  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500), // very fast
+    );
+
+    _controller.addListener(() {
+      setState(() {
+        _progress = _controller.value;
+      });
+    });
+
+    _waitForDataAndNavigate();
+  }*/
+
+  Future<void> _waitForDataAndNavigate() async {
+    // Wait until teacher data is loaded
+    while (imgData.teacherDataResponse.value == null) {
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+
+    // Animate progress to full quickly
+    _controller.forward(from: _progress).then((_) {
+      _checkAppVersion(); // Check version & move to next screen immediately
+    });
+  }
+
 
   Future<void> _checkAppVersion() async {
     // Try to read version from API data
