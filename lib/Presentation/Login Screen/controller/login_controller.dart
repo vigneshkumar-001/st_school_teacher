@@ -112,6 +112,31 @@ class LoginController extends GetxController {
     return null;
   }
 
+  Future<String?> notificationUnregister(String token) async {
+    try {
+      isLoading.value = true;
+      final results = await apiDataSource.notificationUnRegister(token);
+      results.fold(
+        (failure) {
+          isLoading.value = false;
+          AppLogger.log.e(failure.message);
+          CustomSnackBar.showError(failure.message);
+        },
+        (response) async {
+          isLoading.value = false;
+          accessToken = response.token;
+
+          AppLogger.log.i(response.message);
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      AppLogger.log.e(e);
+      return e.toString();
+    }
+    return null;
+  }
+
   Future<String?> otpLogin({required String phone, required String otp}) async {
     try {
       isOtpLoading.value = true;
@@ -214,6 +239,7 @@ class LoginController extends GetxController {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+
     accessToken = '';
     Get.offAll(() => ChangeMobileNumber(page: 'splash'));
   }
