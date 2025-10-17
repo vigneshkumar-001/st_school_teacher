@@ -217,6 +217,42 @@ class LoginController extends GetxController {
     return null;
   }
 
+
+  Future<void> checkTokenExpire() async {
+    try {
+      final results = await apiDataSource.checkTokenExpire();
+      results.fold(
+            (failure) {
+          AppLogger.log.e(failure.message);
+        },
+            (response) async {
+          AppLogger.log.i(response.message);
+
+          final prefs = await SharedPreferences.getInstance();
+
+          // Only replace token if the API returned a new one
+          if (response.token.isNotEmpty) {
+            accessToken = response.token;
+            await prefs.setString('token', accessToken);
+            AppLogger.log.i('Token refreshed: $accessToken');
+          } else {
+            // Keep the existing token
+            accessToken = prefs.getString('token') ?? '';
+            AppLogger.log.i(
+              'Token still valid, using existing token: $accessToken',
+            );
+          }
+
+
+          await _loadInitialData();
+        },
+      );
+    } catch (e) {
+      AppLogger.log.e('Error checking token: $e');
+    } finally {}
+  }
+
+
   Future<void> _loadInitialData() async {
     await Future.wait([
       controller.getTeacherClassData(),
