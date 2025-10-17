@@ -16,6 +16,7 @@ class ApiUrl {
   static String createHomework = '$baseUrl/teacher-homework/create';
   static String profileImageUrl =
       '$baseUrl/teacher-home/profiles/profile-image-url';
+  static String expireTokenCheck = '$baseUrl/auth-token/refresh-if-expired';
   static String profile = '$baseUrl/teacher-home/profile';
   static String teacherQuizCreate = '$baseUrl/teacher-quiz/create';
   static String teacherQuizList = '$baseUrl/teacher-quiz/list';

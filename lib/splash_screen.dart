@@ -86,43 +86,50 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  // void _checkLoginStatus() async {
-  //   final isLoggedIn = await loginController.isLoggedIn();
-  //   if (isLoggedIn) {
-  //     // Skip splash and go to Home
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => Home(page: 'homeScreen')),
-  //     );
-  //   } else {
-  //     // First time user → continue splash
-  //     controller.getTeacherClass();
-  //     WidgetsBinding.instance.addPostFrameCallback((_) {
-  //       announcementContorller.getCategoryList(showLoader: false);
-  //       imgData.getTeacherClassData();
-  //     });
-  //     _startLoading();
-  //   }
-  // }
-
   void _checkLoginStatus() async {
-    final isLoggedIn = await loginController.isLoggedIn();
-    if (isLoggedIn) {
+    if (!mounted) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token != null && token.isNotEmpty) {
+      await loginController.checkTokenExpire();
+
+      // After token check & loading data → navigate to Home
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeNewScreen(page: 'homeScreen'),
+          builder: (_) => const HomeNewScreen(page: 'homeScreen'),
         ),
       );
     } else {
+      // No token → navigate to login/change mobile
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ChangeMobileNumber(page: 'splash'),
+          builder: (_) => const ChangeMobileNumber(page: 'splash'),
         ),
       );
     }
   }
+  // void _checkLoginStatus() async {
+  //   final isLoggedIn = await loginController.isLoggedIn();
+  //   if (isLoggedIn) {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => HomeNewScreen(page: 'homeScreen'),
+  //       ),
+  //     );
+  //   } else {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => ChangeMobileNumber(page: 'splash'),
+  //       ),
+  //     );
+  //   }
+  // }
 
   void _showUpdateBottomSheet() {
     showModalBottomSheet(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Announcement%20Screen/Model/category_list_response.dart';
 import 'package:st_teacher_app/Presentation/Attendance-teacher/model/teacher_attendance_response.dart';
@@ -29,6 +30,7 @@ import '../../Presentation/Homework/model/homework_details_response.dart';
 import '../../Presentation/Homework/model/user_image_response.dart';
 import '../../Presentation/Login Screen/model/login_response.dart';
 import '../../Presentation/Login Screen/model/student_Profile_response.dart';
+import '../../Presentation/Login Screen/model/tokrn_response.dart';
 import '../../Presentation/Profile/model/teacher_data_response.dart';
 import '../../Presentation/Quiz Screen/Model/details_preview.dart';
 import '../../Presentation/Quiz Screen/Model/history_specific_student_response.dart';
@@ -1268,6 +1270,41 @@ class ApiDataSource extends BaseApiDataSource {
       }
     } catch (e) {
       return Left(ServerFailure(''));
+    }
+  }
+
+
+  Future<Either<Failure, TokenResponse>> checkTokenExpire() async {
+    try {
+      String url = ApiUrl.expireTokenCheck;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      dynamic response = await Request.sendRequest(
+        url,
+        {"token": token},
+        'Post',
+        false,
+      );
+      AppLogger.log.i(response);
+
+      if (response is! DioException) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // Always return TokenResponse, even if status=false
+          return Right(TokenResponse.fromJson(response.data));
+        } else {
+          return Left(
+            ServerFailure(response.data['message'] ?? "Something went wrong"),
+          );
+        }
+      } else {
+        final errorData = response.response?.data;
+        if (errorData is Map && errorData.containsKey('message')) {
+          return Left(ServerFailure(errorData['message']));
+        }
+        return Left(ServerFailure(response.message ?? "Unknown Dio error"));
+      }
+    } catch (e) {
+      return Left(ServerFailure('Error checking token'));
     }
   }
 }
