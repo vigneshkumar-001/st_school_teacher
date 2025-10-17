@@ -2185,12 +2185,14 @@
 //   }
 // }
 // */
+///***********old***********
 
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Presentation/Exam%20Screen/screens/result_list.dart';
@@ -2204,6 +2206,7 @@ import '../../Core/Widgets/common_container.dart';
 import '../Exam Screen/controller/exam_controller.dart';
 import 'Model/announcement_details_response.dart';
 import 'Model/announcement_list_general.dart';
+import 'announcement_create.dart';
 import 'controller/announcement_contorller.dart';
 
 class AnnouncementScreen extends StatefulWidget {
@@ -2213,13 +2216,1677 @@ class AnnouncementScreen extends StatefulWidget {
   State<AnnouncementScreen> createState() => _AnnouncementScreenState();
 }
 
+// class _AnnouncementScreenState extends State<AnnouncementScreen> {
+//   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
+//   final ExamController examController = Get.put(ExamController());
+//
+//   int selectedIndex = 0; // 0 = General, 1 = Teacher
+//
+//   final List<Map<String, String>> subjects = [
+//     {'subject': 'Tamil', 'mark': '70'},
+//     {'subject': 'English', 'mark': '70'},
+//     {'subject': 'Maths', 'mark': '70'},
+//     {'subject': 'Science', 'mark': '70'},
+//     {'subject': 'Social Science', 'mark': '70'},
+//   ];
+//
+//   void _openFullScreenNetwork(String url) {
+//     if (url.isEmpty) return;
+//     showDialog(
+//       context: context,
+//       barrierColor: Colors.black.withOpacity(0.9),
+//       builder:
+//           (_) => GestureDetector(
+//             onTap: () => Navigator.pop(context),
+//             child: Center(
+//               child: InteractiveViewer(
+//                 minScale: 0.5,
+//                 maxScale: 5,
+//                 child: Image.network(url),
+//               ),
+//             ),
+//           ),
+//     );
+//   }
+//
+//   // --------- SMALL HELPERS ---------
+//   String _norm(String? s) => (s ?? '').trim().toLowerCase();
+//
+//   DateTime _asDate(dynamic v) {
+//     if (v is DateTime) return v;
+//     return DateTime.tryParse(v?.toString() ?? '') ??
+//         DateTime.fromMillisecondsSinceEpoch(0);
+//   }
+//
+//   // IDs sorted by notifyDate ASC within a given type (with tolerant synonyms)
+//   List<int> _dateSortedIds({AnnouncementData? data, String? type}) {
+//     final d = data ?? controller.announcementData.value;
+//     if (d == null) return const [];
+//
+//     final wanted = _norm(type);
+//
+//     bool _matches(String? raw) {
+//       final v = _norm(raw);
+//       if (wanted.isEmpty) return true; // no filter
+//       if (v == wanted) return true;
+//       if (wanted == 'exammark' &&
+//           (v == 'exam_mark' || v == 'examresult' || v == 'exam_result'))
+//         return true;
+//       if (wanted == 'exam' && v == 'exams') return true;
+//       if (wanted == 'calendar' &&
+//           (v == 'event' || v == 'events' || v == 'calendar_event'))
+//         return true;
+//       if (wanted == 'announcement' && v == 'announcements') return true;
+//       if (wanted == 'feepayment' &&
+//           (v == 'fee' || v == 'fees' || v == 'fee_payment' || v == 'fee-pay'))
+//         return true;
+//       return false;
+//     }
+//
+//     final list = d.items.where((e) => _matches(e.type)).toList();
+//
+//     list.sort((a, b) {
+//       final c = _asDate(a.notifyDate).compareTo(_asDate(b.notifyDate));
+//       if (c != 0) return c;
+//       return a.id.compareTo(b.id);
+//     });
+//
+//     return list.map((e) => e.id).toList();
+//   }
+//
+//   /* List<int> _dateSortedIdsSameTypeAs({
+//      required AnnouncementData data,
+//      required int id,
+//      String? fallbackType, // optional: use when you *know* the type
+//    }) {
+//      // find the clicked item
+//      AnnouncementItem? base;
+//      try {
+//        base = data.items.firstWhere((e) => e.id == id);
+//      } catch (_) {
+//        base = null;
+//      }
+//
+//      // decide the wanted type
+//      String wanted = _norm(base?.type ?? fallbackType ?? '');
+//
+//      // if we still don't know the type, safest is to scope to just the current id
+//      if (wanted.isEmpty) return [id];
+//
+//      // matcher with tolerant synonyms
+//      bool _typeMatches(String? raw) {
+//        final v = _norm(raw);
+//
+//        if (v == wanted) return true;
+//
+//        // normalizations / synonyms
+//        if (wanted == 'exammark' &&
+//            (v == 'exam_mark' || v == 'examresult' || v == 'exam_result'))
+//          return true;
+//
+//        if (wanted == 'exam' && (v == 'exams')) return true;
+//
+//        if (wanted == 'calendar' &&
+//            (v == 'event' || v == 'events' || v == 'calendar_event'))
+//          return true;
+//
+//        if (wanted == 'announcement' && (v == 'announcements')) return true;
+//
+//        if (wanted == 'feepayment' &&
+//            (v == 'fee' || v == 'fees' || v == 'fee_payment' || v == 'fee-pay'))
+//          return true;
+//
+//        return false;
+//      }
+//
+//
+//
+//      void _openById(BuildContext ctx, int id, {String? forceType}) {
+//        final data = controller.announcementData.value;
+//        if (data == null) return;
+//
+//        // find the item & normalize its type
+//        AnnouncementItem? item;
+//        try {
+//          item = data.items.firstWhere((e) => e.id == id);
+//        } catch (_) {
+//          return;
+//        }
+//        final t = _norm(forceType ?? item.type);
+//
+//        // build type-scoped order + current index
+//        final order = _dateSortedIds(data: data, type: t);
+//        final index = order.indexOf(id);
+//
+//        switch (t) {
+//          case 'feepayment':
+//          case 'fee':
+//          case 'fees':
+//          case 'fee_payment':
+//          case 'fee-pay':
+//            _feesSheet(ctx, id, order: order, index: index);
+//            break;
+//
+//          case 'announcement':
+//          case 'announcements':
+//          case 'holiday': // treat like announcement if you want
+//            _showAnnouncementDetails(ctx, id, order: order, index: index);
+//            break;
+//
+//          case 'exam':
+//          case 'exams':
+//            showExamTimeTable(ctx, id, order: order, index: index);
+//            break;
+//
+//          case 'exammark':
+//          case 'exam_mark':
+//          case 'examresult':
+//          case 'exam_result':
+//            _examResult(ctx, id, order: order, index: index);
+//            break;
+//
+//          case 'calendar':
+//          case 'event':
+//          case 'events':
+//          case 'calendar_event':
+//            _showEventDetails(ctx, id, order: order, index: index);
+//            break;
+//
+//          default:
+//            _showAnnouncementDetails(ctx, id, order: order, index: index);
+//        }
+//      }*/
+//
+//   Widget _navHeader({
+//     required BuildContext ctx,
+//     required List<int>? order,
+//     required int? index,
+//     required bool disabled,
+//     VoidCallback? onPrev,
+//     VoidCallback? onNext,
+//   }) {
+//     final hasOrder = order != null && index != null && order.isNotEmpty;
+//     final atStart = hasOrder ? index! <= 0 : true;
+//     final atEnd = hasOrder ? index! >= order!.length - 1 : true;
+//
+//     // Treat these as "disabled" states for color + onPressed
+//     final prevIsDisabled = (!hasOrder || atStart || disabled);
+//     final nextIsDisabled = (!hasOrder || atEnd || disabled);
+//
+//     // Pick colors: low color when disabled, blue when active
+//     final prevColor =
+//         prevIsDisabled ? AppColor.blue.withOpacity(0.2) : AppColor.blue;
+//     final nextColor =
+//         nextIsDisabled ? AppColor.blue.withOpacity(0.2) : AppColor.blue;
+//
+//     return Row(
+//       children: [
+//         // PREVIOUS
+//         IconButton(
+//           icon: Container(
+//             decoration: BoxDecoration(
+//               border: Border.all(color: prevColor),
+//               borderRadius: BorderRadius.circular(50),
+//             ),
+//             child: Padding(
+//               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//               child: Row(
+//                 children: [
+//                   Icon(CupertinoIcons.chevron_left, color: prevColor),
+//                   const SizedBox(width: 8),
+//                   Text(
+//                     'Previous',
+//                     style: GoogleFont.ibmPlexSans(
+//                       fontWeight: FontWeight.w600,
+//                       color: prevColor,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           onPressed: prevIsDisabled ? null : onPrev,
+//         ),
+//
+//         const Spacer(),
+//
+//         // NEXT
+//         IconButton(
+//           icon: Container(
+//             decoration: BoxDecoration(
+//               border: Border.all(color: nextColor),
+//               borderRadius: BorderRadius.circular(50),
+//             ),
+//             child: Padding(
+//               padding: const EdgeInsets.symmetric(
+//                 horizontal: 25.0,
+//                 vertical: 10,
+//               ),
+//               child: Row(
+//                 children: [
+//                   Text(
+//                     'Next',
+//                     style: GoogleFont.ibmPlexSans(
+//                       fontWeight: FontWeight.w600,
+//                       color: nextColor,
+//                     ),
+//                   ),
+//                   const SizedBox(width: 4),
+//                   Icon(CupertinoIcons.chevron_right, color: nextColor),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           onPressed: nextIsDisabled ? null : onNext,
+//         ),
+//       ],
+//     );
+//   }
+//
+//   void _feessSheet(BuildContext context) {
+//     /* showModalBottomSheet(
+//        context: context,
+//        isScrollControlled: true,
+//        backgroundColor: Colors.transparent,
+//        builder: (_) {
+//          return DraggableScrollableSheet(
+//            initialChildSize: 0.55,
+//            minChildSize: 0.20,
+//            maxChildSize: 0.55,
+//            expand: false,
+//            builder: (context, scrollController) {
+//              final items = ['Shoes', 'Notebooks', 'Tuition Fees'];
+//
+//              return Container(
+//                decoration: BoxDecoration(
+//                  color: AppColor.white,
+//                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//                ),
+//                child: ListView(
+//                  controller: scrollController,
+//                  padding: const EdgeInsets.all(16),
+//                  children: [
+//                    Center(
+//                      child: Container(
+//                        height: 4,
+//                        width: 40,
+//                        decoration: BoxDecoration(
+//                          color: AppColor.grayop,
+//                          borderRadius: BorderRadius.circular(2),
+//                        ),
+//                      ),
+//                    ),
+//                    SizedBox(height: 20),
+//
+//                    Image.asset(AppImages.announcement2),
+//                    SizedBox(height: 20),
+//
+//                    Row(
+//                      children: [
+//                        Expanded(
+//                          child: Text(
+//                            'Third-Term Fees',
+//                            style: GoogleFont.ibmPlexSans(
+//                              fontSize: 22,
+//                              fontWeight: FontWeight.w500,
+//                              color: AppColor.black,
+//                            ),
+//                          ),
+//                        ),
+//                        Column(
+//                          children: [
+//                            Text(
+//                              'Due date',
+//                              style: GoogleFont.ibmPlexSans(
+//                                fontSize: 12,
+//                                color: AppColor.lowGrey,
+//                              ),
+//                            ),
+//                            Text(
+//                              '12-Dec-25',
+//                              style: GoogleFont.ibmPlexSans(
+//                                fontSize: 14,
+//                                fontWeight: FontWeight.w500,
+//                                color: AppColor.black,
+//                              ),
+//                            ),
+//                          ],
+//                        ),
+//                        SizedBox(width: 4),
+//                        Icon(
+//                          CupertinoIcons.clock_fill,
+//                          size: 30,
+//                          color: AppColor.grayop,
+//                        ),
+//                      ],
+//                    ),
+//                    SizedBox(height: 20),
+//                    Column(
+//                      crossAxisAlignment: CrossAxisAlignment.start,
+//                      children: List.generate(
+//                        items.length,
+//                        (index) => Padding(
+//                          padding: const EdgeInsets.only(bottom: 8),
+//                          child: Text(
+//                            '${index + 1}. ${items[index]}',
+//                            style: GoogleFont.ibmPlexSans(
+//                              fontSize: 16,
+//                              color: AppColor.lightBlack,
+//                            ),
+//                          ),
+//                        ),
+//                      ),
+//                    ),
+//                    SizedBox(height: 15),
+//
+//                    ElevatedButton(
+//                      onPressed: () {},
+//                      style: ButtonStyle(
+//                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+//                        shape: MaterialStateProperty.all(
+//                          RoundedRectangleBorder(
+//                            borderRadius: BorderRadius.circular(20),
+//                          ),
+//                        ),
+//                        elevation: MaterialStateProperty.all(0),
+//                        backgroundColor: MaterialStateProperty.all(
+//                          Colors.transparent,
+//                        ),
+//                      ),
+//                      child: Ink(
+//                        decoration: BoxDecoration(
+//                          gradient: LinearGradient(
+//                            colors: [AppColor.blueG1, AppColor.blueG2],
+//                            begin: Alignment.topRight,
+//                            end: Alignment.bottomRight,
+//                          ),
+//                          borderRadius: BorderRadius.circular(20),
+//                        ),
+//                        child: Container(
+//                          alignment: Alignment.center,
+//                          height: 50,
+//                          width: double.infinity,
+//                          child: Row(
+//                            mainAxisAlignment: MainAxisAlignment.center,
+//                            children: [
+//                              Text(
+//                                'Pay Rs.15,000',
+//                                style: GoogleFont.ibmPlexSans(
+//                                  fontSize: 16,
+//                                  fontWeight: FontWeight.w800,
+//                                  color: AppColor.white,
+//                                ),
+//                              ),
+//                              SizedBox(width: 5),
+//                              Icon(
+//                                CupertinoIcons.right_chevron,
+//                                size: 14,
+//                                weight: 20,
+//                                color: AppColor.white,
+//                              ),
+//                            ],
+//                          ),
+//                        ),
+//                      ),
+//                    ),
+//                  ],
+//                ),
+//              );
+//            },
+//          );
+//        },
+//      );*/
+//   }
+//
+//   ///*******old _examResult *********///
+//   /* void _examResult(BuildContext context) {
+//      showModalBottomSheet(
+//        context: context,
+//        isScrollControlled: true,
+//        backgroundColor: Colors.transparent,
+//        builder: (_) {
+//          return DraggableScrollableSheet(
+//            initialChildSize: 0.65,
+//            minChildSize: 0.20,
+//            maxChildSize: 0.65,
+//            expand: false,
+//            builder: (context, scrollController) {
+//              return Container(
+//                decoration: BoxDecoration(
+//                  color: AppColor.white,
+//                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//                ),
+//                child: ListView(
+//                  controller: scrollController,
+//                  padding: const EdgeInsets.all(16),
+//                  children: [
+//                    Center(
+//                      child: Container(
+//                        height: 4,
+//                        width: 40,
+//                        decoration: BoxDecoration(
+//                          color: AppColor.borderGary,
+//                          borderRadius: BorderRadius.circular(2),
+//                        ),
+//                      ),
+//                    ),
+//                    SizedBox(height: 40),
+//                    Column(
+//                      crossAxisAlignment: CrossAxisAlignment.center,
+//                      children: [
+//                        Text(
+//                          'Third term fees Result',
+//                          style: GoogleFont.ibmPlexSans(
+//                            fontSize: 18,
+//                            fontWeight: FontWeight.w600,
+//                            color: AppColor.lightBlack,
+//                          ),
+//                        ),
+//                        SizedBox(height: 7),
+//                        RichText(
+//                          text: TextSpan(
+//                            text: 'A+',
+//                            style: GoogleFont.ibmPlexSans(
+//                              fontSize: 43,
+//                              fontWeight: FontWeight.w600,
+//                              color: AppColor.green,
+//                            ),
+//                            children: [
+//                              TextSpan(
+//                                text: ' Grade',
+//                                style: GoogleFont.ibmPlexSans(
+//                                  fontSize: 43,
+//                                  fontWeight: FontWeight.w600,
+//                                  color: AppColor.black,
+//                                ),
+//                              ),
+//                            ],
+//                          ),
+//                        ),
+//                        SizedBox(height: 26),
+//                        Padding(
+//                          padding: EdgeInsets.symmetric(horizontal: 35.0),
+//                          child: DottedLine(
+//                            dashColor: AppColor.borderGary,
+//                            dashGapLength: 6,
+//                            dashLength: 7,
+//                          ),
+//                        ),
+//                        SizedBox(height: 15),
+//                        Stack(
+//                          children: [
+//                            Positioned.fill(
+//                              child: Image.asset(
+//                                AppImages.examResultBCImage,
+//                                height: 100,
+//                                width: 180,
+//                              ),
+//                            ),
+//
+//                            ListView.builder(
+//                              shrinkWrap: true,
+//                              physics: NeverScrollableScrollPhysics(),
+//                              itemCount: subjects.length,
+//                              itemBuilder: (context, index) {
+//                                final subject = subjects[index];
+//                                return Padding(
+//                                  padding: const EdgeInsets.symmetric(
+//                                    vertical: 8.0,
+//                                    horizontal: 16,
+//                                  ),
+//                                  child: Padding(
+//                                    padding: const EdgeInsets.symmetric(
+//                                      horizontal: 38.0,
+//                                    ),
+//                                    child: Row(
+//                                      children: [
+//                                        Text(
+//                                          subject['subject']!,
+//                                          style: GoogleFont.ibmPlexSans(
+//                                            fontSize: 14,
+//                                            fontWeight: FontWeight.w600,
+//                                            color: AppColor.gray,
+//                                          ),
+//                                        ),
+//                                        SizedBox(width: 30),
+//                                        Text(
+//                                          subject['mark']!,
+//                                          style: GoogleFont.ibmPlexSans(
+//                                            fontSize: 20,
+//                                            fontWeight: FontWeight.w500,
+//                                            color: AppColor.black,
+//                                          ),
+//                                        ),
+//                                      ],
+//                                    ),
+//                                  ),
+//                                );
+//                              },
+//                            ),
+//                          ],
+//                        ),
+//
+//                        Padding(
+//                          padding: EdgeInsets.symmetric(horizontal: 35.0),
+//                          child: DottedLine(
+//                            dashColor: AppColor.borderGary,
+//                            dashGapLength: 6,
+//                            dashLength: 7,
+//                          ),
+//                        ),
+//                        SizedBox(height: 30),
+//                        GestureDetector(
+//                          onTap: () {
+//                            Navigator.pop(context);
+//                          },
+//                          child: Center(
+//                            child: Container(
+//                              padding: EdgeInsets.symmetric(
+//                                vertical: 12,
+//                                horizontal: 30,
+//                              ),
+//                              decoration: BoxDecoration(
+//                                borderRadius: BorderRadius.circular(16),
+//                                border: Border.all(
+//                                  color: AppColor.blue,
+//                                  width: 1,
+//                                ),
+//                              ),
+//                              child: CustomTextField.textWithSmall(
+//                                text: 'Close',
+//                                color: AppColor.blue,
+//                              ),
+//                            ),
+//                          ),
+//                        ),
+//                      ],
+//                    ),
+//                  ],
+//                ),
+//              );
+//            },
+//          );
+//        },
+//      );
+//    }*/
+//
+//   ///*******new _examResult *********///
+//   void _examResult(
+//     BuildContext context,
+//     int id, {
+//     List<int>? order,
+//     int? index,
+//   }) {
+//     int currIndex = index ?? 0;
+//
+//     showModalBottomSheet(
+//       context: context,
+//       isScrollControlled: true,
+//       backgroundColor: Colors.transparent,
+//       builder: (_) {
+//         return StatefulBuilder(
+//           builder: (context, setSheetState) {
+//             void goTo(int nextIndex) {
+//               if (order == null || order.isEmpty) return;
+//               currIndex = nextIndex.clamp(0, order.length - 1);
+//               // If result content depends on ID, fetch here and setSheetState
+//               setSheetState(() {});
+//             }
+//
+//             return DraggableScrollableSheet(
+//               initialChildSize: 0.65,
+//               minChildSize: 0.20,
+//               maxChildSize: 0.65,
+//               expand: false,
+//               builder: (context, scrollController) {
+//                 return Container(
+//                   decoration: BoxDecoration(
+//                     color: AppColor.white,
+//                     borderRadius: const BorderRadius.vertical(
+//                       top: Radius.circular(20),
+//                     ),
+//                   ),
+//                   child: ListView(
+//                     controller: scrollController,
+//                     padding: const EdgeInsets.all(16),
+//                     children: [
+//                       Center(
+//                         child: Container(
+//                           height: 4,
+//                           width: 40,
+//                           decoration: BoxDecoration(
+//                             color: AppColor.borderGary,
+//                             borderRadius: BorderRadius.circular(2),
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 12),
+//
+//                       _navHeader(
+//                         ctx: context,
+//                         order: order,
+//                         index: currIndex,
+//                         disabled: false,
+//                         onPrev: () => goTo(currIndex - 1),
+//                         onNext: () => goTo(currIndex + 1),
+//                       ),
+//                       const SizedBox(height: 20),
+//
+//                       // ... your existing result UI (unchanged) ...
+//                       // NOTE: if per-ID marks differ, fetch & bind here like in announcements.
+//
+//                       // Close
+//                       const SizedBox(height: 20),
+//                       GestureDetector(
+//                         onTap: () => Navigator.pop(context),
+//                         child: Center(
+//                           child: Container(
+//                             padding: const EdgeInsets.symmetric(
+//                               vertical: 12,
+//                               horizontal: 30,
+//                             ),
+//                             decoration: BoxDecoration(
+//                               borderRadius: BorderRadius.circular(16),
+//                               border: Border.all(
+//                                 color: AppColor.blue,
+//                                 width: 1,
+//                               ),
+//                             ),
+//                             child: CustomTextField.textWithSmall(
+//                               text: 'Close',
+//                               color: AppColor.blue,
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               },
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+//
+//   ///*******old _showAnnouncementDetails *********///
+//   /*   void _showAnnouncementDetails(BuildContext context, int id) async {
+//      AnnouncementDetails? details;
+//
+//      // If already fetched for the same ID, use it directly
+//      if (controller.announcementDetails.value != null &&
+//          controller.announcementDetails.value!.id == id) {
+//        details = controller.announcementDetails.value;
+//      } else {
+//        // Otherwise fetch from API
+//        details = await controller.getAnnouncementDetails(id: id);
+//      }
+//
+//      if (details == null) return;
+//
+//      showModalBottomSheet(
+//        context: context,
+//        isScrollControlled: true,
+//        backgroundColor: Colors.white,
+//        shape: const RoundedRectangleBorder(
+//          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//        ),
+//        builder: (context) {
+//          return DraggableScrollableSheet(
+//            expand: false,
+//            initialChildSize: 0.75,
+//            minChildSize: 0.4,
+//            maxChildSize: 0.95,
+//            builder: (_, controller) {
+//              return SingleChildScrollView(
+//                controller: controller,
+//                padding: const EdgeInsets.all(20),
+//                child: Column(
+//                  crossAxisAlignment: CrossAxisAlignment.start,
+//                  children: [
+//                    // Grab Handle
+//                    Center(
+//                      child: Container(
+//                        width: 40,
+//                        height: 5,
+//                        decoration: BoxDecoration(
+//                          color: Colors.grey[400],
+//                          borderRadius: BorderRadius.circular(10),
+//                        ),
+//                      ),
+//                    ),
+//                    const SizedBox(height: 16),
+//
+//                    // Image (if exists)
+//                    // if (details!.contents.isNotEmpty &&
+//                    //     details.contents.first.type == "image")
+//                    //   ClipRRect(
+//                    //     borderRadius: BorderRadius.circular(16),
+//                    //     child: Image.network(
+//                    //       details.contents.first.content ?? "",
+//                    //       fit: BoxFit.cover,
+//                    //     ),
+//                    //   ),
+//                    const SizedBox(height: 20),
+//
+//                    // Title
+//                    Text(
+//                      details?.title.toString() ?? '',
+//                      style: const TextStyle(
+//                        fontSize: 22,
+//                        fontWeight: FontWeight.w700,
+//                      ),
+//                    ),
+//
+//                    const SizedBox(height: 8),
+//
+//                    // Date
+//                    Row(
+//                      children: [
+//                        const Icon(
+//                          Icons.calendar_today,
+//                          size: 16,
+//                          color: Colors.grey,
+//                        ),
+//                        const SizedBox(width: 6),
+//                        Text(
+//                          DateFormat('dd-MMM-yyyy').format(
+//                            DateTime.parse(details?.notifyDate.toString() ?? ''),
+//                          ),
+//                          style: const TextStyle(color: Colors.grey),
+//                        ),
+//                      ],
+//                    ),
+//
+//                    const SizedBox(height: 16),
+//
+//                    // Content
+//                    Text(
+//                      details?.content.toString() ?? '',
+//                      style: const TextStyle(fontSize: 16, height: 1.5),
+//                    ),
+//
+//                    const SizedBox(height: 20),
+//
+//                    // Extra dynamic contents
+//                    if (details!.contents.isNotEmpty)
+//                      Column(
+//                        crossAxisAlignment: CrossAxisAlignment.start,
+//                        children:
+//                            details.contents.map((c) {
+//                              if (c.type == "paragraph") {
+//                                return Padding(
+//                                  padding: const EdgeInsets.only(bottom: 12),
+//                                  child: Text(
+//                                    c.content ?? "",
+//                                    style: const TextStyle(fontSize: 15),
+//                                  ),
+//                                );
+//                              } else if (c.type == "list") {
+//                                return Column(
+//                                  crossAxisAlignment: CrossAxisAlignment.start,
+//                                  children:
+//                                      c.items
+//                                          ?.map(
+//                                            (e) => Row(
+//                                              children: [
+//                                                const Icon(
+//                                                  Icons.check,
+//                                                  color: Colors.green,
+//                                                  size: 18,
+//                                                ),
+//                                                const SizedBox(width: 6),
+//                                                Expanded(child: Text(e)),
+//                                              ],
+//                                            ),
+//                                          )
+//                                          .toList() ??
+//                                      [],
+//                                );
+//                              } else if (c.type == "image") {
+//                                return Padding(
+//                                  padding: const EdgeInsets.symmetric(
+//                                    vertical: 10,
+//                                  ),
+//                                  child: ClipRRect(
+//                                    borderRadius: BorderRadius.circular(12),
+//                                    child: Image.network(c.content ?? ""),
+//                                  ),
+//                                );
+//                              }
+//                              return const SizedBox.shrink();
+//                            }).toList(),
+//                      ),
+//                  ],
+//                ),
+//              );
+//            },
+//          );
+//        },
+//      );
+//    }*/
+//   ///*******new _showAnnouncementDetails *********///
+//   void _showAnnouncementDetails(
+//     BuildContext context,
+//     int id, {
+//     List<int>? order,
+//     int? index,
+//   }) async {
+//     // local state for this sheet
+//     int currIndex = index ?? 0;
+//     int currId = id;
+//
+//     AnnouncementDetails? details;
+//     Future<void> _load(int _id) async {
+//       if (controller.announcementDetails.value != null &&
+//           controller.announcementDetails.value!.id == _id) {
+//         details = controller.announcementDetails.value;
+//       } else {
+//         details = await controller.getAnnouncementDetails(id: _id);
+//       }
+//     }
+//
+//     await _load(currId);
+//     if (details == null) return;
+//
+//     showModalBottomSheet(
+//       context: context,
+//       isScrollControlled: true,
+//       backgroundColor: Colors.white,
+//       shape: const RoundedRectangleBorder(
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//       ),
+//       builder: (context) {
+//         return StatefulBuilder(
+//           builder: (context, setSheetState) {
+//             Future<void> goTo(int nextIndex) async {
+//               if (order == null || order.isEmpty) return;
+//               currIndex = nextIndex.clamp(0, order.length - 1);
+//               currId = order[currIndex];
+//               await _load(currId);
+//               setSheetState(() {}); // re-render without closing
+//             }
+//
+//             return DraggableScrollableSheet(
+//               expand: false,
+//               initialChildSize: 0.75,
+//               minChildSize: 0.4,
+//               maxChildSize: 0.95,
+//               builder: (_, controllerScroll) {
+//                 return SingleChildScrollView(
+//                   controller: controllerScroll,
+//                   padding: const EdgeInsets.all(20),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       // Grab handle
+//                       Center(
+//                         child: Container(
+//                           width: 40,
+//                           height: 5,
+//                           decoration: BoxDecoration(
+//                             color: Colors.grey[400],
+//                             borderRadius: BorderRadius.circular(10),
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 12),
+//
+//                       // Prev / Next header
+//                       _navHeader(
+//                         ctx: context,
+//                         order: order,
+//                         index: currIndex,
+//                         disabled: false,
+//                         onPrev: () => goTo(currIndex - 1),
+//                         onNext: () => goTo(currIndex + 1),
+//                       ),
+//                       const SizedBox(height: 12),
+//
+//                       // Title
+//                       Text(
+//                         details?.title ?? '',
+//                         style: const TextStyle(
+//                           fontSize: 22,
+//                           fontWeight: FontWeight.w700,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 8),
+//
+//                       // Date
+//                       Row(
+//                         children: [
+//                           const Icon(
+//                             Icons.calendar_today,
+//                             size: 16,
+//                             color: Colors.grey,
+//                           ),
+//                           const SizedBox(width: 6),
+//                           Text(
+//                             DateFormat('dd-MMM-yyyy').format(
+//                               DateTime.tryParse(
+//                                     details?.notifyDate.toString() ?? '',
+//                                   ) ??
+//                                   DateTime.now(),
+//                             ),
+//                             style: const TextStyle(color: Colors.grey),
+//                           ),
+//                         ],
+//                       ),
+//                       const SizedBox(height: 16),
+//
+//                       // Content
+//                       Text(
+//                         details?.content ?? '',
+//                         style: const TextStyle(fontSize: 16, height: 1.5),
+//                       ),
+//                       const SizedBox(height: 16),
+//
+//                       if (details != null && details!.contents.isNotEmpty)
+//                         Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children:
+//                               details!.contents.map((c) {
+//                                 if (c.type == "paragraph") {
+//                                   return Padding(
+//                                     padding: const EdgeInsets.only(bottom: 12),
+//                                     child: Text(
+//                                       c.content ?? "",
+//                                       style: const TextStyle(fontSize: 15),
+//                                     ),
+//                                   );
+//                                 } else if (c.type == "list") {
+//                                   return Column(
+//                                     crossAxisAlignment:
+//                                         CrossAxisAlignment.start,
+//                                     children:
+//                                         (c.items ?? [])
+//                                             .map(
+//                                               (e) => Row(
+//                                                 children: [
+//                                                   const Icon(
+//                                                     Icons.check,
+//                                                     color: Colors.green,
+//                                                     size: 18,
+//                                                   ),
+//                                                   const SizedBox(width: 6),
+//                                                   Expanded(child: Text(e)),
+//                                                 ],
+//                                               ),
+//                                             )
+//                                             .toList(),
+//                                   );
+//                                 } else if (c.type == "image") {
+//                                   return Padding(
+//                                     padding: const EdgeInsets.symmetric(
+//                                       vertical: 10,
+//                                     ),
+//                                     child: ClipRRect(
+//                                       borderRadius: BorderRadius.circular(12),
+//                                       child: Image.network(c.content ?? ""),
+//                                     ),
+//                                   );
+//                                 }
+//                                 return const SizedBox.shrink();
+//                               }).toList(),
+//                         ),
+//                     ],
+//                   ),
+//                 );
+//               },
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+//
+//   ///*******old showExamTimeTable *********///
+//   /*  void showExamTimeTable(BuildContext context, int examId) async {
+//      // Fetch details if not already fetched
+//      if (examController.examDetails.value == null ||
+//          examController.examDetails.value!.exam.id != examId) {
+//        await examController.getExamDetailsList(examId: examId);
+//      }
+//
+//      final details = examController.examDetails.value;
+//      if (details == null) return;
+//
+//      showModalBottomSheet(
+//        context: context,
+//        isScrollControlled: true,
+//        backgroundColor: Colors.white,
+//        shape: const RoundedRectangleBorder(
+//          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//        ),
+//        builder: (context) {
+//          return DraggableScrollableSheet(
+//            expand: false,
+//            initialChildSize: 0.75,
+//            minChildSize: 0.4,
+//            maxChildSize: 0.95,
+//            builder: (_, scrollController) {
+//              return SingleChildScrollView(
+//                controller: scrollController,
+//                padding: const EdgeInsets.all(20),
+//                child: Column(
+//                  crossAxisAlignment: CrossAxisAlignment.start,
+//                  children: [
+//                    // Grab Handle
+//                    Center(
+//                      child: Container(
+//                        width: 40,
+//                        height: 5,
+//                        decoration: BoxDecoration(
+//                          color: Colors.grey[400],
+//                          borderRadius: BorderRadius.circular(10),
+//                        ),
+//                      ),
+//                    ),
+//                    const SizedBox(height: 16),
+//
+//                    // Timetable Image
+//                    const SizedBox(height: 20),
+//
+//                    // Exam Title
+//                    Text(
+//                      details.exam.heading ?? '',
+//                      style: const TextStyle(
+//                        fontSize: 22,
+//                        fontWeight: FontWeight.w700,
+//                      ),
+//                    ),
+//
+//                    const SizedBox(height: 8),
+//
+//                    // Exam Dates
+//                    Row(
+//                      children: [
+//                        const Icon(
+//                          Icons.calendar_today,
+//                          size: 16,
+//                          color: Colors.grey,
+//                        ),
+//                        const SizedBox(width: 6),
+//                        Text(
+//                          '${details.exam.startDate} to ${details.exam.endDate}',
+//                          style: const TextStyle(color: Colors.grey),
+//                        ),
+//                      ],
+//                    ),
+//
+//                    const SizedBox(height: 16),
+//                    if (details.exam.timetableUrl != null &&
+//                        details.exam.timetableUrl!.isNotEmpty)
+//                      ClipRRect(
+//                        borderRadius: BorderRadius.circular(16),
+//                        child: Image.network(
+//                          details.exam.timetableUrl!,
+//                          fit: BoxFit.cover,
+//                        ),
+//                      ),
+//                  ],
+//                ),
+//              );
+//            },
+//          );
+//        },
+//      );
+//    }*/
+//   ///*******new showExamTimeTable *********///
+//   void showExamTimeTable(
+//     BuildContext context,
+//     int examId, {
+//     List<int>? order,
+//     int? index,
+//   }) async {
+//     int currIndex = index ?? 0;
+//     int currId = examId;
+//
+//     Future<void> _load(int id) async {
+//       if (examController.examDetails.value == null ||
+//           examController.examDetails.value!.exam.id != id) {
+//         await examController.getExamDetailsList(examId: id);
+//       }
+//     }
+//
+//     await _load(currId);
+//     final first = examController.examDetails.value;
+//     if (first == null) return;
+//
+//     showModalBottomSheet(
+//       context: context,
+//       isScrollControlled: true,
+//       backgroundColor: Colors.white,
+//       shape: const RoundedRectangleBorder(
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//       ),
+//       builder: (context) {
+//         return StatefulBuilder(
+//           builder: (context, setSheetState) {
+//             Future<void> goTo(int nextIndex) async {
+//               if (order == null || order.isEmpty) return;
+//               currIndex = nextIndex.clamp(0, order.length - 1);
+//               currId = order[currIndex];
+//               await _load(currId);
+//               setSheetState(() {}); // refresh
+//             }
+//
+//             final details = examController.examDetails.value!;
+//             return DraggableScrollableSheet(
+//               expand: false,
+//               initialChildSize: 0.75,
+//               minChildSize: 0.4,
+//               maxChildSize: 0.95,
+//               builder: (_, sc) {
+//                 return SingleChildScrollView(
+//                   controller: sc,
+//                   padding: const EdgeInsets.all(20),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Center(
+//                         child: Container(
+//                           width: 40,
+//                           height: 5,
+//                           decoration: BoxDecoration(
+//                             color: Colors.grey[400],
+//                             borderRadius: BorderRadius.circular(10),
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 12),
+//
+//                       _navHeader(
+//                         ctx: context,
+//                         order: order,
+//                         index: currIndex,
+//                         disabled: false,
+//                         onPrev: () => goTo(currIndex - 1),
+//                         onNext: () => goTo(currIndex + 1),
+//                       ),
+//                       const SizedBox(height: 12),
+//
+//                       Text(
+//                         details.exam.heading ?? '',
+//                         style: const TextStyle(
+//                           fontSize: 22,
+//                           fontWeight: FontWeight.w700,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 8),
+//                       Row(
+//                         children: [
+//                           const Icon(
+//                             Icons.calendar_today,
+//                             size: 16,
+//                             color: Colors.grey,
+//                           ),
+//                           const SizedBox(width: 6),
+//                           Text(
+//                             '${details.exam.startDate} to ${details.exam.endDate}',
+//                             style: const TextStyle(color: Colors.grey),
+//                           ),
+//                         ],
+//                       ),
+//                       const SizedBox(height: 16),
+//
+//                       if ((details.exam.timetableUrl ?? '').isNotEmpty)
+//                         ClipRRect(
+//                           borderRadius: BorderRadius.circular(16),
+//                           child: Image.network(
+//                             details.exam.timetableUrl!,
+//                             fit: BoxFit.cover,
+//                           ),
+//                         ),
+//                     ],
+//                   ),
+//                 );
+//               },
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+//
+//   ///*******old _showEventDetails *********///
+//   /*   void _showEventDetails(
+//        BuildContext context,
+//        String title,
+//        DateTime time,
+//        String image,
+//        ) async {
+//      showModalBottomSheet(
+//        context: context,
+//        isScrollControlled: true,
+//        backgroundColor: Colors.white,
+//        shape: const RoundedRectangleBorder(
+//          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//        ),
+//        builder: (context) {
+//          return DraggableScrollableSheet(
+//            expand: false,
+//            initialChildSize: 0.50,
+//            minChildSize: 0.4,
+//            maxChildSize: 0.95,
+//            builder: (_, controller) {
+//              return SingleChildScrollView(
+//                controller: controller,
+//                padding: const EdgeInsets.all(20),
+//                child: Column(
+//                  crossAxisAlignment: CrossAxisAlignment.start,
+//                  children: [
+//                    // Grab Handle
+//                    Center(
+//                      child: Container(
+//                        width: 40,
+//                        height: 5,
+//                        decoration: BoxDecoration(
+//                          color: Colors.grey[400],
+//                          borderRadius: BorderRadius.circular(10),
+//                        ),
+//                      ),
+//                    ),
+//
+//                    // Image (if exists)
+//                    // if (details!.contents.isNotEmpty &&
+//                    //     details.contents.first.type == "image")
+//                    SizedBox(height: 8),
+//                    // Title
+//                    Text(
+//                      title.toUpperCase(),
+//                      style: GoogleFont.ibmPlexSans(
+//                        fontSize: 22,
+//                        fontWeight: FontWeight.w700,
+//                      ),
+//                    ),
+//
+//                    SizedBox(height: 8),
+//
+//                    Row(
+//                      children: [
+//                        const Icon(
+//                          Icons.calendar_today,
+//                          size: 16,
+//                          color: Colors.grey,
+//                        ),
+//                        const SizedBox(width: 6),
+//                        Text(
+//                          DateFormat(
+//                            'dd-MMM-yyyy',
+//                          ).format(DateTime.parse(time.toString())),
+//                          style: const TextStyle(color: Colors.grey),
+//                        ),
+//                      ],
+//                    ),
+//                    SizedBox(height: 25),
+//                    GestureDetector(
+//                      onTap: () {
+//                        _openFullScreenNetwork(image.toString() ?? "");
+//                      },
+//                      child: ClipRRect(
+//                        borderRadius: BorderRadius.circular(16),
+//                        child: Image.network(
+//                          image.toString() ?? "",
+//                          fit: BoxFit.cover,
+//                        ),
+//                      ),
+//                    ),
+//                  ],
+//                ),
+//              );
+//            },
+//          );
+//        },
+//      );
+//    }*/
+//
+//   ///*******new _showEventDetails *********///
+//   void _showEventDetails(
+//     BuildContext context,
+//     int id,
+//     DateTime notifyDate,
+//     String image, {
+//     List<int>? order,
+//     int? index,
+//   }) {
+//     final data = controller.announcementData.value;
+//     if (data == null) return;
+//
+//     int currIndex = index ?? 0;
+//     int currId = id;
+//
+//     AnnouncementItem? _get(int _id) {
+//       try {
+//         return data.items.firstWhere((e) => e.id == _id);
+//       } catch (_) {
+//         return null;
+//       }
+//     }
+//
+//     AnnouncementItem? item = _get(currId);
+//     if (item == null) return;
+//
+//     showModalBottomSheet(
+//       context: context,
+//       isScrollControlled: true,
+//       backgroundColor: Colors.white,
+//       shape: const RoundedRectangleBorder(
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//       ),
+//       builder: (context) {
+//         return StatefulBuilder(
+//           builder: (context, setSheetState) {
+//             void goTo(int nextIndex) {
+//               if (order == null || order.isEmpty) return;
+//               currIndex = nextIndex.clamp(0, order.length - 1);
+//               currId = order[currIndex];
+//               item = _get(currId);
+//               setSheetState(() {});
+//             }
+//
+//             return DraggableScrollableSheet(
+//               expand: false,
+//               initialChildSize: 0.50,
+//               minChildSize: 0.4,
+//               maxChildSize: 0.95,
+//               builder: (_, controllerScroll) {
+//                 return SingleChildScrollView(
+//                   controller: controllerScroll,
+//                   padding: const EdgeInsets.all(20),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Center(
+//                         child: Container(
+//                           width: 40,
+//                           height: 5,
+//                           decoration: BoxDecoration(
+//                             color: Colors.grey[400],
+//                             borderRadius: BorderRadius.circular(10),
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 12),
+//
+//                       _navHeader(
+//                         ctx: context,
+//                         order: order,
+//                         index: currIndex,
+//                         disabled: false,
+//                         onPrev: () => goTo(currIndex - 1),
+//                         onNext: () => goTo(currIndex + 1),
+//                       ),
+//                       const SizedBox(height: 12),
+//
+//                       Text(
+//                         _norm(item?.title).toUpperCase(),
+//                         style: GoogleFont.ibmPlexSans(
+//                           fontSize: 22,
+//                           fontWeight: FontWeight.w700,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 8),
+//                       Row(
+//                         children: [
+//                           const Icon(
+//                             Icons.calendar_today,
+//                             size: 16,
+//                             color: Colors.grey,
+//                           ),
+//                           const SizedBox(width: 6),
+//                           Text(
+//                             DateFormat('dd-MMM-yyyy').format(item!.notifyDate),
+//                             style: const TextStyle(color: Colors.grey),
+//                           ),
+//                         ],
+//                       ),
+//                       const SizedBox(height: 20),
+//
+//                       GestureDetector(
+//                         onTap: () => _openFullScreenNetwork(item?.image ?? ""),
+//                         child: ClipRRect(
+//                           borderRadius: BorderRadius.circular(16),
+//                           child: Image.network(
+//                             item?.image ?? "",
+//                             fit: BoxFit.cover,
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               },
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       controller.getCategoryList(showLoader: false);
+//
+//       if (controller.announcementData.value == null) {
+//         controller.getAnnouncement(type: "general");
+//       }
+//     });
+//   }
+//
+//   // Widget _buildGeneralTab(List<AnnouncementItem> items) {
+//   //   // General: everything except teacher-specific category name
+//   //   final list =
+//   //       items.where((e) {
+//   //         final cat = e.category.toLowerCase();
+//   //         final ac = e.announcementCategory.toLowerCase();
+//   //         return !(cat == 'teachers' || ac.startsWith('teacher'));
+//   //       }).toList();
+//   //
+//   //   return Column(
+//   //     children: [
+//   //       for (final a in list) ...[
+//   //         _AnnouncementCard(a),
+//   //         const SizedBox(height: 20),
+//   //       ],
+//   //     ],
+//   //   );
+//   // }
+//   //
+//   // Widget _buildTeacherTab(List<AnnouncementItem> items) {
+//   //   // Teacher tab: teacher_* or category == Teachers
+//   //   final list =
+//   //       items.where((e) {
+//   //         final cat = e.category.toLowerCase();
+//   //         final ac = e.announcementCategory.toLowerCase();
+//   //         return cat == 'teachers' || ac.startsWith('teacher');
+//   //       }).toList();
+//   //
+//   //   return Column(
+//   //     children: [
+//   //       for (final a in list) ...[
+//   //         _AnnouncementCard(a),
+//   //         const SizedBox(height: 20),
+//   //       ],
+//   //     ],
+//   //   );
+//   // }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: SafeArea(
+//         child: Obx(() {
+//           final data = controller.announcementData.value;
+//
+//           if (controller.isLoading.value) {
+//             return Center(child: AppLoader.circularLoader());
+//           }
+//
+//           if (data == null || data.items.isEmpty) {
+//             return Container(
+//               padding: EdgeInsets.symmetric(vertical: 80),
+//               decoration: BoxDecoration(color: AppColor.white),
+//               child: Column(
+//                 children: [
+//                   Center(
+//                     child: Text(
+//                       'No announcements available',
+//                       style: GoogleFont.ibmPlexSans(
+//                         fontWeight: FontWeight.w500,
+//                         fontSize: 14,
+//                         color: AppColor.gray,
+//                       ),
+//                     ),
+//                   ),
+//                   SizedBox(height: 30),
+//                   Image.asset(AppImages.noDataFound),
+//                 ],
+//               ),
+//             );
+//           }
+//
+//           return RefreshIndicator(
+//             onRefresh: () async {
+//               await controller.getAnnouncement(
+//                 type: selectedIndex == 0 ? "general" : "teacher",
+//               );
+//             },
+//             child: ListView.builder(
+//               physics: BouncingScrollPhysics(),
+//               padding: const EdgeInsets.all(15),
+//               itemCount: data.items.length + 1,
+//               itemBuilder: (context, index) {
+//                 if (index == 0) {
+//                   return Padding(
+//                     padding: const EdgeInsets.only(bottom: 20),
+//                     child: Center(
+//                       child: Text(
+//                         selectedIndex == 0
+//                             ? 'General Announcements'
+//                             : 'Teacher Announcements',
+//                         style: GoogleFont.ibmPlexSans(
+//                           fontWeight: FontWeight.w600,
+//                           fontSize: 26,
+//                           color: AppColor.black,
+//                         ),
+//                       ),
+//                     ),
+//                   );
+//                 }
+//
+//                 final item = data.items[index - 1];
+//                 return Padding(
+//                   padding: const EdgeInsets.only(bottom: 16),
+//                   child: CommonContainer.announcementsScreen(
+//                     mainText: item.announcementCategory,
+//                     backRoundImage: item.image,
+//                     iconData: CupertinoIcons.clock_fill,
+//                     additionalText1: "Date",
+//                     additionalText2: DateFormat(
+//                       "dd-MMM-yy",
+//                     ).format(DateTime.parse(item.notifyDate.toString())),
+//                     verticalPadding: 12,
+//                     gradientStartColor: AppColor.black.withOpacity(0.01),
+//                     gradientEndColor: AppColor.black,
+//                     onDetailsTap: () async {
+//                       if (item.type == "exammark") {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder:
+//                                 (context) => ResultList(
+//                                   examId: item.id,
+//                                   tittle: item.title,
+//                                   startDate: '',
+//                                   endDate: '',
+//                                 ),
+//                           ),
+//                         );
+//                       } else if (item.type == "announcement" ||
+//                           item.type == "holiday") {
+//                         _showAnnouncementDetails(context, item.id);
+//                       } else if (item.type == "exam") {
+//                         showExamTimeTable(context, item.id);
+//                       } else if (item.type == "calendar") {
+//                         print(item.id);
+//                         print('calendar');
+//                         _showEventDetails(
+//                           context,
+//                           item.title as int,
+//                           item.notifyDate,
+//                           item.image,
+//                         );
+//                       }
+//                     },
+//                   ),
+//                 );
+//               },
+//             ),
+//           );
+//         }),
+//       ),
+//       bottomNavigationBar: Container(
+//         padding: const EdgeInsets.symmetric(vertical: 12),
+//         decoration: const BoxDecoration(color: Colors.white),
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//           children: [
+//             _buildTabButton("General", 0),
+//             _buildTabButton("Teacher", 1),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _buildTabButton(String label, int index) {
+//     final isSelected = selectedIndex == index;
+//     return GestureDetector(
+//       onTap: () async {
+//         setState(() => selectedIndex = index);
+//         // Call API based on selected tab
+//         await controller.getAnnouncement(
+//           type: selectedIndex == 0 ? "general" : "teacher",
+//         );
+//       },
+//       child: Container(
+//         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 50),
+//         decoration: BoxDecoration(
+//           color: isSelected ? Colors.blue.shade50 : Colors.white,
+//           borderRadius: BorderRadius.circular(25),
+//           border: Border.all(
+//             color: isSelected ? Colors.blue : Colors.grey.shade400,
+//             width: 1.5,
+//           ),
+//         ),
+//         child: Text(
+//           label,
+//           style: TextStyle(
+//             fontSize: 16,
+//             fontWeight: FontWeight.w600,
+//             color: isSelected ? Colors.blue : Colors.grey,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+///********new*******
+
 class _AnnouncementScreenState extends State<AnnouncementScreen> {
   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
   final ExamController examController = Get.put(ExamController());
 
   int selectedIndex = 0; // 0 = General, 1 = Teacher
 
-  final List<Map<String, String>> subjects = [
+  final List<Map<String, String>> subjects = const [
     {'subject': 'Tamil', 'mark': '70'},
     {'subject': 'English', 'mark': '70'},
     {'subject': 'Maths', 'mark': '70'},
@@ -2227,6 +3894,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     {'subject': 'Social Science', 'mark': '70'},
   ];
 
+  // ============== UTILITIES ==============
   void _openFullScreenNetwork(String url) {
     if (url.isEmpty) return;
     showDialog(
@@ -2234,218 +3902,457 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
       barrierColor: Colors.black.withOpacity(0.9),
       builder:
           (_) => GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: Center(
-          child: InteractiveViewer(
-            minScale: 0.5,
-            maxScale: 5,
-            child: Image.network(url),
+            onTap: () => Navigator.pop(context),
+            child: Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 5,
+                child: Image.network(url),
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 
-  void _feessSheet(BuildContext context) {
-    /* showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.55,
-          minChildSize: 0.20,
-          maxChildSize: 0.55,
-          expand: false,
-          builder: (context, scrollController) {
-            final items = ['Shoes', 'Notebooks', 'Tuition Fees'];
+  String _norm(String? s) => (s ?? '').trim().toLowerCase();
 
-            return Container(
-              decoration: BoxDecoration(
-                color: AppColor.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(16),
+  DateTime _asDate(dynamic v) {
+    if (v is DateTime) return v;
+    return DateTime.tryParse(v?.toString() ?? '') ??
+        DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  // IDs sorted by notifyDate ASC within a given type (with tolerant synonyms)
+  List<int> _dateSortedIds({AnnouncementData? data, String? type}) {
+    final d = data ?? controller.announcementData.value;
+    if (d == null) return const [];
+
+    final wanted = _norm(type);
+
+    bool _matches(String? raw) {
+      final v = _norm(raw);
+      if (wanted.isEmpty) return true; // no filter
+      if (v == wanted) return true;
+      if (wanted == 'exammark' &&
+          (v == 'exam_mark' || v == 'examresult' || v == 'exam_result'))
+        return true;
+      if (wanted == 'exam' && v == 'exams') return true;
+      if (wanted == 'calendar' &&
+          (v == 'event' || v == 'events' || v == 'calendar_event'))
+        return true;
+      if (wanted == 'announcement' && v == 'announcements') return true;
+      if (wanted == 'feepayment' &&
+          (v == 'fee' || v == 'fees' || v == 'fee_payment' || v == 'fee-pay'))
+        return true;
+      return false;
+    }
+
+    final list = d.items.where((e) => _matches(e.type)).toList();
+
+    list.sort((a, b) {
+      final c = _asDate(a.notifyDate).compareTo(_asDate(b.notifyDate));
+      if (c != 0) return c;
+      return a.id.compareTo(b.id);
+    });
+
+    return list.map((e) => e.id).toList();
+  }
+
+  // Same-type ids when you only know a clicked id
+  List<int> _dateSortedIdsSameTypeAs({
+    required AnnouncementData data,
+    required int id,
+    String? fallbackType,
+  }) {
+    AnnouncementItem? base;
+    try {
+      base = data.items.firstWhere((e) => e.id == id);
+    } catch (_) {
+      base = null;
+    }
+
+    final wanted = _norm(base?.type ?? fallbackType ?? '');
+    if (wanted.isEmpty) return [id];
+
+    bool _typeMatches(String? raw) {
+      final v = _norm(raw);
+      if (v == wanted) return true;
+      if (wanted == 'exammark' &&
+          (v == 'exam_mark' || v == 'examresult' || v == 'exam_result'))
+        return true;
+      if (wanted == 'exam' && (v == 'exams')) return true;
+      if (wanted == 'calendar' &&
+          (v == 'event' || v == 'events' || v == 'calendar_event'))
+        return true;
+      if (wanted == 'announcement' && (v == 'announcements')) return true;
+      if (wanted == 'feepayment' &&
+          (v == 'fee' || v == 'fees' || v == 'fee_payment' || v == 'fee-pay'))
+        return true;
+      return false;
+    }
+
+    final list = data.items.where((e) => _typeMatches(e.type)).toList();
+    if (list.isEmpty) return [id];
+
+    list.sort((a, b) {
+      final c = _asDate(a.notifyDate).compareTo(_asDate(b.notifyDate));
+      if (c != 0) return c;
+      return a.id.compareTo(b.id);
+    });
+
+    return list.map((e) => e.id).toList();
+  }
+
+  // ============== UNIFIED OPEN ==============
+  void _openById(BuildContext ctx, int id, {String? forceType}) {
+    final data = controller.announcementData.value;
+    if (data == null) return;
+
+    AnnouncementItem? item;
+    try {
+      item = data.items.firstWhere((e) => e.id == id);
+    } catch (_) {
+      return;
+    }
+    final t = _norm(forceType ?? item.type);
+
+    final order = _dateSortedIds(data: data, type: t);
+    final index = order.indexOf(id);
+
+    switch (t) {
+      case 'feepayment':
+      case 'fee':
+      case 'fees':
+      case 'fee_payment':
+      case 'fee-pay':
+        _feesSheet(ctx, id, order: order, index: index);
+        break;
+
+      case 'announcement':
+      case 'announcements':
+      case 'holiday':
+        _showAnnouncementDetails(ctx, id, order: order, index: index);
+        break;
+
+      case 'exam':
+      case 'exams':
+        showExamTimeTable(ctx, id, order: order, index: index);
+        break;
+
+      case 'exammark':
+      case 'exam_mark':
+      case 'examresult':
+      case 'exam_result':
+        _examResult(ctx, id, order: order, index: index);
+        break;
+
+      case 'calendar':
+      case 'event':
+      case 'events':
+      case 'calendar_event':
+        _showEventDetails(ctx, id, order: order, index: index);
+        break;
+
+      default:
+        _showAnnouncementDetails(ctx, id, order: order, index: index);
+    }
+  }
+
+  // ============== NAV HEADER ==============
+  Widget _navHeader({
+    required BuildContext ctx,
+    required List<int>? order,
+    required int? index,
+    required bool disabled,
+    VoidCallback? onPrev,
+    VoidCallback? onNext,
+  }) {
+    final hasOrder = order != null && index != null && order.isNotEmpty;
+    final atStart = hasOrder ? index! <= 0 : true;
+    final atEnd = hasOrder ? index! >= order!.length - 1 : true;
+
+    final prevIsDisabled = (!hasOrder || atStart || disabled);
+    final nextIsDisabled = (!hasOrder || atEnd || disabled);
+
+    final prevColor =
+        prevIsDisabled ? AppColor.blue.withOpacity(0.2) : AppColor.blue;
+    final nextColor =
+        nextIsDisabled ? AppColor.blue.withOpacity(0.2) : AppColor.blue;
+
+    return Row(
+      children: [
+        // PREVIOUS
+        IconButton(
+          icon: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: prevColor),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
                 children: [
-                  Center(
-                    child: Container(
-                      height: 4,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: AppColor.grayop,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-
-                  Image.asset(AppImages.announcement2),
-                  SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Third-Term Fees',
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.black,
-                          ),
-                        ),
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            'Due date',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 12,
-                              color: AppColor.lowGrey,
-                            ),
-                          ),
-                          Text(
-                            '12-Dec-25',
-                            style: GoogleFont.ibmPlexSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColor.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: 4),
-                      Icon(
-                        CupertinoIcons.clock_fill,
-                        size: 30,
-                        color: AppColor.grayop,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(
-                      items.length,
-                      (index) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          '${index + 1}. ${items[index]}',
-                          style: GoogleFont.ibmPlexSans(
-                            fontSize: 16,
-                            color: AppColor.lightBlack,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15),
-
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      elevation: MaterialStateProperty.all(0),
-                      backgroundColor: MaterialStateProperty.all(
-                        Colors.transparent,
-                      ),
-                    ),
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppColor.blueG1, AppColor.blueG2],
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: 50,
-                        width: double.infinity,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Pay Rs.15,000',
-                              style: GoogleFont.ibmPlexSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: AppColor.white,
-                              ),
-                            ),
-                            SizedBox(width: 5),
-                            Icon(
-                              CupertinoIcons.right_chevron,
-                              size: 14,
-                              weight: 20,
-                              color: AppColor.white,
-                            ),
-                          ],
-                        ),
-                      ),
+                  Icon(CupertinoIcons.chevron_left, color: prevColor),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Previous',
+                    style: GoogleFont.ibmPlexSans(
+                      fontWeight: FontWeight.w600,
+                      color: prevColor,
                     ),
                   ),
                 ],
               ),
+            ),
+          ),
+          onPressed: prevIsDisabled ? null : onPrev,
+        ),
+
+        const Spacer(),
+
+        // NEXT
+        IconButton(
+          icon: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: nextColor),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 25.0,
+                vertical: 10,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'Next',
+                    style: GoogleFont.ibmPlexSans(
+                      fontWeight: FontWeight.w600,
+                      color: nextColor,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(CupertinoIcons.chevron_right, color: nextColor),
+                ],
+              ),
+            ),
+          ),
+          onPressed: nextIsDisabled ? null : onNext,
+        ),
+      ],
+    );
+  }
+
+  // ============== SHEETS ==============
+  // Fees
+  void _feesSheet(
+    BuildContext context,
+    int id, {
+    List<int>? order,
+    int? index,
+  }) {
+    int currIndex = index ?? 0;
+    int currId = id;
+
+    final data = controller.announcementData.value;
+    if (data == null) return;
+
+    AnnouncementItem? _get(int _id) {
+      try {
+        return data.items.firstWhere((e) => e.id == _id);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    AnnouncementItem? item = _get(currId);
+    if (item == null) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            void goTo(int nextIndex) {
+              if (order == null || order.isEmpty) return;
+              currIndex = nextIndex.clamp(0, order.length - 1);
+              currId = order[currIndex];
+              item = _get(currId);
+              setSheetState(() {});
+            }
+
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.55,
+              minChildSize: 0.2,
+              maxChildSize: 0.95,
+              builder: (context, sc) {
+                return SingleChildScrollView(
+                  controller: sc,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          height: 4,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        item?.title ?? 'Fees',
+                        style: GoogleFonts.ibmPlexSans(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.clock_fill,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            DateFormat('dd-MMM-yyyy').format(item!.notifyDate),
+                            style: GoogleFonts.ibmPlexSans(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if ((item?.image ?? '').isNotEmpty)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            item!.image,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => SizedBox.shrink(),
+                          ),
+                        ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          child: const Text('Proceed to Pay'),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      _navHeader(
+                        ctx: context,
+                        order: order,
+                        index: currIndex,
+                        disabled: false,
+                        onPrev: () => goTo(currIndex - 1),
+                        onNext: () => goTo(currIndex + 1),
+                      ),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );
       },
-    );*/
+    );
   }
 
-  void _examResult(BuildContext context) {
+  // Exam Result
+  void _examResult(
+    BuildContext context,
+    int id, {
+    List<int>? order,
+    int? index,
+  }) {
+    int currIndex = index ?? 0;
+    int currId = id;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.65,
-          minChildSize: 0.20,
-          maxChildSize: 0.65,
-          expand: false,
-          builder: (context, scrollController) {
-            return Container(
-              decoration: BoxDecoration(
-                color: AppColor.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(16),
-                children: [
-                  Center(
-                    child: Container(
-                      height: 4,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: AppColor.borderGary,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            void goTo(int nextIndex) {
+              if (order == null || order.isEmpty) return;
+              currIndex = nextIndex.clamp(0, order.length - 1);
+              currId = order[currIndex];
+
+              // Optionally fetch new data here if per-id marks differ
+              setSheetState(() {});
+            }
+
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.65,
+              minChildSize: 0.20,
+              maxChildSize: 0.95,
+              builder: (context, scrollController) {
+                // Replace this with your actual data source
+                final subjects = [
+                  {'subject': 'Math', 'mark': '95'},
+                  {'subject': 'Science', 'mark': '90'},
+                  {'subject': 'English', 'mark': '92'},
+                ];
+
+                return Container(
+                  decoration: BoxDecoration(
+                    color: AppColor.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
                     ),
                   ),
-                  SizedBox(height: 40),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(16),
+                    shrinkWrap:
+                        true, // ensures height fits content automatically
                     children: [
+                      Center(
+                        child: Container(
+                          height: 4,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            color: AppColor.borderGary,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Exam Title
                       Text(
-                        'Third term fees Result',
+                        'Third Term Exam Result',
+                        textAlign: TextAlign.center,
                         style: GoogleFont.ibmPlexSans(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: AppColor.lightBlack,
                         ),
                       ),
-                      SizedBox(height: 7),
+                      const SizedBox(height: 7),
+
+                      // Grade
                       RichText(
+                        textAlign: TextAlign.center,
                         text: TextSpan(
                           text: 'A+',
                           style: GoogleFont.ibmPlexSans(
@@ -2465,85 +4372,73 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 26),
+                      const SizedBox(height: 26),
+
+                      // Divider
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 35.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 35.0),
                         child: DottedLine(
                           dashColor: AppColor.borderGary,
                           dashGapLength: 6,
                           dashLength: 7,
                         ),
                       ),
-                      SizedBox(height: 15),
-                      Stack(
-                        children: [
-                          Positioned.fill(
-                            child: Image.asset(
-                              AppImages.examResultBCImage,
-                              height: 100,
-                              width: 180,
+                      const SizedBox(height: 15),
+
+                      // Subject Marks
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: subjects.length,
+                        itemBuilder: (context, i) {
+                          final subject = subjects[i];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 38,
                             ),
-                          ),
-
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: subjects.length,
-                            itemBuilder: (context, index) {
-                              final subject = subjects[index];
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                  horizontal: 16,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 38.0,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        subject['subject']!,
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColor.gray,
-                                        ),
-                                      ),
-                                      SizedBox(width: 30),
-                                      Text(
-                                        subject['mark']!,
-                                        style: GoogleFont.ibmPlexSans(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColor.black,
-                                        ),
-                                      ),
-                                    ],
+                            child: Row(
+                              children: [
+                                Text(
+                                  subject['subject']!,
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColor.gray,
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                        ],
+                                const SizedBox(width: 30),
+                                Text(
+                                  subject['mark']!,
+                                  style: GoogleFont.ibmPlexSans(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
 
+                      // Divider
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 35.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 35.0),
                         child: DottedLine(
                           dashColor: AppColor.borderGary,
                           dashGapLength: 6,
                           dashLength: 7,
                         ),
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
+
+                      // Close Button
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+                        onTap: () => Navigator.pop(context),
                         child: Center(
                           child: Container(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               vertical: 12,
                               horizontal: 30,
                             ),
@@ -2561,10 +4456,21 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20),
+
+                      // Prev/Next Navigation
+                      _navHeader(
+                        ctx: context,
+                        order: order,
+                        index: currIndex,
+                        disabled: false,
+                        onPrev: () => goTo(currIndex - 1),
+                        onNext: () => goTo(currIndex + 1),
+                      ),
                     ],
                   ),
-                ],
-              ),
+                );
+              },
             );
           },
         );
@@ -2572,19 +4478,43 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     );
   }
 
-  void _showAnnouncementDetails(BuildContext context, int id) async {
+  // Announcement details
+  void _showAnnouncementDetails(
+    BuildContext context,
+    int id, {
+    List<int>? order,
+    int? index,
+  }) async {
+    int currIndex = index ?? 0;
+    int currId = id;
+
     AnnouncementDetails? details;
 
-    // If already fetched for the same ID, use it directly
-    if (controller.announcementDetails.value != null &&
-        controller.announcementDetails.value!.id == id) {
-      details = controller.announcementDetails.value;
-    } else {
-      // Otherwise fetch from API
-      details = await controller.getAnnouncementDetails(id: id);
+    // Load announcement details
+    Future<void> _load(int _id) async {
+      if (controller.announcementDetails.value != null &&
+          controller.announcementDetails.value!.id == _id) {
+        details = controller.announcementDetails.value;
+      } else {
+        details = await controller.getAnnouncementDetails(id: _id);
+      }
     }
 
+    await _load(currId);
     if (details == null) return;
+
+    // Helper to safely build network images
+    Widget buildNetworkImage(String? url) {
+      if (url == null || url.isEmpty) return SizedBox.shrink();
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          url,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => SizedBox.shrink(),
+        ),
+      );
+    }
 
     showModalBottomSheet(
       context: context,
@@ -2594,19 +4524,27 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.75,
-          minChildSize: 0.4,
-          maxChildSize: 0.95,
-          builder: (_, controller) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            Future<void> goTo(int nextIndex) async {
+              if (order == null || order.isEmpty) return;
+              currIndex = nextIndex.clamp(0, order.length - 1);
+              currId = order[currIndex];
+
+              // Load details for the new ID
+              await _load(currId);
+
+              // Refresh sheet state
+              setSheetState(() {});
+            }
+
             return SingleChildScrollView(
-              controller: controller,
               padding: const EdgeInsets.all(20),
               child: Column(
+                mainAxisSize: MainAxisSize.min, // shrink to fit content
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Grab Handle
+                  // Drag handle
                   Center(
                     child: Container(
                       width: 40,
@@ -2617,29 +4555,16 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-
-                  // Image (if exists)
-                  // if (details!.contents.isNotEmpty &&
-                  //     details.contents.first.type == "image")
-                  //   ClipRRect(
-                  //     borderRadius: BorderRadius.circular(16),
-                  //     child: Image.network(
-                  //       details.contents.first.content ?? "",
-                  //       fit: BoxFit.cover,
-                  //     ),
-                  //   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   // Title
                   Text(
-                    details?.title.toString() ?? '',
+                    details?.title ?? '',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
                   const SizedBox(height: 8),
 
                   // Date
@@ -2653,29 +4578,30 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       const SizedBox(width: 6),
                       Text(
                         DateFormat('dd-MMM-yyyy').format(
-                          DateTime.parse(details?.notifyDate.toString() ?? ''),
+                          DateTime.tryParse(
+                                details?.notifyDate.toString() ?? '',
+                              ) ??
+                              DateTime.now(),
                         ),
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
 
-                  // Content
+                  // Main content
                   Text(
-                    details?.content.toString() ?? '',
+                    details?.content ?? '',
                     style: const TextStyle(fontSize: 16, height: 1.5),
                   ),
+                  const SizedBox(height: 16),
 
-                  const SizedBox(height: 20),
-
-                  // Extra dynamic contents
-                  if (details!.contents.isNotEmpty)
+                  // Sub-contents (paragraphs, lists, images)
+                  if (details != null && details!.contents.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:
-                          details.contents.map((c) {
+                          details!.contents.map((c) {
                             if (c.type == "paragraph") {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
@@ -2688,37 +4614,43 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children:
-                                    c.items
-                                        ?.map(
-                                          (e) => Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.check,
-                                                color: Colors.green,
-                                                size: 18,
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Expanded(child: Text(e)),
-                                            ],
+                                    (c.items ?? []).map((e) {
+                                      return Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.check,
+                                            color: Colors.green,
+                                            size: 18,
                                           ),
-                                        )
-                                        .toList() ??
-                                    [],
+                                          const SizedBox(width: 6),
+                                          Expanded(child: Text(e)),
+                                        ],
+                                      );
+                                    }).toList(),
                               );
                             } else if (c.type == "image") {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 10,
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(c.content ?? ""),
-                                ),
+                                child: buildNetworkImage(c.content),
                               );
                             }
                             return const SizedBox.shrink();
                           }).toList(),
                     ),
+
+                  const SizedBox(height: 20),
+
+                  // Prev/Next navigation
+                  _navHeader(
+                    ctx: context,
+                    order: order,
+                    index: currIndex,
+                    disabled: false,
+                    onPrev: () => goTo(currIndex - 1),
+                    onNext: () => goTo(currIndex + 1),
+                  ),
                 ],
               ),
             );
@@ -2728,13 +4660,24 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     );
   }
 
-  void showExamTimeTable(BuildContext context, int examId) async {
-    // Fetch details if not already fetched
-    if (examController.examDetails.value == null ||
-        examController.examDetails.value!.exam.id != examId) {
-      await examController.getExamDetailsList(examId: examId);
+  // Exam timetable
+  void showExamTimeTable(
+    BuildContext context,
+    int examId, {
+    List<int>? order,
+    int? index,
+  }) async {
+    int currIndex = index ?? 0;
+    int currId = examId;
+
+    Future<void> _load(int id) async {
+      if (examController.examDetails.value == null ||
+          examController.examDetails.value!.exam.id != id) {
+        await examController.getExamDetailsList(examId: id);
+      }
     }
 
+    await _load(currId);
     final details = examController.examDetails.value;
     if (details == null) return;
 
@@ -2746,19 +4689,36 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.75,
-          minChildSize: 0.4,
-          maxChildSize: 0.95,
-          builder: (_, scrollController) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            Future<void> goTo(int nextIndex) async {
+              if (order == null || order.isEmpty) return;
+              currIndex = nextIndex.clamp(0, order.length - 1);
+              currId = order[currIndex];
+              await _load(currId);
+              setSheetState(() {});
+            }
+
+            // Helper to safely show network image
+            Widget buildNetworkImage(String? url) {
+              if (url == null || url.isEmpty) return SizedBox.shrink();
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  url,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => SizedBox.shrink(),
+                ),
+              );
+            }
+
             return SingleChildScrollView(
-              controller: scrollController,
               padding: const EdgeInsets.all(20),
               child: Column(
+                mainAxisSize: MainAxisSize.min, // shrink to fit content
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Grab Handle
+                  // Drag handle
                   Center(
                     child: Container(
                       width: 40,
@@ -2769,12 +4729,9 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
-                  // Timetable Image
-                  const SizedBox(height: 20),
-
-                  // Exam Title
+                  // Exam heading
                   Text(
                     details.exam.heading ?? '',
                     style: const TextStyle(
@@ -2782,10 +4739,9 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
                   const SizedBox(height: 8),
 
-                  // Exam Dates
+                  // Dates
                   Row(
                     children: [
                       const Icon(
@@ -2800,17 +4756,23 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
-                  if (details.exam.timetableUrl != null &&
-                      details.exam.timetableUrl!.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        details.exam.timetableUrl!,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+
+                  // Timetable image
+                  if ((details.exam.timetableUrl ?? '').isNotEmpty)
+                    buildNetworkImage(details.exam.timetableUrl),
+
+                  const SizedBox(height: 20),
+
+                  // Prev/Next navigation
+                  _navHeader(
+                    ctx: context,
+                    order: order,
+                    index: currIndex,
+                    disabled: false,
+                    onPrev: () => goTo(currIndex - 1),
+                    onNext: () => goTo(currIndex + 1),
+                  ),
                 ],
               ),
             );
@@ -2820,12 +4782,29 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     );
   }
 
+  // Calendar event
   void _showEventDetails(
-      BuildContext context,
-      String title,
-      DateTime time,
-      String image,
-      ) async {
+    BuildContext context,
+    int id, {
+    List<int>? order,
+    int? index,
+  }) {
+    final data = controller.announcementData.value;
+    if (data == null) return;
+
+    int currIndex = index ?? 0;
+
+    AnnouncementItem? _get(int _id) {
+      try {
+        return data.items.firstWhere((e) => e.id == _id);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    AnnouncementItem? item = _get(id);
+    if (item == null) return;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -2834,19 +4813,30 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.50,
-          minChildSize: 0.4,
-          maxChildSize: 0.95,
-          builder: (_, controller) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            void goTo(int nextIndex) {
+              if (order == null || order.isEmpty) return;
+              final nextIdx = nextIndex.clamp(0, order.length - 1);
+              final nextId = order[nextIdx];
+
+              Navigator.pop(context); // Close current sheet
+              Future.microtask(() {
+                _showEventDetails(
+                  context,
+                  nextId,
+                  order: order,
+                  index: nextIdx,
+                );
+              });
+            }
+
             return SingleChildScrollView(
-              controller: controller,
               padding: const EdgeInsets.all(20),
               child: Column(
+                mainAxisSize: MainAxisSize.min, // shrink to fit content
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Grab Handle
                   Center(
                     child: Container(
                       width: 40,
@@ -2857,22 +4847,16 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 12),
 
-                  // Image (if exists)
-                  // if (details!.contents.isNotEmpty &&
-                  //     details.contents.first.type == "image")
-                  SizedBox(height: 8),
-                  // Title
                   Text(
-                    title.toUpperCase(),
+                    _norm(item?.title).toUpperCase(),
                     style: GoogleFont.ibmPlexSans(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
-                  SizedBox(height: 8),
-
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       const Icon(
@@ -2882,25 +4866,35 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        DateFormat(
-                          'dd-MMM-yyyy',
-                        ).format(DateTime.parse(time.toString())),
+                        DateFormat('dd-MMM-yyyy').format(item!.notifyDate),
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
-                  SizedBox(height: 25),
-                  GestureDetector(
-                    onTap: () {
-                      _openFullScreenNetwork(image.toString() ?? "");
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        image.toString() ?? "",
-                        fit: BoxFit.cover,
+                  const SizedBox(height: 20),
+
+                  if ((item?.image ?? '').isNotEmpty)
+                    GestureDetector(
+                      onTap: () => _openFullScreenNetwork(item?.image ?? ""),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.network(
+                          item?.image ?? "",
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) => SizedBox.shrink(),
+                        ),
                       ),
                     ),
+                  const SizedBox(height: 12),
+
+                  _navHeader(
+                    ctx: context,
+                    order: order,
+                    index: currIndex,
+                    disabled: false,
+                    onPrev: () => goTo(currIndex - 1),
+                    onNext: () => goTo(currIndex + 1),
                   ),
                 ],
               ),
@@ -2911,57 +4905,19 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     );
   }
 
+  // ============== LIFECYCLE ==============
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.getCategoryList(showLoader: false);
-
       if (controller.announcementData.value == null) {
         controller.getAnnouncement(type: "general");
       }
     });
   }
 
-  // Widget _buildGeneralTab(List<AnnouncementItem> items) {
-  //   // General: everything except teacher-specific category name
-  //   final list =
-  //       items.where((e) {
-  //         final cat = e.category.toLowerCase();
-  //         final ac = e.announcementCategory.toLowerCase();
-  //         return !(cat == 'teachers' || ac.startsWith('teacher'));
-  //       }).toList();
-  //
-  //   return Column(
-  //     children: [
-  //       for (final a in list) ...[
-  //         _AnnouncementCard(a),
-  //         const SizedBox(height: 20),
-  //       ],
-  //     ],
-  //   );
-  // }
-  //
-  // Widget _buildTeacherTab(List<AnnouncementItem> items) {
-  //   // Teacher tab: teacher_* or category == Teachers
-  //   final list =
-  //       items.where((e) {
-  //         final cat = e.category.toLowerCase();
-  //         final ac = e.announcementCategory.toLowerCase();
-  //         return cat == 'teachers' || ac.startsWith('teacher');
-  //       }).toList();
-  //
-  //   return Column(
-  //     children: [
-  //       for (final a in list) ...[
-  //         _AnnouncementCard(a),
-  //         const SizedBox(height: 20),
-  //       ],
-  //     ],
-  //   );
-  // }
-
+  // ============== UI ==============
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -2975,8 +4931,8 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
 
           if (data == null || data.items.isEmpty) {
             return Container(
-              padding: EdgeInsets.symmetric(vertical: 80),
-              decoration: BoxDecoration(color: AppColor.white),
+              padding: const EdgeInsets.symmetric(vertical: 80),
+              decoration: const BoxDecoration(color: Colors.white),
               child: Column(
                 children: [
                   Center(
@@ -2989,7 +4945,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Image.asset(AppImages.noDataFound),
                 ],
               ),
@@ -3003,25 +4959,73 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               );
             },
             child: ListView.builder(
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(15),
               itemCount: data.items.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 20),
-                    child: Center(
-                      child: Text(
-                        selectedIndex == 0
-                            ? 'General Announcements'
-                            : 'Teacher Announcements',
-                        style: GoogleFont.ibmPlexSans(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 26,
-                          color: AppColor.black,
+                    child:
+                    Column(
+                      children: [
+                        Row(
+                         children: [
+                           CommonContainer.NavigatArrow(
+                             image: AppImages.leftSideArrow,
+                             imageColor: AppColor.lightBlack,
+                             container: AppColor.lowLightgray,
+                             onIconTap: () => Navigator.pop(context),
+                             border: Border.all(
+                               color: AppColor.lightgray,
+                               width: 0.3,
+                             ),
+                           ),
+                           const Spacer(),
+                           InkWell(
+                             onTap: () {
+                               Navigator.push(
+                                 context,
+                                 MaterialPageRoute(
+                                   builder: (_) => const AnnouncementCreate(),
+                                 ),
+                               );
+                             },
+                             child: Row(
+                               mainAxisSize: MainAxisSize.min,
+                               children: [
+                                 Text(
+                                   'Create Announcement',
+                                   style: GoogleFont.ibmPlexSans(
+                                     fontSize: 12,
+                                     fontWeight: FontWeight.w500,
+                                     color: AppColor.blue,
+                                   ),
+                                 ),
+                                 const SizedBox(width: 15),
+                                 Image.asset(AppImages.doubleArrow, height: 19),
+                               ],
+                             ),
+                           ),
+                         ],
+                                           ),
+                        const SizedBox(height: 35),
+                        Center(
+                          child: Text(
+                            selectedIndex == 0
+                                ? 'General Announcements'
+                                : 'Teacher Announcements',
+                            style: GoogleFont.ibmPlexSans(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 26,
+                              color: AppColor.black,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
+
+
                   );
                 }
 
@@ -3039,35 +5043,9 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                     verticalPadding: 12,
                     gradientStartColor: AppColor.black.withOpacity(0.01),
                     gradientEndColor: AppColor.black,
-                    onDetailsTap: () async {
-                      if (item.type == "exammark") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => ResultList(
-                                  examId: item.id,
-                                  tittle: item.title,
-                                  startDate: '',
-                                  endDate: '',
-                                ),
-                          ),
-                        );
-                      } else if (item.type == "announcement" ||
-                          item.type == "holiday") {
-                        _showAnnouncementDetails(context, item.id);
-                      } else if (item.type == "exam") {
-                        showExamTimeTable(context, item.id);
-                      }else if (item.type == "calendar") {
-                        print(item.id);
-                        print('calendar');
-                        _showEventDetails(
-                          context,
-                          item.title,
-                          item.notifyDate,
-                          item.image,
-                        );
-                      }
+                    onDetailsTap: () {
+                      // Unified opener (prevents old signature mistakes):
+                      _openById(context, item.id);
                     },
                   ),
                 );
@@ -3095,7 +5073,6 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     return GestureDetector(
       onTap: () async {
         setState(() => selectedIndex = index);
-        // Call API based on selected tab
         await controller.getAnnouncement(
           type: selectedIndex == 0 ? "general" : "teacher",
         );
