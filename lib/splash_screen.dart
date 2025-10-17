@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       // Case 3: Version mismatch → show update bottom sheet
       _showUpdateBottomSheet();
-    }
+    }    
   }
 
   void _checkLoginStatus() async {
