@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
     AnnouncementContorller(),
   );
   final LoginController loginController = Get.put(LoginController());
-  final String latestVersion = "2.3.1";
+  final String latestVersion = "2.3.2";
 
 
   @override
