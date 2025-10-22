@@ -1099,6 +1099,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
     TeacherClassController(),
   );
   final QuizController controller = Get.put(QuizController());
+  final TextEditingController singleDateController = TextEditingController();
 
   // ===== State (inside your State class) =====
 
@@ -1116,6 +1117,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   int? selectedSubjectId;
   String? selectedSubject;
   bool showClearIcon = false;
+  bool _singleDateInvalid = false;
+  String? _singleDateError;
   final TextEditingController headingController = TextEditingController();
   final TextEditingController timeLimitController = TextEditingController();
   final List<TextEditingController> descriptionControllers = [];
@@ -1473,6 +1476,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       "heading": headingController.text.trim(),
       "timeLimit": timeNum, // <- clean numeric minutes
       "publish": true,
+      "announcementDate": singleDateController.text.trim(),
       "questions":
           questionList.map((q) {
             return {
@@ -2407,8 +2411,54 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                   ),
                                 ),
 
-                              const SizedBox(height: 25),
+                              SizedBox(height: 25),
+                              Text(
+                                'Announcement Date',
+                                style: GoogleFont.ibmPlexSans(
+                                  fontSize: 14,
+                                  color: AppColor.black,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
 
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color:
+                                        _singleDateInvalid
+                                            ? Colors.red
+                                            : Colors.transparent,
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: CommonContainer.studentInfoScreen(
+                                  text: 'Date',
+                                  controller: singleDateController,
+                                  context: context,
+                                  imagePath: AppImages.calander,
+                                  verticalDivider: true,
+                                  datePickMode: DatePickMode.single,
+                                  styledRangeText: false,
+                                ),
+                              ),
+
+                              if (_singleDateInvalid &&
+                                  _singleDateError != null)
+                                const SizedBox(height: 6),
+                              if (_singleDateInvalid &&
+                                  _singleDateError != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 4),
+                                  child: Text(
+                                    _singleDateError!,
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              SizedBox(height: 25),
                               // ------------------ Questions & Answers ------------------
                               Column(
                                 children: List.generate(questionList.length, (
@@ -2505,7 +2555,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                             ),
                                           ),
 
-                                        const SizedBox(height: 12),
+                                        SizedBox(height: 15),
                                         Text(
                                           'Answer',
                                           style: GoogleFont.ibmPlexSans(

@@ -217,7 +217,6 @@ class _ExamCreateState extends State<ExamCreate> {
   }
 
   void _onSubmit() {
-
     final heading = headingController.text.trim();
     final rangeText = dateRangeController.text.trim();
     final singleDateText = singleDateController.text.trim();
@@ -707,7 +706,7 @@ class _ExamCreateState extends State<ExamCreate> {
                             ),
                           ),
 
-                          SizedBox(height: 35),
+                          SizedBox(height: 50),
                           Text(
                             'Heading',
                             style: GoogleFont.ibmPlexSans(
@@ -715,7 +714,6 @@ class _ExamCreateState extends State<ExamCreate> {
                               color: AppColor.black,
                             ),
                           ),
-
                           const SizedBox(height: 10),
                           Container(
                             decoration: BoxDecoration(
@@ -763,8 +761,6 @@ class _ExamCreateState extends State<ExamCreate> {
                                 ),
                               ),
                             ),
-
-                          const SizedBox(height: 25),
 
                           SizedBox(height: 25),
                           Text(

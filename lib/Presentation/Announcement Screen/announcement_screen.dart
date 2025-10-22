@@ -2216,6 +2216,8 @@ class AnnouncementScreen extends StatefulWidget {
   State<AnnouncementScreen> createState() => _AnnouncementScreenState();
 }
 
+///*****old********
+
 // class _AnnouncementScreenState extends State<AnnouncementScreen> {
 //   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
 //   final ExamController examController = Get.put(ExamController());
@@ -3886,7 +3888,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
 
   int selectedIndex = 0; // 0 = General, 1 = Teacher
 
-  final List<Map<String, String>> subjects = const [
+  final List<Map<String, String>> subjects = [
     {'subject': 'Tamil', 'mark': '70'},
     {'subject': 'English', 'mark': '70'},
     {'subject': 'Maths', 'mark': '70'},
@@ -4966,49 +4968,51 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                 if (index == 0) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 20),
-                    child:
-                    Column(
+                    child: Column(
                       children: [
                         Row(
-                         children: [
-                           CommonContainer.NavigatArrow(
-                             image: AppImages.leftSideArrow,
-                             imageColor: AppColor.lightBlack,
-                             container: AppColor.lowLightgray,
-                             onIconTap: () => Navigator.pop(context),
-                             border: Border.all(
-                               color: AppColor.lightgray,
-                               width: 0.3,
-                             ),
-                           ),
-                           const Spacer(),
-                           InkWell(
-                             onTap: () {
-                               Navigator.push(
-                                 context,
-                                 MaterialPageRoute(
-                                   builder: (_) => const AnnouncementCreate(),
-                                 ),
-                               );
-                             },
-                             child: Row(
-                               mainAxisSize: MainAxisSize.min,
-                               children: [
-                                 Text(
-                                   'Create Announcement',
-                                   style: GoogleFont.ibmPlexSans(
-                                     fontSize: 12,
-                                     fontWeight: FontWeight.w500,
-                                     color: AppColor.blue,
-                                   ),
-                                 ),
-                                 const SizedBox(width: 15),
-                                 Image.asset(AppImages.doubleArrow, height: 19),
-                               ],
-                             ),
-                           ),
-                         ],
-                                           ),
+                          children: [
+                            CommonContainer.NavigatArrow(
+                              image: AppImages.leftSideArrow,
+                              imageColor: AppColor.lightBlack,
+                              container: AppColor.lowLightgray,
+                              onIconTap: () => Navigator.pop(context),
+                              border: Border.all(
+                                color: AppColor.lightgray,
+                                width: 0.3,
+                              ),
+                            ),
+                            const Spacer(),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AnnouncementCreate(),
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Create Announcement',
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColor.blue,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Image.asset(
+                                    AppImages.doubleArrow,
+                                    height: 19,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 35),
                         Center(
                           child: Text(
@@ -5024,8 +5028,6 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                         ),
                       ],
                     ),
-
-
                   );
                 }
 

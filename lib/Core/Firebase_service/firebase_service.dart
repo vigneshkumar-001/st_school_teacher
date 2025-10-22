@@ -136,7 +136,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class FirebaseService {
   final LoginController controller = Get.put(LoginController());
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   final AndroidNotificationChannel channel = const AndroidNotificationChannel(
     'flutter_notification',
@@ -173,7 +173,8 @@ class FirebaseService {
 
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
 
     // Ask notification permission (Android 13+ & iOS)
@@ -189,7 +190,9 @@ class FirebaseService {
       provisional: false,
     );
 
-    AppLogger.log.i('🔔 Notification permission: ${settings.authorizationStatus}');
+    AppLogger.log.i(
+      '🔔 Notification permission: ${settings.authorizationStatus}',
+    );
 
     if (settings.authorizationStatus == AuthorizationStatus.denied) {
       AppLogger.log.w('🚫 User denied notification permission');
@@ -256,8 +259,7 @@ class FirebaseService {
   void listenToMessages({
     required void Function(RemoteMessage) onMessage,
     required void Function(RemoteMessage) onMessageOpenedApp,
-  })
-  {
+  }) {
     // Foreground message
     FirebaseMessaging.onMessage.listen((msg) {
       AppLogger.log.i('📩 [FOREGROUND] Full Message Data:');
@@ -284,7 +286,7 @@ class FirebaseService {
     });
   }
 
-void _printFullMessage(RemoteMessage message) {
+  void _printFullMessage(RemoteMessage message) {
     AppLogger.log.i('🔔 Notification Title: ${message.notification?.title}');
     AppLogger.log.i('📝 Notification Body: ${message.notification?.body}');
     AppLogger.log.i('📦 Message ID: ${message.messageId}');
@@ -292,7 +294,9 @@ void _printFullMessage(RemoteMessage message) {
     AppLogger.log.i('⏰ Sent Time: ${message.sentTime}');
     AppLogger.log.i('🌐 Category: ${message.category}');
     AppLogger.log.i('🧩 Collapse Key: ${message.collapseKey}');
-    AppLogger.log.i('💾 Data Payload: ${message.data.isNotEmpty ? message.data : 'No data'}');
+    AppLogger.log.i(
+      '💾 Data Payload: ${message.data.isNotEmpty ? message.data : 'No data'}',
+    );
   }
 
   void _handleNotificationTap(String? route) {
@@ -300,7 +304,7 @@ void _printFullMessage(RemoteMessage message) {
 
     switch (route) {
       case 'TeacherMessageDetails':
-       Get.to(MessageScreen());
+        Get.to(MessageScreen());
         break;
       case 'attendance':
         Get.toNamed('/attendance');
