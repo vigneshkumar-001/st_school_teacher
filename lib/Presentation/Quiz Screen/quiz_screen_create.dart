@@ -1117,8 +1117,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   int? selectedSubjectId;
   String? selectedSubject;
   bool showClearIcon = false;
-  bool _singleDateInvalid = false;
-  String? _singleDateError;
+
   final TextEditingController headingController = TextEditingController();
   final TextEditingController timeLimitController = TextEditingController();
   final List<TextEditingController> descriptionControllers = [];
@@ -1127,6 +1126,8 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
   bool _timeLimitInvalid = false;
   bool _classInvalid = false;
   bool _subjectInvalid = false;
+  bool _dateInvalid = false;
+  String? _dateError;
 
   // --- Class scroller centering ---
   final ScrollController _classScroll = ScrollController();
@@ -1154,6 +1155,43 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
     } else {
       _classScroll.jumpTo(offset);
     }
+  }
+
+  // --- Date helpers ---
+  DateTime? _parseDateLoose(String raw) {
+    final v = raw.trim();
+    if (v.isEmpty) return null;
+
+    // Try ISO first (yyyy-mm-dd or full iso)
+    final tryIso = DateTime.tryParse(v);
+    if (tryIso != null) return DateTime(tryIso.year, tryIso.month, tryIso.day);
+
+    // Try common dd/MM/yyyy
+    final m = RegExp(r'^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$').firstMatch(v);
+    if (m != null) {
+      final d = int.tryParse(m.group(1)!);
+      final mo = int.tryParse(m.group(2)!);
+      final y = int.tryParse(m.group(3)!);
+      if (d != null && mo != null && y != null) {
+        // Basic sanity
+        if (y >= 1900 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+          return DateTime(y, mo, d);
+        }
+      }
+    }
+    return null; // unrecognized
+  }
+
+  bool _isBeforeToday(DateTime d) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final dd = DateTime(d.year, d.month, d.day);
+    return dd.isBefore(today);
+  }
+
+  String _toYMD(DateTime d) {
+    String two(int n) => n < 10 ? '0$n' : '$n';
+    return '${d.year}-${two(d.month)}-${two(d.day)}';
   }
 
   @override
@@ -1462,6 +1500,26 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
           ),
         );
         hasError = true;
+      }
+
+      // ----- Announcement date (required, not in the past) -----
+      final rawDate = singleDateController.text.trim();
+      DateTime? picked;
+      if (rawDate.isEmpty) {
+        _dateInvalid = true;
+        _dateError = 'Date is required';
+        hasError = true;
+      } else {
+        picked = _parseDateLoose(rawDate);
+        if (picked == null) {
+          _dateInvalid = true;
+          _dateError = 'Invalid date format';
+          hasError = true;
+        } else if (_isBeforeToday(picked)) {
+          _dateInvalid = true;
+          _dateError = 'Date cannot be in the past';
+          hasError = true;
+        }
       }
     }
 
@@ -2217,7 +2275,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        SingleChildScrollView(
+                        /*SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           physics: BouncingScrollPhysics(),
                           child: Wrap(
@@ -2225,6 +2283,11 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                             children: List.generate(subjects.length, (index) {
                               final sub = subjects[index];
                               final isSelected = subjectIndex == index;
+                              print('Subjects length: ${subjects.length}');
+                              for (final s in subjects) {
+                                print('${s.id} - ${s.name}');
+                              }
+
                               return GestureDetector(
                                 onTap:
                                     () => setState(() {
@@ -2275,6 +2338,78 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                 ),
                               );
                             }),
+                          ),
+                        ),*/
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: BouncingScrollPhysics(),
+                          child: Wrap(
+                            spacing: 10,
+                            children: List.generate(
+                              teacherClassController.filteredSubjects.length,
+                              (index) {
+                                final sub =
+                                    teacherClassController
+                                        .filteredSubjects[index];
+                                final selectedIndexs =
+                                    teacherClassController
+                                        .selectedSubjectIndex
+                                        .value;
+                                final isSelected = selectedIndexs == index;
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    teacherClassController
+                                        .selectedSubjectIndex
+                                        .value = index;
+                                    teacherClassController
+                                        .selectedSubject
+                                        .value = sub;
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isSelected ? 25 : 35,
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColor.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? AppColor.blue
+                                                : AppColor.borderGary,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (isSelected) ...[
+                                          Image.asset(
+                                            AppImages.tick,
+                                            height: 15,
+                                            color: AppColor.blue,
+                                          ),
+                                          const SizedBox(width: 10),
+                                        ],
+                                        Text(
+                                          sub.name,
+                                          style: GoogleFont.ibmPlexSans(
+                                            fontSize: 12,
+                                            color:
+                                                isSelected
+                                                    ? AppColor.blue
+                                                    : AppColor.gray,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                         if (_subjectInvalid)
@@ -2421,43 +2556,56 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                               ),
                               const SizedBox(height: 10),
 
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color:
-                                        _singleDateInvalid
-                                            ? Colors.red
-                                            : Colors.transparent,
-                                    width: 1.2,
-                                  ),
-                                ),
-                                child: CommonContainer.studentInfoScreen(
-                                  text: 'Date',
-                                  controller: singleDateController,
-                                  context: context,
-                                  imagePath: AppImages.calander,
-                                  verticalDivider: true,
-                                  datePickMode: DatePickMode.single,
-                                  styledRangeText: false,
-                                ),
-                              ),
-
-                              if (_singleDateInvalid &&
-                                  _singleDateError != null)
-                                const SizedBox(height: 6),
-                              if (_singleDateInvalid &&
-                                  _singleDateError != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 4),
-                                  child: Text(
-                                    _singleDateError!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color:
+                                            _dateInvalid
+                                                ? Colors.red
+                                                : Colors.transparent,
+                                        width: 1.2,
+                                      ),
+                                    ),
+                                    child: CommonContainer.studentInfoScreen(
+                                      text: 'Date',
+                                      controller: singleDateController,
+                                      context: context,
+                                      imagePath: AppImages.calander,
+                                      verticalDivider: true,
+                                      datePickMode: DatePickMode.single,
+                                      styledRangeText: false,
+                                      onChanged: (v) {
+                                        setState(() {
+                                          if (_dateInvalid &&
+                                              v.trim().isNotEmpty) {
+                                            _dateInvalid = false;
+                                            _dateError = null;
+                                          }
+                                        });
+                                      },
                                     ),
                                   ),
-                                ),
+                                  if (_dateInvalid)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 4.0,
+                                        left: 8,
+                                      ),
+                                      child: Text(
+                                        _dateError ?? "Date is required",
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+
                               SizedBox(height: 25),
                               // ------------------ Questions & Answers ------------------
                               Column(
@@ -2507,6 +2655,10 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
                                           maxLines: 3,
                                           decoration: InputDecoration(
                                             hintText: "Enter question",
+                                            hintStyle: GoogleFont.ibmPlexSans(
+                                              color: AppColor.gray,
+                                              fontSize: 16,
+                                            ),
                                             filled: true,
                                             fillColor: AppColor.lightWhite,
                                             enabledBorder: OutlineInputBorder(

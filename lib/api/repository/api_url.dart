@@ -1,5 +1,6 @@
 class ApiUrl {
-  static String baseUrl12 = 'https://school-back-end-594f59bea6cb.herokuapp.com';
+  static String baseUrl12 =
+      'https://school-back-end-594f59bea6cb.herokuapp.com';
   static String baseUrl1 = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
   static String baseUrl = 'https://backend.stjosephmatricschool.com';
 
@@ -26,7 +27,8 @@ class ApiUrl {
   // static String listAnnouncement = '$baseUrl/teacher-announcement/list?=teacher  general';
   static String categoriesList = '$baseUrl/announcement-categories';
 
-  static String notificationUnregister = '$baseUrl/notifications/teachers/unregister';
+  static String notificationUnregister =
+      '$baseUrl/notifications/teachers/unregister';
 
   static String announcementDetail({required int Id}) {
     return '$baseUrl/teacher-announcement/details/$Id';

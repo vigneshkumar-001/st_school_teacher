@@ -37,27 +37,32 @@ class _ExamHistoryState extends State<ExamHistory> {
           final grouped = controller.groupedExams;
 
           if (grouped.isEmpty) {
-            return Container(
-              padding: EdgeInsets.symmetric(vertical: 80),
-              decoration: BoxDecoration(color: AppColor.white),
-              child: Column(
-                children: [
-                  Center(
-                    child: Text(
-                      'No exams available',
-                      style: GoogleFont.ibmPlexSans(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: AppColor.gray,
+            return RefreshIndicator(
+              onRefresh: controller.getExamList,
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  padding: EdgeInsets.only(top: 80, bottom: 350),
+                  decoration: BoxDecoration(color: AppColor.white),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Text(
+                          'No exams available',
+                          style: GoogleFont.ibmPlexSans(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: AppColor.gray,
+                          ),
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 30),
+                      Image.asset(AppImages.noDataFound),
+                    ],
                   ),
-                  SizedBox(height: 30),
-                  Image.asset(AppImages.noDataFound),
-                ],
+                ),
               ),
             );
-
           }
 
           int colorIndex = 0; // global color counter
@@ -73,6 +78,10 @@ class _ExamHistoryState extends State<ExamHistory> {
             },
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
+              physics: const AlwaysScrollableScrollPhysics(
+                // <-- important
+                parent: BouncingScrollPhysics(),
+              ),
               children: [
                 // Top Row
                 Row(
@@ -230,7 +239,6 @@ class _ExamHistoryState extends State<ExamHistory> {
                                         AppColor.white,
                                         AppColor.lowLightPink,
                                       ];
-
                                       final bgColor =
                                           colors[colorIndex % colors.length];
                                       colorIndex++; // increment for next exam globally
@@ -278,7 +286,9 @@ class _ExamHistoryState extends State<ExamHistory> {
                                               context,
                                               MaterialPageRoute(
                                                 builder:
-                                                    (_) => ExamResult(classs: exam.className,section: exam.section,
+                                                    (_) => ExamResult(
+                                                      classs: exam.className,
+                                                      section: exam.section,
                                                       examId: exam.id,
                                                       tittle: exam.heading,
                                                       startDate: exam.startDate,

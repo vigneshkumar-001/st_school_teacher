@@ -4932,24 +4932,34 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           }
 
           if (data == null || data.items.isEmpty) {
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 80),
-              decoration: const BoxDecoration(color: Colors.white),
-              child: Column(
-                children: [
-                  Center(
-                    child: Text(
-                      'No announcements available',
-                      style: GoogleFont.ibmPlexSans(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: AppColor.gray,
+            return RefreshIndicator(
+              onRefresh: () async {
+                await controller.getAnnouncement(
+                  // type: selectedIndex == 0 ? "general" : "teacher",
+                );
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(), // critical
+                child: Container(
+                  padding: const EdgeInsets.only(top: 80, bottom: 300),
+                  decoration: const BoxDecoration(color: Colors.white),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Text(
+                          'No announcements available',
+                          style: GoogleFont.ibmPlexSans(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: AppColor.gray,
+                          ),
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 30),
+                      Image.asset(AppImages.noDataFound),
+                    ],
                   ),
-                  const SizedBox(height: 30),
-                  Image.asset(AppImages.noDataFound),
-                ],
+                ),
               ),
             );
           }
@@ -4961,7 +4971,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               );
             },
             child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
+              physics: BouncingScrollPhysics(),
               padding: const EdgeInsets.all(15),
               itemCount: data.items.length + 1,
               itemBuilder: (context, index) {
@@ -5033,7 +5043,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
 
                 final item = data.items[index - 1];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: 16),
                   child: CommonContainer.announcementsScreen(
                     mainText: item.announcementCategory,
                     backRoundImage: item.image,
@@ -5056,6 +5066,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           );
         }),
       ),
+
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: const BoxDecoration(color: Colors.white),
@@ -5091,7 +5102,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: GoogleFont.ibmPlexSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isSelected ? Colors.blue : Colors.grey,

@@ -28,7 +28,9 @@ class _QuizHistoryState extends State<QuizHistory> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await quizController.quizList();
-      if (!quizController.classNames.contains(quizController.selectedClassName.value)) {
+      if (!quizController.classNames.contains(
+        quizController.selectedClassName.value,
+      )) {
         quizController.selectClass('All');
       }
     });
@@ -48,30 +50,286 @@ class _QuizHistoryState extends State<QuizHistory> {
           final hasData = groups.isNotEmpty;
 
           if (!hasData) {
-            return Container(
-              padding: EdgeInsets.symmetric(vertical: 80),
-              decoration: BoxDecoration(color: AppColor.white),
-              child: Column(
-                children: [
-                  Center(
-                    child: Text(
-                      'No quizzes found',
-                      style: GoogleFont.ibmPlexSans(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: AppColor.gray,
+            return RefreshIndicator(
+              onRefresh: quizController.quizList,
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 80),
+                  decoration: BoxDecoration(color: AppColor.white),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Text(
+                          'No quizzes found',
+                          style: GoogleFont.ibmPlexSans(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: AppColor.gray,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Image.asset(AppImages.noDataFound),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          return RefreshIndicator(
+            // must return Future<void>
+            onRefresh: () => quizController.quizList(),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  child: ConstrainedBox(
+                    // make sure content height >= screen height
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 18,
+                        horizontal: 15,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CommonContainer.NavigatArrow(
+                                image: AppImages.leftSideArrow,
+                                imageColor: AppColor.lightBlack,
+                                container: AppColor.lowLightgray,
+                                onIconTap: () => Navigator.pop(context),
+                                border: Border.all(
+                                  color: AppColor.lightgray,
+                                  width: 0.3,
+                                ),
+                              ),
+                              const Spacer(),
+                              InkWell(
+                                onTap:
+                                    () =>
+                                        Get.to(() => const QuizScreenCreate()),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Create Quiz  ',
+                                      style: GoogleFont.ibmPlexSans(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColor.blue,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    Image.asset(
+                                      AppImages.doubleArrow,
+                                      height: 19,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 35),
+                          Center(
+                            child: Text(
+                              'Quiz History',
+                              style: GoogleFont.inter(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.black,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Filter Chips (Class Names)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColor.white,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 28.0,
+                                  ),
+                                  child: SizedBox(
+                                    height: 40,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount:
+                                          quizController.classNames.length,
+                                      itemBuilder: (context, index) {
+                                        final name =
+                                            quizController.classNames[index];
+                                        final isSelected =
+                                            quizController
+                                                .selectedClassName
+                                                .value ==
+                                            name;
+
+                                        return GestureDetector(
+                                          onTap:
+                                              () => quizController.selectClass(
+                                                name,
+                                              ),
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                              right: 12,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 8,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColor.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color:
+                                                    isSelected
+                                                        ? AppColor.blue
+                                                        : AppColor.borderGary,
+                                              ),
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: buildClassNameRichText(
+                                              name,
+                                              isSelected
+                                                  ? AppColor.blue
+                                                  : AppColor.gray,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Grouped sections
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children:
+                                      groups.entries.map((entry) {
+                                        final dateLabel = entry.key;
+                                        final List<QuizItem> items =
+                                            entry.value;
+
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Center(
+                                              child: Text(
+                                                dateLabel,
+                                                style: GoogleFont.ibmPlexSans(
+                                                  fontSize: 12,
+                                                  color: AppColor.gray,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 15),
+
+                                            ...items.asMap().entries.map((e) {
+                                              final int idx = e.key;
+                                              final QuizItem qi = e.value;
+
+                                              final colors = [
+                                                AppColor.lightBlueC1,
+                                                AppColor.lowLightYellow,
+                                                AppColor.lowLightNavi,
+                                                AppColor.lowLightPink,
+                                              ];
+                                              final bgColor =
+                                                  colors[idx % colors.length];
+
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 10,
+                                                ),
+                                                child: CommonContainer.homeworkhistory(
+                                                  view: 'view',
+                                                  onTap: () async {
+                                                    await quizController
+                                                        .quizDetailsPreviews(
+                                                          classId: qi.id,
+                                                        );
+                                                    Get.to(
+                                                      () => const QuizDetails(
+                                                        revealOnOpen: true,
+                                                      ),
+                                                    );
+                                                  },
+                                                  CText1: qi.quizClass,
+                                                  onIconTap: () {
+                                                    Get.to(
+                                                      () =>
+                                                          DetailsAttendHistory(
+                                                            quizId: qi.id,
+                                                            dateLabel:
+                                                                dateLabel,
+                                                          ),
+                                                    );
+                                                  },
+                                                  section: qi.quizClass,
+                                                  className: qi.quizClass,
+                                                  subText: '',
+                                                  homeWorkText: qi.subject,
+                                                  homeWorkImage: '',
+                                                  avatarImage: '',
+                                                  mainText: qi.title,
+                                                  smaleText: '',
+                                                  time:
+                                                      DateAndTimeConvert.formatDateTime(
+                                                        showTime: true,
+                                                        showDate: false,
+                                                        qi.time.toString(),
+                                                      ),
+                                                  aText1: ' ',
+                                                  aText2: '',
+                                                  backRoundColor: bgColor,
+                                                  gradient:
+                                                      const LinearGradient(
+                                                        colors: [
+                                                          AppColor.black,
+                                                          AppColor.black,
+                                                        ],
+                                                        begin:
+                                                            Alignment.topLeft,
+                                                        end:
+                                                            Alignment
+                                                                .bottomRight,
+                                                      ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ],
+                                        );
+                                      }).toList(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
-                  Image.asset(AppImages.noDataFound),
-                ],
-              ),
-            );
+                );
+              },
+            ),
+          );
 
-          }
-
-          return SingleChildScrollView(
+          /* return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
               child: Column(
@@ -282,7 +540,7 @@ class _QuizHistoryState extends State<QuizHistory> {
                 ],
               ),
             ),
-          );
+          );*/
         }),
       ),
     );
