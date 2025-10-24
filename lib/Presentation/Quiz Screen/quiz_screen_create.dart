@@ -1433,7 +1433,6 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       hasError = true;
     }
 
-    // Questions & Answers required
     for (int qIndex = 0; qIndex < questionList.length; qIndex++) {
       final q = questionList[qIndex];
 
@@ -1463,7 +1462,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
     }
 
     if (hasError) {
-      setState(() {}); // update UI with errors
+      setState(() {});
       return null;
     }
 
@@ -1471,7 +1470,7 @@ class _QuizScreenCreateState extends State<QuizScreenCreate> {
       "classId": selectedClassId,
       "subjectId": selectedSubjectId,
       "heading": headingController.text.trim(),
-      "timeLimit": timeNum, // <- clean numeric minutes
+      "timeLimit": timeNum,
       "publish": true,
       "questions":
           questionList.map((q) {
