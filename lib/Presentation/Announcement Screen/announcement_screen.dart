@@ -2216,6 +2216,8 @@ class AnnouncementScreen extends StatefulWidget {
   State<AnnouncementScreen> createState() => _AnnouncementScreenState();
 }
 
+///*****old********
+
 // class _AnnouncementScreenState extends State<AnnouncementScreen> {
 //   final AnnouncementContorller controller = Get.put(AnnouncementContorller());
 //   final ExamController examController = Get.put(ExamController());
@@ -3886,7 +3888,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
 
   int selectedIndex = 0; // 0 = General, 1 = Teacher
 
-  final List<Map<String, String>> subjects = const [
+  final List<Map<String, String>> subjects = [
     {'subject': 'Tamil', 'mark': '70'},
     {'subject': 'English', 'mark': '70'},
     {'subject': 'Maths', 'mark': '70'},
@@ -4930,24 +4932,34 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           }
 
           if (data == null || data.items.isEmpty) {
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 80),
-              decoration: const BoxDecoration(color: Colors.white),
-              child: Column(
-                children: [
-                  Center(
-                    child: Text(
-                      'No announcements available',
-                      style: GoogleFont.ibmPlexSans(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: AppColor.gray,
+            return RefreshIndicator(
+              onRefresh: () async {
+                await controller.getAnnouncement(
+                  // type: selectedIndex == 0 ? "general" : "teacher",
+                );
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(), // critical
+                child: Container(
+                  padding: const EdgeInsets.only(top: 80, bottom: 300),
+                  decoration: const BoxDecoration(color: Colors.white),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Text(
+                          'No announcements available',
+                          style: GoogleFont.ibmPlexSans(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: AppColor.gray,
+                          ),
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 30),
+                      Image.asset(AppImages.noDataFound),
+                    ],
                   ),
-                  const SizedBox(height: 30),
-                  Image.asset(AppImages.noDataFound),
-                ],
+                ),
               ),
             );
           }
@@ -4959,56 +4971,58 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               );
             },
             child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
+              physics: BouncingScrollPhysics(),
               padding: const EdgeInsets.all(15),
               itemCount: data.items.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 20),
-                    child:
-                    Column(
+                    child: Column(
                       children: [
                         Row(
-                         children: [
-                           CommonContainer.NavigatArrow(
-                             image: AppImages.leftSideArrow,
-                             imageColor: AppColor.lightBlack,
-                             container: AppColor.lowLightgray,
-                             onIconTap: () => Navigator.pop(context),
-                             border: Border.all(
-                               color: AppColor.lightgray,
-                               width: 0.3,
-                             ),
-                           ),
-                           const Spacer(),
-                           InkWell(
-                             onTap: () {
-                               Navigator.push(
-                                 context,
-                                 MaterialPageRoute(
-                                   builder: (_) => const AnnouncementCreate(),
-                                 ),
-                               );
-                             },
-                             child: Row(
-                               mainAxisSize: MainAxisSize.min,
-                               children: [
-                                 Text(
-                                   'Create Announcement',
-                                   style: GoogleFont.ibmPlexSans(
-                                     fontSize: 12,
-                                     fontWeight: FontWeight.w500,
-                                     color: AppColor.blue,
-                                   ),
-                                 ),
-                                 const SizedBox(width: 15),
-                                 Image.asset(AppImages.doubleArrow, height: 19),
-                               ],
-                             ),
-                           ),
-                         ],
-                                           ),
+                          children: [
+                            CommonContainer.NavigatArrow(
+                              image: AppImages.leftSideArrow,
+                              imageColor: AppColor.lightBlack,
+                              container: AppColor.lowLightgray,
+                              onIconTap: () => Navigator.pop(context),
+                              border: Border.all(
+                                color: AppColor.lightgray,
+                                width: 0.3,
+                              ),
+                            ),
+                            const Spacer(),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AnnouncementCreate(),
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Create Announcement',
+                                    style: GoogleFont.ibmPlexSans(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColor.blue,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Image.asset(
+                                    AppImages.doubleArrow,
+                                    height: 19,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 35),
                         Center(
                           child: Text(
@@ -5024,14 +5038,12 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                         ),
                       ],
                     ),
-
-
                   );
                 }
 
                 final item = data.items[index - 1];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: 16),
                   child: CommonContainer.announcementsScreen(
                     mainText: item.announcementCategory,
                     backRoundImage: item.image,
@@ -5054,6 +5066,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
           );
         }),
       ),
+
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: const BoxDecoration(color: Colors.white),
@@ -5089,7 +5102,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: GoogleFont.ibmPlexSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isSelected ? Colors.blue : Colors.grey,

@@ -1665,6 +1665,9 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
   final TextEditingController Description = TextEditingController();
 
   bool showHeadingClear = false;
+  bool _lockedInitialClass = false; // set true once we choose a default
+  bool _userTappedClass = false;
+  bool _userPickedClass = false;
 
   // ---------- legacy list section ----------
   final List<String> _listTextFields = [];
@@ -1877,6 +1880,19 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
     });
   }
 
+  void _centerAfterTap(int index, double viewportWidth) {
+    if (_classScrollController.hasClients) {
+      _centerOnSelected(index: index, viewportWidth: viewportWidth);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_classScrollController.hasClients) {
+          _centerOnSelected(index: index, viewportWidth: viewportWidth);
+        }
+      });
+    }
+  }
+
+
   void addDescriptionField() {
     setState(() {
       descriptionControllers.add(TextEditingController());
@@ -2010,7 +2026,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
       }
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    /*   WidgetsBinding.instance.addPostFrameCallback((_) async {
       await announcementController.getCategoryList(showLoader: false);
       if (teacherClassController.classList.isNotEmpty) {
         final defaultClass = teacherClassController.classList.firstWhere(
@@ -2031,7 +2047,32 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
       }
 
       setState(() {});
+    });*/
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await announcementController.getCategoryList(showLoader: false);
+
+      // Only set a default if:
+      //  - we haven't locked initial selection
+      //  - the user hasn't tapped yet
+      //  - we don't already have a selected classId
+      if (!_lockedInitialClass && !_userTappedClass && selectedClassId == null) {
+        if (teacherClassController.classList.isNotEmpty) {
+          final defaultClass = teacherClassController.classList.firstWhere(
+                (c) => c.name == (widget.className ?? c.name) &&
+                c.section == (widget.section ?? c.section),
+            orElse: () => teacherClassController.classList.first,
+          );
+          teacherClassController.selectedClass.value = defaultClass;
+          selectedIndex = teacherClassController.classList.indexOf(defaultClass);
+          selectedClassId = defaultClass.id;
+          _lockedInitialClass = true; // lock it so we don’t repeat later
+          setState(() {});
+        }
+      }
     });
+
+
     descriptionControllers.add(TextEditingController());
 
     headingController.addListener(() {
@@ -2263,13 +2304,26 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                 item: item,
                 isSelected: isSelected,
                 onTap: () {
+                  _userPickedClass = true;
+                  _userTappedClass = true;
+                  _lockedInitialClass = true;
                   setState(() {
                     selectedIndex = index;
                     selectedClassId = item.id;
                     teacherClassController.selectedClass.value = item;
                   });
-                  // no scroll needed for ≤ 3
+                  // no centering needed for <= 3
                 },
+
+
+                // onTap: () {
+                //   setState(() {
+                //     selectedIndex = index;
+                //     selectedClassId = item.id;
+                //     teacherClassController.selectedClass.value = item;
+                //   });
+                //   // no scroll needed for ≤ 3
+                // },
               ),
             );
           }),
@@ -2326,6 +2380,25 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
       body: SafeArea(
         child: Obx(() {
           final classes = teacherClassController.classList;
+          // If data is now available and we still haven’t chosen anything,
+          // pick a default ONCE (and only if the user hasn’t tapped).
+          if (!_lockedInitialClass && !_userTappedClass && selectedClassId == null && classes.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && !_lockedInitialClass && !_userTappedClass && selectedClassId == null) {
+                final defaultClass = classes.firstWhere(
+                      (c) => c.name == (widget.className ?? c.name) &&
+                      c.section == (widget.section ?? c.section),
+                  orElse: () => classes.first,
+                );
+                setState(() {
+                  teacherClassController.selectedClass.value = defaultClass;
+                  selectedIndex = classes.indexOf(defaultClass);
+                  selectedClassId = defaultClass.id;
+                  _lockedInitialClass = true;
+                });
+              }
+            });
+          }
 
           return SingleChildScrollView(
             child: Padding(
@@ -2802,7 +2875,7 @@ class _AnnouncementCreateState extends State<AnnouncementCreate> {
                                     color: AppColor.black,
                                   ),
                                 ),
-                                const SizedBox(width: 25),
+                                SizedBox(width: 25),
                                 CommonContainer.addMore(
                                   onTap:
                                       () => setState(
