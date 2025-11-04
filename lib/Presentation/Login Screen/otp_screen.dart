@@ -69,17 +69,54 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                 ),
                 SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    'Resend OTP',
-                    style: GoogleFont.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.blue,
-                    ),
-                  ),
-                ),
+                Obx(() {
+                  final cooldown = otpController.resendCooldown.value;
+                  final isLoading = otpController.isOtpLoading.value;
+                  return Row(
+                    children: [
+                      if (isLoading) ...[
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 8),
+                      ],
+                      GestureDetector(
+                        onTap:
+                            cooldown == 0 && !isLoading
+                                ? () => otpController.resentOtpWithTimer(
+                                  widget.mobileNumber!,
+                                )
+                                : null,
+                        child: Text(
+                          cooldown == 0
+                              ? 'Resend OTP'
+                              : 'Resend in ${cooldown}s',
+                          style: GoogleFont.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                (cooldown == 0 && !isLoading)
+                                    ? AppColor.blueG2
+                                    : AppColor.blueG2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+                // GestureDetector(
+                //   onTap: () {},
+                //   child: Text(
+                //     'Resend OTP',
+                //     style: GoogleFont.inter(
+                //       fontSize: 12,
+                //       fontWeight: FontWeight.w500,
+                //       color: AppColor.blue,
+                //     ),
+                //   ),
+                // ),
                 SizedBox(height: 25),
 
                 PinCodeTextField(
