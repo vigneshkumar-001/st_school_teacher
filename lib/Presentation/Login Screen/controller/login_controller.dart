@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:st_teacher_app/Core/consents.dart';
@@ -27,6 +29,12 @@ class LoginController extends GetxController {
   final TeacherAttendanceController teacherAttendanceController = Get.put(
     TeacherAttendanceController(),
   );
+
+
+  final RxInt resendCooldown = 0.obs;
+  final RxInt otpExpiry = 0.obs;
+  Timer? _otpExpiryTimer;
+
 
   @override
   void onInit() {
@@ -176,6 +184,98 @@ class LoginController extends GetxController {
     }
     return null;
   }
+
+
+  Future<String?> resentOtp({required String phone}) async {
+    try {
+      isOtpLoading.value = true;
+      final results = await apiDataSource.resentOtp(phone: phone);
+      results.fold(
+            (failure) {
+          isOtpLoading.value = false;
+          CustomSnackBar.showError(failure.message);
+          AppLogger.log.e(failure.message);
+        },
+            (response) async {
+          AppLogger.log.i(response.message);
+          final prefs = await SharedPreferences.getInstance();
+          // accessToken = response.token;
+
+          prefs.setString('token', accessToken);
+          prefs.setBool('isAdmissionCompleted', false);
+
+          String? token = prefs.getString('token');
+          final fcmToken = prefs.getString('fcmToken');
+          sendFcmToken(fcmToken!);
+          await _loadInitialData();
+          // if (response == 'student') {
+          //   prefs.setBool('isAdmissionCompleted', true);
+          //   Get.offAll(CommonBottomNavigation(initialIndex: 0));
+          // } else {
+          //   prefs.setBool('isAdmissionCompleted', false);
+          //   Get.offAll(Admission1());
+          // }
+
+          isOtpLoading.value = false;
+          AppLogger.log.i('token = $token');
+        },
+      );
+    } catch (e) {
+      isOtpLoading.value = false;
+      AppLogger.log.e(e);
+      return e.toString();
+    }
+    return null;
+  }
+
+  Future<void> resentOtpWithTimer(String phone) async {
+    if (resendCooldown.value > 0) return; // prevent spam
+
+    isOtpLoading.value = true;
+    final results = await apiDataSource.resentOtp(phone: phone);
+
+    results.fold(
+          (failure) {
+        isOtpLoading.value = false;
+        CustomSnackBar.showError(failure.message);
+      },
+          (response) {
+        isOtpLoading.value = false;
+        resendCooldown.value = response.meta.nextAllowedIn;
+        otpExpiry.value = response.meta.nextAllowedIn; // same duration for OTP expiry
+        CustomSnackBar.showSuccess(response.message);
+        _startResendTimer();
+        _startOtpExpiryTimer();
+      },
+    );
+  }
+
+  void _startResendTimer() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (resendCooldown.value <= 1) {
+        resendCooldown.value = 0;
+        timer.cancel();
+      } else {
+        resendCooldown.value--;
+      }
+    });
+  }
+
+  void _startOtpExpiryTimer() {
+    _otpExpiryTimer?.cancel();
+    _otpExpiryTimer = Timer.periodic( Duration(seconds: 1), (timer) {
+      if (otpExpiry.value <= 1) {
+        otpExpiry.value = 0;
+        timer.cancel();
+        CustomSnackBar.showError("OTP expired. Please resend.");
+      } else {
+        otpExpiry.value--;
+      }
+    });
+  }
+
+
+
 
   Future<String?> changeNumberOtp({
     required String phone,
