@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,7 +12,12 @@ import 'controller/create_homework_controller.dart';
 
 class HomeworkHistoryDetails extends StatefulWidget {
   final int homeworkId;
-  const HomeworkHistoryDetails({super.key, required this.homeworkId});
+  final String profileImg;
+  const HomeworkHistoryDetails({
+    super.key,
+    required this.homeworkId,
+    required this.profileImg,
+  });
 
   @override
   State<HomeworkHistoryDetails> createState() => _HomeworkHistoryDetailsState();
@@ -95,16 +101,16 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
           child: Image.network(
             url,
             fit: BoxFit.cover, // 👈 cover makes it look neat
-            errorBuilder: (_, __, ___) => Image.asset(
-              AppImages.homeworkPreviewImage2,
-              fit: BoxFit.cover,
-            ),
+            errorBuilder:
+                (_, __, ___) => Image.asset(
+                  AppImages.homeworkPreviewImage2,
+                  fit: BoxFit.cover,
+                ),
           ),
         ),
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -208,10 +214,11 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                 final url = (task['content'] ?? '').toString();
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
-                                  child: _shortPreviewNetImage(url), // 👈 now short preview + full screen
+                                  child: _shortPreviewNetImage(
+                                    url,
+                                  ), // 👈 now short preview + full screen
                                 );
                               }),
-
 
                               const SizedBox(height: 16),
 
@@ -307,29 +314,60 @@ class _HomeworkHistoryDetailsState extends State<HomeworkHistoryDetails> {
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 25,
-                                      vertical: 20,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                      vertical: 10,
                                     ),
                                     child: Row(
                                       children: [
-                                        // CircleAvatar(
-                                        //   child: Image.asset(AppImages.avatar1),
-                                        // ),
-                                        // const SizedBox(width: 10),
+                                        ClipOval(
+                                          child: CachedNetworkImage(
+                                            imageUrl: widget.profileImg,
+                                            fit: BoxFit.cover,
+                                            height: 35,
+                                            width: 35,
+                                            placeholder:
+                                                (context, url) => SizedBox(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child: Center(
+                                                    child: SizedBox(
+                                                      height: 18,
+                                                      width: 18,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    CircleAvatar(
+                                                      radius: 15,
+                                                      backgroundColor:
+                                                          Colors.grey,
+                                                      child: Icon(
+                                                        Icons.person,
+                                                        size: 16,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
                                         Text(
-                                          (details.subject?.name ?? '')
-                                              .toString(),
+                                          details.subject.name ?? '',
                                           style: GoogleFont.inter(
                                             fontSize: 12,
                                             color: AppColor.lightBlack,
                                           ),
                                         ),
-                                        const SizedBox(width: 20),
                                       ],
                                     ),
                                   ),
                                 ),
+
                                 const SizedBox(width: 20),
                                 Container(
                                   decoration: BoxDecoration(

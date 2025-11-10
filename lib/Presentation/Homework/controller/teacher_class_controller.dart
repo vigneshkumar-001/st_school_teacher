@@ -54,12 +54,11 @@ class TeacherClassController extends GetxController {
           AppLogger.log.e(failure.message);
         },
             (response) {
-          // 🔑 assignAll instead of value =
+
           classList.assignAll(response.data.classes);
           subjectList.assignAll(response.data.subjects);
           isLoading.value = false;
 
-          // Set selected class based on passed className/section or default to first
 
           if (classList.isNotEmpty) {
             // Pick default class
