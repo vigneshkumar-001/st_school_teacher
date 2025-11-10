@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:st_teacher_app/Core/Utility/custom_app_button.dart';
+import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Homework/controller/teacher_class_controller.dart';
+import 'package:st_teacher_app/Presentation/Profile/controller/teacher_data_controller.dart';
 import '../../Core/Utility/app_color.dart';
 import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/google_fonts.dart';
@@ -52,8 +54,8 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
   final TeacherClassController teacherClassController = Get.put(
     TeacherClassController(),
   );
+  final TeacherDataController controller = Get.put(TeacherDataController());
 
-  // form
   final _formKey = GlobalKey<FormState>();
 
   // class/subject pickers
@@ -172,7 +174,13 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       setState(() => showClearIcon = headingController.text.isNotEmpty);
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await controller.getTeacherClassData();
+
+      final profile = controller.teacherDataResponse.value?.data.profile;
+      if (profile != null) {
+        AppLogger.log.i("✅ Profile fetched: $profile");
+      }
       final classes = teacherClassController.classList;
       if (classes.isNotEmpty) {
         // If nothing selected yet, set default ONCE
@@ -203,50 +211,6 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       setState(() {});
     });
   }
-
-  /*  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // ... your existing defaultClass / subject setup ...
-
-      setState(() {}); // you already had this
-      // Center the default/initial selection
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _centerSelectedClass(animate: false);
-      });
-    });
-
-    // Always show at least 1 description field
-    descriptionControllers.add(TextEditingController());
-
-    headingController.addListener(() {
-      setState(() => showClearIcon = headingController.text.isNotEmpty);
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (teacherClassController.classList.isNotEmpty) {
-        final defaultClass = teacherClassController.classList.firstWhere(
-          (c) =>
-              c.name == (widget.className ?? c.name) &&
-              c.section == (widget.section ?? c.section),
-          orElse: () => teacherClassController.classList.first,
-        );
-        teacherClassController.selectedClass.value = defaultClass;
-        selectedIndex = teacherClassController.classList.indexOf(defaultClass);
-        selectedClassId = defaultClass.id;
-      }
-
-      if (teacherClassController.subjectList.isNotEmpty) {
-        subjectIndex = 0;
-        selectedSubject = teacherClassController.subjectList[0].name;
-        selectedSubjectId = teacherClassController.subjectList[0].id;
-      }
-
-      setState(() {});
-    });
-  }*/
 
   @override
   void dispose() {
@@ -405,6 +369,14 @@ class _HomeworkCreateState extends State<HomeworkCreate> {
       MaterialPageRoute(
         builder:
             (_) => HomeworkCreatePreview(
+              profileImg:
+                  controller
+                      .teacherDataResponse
+                      .value
+                      ?.data
+                      .profile
+                      .profileImg ??
+                  '',
               listPoints: listPoints,
               subjectId: selectedSubjectId,
               subjects: selectedSubject.name,
