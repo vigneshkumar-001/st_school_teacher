@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,7 @@ import 'package:get/get.dart';
 
 class HomeworkCreatePreview extends StatefulWidget {
   final String subjects;
+  final String profileImg;
   final List<String> description; // paragraphs
   final List<File> images;
 
@@ -31,12 +33,13 @@ class HomeworkCreatePreview extends StatefulWidget {
     super.key,
     required this.subjects,
     required this.description,
-    this.permanentImage, // 👈 optional
+    this.permanentImage,
     required this.heading,
     this.subjectId,
     required this.images,
     required this.listPoints,
     this.selectedClassId,
+    required this.profileImg,
     // File?permanentImage,
   });
 
@@ -326,16 +329,48 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 25,
-                                      vertical: 20,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                      vertical: 10,
                                     ),
                                     child: Row(
                                       children: [
-                                        // CircleAvatar(
-                                        //   child: Image.asset(AppImages.avatar1),
-                                        // ),
-                                        // SizedBox(width: 10),
+                                        ClipOval(
+                                          child: CachedNetworkImage(
+                                            imageUrl: widget.profileImg,
+                                            fit: BoxFit.cover,
+                                            height: 35,
+                                            width: 35,
+                                            placeholder:
+                                                (context, url) => SizedBox(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child: Center(
+                                                    child: SizedBox(
+                                                      height: 18,
+                                                      width: 18,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    CircleAvatar(
+                                                      radius: 15,
+                                                      backgroundColor:
+                                                          Colors.grey,
+                                                      child: Icon(
+                                                        Icons.person,
+                                                        size: 16,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
                                         Text(
                                           widget.subjects ?? '',
                                           style: GoogleFont.inter(
@@ -347,7 +382,8 @@ class _HomeworkCreatePreviewState extends State<HomeworkCreatePreview> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 20),
+
+                                SizedBox(width: 10),
                                 Container(
                                   decoration: BoxDecoration(
                                     color: AppColor.black.withOpacity(0.05),

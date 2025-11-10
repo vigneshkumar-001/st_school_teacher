@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:st_teacher_app/Core/Utility/app_loader.dart';
+import 'package:st_teacher_app/Core/consents.dart';
 import 'package:st_teacher_app/Presentation/Homework/controller/create_homework_controller.dart';
 
 import '../../Core/Utility/app_color.dart';
@@ -9,6 +10,7 @@ import '../../Core/Utility/app_images.dart';
 import '../../Core/Utility/date_and_time_convert.dart';
 import '../../Core/Utility/google_fonts.dart';
 import '../../Core/Widgets/common_container.dart';
+import '../Profile/controller/teacher_data_controller.dart';
 import 'homework_create.dart';
 import 'homework_history_details.dart';
 import 'package:get/get.dart';
@@ -26,12 +28,22 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
   final CreateHomeworkController controller = Get.put(
     CreateHomeworkController(),
   );
+  final TeacherDataController teacherDataController = Get.put(
+    TeacherDataController(),
+  );
   int index = 0;
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchHomeworks();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await controller.fetchHomeworks();
+      await teacherDataController.getTeacherClassData();
+
+      final profile =
+          teacherDataController.teacherDataResponse.value?.data.profile;
+      if (profile != null) {
+        AppLogger.log.i("✅ Profile fetched: $profile");
+      }
     });
   }
 
@@ -320,9 +332,14 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                     parent: BouncingScrollPhysics(),
                   ),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 18,
+                        horizontal: 15,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -333,13 +350,20 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                 imageColor: AppColor.lightBlack,
                                 container: AppColor.lowLightgray,
                                 onIconTap: () => Navigator.pop(context),
-                                border: Border.all(color: AppColor.lightgray, width: 0.3),
+                                border: Border.all(
+                                  color: AppColor.lightgray,
+                                  width: 0.3,
+                                ),
                               ),
                               const Spacer(),
                               InkWell(
                                 onTap: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (_) => HomeworkCreate()));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => HomeworkCreate(),
+                                    ),
+                                  );
                                 },
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -353,7 +377,10 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                       ),
                                     ),
                                     const SizedBox(width: 15),
-                                    Image.asset(AppImages.doubleArrow, height: 19),
+                                    Image.asset(
+                                      AppImages.doubleArrow,
+                                      height: 19,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -385,29 +412,47 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 20.0, horizontal: 20),
+                                        vertical: 20.0,
+                                        horizontal: 20,
+                                      ),
                                       child: SizedBox(
                                         height: 40,
                                         child: ListView.builder(
                                           scrollDirection: Axis.horizontal,
-                                          itemCount: controller.classNames.length,
+                                          itemCount:
+                                              controller.classNames.length,
                                           itemBuilder: (context, index) {
-                                            final name = controller.classNames[index];
+                                            final name =
+                                                controller.classNames[index];
                                             final isSelected =
-                                                controller.selectedClassName.value == name;
+                                                controller
+                                                    .selectedClassName
+                                                    .value ==
+                                                name;
                                             return GestureDetector(
-                                              onTap: () => controller.selectClass(name),
+                                              onTap:
+                                                  () => controller.selectClass(
+                                                    name,
+                                                  ),
                                               child: Container(
-                                                margin: const EdgeInsets.only(right: 12),
-                                                padding: const EdgeInsets.symmetric(
-                                                    horizontal: 16, vertical: 8),
+                                                margin: const EdgeInsets.only(
+                                                  right: 12,
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 8,
+                                                    ),
                                                 decoration: BoxDecoration(
                                                   color: AppColor.white,
-                                                  borderRadius: BorderRadius.circular(20),
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                   border: Border.all(
-                                                    color: isSelected
-                                                        ? AppColor.blue
-                                                        : AppColor.borderGary,
+                                                    color:
+                                                        isSelected
+                                                            ? AppColor.blue
+                                                            : AppColor
+                                                                .borderGary,
                                                   ),
                                                 ),
                                                 alignment: Alignment.center,
@@ -426,71 +471,103 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
 
                                     // grouped sections (unchanged)
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: controller.groupedHomeworkByDate.entries
-                                          .map((entry) {
-                                        final dateLabel = entry.key;
-                                        final homeworks = entry.value;
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Center(
-                                              child: Text(
-                                                dateLabel,
-                                                style: GoogleFont.ibmPlexSans(
-                                                  fontSize: 12,
-                                                  color: AppColor.gray,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children:
+                                          controller.groupedHomeworkByDate.entries.map((
+                                            entry,
+                                          ) {
+                                            final dateLabel = entry.key;
+                                            final homeworks = entry.value;
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Center(
+                                                  child: Text(
+                                                    dateLabel,
+                                                    style:
+                                                        GoogleFont.ibmPlexSans(
+                                                          fontSize: 12,
+                                                          color: AppColor.gray,
+                                                        ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 15),
-                                            ...homeworks.asMap().entries.map((e) {
-                                              final idx = e.key;
-                                              final hw = e.value;
-                                              const colors = [
-                                                AppColor.lightBlueC1,
-                                                AppColor.lowLightYellow,
-                                                AppColor.lowLightNavi,
-                                                AppColor.lowLightPink,
-                                              ];
-                                              final bgColor = colors[idx % colors.length];
+                                                const SizedBox(height: 15),
+                                                ...homeworks.asMap().entries.map((
+                                                  e,
+                                                ) {
+                                                  final idx = e.key;
+                                                  final hw = e.value;
+                                                  const colors = [
+                                                    AppColor.lightBlueC1,
+                                                    AppColor.lowLightYellow,
+                                                    AppColor.lowLightNavi,
+                                                    AppColor.lowLightPink,
+                                                  ];
+                                                  final bgColor =
+                                                      colors[idx %
+                                                          colors.length];
 
-                                              return Padding(
-                                                padding: const EdgeInsets.only(bottom: 10),
-                                                child: CommonContainer.homeworkhistory(
-                                                  CText1: hw.classNames,
-                                                  onIconTap: () {
-                                                    Get.to(() => HomeworkHistoryDetails(
-                                                      homeworkId: hw.id,
-                                                    ));
-                                                  },
-                                                  section: hw.classNames,
-                                                  className: hw.classNames,
-                                                  subText: '',
-                                                  homeWorkText: hw.subject,
-                                                  homeWorkImage: '',
-                                                  avatarImage: '',
-                                                  mainText: hw.title,
-                                                  smaleText: '',
-                                                  time: DateAndTimeConvert.formatDateTime(
-                                                    showTime: true,
-                                                    showDate: false,
-                                                    hw.time.toString(),
-                                                  ),
-                                                  aText1: ' ',
-                                                  aText2: '',
-                                                  backRoundColor: bgColor,
-                                                  gradient: const LinearGradient(
-                                                    colors: [AppColor.black, AppColor.black],
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomRight,
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ],
-                                        );
-                                      }).toList(),
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          bottom: 10,
+                                                        ),
+                                                    child: CommonContainer.homeworkhistory(
+                                                      CText1: hw.classNames,
+                                                      onIconTap: () {
+                                                        Get.to(
+                                                          () => HomeworkHistoryDetails(
+                                                            profileImg:
+                                                                teacherDataController
+                                                                    .teacherDataResponse
+                                                                    .value
+                                                                    ?.data
+                                                                    .profile
+                                                                    .profileImg ??
+                                                                '',
+
+                                                            homeworkId: hw.id,
+                                                          ),
+                                                        );
+                                                      },
+                                                      section: hw.classNames,
+                                                      className: hw.classNames,
+                                                      subText: '',
+                                                      homeWorkText: hw.subject,
+                                                      homeWorkImage: '',
+                                                      avatarImage: '',
+                                                      mainText: hw.title,
+                                                      smaleText: '',
+                                                      time:
+                                                          DateAndTimeConvert.formatDateTime(
+                                                            showTime: true,
+                                                            showDate: false,
+                                                            hw.time.toString(),
+                                                          ),
+                                                      aText1: ' ',
+                                                      aText2: '',
+                                                      backRoundColor: bgColor,
+                                                      gradient:
+                                                          const LinearGradient(
+                                                            colors: [
+                                                              AppColor.black,
+                                                              AppColor.black,
+                                                            ],
+                                                            begin:
+                                                                Alignment
+                                                                    .topLeft,
+                                                            end:
+                                                                Alignment
+                                                                    .bottomRight,
+                                                          ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ],
+                                            );
+                                          }).toList(),
                                     ),
                                   ],
                                 ),
@@ -505,7 +582,6 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
               },
             ),
           );
-
         }),
       ),
     );
