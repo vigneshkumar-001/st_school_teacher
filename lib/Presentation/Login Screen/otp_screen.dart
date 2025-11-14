@@ -206,13 +206,13 @@ class _OtpScreenState extends State<OtpScreen> {
 
                 CommonContainer.checkMark(
                   onTap: () {
-                    if (otp.text.length != 4) {
-                      errorController?.add(ErrorAnimationType.shake);
-                      setState(() {
-                        otpError = 'Please enter a valid 4-digit OTP';
-                      });
-                      return;
-                    }
+                    // if (otp.text.length != 4) {
+                    //   errorController?.add(ErrorAnimationType.shake);
+                    //   setState(() {
+                    //     otpError = 'Please enter a valid 4-digit OTP';
+                    //   });
+                    //   return;
+                    // }
 
                     if (widget.pages == 'splash') {
                       String Otp = otp.text.toString();

@@ -1,13 +1,12 @@
 class ApiUrl {
-  static String baseUrl12 =
-      'https://school-back-end-594f59bea6cb.herokuapp.com';
+  static String baseUrl = 'https://school-back-end-594f59bea6cb.herokuapp.com';
   static String baseUrl1 = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
-  static String baseUrl = 'https://backend.stjosephmatricschool.com';
+  static String baseUrl12 = 'https://backend.stjosephmatricschool.com';
 
   static String login = '$baseUrl/teacher-auth/login';
   static String changePhone = '$baseUrl/teacher/change-phone/request';
   static String verifyOtp = '$baseUrl/teacher-auth/verify-otp';
-  static String resendOtp = '$baseUrl/student-auth/resend-otp';
+  static String resendOtp = '$baseUrl/teacher-auth/resend-otp';
   static String changePhoneVerify = '$baseUrl/teacher/change-phone/verify';
   static String notifications = '$baseUrl/notifications/teachers/register';
   static String classList = '$baseUrl/teacher-student-attendance/class-list';
