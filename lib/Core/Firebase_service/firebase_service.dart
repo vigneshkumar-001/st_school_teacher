@@ -210,28 +210,54 @@ class FirebaseService {
     _fcmToken = prefs.getString('fcmToken');
 
     if (_fcmToken == null) {
-      final messaging = FirebaseMessaging.instance;
-      final token = await messaging.getToken();
+      final token = await getTokenWithRetry();
       AppLogger.log.i('✅ New FCM Token: $token');
-      _fcmToken = token;
+
       if (token != null) {
+        _fcmToken = token;
         await prefs.setString('fcmToken', token);
         controller.sendFcmToken(token);
+      } else {
+        AppLogger.log.w(
+          '🚫 Could not obtain FCM token right now (SERVICE_NOT_AVAILABLE / network / Play services)',
+        );
       }
     } else {
       AppLogger.log.i('ℹ️ Existing FCM Token: $_fcmToken');
       controller.sendFcmToken(_fcmToken!);
     }
 
-    // 🔁 Listen for token refresh
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
       AppLogger.log.i('🔁 Token refreshed: $newToken');
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setString('fcmToken', newToken);
       controller.sendFcmToken(newToken);
     });
   }
+  Future<String?> getTokenWithRetry({
+    int maxAttempts = 4,
+    Duration initialDelay = const Duration(seconds: 2),
+  }) async {
+    var delay = initialDelay;
 
+    for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await FirebaseMessaging.instance.setAutoInitEnabled(true);
+
+        final token = await FirebaseMessaging.instance.getToken();
+        if (token != null && token.isNotEmpty) return token;
+      } catch (e) {
+        AppLogger.log.w(
+          '⚠️ FCM getToken failed (attempt $attempt/$maxAttempts): $e',
+        );
+      }
+
+      if (attempt < maxAttempts) {
+        await Future.delayed(delay);
+        delay *= 2;
+      }
+    }
+    return null;
+  }
   // 🔹 Show local notification (for foreground)
   Future<void> showNotification(RemoteMessage message) async {
     final data = message.data;

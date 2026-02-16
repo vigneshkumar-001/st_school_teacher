@@ -30,11 +30,9 @@ class LoginController extends GetxController {
     TeacherAttendanceController(),
   );
 
-
   final RxInt resendCooldown = 0.obs;
   final RxInt otpExpiry = 0.obs;
   Timer? _otpExpiryTimer;
-
 
   @override
   void onInit() {
@@ -165,7 +163,7 @@ class LoginController extends GetxController {
           await prefs.setString('token', response.token);
           String? token = prefs.getString('token');
           final _fcmToken = prefs.getString('fcmToken');
-          sendFcmToken(_fcmToken!);
+          sendFcmToken(_fcmToken ?? '');
           await _loadInitialData();
           final now = DateTime.now();
           await teacherAttendanceController.getTeacherAttendanceMonth(
@@ -185,18 +183,17 @@ class LoginController extends GetxController {
     return null;
   }
 
-
   Future<String?> resentOtp({required String phone}) async {
     try {
       isOtpLoading.value = true;
       final results = await apiDataSource.resentOtp(phone: phone);
       results.fold(
-            (failure) {
+        (failure) {
           isOtpLoading.value = false;
           CustomSnackBar.showError(failure.message);
           AppLogger.log.e(failure.message);
         },
-            (response) async {
+        (response) async {
           AppLogger.log.i(response.message);
           final prefs = await SharedPreferences.getInstance();
           // accessToken = response.token;
@@ -235,14 +232,15 @@ class LoginController extends GetxController {
     final results = await apiDataSource.resentOtp(phone: phone);
 
     results.fold(
-          (failure) {
+      (failure) {
         isOtpLoading.value = false;
         CustomSnackBar.showError(failure.message);
       },
-          (response) {
+      (response) {
         isOtpLoading.value = false;
         resendCooldown.value = response.meta.nextAllowedIn;
-        otpExpiry.value = response.meta.nextAllowedIn; // same duration for OTP expiry
+        otpExpiry.value =
+            response.meta.nextAllowedIn; // same duration for OTP expiry
         CustomSnackBar.showSuccess(response.message);
         _startResendTimer();
         _startOtpExpiryTimer();
@@ -263,7 +261,7 @@ class LoginController extends GetxController {
 
   void _startOtpExpiryTimer() {
     _otpExpiryTimer?.cancel();
-    _otpExpiryTimer = Timer.periodic( Duration(seconds: 1), (timer) {
+    _otpExpiryTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (otpExpiry.value <= 1) {
         otpExpiry.value = 0;
         timer.cancel();
@@ -273,9 +271,6 @@ class LoginController extends GetxController {
       }
     });
   }
-
-
-
 
   Future<String?> changeNumberOtp({
     required String phone,
@@ -317,15 +312,14 @@ class LoginController extends GetxController {
     return null;
   }
 
-
   Future<void> checkTokenExpire() async {
     try {
       final results = await apiDataSource.checkTokenExpire();
       results.fold(
-            (failure) {
+        (failure) {
           AppLogger.log.e(failure.message);
         },
-            (response) async {
+        (response) async {
           AppLogger.log.i(response.message);
 
           final prefs = await SharedPreferences.getInstance();
@@ -343,7 +337,6 @@ class LoginController extends GetxController {
             );
           }
 
-
           await _loadInitialData();
         },
       );
@@ -351,7 +344,6 @@ class LoginController extends GetxController {
       AppLogger.log.e('Error checking token: $e');
     } finally {}
   }
-
 
   Future<void> _loadInitialData() async {
     await Future.wait([
