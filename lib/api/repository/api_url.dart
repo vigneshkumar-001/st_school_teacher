@@ -1,7 +1,7 @@
 class ApiUrl {
   static String baseUrl = 'https://school-back-end-594f59bea6cb.herokuapp.com';
   static String baseUrl1 = 'https://9kt7pzw3-4000.inc1.devtunnels.ms';
-  static String baseUrl12 = 'https://backend.stjosephmatricschool.com';
+  // static String baseUrl = 'https://backend.stjosephmatricschool.com';
 
   static String login = '$baseUrl/teacher-auth/login';
   static String changePhone = '$baseUrl/teacher/change-phone/request';
@@ -105,6 +105,7 @@ class ApiUrl {
     return '$baseUrl/teacher-home/attendance/daily?date=$formattedDate';
   }
 
-  static String imageUrl =
-      "https://next.fenizotechnologies.com/Adrox/api/image-save";
+  // static String imageUrl =
+  //     "$baseUrl/api/image-save";
+  static String imageUrl = "$baseUrl/api/image-save";
 }

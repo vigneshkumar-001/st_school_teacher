@@ -11,9 +11,11 @@ import 'init_controller.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   final firebaseService = FirebaseService();
-  await firebaseService.initializeFirebase();
-  await firebaseService.fetchFCMTokenIfNeeded();
+  await firebaseService.initializeFirebase();      // asks permission + channels
+  await firebaseService.fetchFCMTokenIfNeeded();   // now uses retry
+
 
   // (Optional) foreground/opened handlers
   firebaseService.listenToMessages(

@@ -97,7 +97,6 @@ class ExamController extends GetxController {
 
     return grouped;
   }
-
   Future<void> createExam({
     bool showLoader = true,
     BuildContext? context,
@@ -108,9 +107,9 @@ class ExamController extends GetxController {
     required String announcementDate,
     File? imageFiles,
   }) async {
-    try {
-      if (showLoader) showPopupLoader();
+    if (showLoader) showPopupLoader();
 
+    try {
       String? timetableUrl;
 
       // Upload timetable image if selected
@@ -119,10 +118,13 @@ class ExamController extends GetxController {
           imageFile: imageFiles,
         );
 
-        timetableUrl = uploadResult.fold((failure) {
-          CustomSnackBar.showError("Image Upload Failed: ${failure.message}");
-          return null;
-        }, (success) => success.message);
+        timetableUrl = uploadResult.fold(
+              (failure) {
+            CustomSnackBar.showError("Image Upload Failed: ${failure.message}");
+            return null;
+          },
+              (success) => success.message, // ⚠️ make sure this is actually URL
+        );
       }
 
       final results = await apiDataSource.createExam(
@@ -134,26 +136,87 @@ class ExamController extends GetxController {
         timetableUrl: timetableUrl,
       );
 
-      results.fold(
-        (failure) {
-          if (showLoader) hidePopupLoader();
+      await results.fold(
+            (failure) async {
           AppLogger.log.e(failure.message);
           CustomSnackBar.showError(failure.message);
         },
-        (response) async {
+            (response) async {
           await getExamList();
-          Get.off(ExamHistory());
-          if (showLoader) hidePopupLoader();
-          // Navigator.pop(context);
 
+          // ✅ hide loader BEFORE navigation (important)
+          if (showLoader) hidePopupLoader();
+
+          Get.off(() => ExamHistory());
           AppLogger.log.i(response.message);
         },
       );
     } catch (e) {
-      if (showLoader) hidePopupLoader();
       AppLogger.log.e(e);
+      CustomSnackBar.showError(e.toString());
+    } finally {
+      // ✅ safety net: loader will always stop
+      if (showLoader) hidePopupLoader();
     }
   }
+
+  //
+  // Future<void> createExam({
+  //   bool showLoader = true,
+  //   BuildContext? context,
+  //   required int classId,
+  //   required String heading,
+  //   required String startDate,
+  //   required String endDate,
+  //   required String announcementDate,
+  //   File? imageFiles,
+  // }) async {
+  //   try {
+  //     if (showLoader) showPopupLoader();
+  //
+  //     String? timetableUrl;
+  //
+  //     // Upload timetable image if selected
+  //     if (imageFiles != null) {
+  //       final uploadResult = await apiDataSource.userProfileUpload(
+  //         imageFile: imageFiles,
+  //       );
+  //
+  //       timetableUrl = uploadResult.fold((failure) {
+  //         CustomSnackBar.showError("Image Upload Failed: ${failure.message}");
+  //         return null;
+  //       }, (success) => success.message);
+  //     }
+  //
+  //     final results = await apiDataSource.createExam(
+  //       classId: classId,
+  //       heading: heading,
+  //       startDate: startDate,
+  //       endDate: endDate,
+  //       announcementDate: announcementDate,
+  //       timetableUrl: timetableUrl,
+  //     );
+  //
+  //     results.fold(
+  //       (failure) {
+  //         if (showLoader) hidePopupLoader();
+  //         AppLogger.log.e(failure.message);
+  //         CustomSnackBar.showError(failure.message);
+  //       },
+  //       (response) async {
+  //         await getExamList();
+  //         Get.off(ExamHistory());
+  //         if (showLoader) hidePopupLoader();
+  //         // Navigator.pop(context);
+  //
+  //         AppLogger.log.i(response.message);
+  //       },
+  //     );
+  //   } catch (e) {
+  //     if (showLoader) hidePopupLoader();
+  //     AppLogger.log.e(e);
+  //   }
+  // }
 
   Future<void> markEnter({
     bool showLoader = false,

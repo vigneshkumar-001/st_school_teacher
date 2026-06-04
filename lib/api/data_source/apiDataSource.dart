@@ -476,7 +476,7 @@ class ApiDataSource extends BaseApiDataSource {
         "publish": publish,
         "contents": contents, // pass directly
       };
-
+      AppLogger.log.i(body);
       dynamic response = await Request.sendRequest(url, body, 'Post', true);
       AppLogger.log.i(response);
       if (response is! DioException &&
@@ -489,8 +489,11 @@ class ApiDataSource extends BaseApiDataSource {
       } else {
         return Left(ServerFailure((response as DioException).message ?? ""));
       }
-    } catch (e) {
-      return Left(ServerFailure(''));
+    } catch (e, st) {
+      AppLogger.log.e(e);
+      AppLogger.log.e(st);
+      print(e);
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -655,8 +658,9 @@ class ApiDataSource extends BaseApiDataSource {
       } else {
         return Left(ServerFailure("Unexpected error"));
       }
-    } catch (e) {
-      // CommonLogger.log.e(e);
+    } catch (e,st) {
+      AppLogger.log.e(e);
+      AppLogger.log.e(st );
       print(e);
       return Left(ServerFailure('Something went wrong'));
     }
@@ -983,6 +987,7 @@ class ApiDataSource extends BaseApiDataSource {
         "isPublished": true,
       };
 
+      AppLogger.log.i(body);
       dynamic response = await Request.sendRequest(url, body, 'Post', true);
       AppLogger.log.i(response);
       if (response is! DioException &&
@@ -990,19 +995,21 @@ class ApiDataSource extends BaseApiDataSource {
         if (response.data['status'] == true) {
           return Right(AnnouncementCreateResponse.fromJson(response.data));
         } else {
-          final msg = response.data['message']?.toString() ?? "Something went wrong";
+          final msg =
+              response.data['message']?.toString() ?? "Something went wrong";
           return Left(ServerFailure(msg));
         }
       } else {
         final dioErr = response as DioException;
-        final msg = dioErr.response?.data?['message']?.toString() ??
+        final msg =
+            dioErr.response?.data?['message']?.toString() ??
             dioErr.message ??
             "Request failed";
         return Left(ServerFailure(msg));
       }
-    } catch (e,st) {
+    } catch (e, st) {
       AppLogger.log.e("createExam error", error: e, stackTrace: st);
-      return Left(ServerFailure(''));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -1080,7 +1087,9 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-  Future<Either<Failure, ExamDetailsResponse>> getExamDetailsList({required int examId}) async {
+  Future<Either<Failure, ExamDetailsResponse>> getExamDetailsList({
+    required int examId,
+  }) async {
     try {
       String url = ApiUrl.examDetails(examId: examId);
 
@@ -1223,8 +1232,7 @@ class ApiDataSource extends BaseApiDataSource {
 
   Future<Either<Failure, LoginResponse>> sendFcmToken({
     required String token,
-  }) async
-  {
+  }) async {
     try {
       String url = ApiUrl.notifications;
       final payload = {
@@ -1234,12 +1242,7 @@ class ApiDataSource extends BaseApiDataSource {
         "appVersion": "2.3.2",
       };
 
-      dynamic response = await Request.sendRequest(
-        url,
-        payload,
-        'Post',
-        false,
-      );
+      dynamic response = await Request.sendRequest(url, payload, 'Post', false);
       AppLogger.log.i('FCM PAYLOAD $payload');
       if (response is! DioException) {
         // If status code is success
@@ -1272,11 +1275,9 @@ class ApiDataSource extends BaseApiDataSource {
     }
   }
 
-
-
   Future<Either<Failure, LoginResponse>> notificationUnRegister(
-      String token,
-      ) async {
+    String token,
+  ) async {
     try {
       String url = ApiUrl.notificationUnregister;
 
@@ -1316,7 +1317,6 @@ class ApiDataSource extends BaseApiDataSource {
       return Left(ServerFailure(''));
     }
   }
-
 
   Future<Either<Failure, TokenResponse>> checkTokenExpire() async {
     try {

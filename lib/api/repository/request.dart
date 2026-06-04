@@ -103,7 +103,13 @@ class Request {
 
     // AuthController authController = getx.Get.find();
     // // OtpController otpController = getx.Get.find();
-    Dio dio = Dio();
+    Dio dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 10),
+        sendTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
+    );
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
@@ -174,8 +180,7 @@ class Request {
     Map<String, dynamic> queryParams,
     String method,
     bool isTokenRequired,
-  ) async
-  {
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     String? userId = prefs.getString('userId');
@@ -240,10 +245,10 @@ class Request {
   }
 
   static Future<Response?> sendPatchRequest(
-      String url,
-      Map<String, dynamic> body,
-      bool isTokenRequired,
-      ) async {
+    String url,
+    Map<String, dynamic> body,
+    bool isTokenRequired,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -255,9 +260,9 @@ class Request {
           return handler.next(options);
         },
         onResponse: (
-            Response<dynamic> response,
-            ResponseInterceptorHandler handler,
-            ) {
+          Response<dynamic> response,
+          ResponseInterceptorHandler handler,
+        ) {
           AppLogger.log.i(
             "PATCH Request \n Token: $token \n API: $url \n RESPONSE: ${response.toString()}",
           );
@@ -274,9 +279,7 @@ class Request {
         url,
         data: body,
         options: Options(
-          headers: {
-            "Authorization": token != null ? "Bearer $token" : "",
-          },
+          headers: {"Authorization": token != null ? "Bearer $token" : ""},
           validateStatus: (status) {
             return status != null && status < 500;
           },
@@ -289,5 +292,4 @@ class Request {
       return null;
     }
   }
-
 }

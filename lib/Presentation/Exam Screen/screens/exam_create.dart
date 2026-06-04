@@ -216,7 +216,7 @@ class _ExamCreateState extends State<ExamCreate> {
     return [start, end];
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
     final heading = headingController.text.trim();
     final rangeText = dateRangeController.text.trim();
     final singleDateText = singleDateController.text.trim();
@@ -269,9 +269,8 @@ class _ExamCreateState extends State<ExamCreate> {
       return;
     }
 
-    // all good -> submit
-    controller.createExam(
-      classId: teacherClassController.selectedClass.value?.id ?? 1, // ✅ FIXED
+    await controller.createExam(
+      classId: teacherClassController.selectedClass.value?.id ?? 1,
       heading: heading,
       startDate: startDate,
       endDate: endDate,
